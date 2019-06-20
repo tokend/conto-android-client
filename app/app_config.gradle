@@ -2,12 +2,12 @@ ext {
     // ----- Android params -----
 
     // Application ID - unique identifier of the app in Google Play and on user's device
-    application_id = 'org.tokend.template'
+    application_id = 'org.tokend.loyaltyplus'
     // Version Name - human-readable app version
-    version_name = '1.10.0'
+    version_name = '0.0.1'
     // Version Code - code number for version,
     // must be incremented after each release
-    version_code = 13
+    version_code = 1
 
     // --------------------------
 
@@ -112,18 +112,18 @@ ext {
     // It doesn't affect the display of payment transactions in the history.
     allow_send = true
     //Allow limits - Controls limits functionality availability.
-    allow_limits = true
+    allow_limits = false
     // Allow trade - Controls trading functionality availability.
     // It doesn't affect the display of offer match transactions in the history.
-    allow_trade = true
+    allow_trade = false
     // Allow deposit - Controls deposit functionality availability.
     // It doesn't affect the display of deposit transactions in the history.
-    allow_deposit = true
+    allow_deposit = false
     // Allow withdraw - Controls withdrawal functionality availability.
     // It doesn't affect the display of withdrawal transactions in the history.
-    allow_withdraw = true
+    allow_withdraw = false
     // Allow fees - Controls fees functionality availability.
-    allow_fees = true
+    allow_fees = false
     // Allow explore - Controls explore tokens functionality availability.
     allow_explore = true
     // Allow invest - Controls investment functionality availability.
