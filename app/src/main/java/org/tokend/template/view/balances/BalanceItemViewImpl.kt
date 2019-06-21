@@ -5,7 +5,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.list_item_balance.view.*
 import org.tokend.template.R
-import org.tokend.template.view.util.AssetLogoUtil
+import org.tokend.template.view.util.LogoUtil
 
 class BalanceItemViewImpl(view: View) : BalanceItemView {
     private val logoSize =
@@ -17,6 +17,6 @@ class BalanceItemViewImpl(view: View) : BalanceItemView {
     override val dividerView: View = view.divider_view
 
     override fun displayLogo(logoUrl: String?, assetCode: String) {
-        AssetLogoUtil.setAssetLogo(logoImageView, assetCode, logoUrl, logoSize)
+        LogoUtil.setLogo(logoImageView, assetCode, logoUrl, logoSize)
     }
 }

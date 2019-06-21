@@ -6,7 +6,7 @@ import android.widget.TextView
 import org.jetbrains.anko.find
 import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseViewHolder
-import org.tokend.template.view.util.AssetLogoUtil
+import org.tokend.template.view.util.LogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
 class AssetPairItemViewHolder(
@@ -43,7 +43,7 @@ class AssetPairItemViewHolder(
                 minDecimalDigits = item.quoteAsset.trailingDigits
         )
 
-        AssetLogoUtil.setAssetLogo(baseLogoImageView, item.baseAsset.code,
+        LogoUtil.setLogo(baseLogoImageView, item.baseAsset.code,
                 item.baseAssetLogoUrl, baseLogoSize)
     }
 }

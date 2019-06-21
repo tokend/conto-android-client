@@ -100,6 +100,10 @@ class RepositoryProviderImpl(
         FeesRepository(apiProvider, walletInfoProvider)
     }
 
+    private val companiesRepository: CompaniesRepository by lazy {
+        CompaniesRepository(MemoryOnlyRepositoryCache())
+    }
+
     private val balanceChangesRepositoriesByBalanceId =
             LruCache<String, BalanceChangesRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
@@ -249,6 +253,10 @@ class RepositoryProviderImpl(
             AtomicSwapRequestsRepository(apiProvider, asset,
                     MemoryOnlyRepositoryCache())
         }
+    }
+
+    override fun companies(): CompaniesRepository {
+        return companiesRepository
     }
 
     companion object {

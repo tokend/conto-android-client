@@ -227,7 +227,7 @@ class AuthenticatorSignInActivity : BaseActivity() {
                 .subscribeBy(
                         onComplete = {
                             setResult(Activity.RESULT_OK)
-                            Navigator.from(this).toMainActivity()
+                            Navigator.from(this).toCompaniesActivity()
                         },
                         onError = {
                             errorHandlerFactory.getDefault().handle(it)

@@ -334,9 +334,10 @@ class BalanceDetailsActivity : BaseActivity() {
 
         asset_name_text_view.text = balance.asset.name ?: balance.assetCode
 
-        AssetLogoUtil.setAssetLogo(
+        LogoUtil.setLogo(
                 asset_logo_image_view,
-                balance.asset,
+                balance.asset.code,
+                balance.asset.logoUrl,
                 resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
         )
 

@@ -10,31 +10,24 @@ import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.util.imagetransform.CircleTransform
 
-object AssetLogoUtil {
-    private fun generateAssetLogo(assetCode: String,
-                                  context: Context,
-                                  @Dimension
-                                  logoSize: Int): Drawable {
+object LogoUtil {
+    private fun generateLogo(value: String,
+                             context: Context,
+                             @Dimension
+                             logoSize: Int): Drawable {
         val bitmap = LogoFactory(context).getWithAutoBackground(
-                assetCode,
+                value,
                 logoSize
         )
 
         return BitmapDrawable(context.resources, bitmap)
     }
 
-    fun setAssetLogo(view: ImageView,
-                     asset: AssetRecord,
-                     @Dimension
-                     logoSize: Int) {
-        setAssetLogo(view, asset.code, asset.logoUrl, logoSize)
-    }
-
-    fun setAssetLogo(view: ImageView,
-                     assetCode: String,
-                     logoUrl: String?,
-                     @Dimension
-                     logoSize: Int) {
+    fun setLogo(view: ImageView,
+                value: String,
+                logoUrl: String?,
+                @Dimension
+                logoSize: Int) {
         val context = view.context
         val picasso = Picasso.with(context)
 
@@ -46,7 +39,7 @@ object AssetLogoUtil {
                     .into(view)
         } else {
             picasso.cancelRequest(view)
-            view.setImageDrawable(generateAssetLogo(assetCode, context, logoSize))
+            view.setImageDrawable(generateLogo(value, context, logoSize))
         }
     }
 }
