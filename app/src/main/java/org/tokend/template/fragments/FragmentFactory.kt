@@ -6,6 +6,7 @@ import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.AssetDetailsFragment
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
+import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.movements.view.AccountMovementsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
@@ -124,5 +125,9 @@ class FragmentFactory {
 
     fun getAtomicSwapAsksFragment(assetCode: String? = null): Fragment {
         return AtomicSwapAsksFragment.newInstance(assetCode)
+    }
+
+    fun getCompaniesFragment(): Fragment {
+        return CompaniesFragment()
     }
 }

@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
@@ -49,7 +50,7 @@ import org.tokend.template.view.util.input.SoftInputUtil
 
 class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
-        private const val DEFAULT_FRAGMENT_ID = DashboardFragment.ID
+        private const val DEFAULT_FRAGMENT_ID = CompaniesFragment.ID
     }
 
     private var navigationDrawer: Drawer? = null
@@ -96,6 +97,12 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         )
 
         val items = HashMap<Long, PrimaryDrawerItem>()
+
+        PrimaryDrawerItem()
+                .withName(R.string.companies_title)
+                .withIdentifier(CompaniesFragment.ID)
+                .withIcon(R.drawable.ic_briefcase)
+                .also { items[CompaniesFragment.ID] = it }
 
         PrimaryDrawerItem()
                 .withName(R.string.dashboard_title)
@@ -210,6 +217,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .withTranslucentStatusBar(false)
                 .withSliderBackgroundColorRes(R.color.material_drawer_background)
                 .addDrawerItems(
+                        items[CompaniesFragment.ID],
                         items[DashboardFragment.ID]
                 )
                 .apply {
@@ -280,6 +288,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                     SalesFragment.ID -> factory.getSalesFragment()
                     TradeAssetPairsFragment.ID -> factory.getTradeAssetPairsFragment()
                     PollsFragment.ID -> factory.getPollsFragment()
+                    CompaniesFragment.ID -> factory.getCompaniesFragment()
                     else -> return
                 }
 
