@@ -27,6 +27,7 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
+import org.tokend.template.features.companies.view.CompaniesActivity
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
@@ -174,10 +175,9 @@ class Navigator private constructor() {
         activity?.finish()
     }
 
-    fun toMainActivity() {
+    fun openMainActivity() {
         val intent = context?.intentFor<MainActivity>()
         performIntent(intent)
-        activity?.let { fadeOut(it) }
     }
 
     fun openQrShare(title: String,
@@ -420,5 +420,11 @@ class Navigator private constructor() {
                 SingleFragmentActivity.SCREEN_ID to AtomicSwapAsksFragment.ID
         )
         performIntent(intent)
+    }
+
+    fun toCompaniesActivity() {
+        val intent = context?.intentFor<CompaniesActivity>()
+        performIntent(intent)
+        activity?.let { fadeOut(it) }
     }
 }

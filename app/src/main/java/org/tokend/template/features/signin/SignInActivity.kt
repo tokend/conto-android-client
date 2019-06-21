@@ -221,7 +221,7 @@ class SignInActivity : BaseActivity() {
                 .subscribeBy(
                         onComplete = {
                             canSignIn = false
-                            Navigator.from(this).toMainActivity()
+                            Navigator.from(this).toCompaniesActivity()
                         },
                         onError = {
                             it.printStackTrace()

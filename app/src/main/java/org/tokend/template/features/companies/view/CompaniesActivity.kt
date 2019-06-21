@@ -4,41 +4,30 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
-import android.support.v7.widget.Toolbar
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.subjects.BehaviorSubject
-import kotlinx.android.synthetic.main.fragment_companies.*
-import kotlinx.android.synthetic.main.fragment_polls.*
+import kotlinx.android.synthetic.main.activity_companies.*
 import kotlinx.android.synthetic.main.fragment_polls.swipe_refresh
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.repository.CompaniesRepository
 import org.tokend.template.features.companies.view.adapter.CompanyItemsAdapter
 import org.tokend.template.features.companies.view.adapter.CompanyListItem
-import org.tokend.template.fragments.BaseFragment
-import org.tokend.template.fragments.ToolbarProvider
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.SearchUtil
 import org.tokend.template.view.util.*
-import java.util.*
-import kotlin.collections.ArrayList
 
-class CompaniesFragment : BaseFragment(), ToolbarProvider {
+class CompaniesActivity : BaseActivity() {
 
     private val loadingIndicator = LoadingIndicatorManager(
             showLoading = { swipe_refresh.isRefreshing = true },
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
-
-    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
 
     private val companiesRepository: CompaniesRepository
         get() = repositoryProvider.companies()
@@ -56,11 +45,8 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
             }
         }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_companies, container, false)
-    }
-
-    override fun onInitAllowed() {
+    override fun onCreateAllowed(savedInstanceState: Bundle?) {
+        setContentView(R.layout.activity_companies)
         initToolbar()
         initSwipeRefresh()
         initList()
@@ -70,7 +56,6 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initToolbar() {
-        toolbarSubject.onNext(toolbar)
         toolbar.title = getString(R.string.companies_title)
         ElevationUtil.initScrollElevation(companies_recycler_view, appbar_elevation_view)
         initMenu()
@@ -102,12 +87,12 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initSwipeRefresh() {
-        swipe_refresh.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.accent))
+        swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(true) }
     }
 
     private fun initList() {
-        layoutManager = GridLayoutManager(requireContext(), 1)
+        layoutManager = GridLayoutManager(this, 1)
         companiesAdapter = CompanyItemsAdapter()
         updateListColumnsCount()
 
@@ -124,7 +109,7 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
                 ScrollOnTopItemUpdateAdapterObserver(companies_recycler_view)
         )
         companiesAdapter.onItemClick { _, _ ->
-
+            Navigator.from(this).openMainActivity()
         }
     }
 
@@ -192,14 +177,14 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun updateListColumnsCount() {
-        layoutManager.spanCount = ColumnCalculator.getColumnCount(requireActivity())
+        layoutManager.spanCount = ColumnCalculator.getColumnCount(this)
         companiesAdapter.drawDividers = layoutManager.spanCount == 1
     }
 
-    override fun onBackPressed(): Boolean {
-        return searchItem?.isActionViewExpanded == false.also {
+    override fun onBackPressed() {
+        if (searchItem?.isActionViewExpanded == true) {
             searchItem?.collapseActionView()
-        }
+        } else moveTaskToBack(true)
     }
 
     companion object {
