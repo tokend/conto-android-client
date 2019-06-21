@@ -123,9 +123,6 @@ class RepositoryProviderImpl(
     private val investmentInfoRepositoriesBySaleId =
             LruCache<Long, InvestmentInfoRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
-    private val pollsRepositoriesByOwnerAccountId =
-            LruCache<String, PollsRepository>(MAX_SAME_REPOSITORIES_COUNT)
-
     private val atomicSwapRepositoryByAsset =
             LruCache<String, AtomicSwapRequestsRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
@@ -248,11 +245,9 @@ class RepositoryProviderImpl(
         }
     }
 
-    override fun polls(ownerAccountId: String): PollsRepository {
-        return pollsRepositoriesByOwnerAccountId.getOrPut(ownerAccountId) {
-            PollsRepository(ownerAccountId, apiProvider, walletInfoProvider,
-                    MemoryOnlyRepositoryCache())
-        }
+    override fun polls(): PollsRepository {
+        return PollsRepository(companyId, apiProvider, walletInfoProvider,
+                MemoryOnlyRepositoryCache())
     }
 
     override fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository {

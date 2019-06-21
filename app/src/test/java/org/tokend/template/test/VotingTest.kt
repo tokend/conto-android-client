@@ -35,14 +35,12 @@ class VotingTest {
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 
-        val (_, rootAccount, _) =
+        val (_, _, _) =
                 Util.getVerifiedWallet(email, password, apiProvider, session, repositoryProvider)
 
         createPoll(repositoryProvider, apiProvider, session)
 
-        val pollOwner = rootAccount.accountId
-
-        val repo = repositoryProvider.polls(pollOwner)
+        val repo = repositoryProvider.polls()
 
         repo.updateDeferred().blockingAwait()
 
@@ -86,14 +84,12 @@ class VotingTest {
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 
-        val (_, rootAccount, _) =
+        val (_, _, _) =
                 Util.getVerifiedWallet(email, password, apiProvider, session, repositoryProvider)
 
         createPoll(repositoryProvider, apiProvider, session)
 
-        val pollOwner = rootAccount.accountId
-
-        val repo = repositoryProvider.polls(pollOwner)
+        val repo = repositoryProvider.polls()
 
         repo.updateDeferred().blockingAwait()
 

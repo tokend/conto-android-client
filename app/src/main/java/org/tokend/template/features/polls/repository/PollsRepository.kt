@@ -17,7 +17,7 @@ import org.tokend.template.extensions.mapSuccessful
 import org.tokend.template.features.polls.model.PollRecord
 
 class PollsRepository(
-        private val ownerAccountId: String,
+        private val ownerAccountId: String?,
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         itemsCache: RepositoryCache<PollRecord>

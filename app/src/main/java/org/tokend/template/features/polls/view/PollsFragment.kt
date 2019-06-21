@@ -7,8 +7,6 @@ import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -19,9 +17,6 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.features.polls.logic.AddVoteUseCase
 import org.tokend.template.features.polls.logic.RemoveVoteUseCase
 import org.tokend.template.features.polls.model.PollRecord
@@ -32,11 +27,9 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
-import java.math.BigDecimal
 
 class PollsFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
@@ -50,23 +43,8 @@ class PollsFragment : BaseFragment(), ToolbarProvider {
         arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, true) ?: true
     }
 
-    private val requiredOwnerAccountId: String? by lazy {
-        arguments?.getString(OWNER_ACCOUNT_ID_EXTRA)
-    }
-
-    private val balancesRepository: BalancesRepository
-        get() = repositoryProvider.balances()
-
-    private var currentAsset: AssetRecord? = null
-        set(value) {
-            field = value
-            onAssetChanged()
-        }
-
-    private val pollsRepository: PollsRepository?
-        get() = currentAsset
-                ?.ownerAccountId
-                ?.let { repositoryProvider.polls(it) }
+    private val pollsRepository: PollsRepository
+        get() = repositoryProvider.polls()
 
     private val adapter = PollsAdapter()
 
@@ -76,9 +54,10 @@ class PollsFragment : BaseFragment(), ToolbarProvider {
 
     override fun onInitAllowed() {
         initToolbar()
-        initAssetSelection()
         initSwipeRefresh()
         initList()
+        subscribeToPolls()
+        update()
     }
 
     // region Init
@@ -86,50 +65,12 @@ class PollsFragment : BaseFragment(), ToolbarProvider {
         if (allowToolbar) {
             toolbar.title = getString(R.string.polls_title)
 
-            val dropDownButton = ImageButton(requireContext()).apply {
-                setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_arrow_drop_down))
-                background = null
-
-                setOnClickListener {
-                    openAssetPicker()
-                }
-            }
-
-            toolbar.addView(dropDownButton)
-
             ElevationUtil.initScrollElevation(polls_list, appbar_elevation_view)
         } else {
             appbar_elevation_view.visibility = View.GONE
             appbar.visibility = View.GONE
         }
         toolbarSubject.onNext(toolbar)
-    }
-
-    private fun initAssetSelection() {
-        val requiredOwnerAccountId = this.requiredOwnerAccountId
-
-        val assets = balancesRepository
-                .itemsList
-                .map(BalanceRecord::asset)
-
-        if (requiredOwnerAccountId != null) {
-            assets
-                    .find {
-                        it.ownerAccountId == requiredOwnerAccountId
-                    }
-                    ?.also {
-                        currentAsset = it
-                    }
-        } else {
-            assets.firstOrNull().also { firstAsset ->
-                if (firstAsset != null) {
-                    currentAsset = firstAsset
-                } else {
-                    toolbar.subtitle = null
-                    error_empty_view.showEmpty(R.string.no_assets_found)
-                }
-            }
-        }
     }
 
     private fun initSwipeRefresh() {
@@ -154,70 +95,46 @@ class PollsFragment : BaseFragment(), ToolbarProvider {
 
         error_empty_view.setEmptyDrawable(R.drawable.ic_poll)
         error_empty_view.observeAdapter(adapter, R.string.no_polls_found)
-        error_empty_view.setEmptyViewDenial { pollsRepository?.isNeverUpdated == true }
+        error_empty_view.setEmptyViewDenial { pollsRepository.isNeverUpdated }
     }
     // endregion
 
-    private fun openAssetPicker() {
-        object : BalancePickerBottomDialog(
-                requireContext(),
-                amountFormatter,
-                balanceComparator,
-                balancesRepository
-        ) {
-            // Available amounts are useless on this screen.
-            override fun getAvailableAmount(assetCode: String,
-                                            balance: BalanceRecord?): BigDecimal? = null
-        }
-                .show {
-                    currentAsset = it.source?.asset
-                }
-    }
-
-    private fun onAssetChanged() {
-        toolbar.subtitle = getString(R.string.template_asset, currentAsset?.code.toString())
-        subscribeToPolls()
-        update()
-    }
-
     private fun update(force: Boolean = false) {
         if (!force) {
-            pollsRepository?.updateIfNotFresh()
+            pollsRepository.updateIfNotFresh()
         } else {
-            pollsRepository?.update()
+            pollsRepository.update()
         }
     }
 
-    private var pollsDisposable: Disposable? = null
     private fun subscribeToPolls() {
-        pollsDisposable?.dispose()
+        pollsRepository
+                .itemsSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe(this::displayPolls)
+                .addTo(compositeDisposable)
 
-        val repository = pollsRepository
-                ?: return
+        pollsRepository
+                .loadingSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { loadingIndicator.setLoading(it, "polls") }
+                .addTo(compositeDisposable)
 
-        pollsDisposable = CompositeDisposable(
-                repository
-                        .itemsSubject
-                        .compose(ObservableTransformers.defaultSchedulers())
-                        .subscribe(this::displayPolls),
-                repository
-                        .loadingSubject
-                        .compose(ObservableTransformers.defaultSchedulers())
-                        .subscribe { loadingIndicator.setLoading(it, "polls") },
-                repository
-                        .errorsSubject
-                        .compose(ObservableTransformers.defaultSchedulers())
-                        .subscribe { error ->
-                            if (!adapter.hasData) {
-                                error_empty_view.showError(error,
-                                        errorHandlerFactory.getDefault()) {
-                                    update(true)
-                                }
-                            } else {
-                                errorHandlerFactory.getDefault().handle(error)
-                            }
+        pollsRepository
+                .errorsSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { error ->
+                    if (!adapter.hasData) {
+                        error_empty_view.showError(error,
+                                errorHandlerFactory.getDefault()) {
+                            update(true)
                         }
-        )
+                    } else {
+                        errorHandlerFactory.getDefault().handle(error)
+                    }
+                }
+                .addTo(compositeDisposable)
+
     }
 
     private fun displayPolls(polls: List<PollRecord>) {
