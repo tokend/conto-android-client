@@ -210,6 +210,9 @@
         <activity
             android:name=".features.companies.view.CompaniesActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".features.companies.view.CompanyLoadingActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>
