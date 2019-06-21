@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v4.util.LruCache
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.template.BuildConfig
+import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.converter.DefaultParticipantEffectConverter
 import org.tokend.template.data.repository.*
 import org.tokend.template.data.repository.assets.AssetChartRepository
@@ -30,6 +31,8 @@ import org.tokend.template.features.trade.orderbook.repository.OrderBookReposito
 /**
  * @param context if not specified then android-related repositories
  * will be unavailable
+ * @param company if specified then asset-related repositories
+ * will receive it as a filter criteria
  */
 class RepositoryProviderImpl(
         private val apiProvider: ApiProvider,
@@ -37,6 +40,7 @@ class RepositoryProviderImpl(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         private val context: Context? = null,
+        company: CompanyRecord? = null,
         private val kycStatePersistor: SubmittedKycStatePersistor? = null
 ) : RepositoryProvider {
     private val conversionAssetCode =
@@ -45,8 +49,11 @@ class RepositoryProviderImpl(
             else
                 null
 
+    private val companyId: String? = company?.id
+
     private val balancesRepository: BalancesRepository by lazy {
         BalancesRepository(
+                companyId,
                 apiProvider,
                 walletInfoProvider,
                 urlConfigProvider,
@@ -65,7 +72,7 @@ class RepositoryProviderImpl(
         TfaFactorsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
     }
     private val assetsRepository: AssetsRepository by lazy {
-        AssetsRepository(apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
+        AssetsRepository(companyId, apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
     }
     private val orderBookRepositories =
             LruCache<String, OrderBookRepository>(MAX_SAME_REPOSITORIES_COUNT)
@@ -79,11 +86,11 @@ class RepositoryProviderImpl(
         AccountRepository(apiProvider, walletInfoProvider)
     }
     private val salesRepository: SalesRepository by lazy {
-        SalesRepository(apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+        SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
     }
 
     private val filteredSalesRepository: SalesRepository by lazy {
-        SalesRepository(apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+        SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
     }
 
     private val contactsRepository: ContactsRepository by lazy {

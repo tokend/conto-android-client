@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.CompaniesRepository
 import org.tokend.template.features.companies.view.adapter.CompanyItemsAdapter
 import org.tokend.template.features.companies.view.adapter.CompanyListItem
@@ -108,8 +109,8 @@ class CompaniesActivity : BaseActivity() {
         companiesAdapter.registerAdapterDataObserver(
                 ScrollOnTopItemUpdateAdapterObserver(companies_recycler_view)
         )
-        companiesAdapter.onItemClick { _, _ ->
-            Navigator.from(this).openMainActivity()
+        companiesAdapter.onItemClick { _, item ->
+            item.source?.also(this::onCompanySelected)
         }
     }
 
@@ -169,6 +170,11 @@ class CompaniesActivity : BaseActivity() {
         } else {
             companiesRepository.update()
         }
+    }
+
+    private fun onCompanySelected(company: CompanyRecord) {
+        session.setCompany(company)
+        Navigator.from(this).openMainActivity()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

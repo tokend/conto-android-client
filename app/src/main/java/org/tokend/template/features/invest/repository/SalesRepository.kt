@@ -13,6 +13,7 @@ import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.features.invest.model.SaleRecord
 
 class SalesRepository(
+        private val ownerId: String?,
         private val apiProvider: ApiProvider,
         private val urlConfigProvider: UrlConfigProvider,
         itemsCache: RepositoryCache<SaleRecord>
@@ -23,6 +24,7 @@ class SalesRepository(
 
     override fun getPage(nextCursor: String?): Single<DataPage<SaleRecord>> {
         val requestParams = SalesParams(
+                ownerAccountId = ownerId,
                 name = name,
                 baseAsset = baseAsset,
                 pagingParams = PagingParamsV2(

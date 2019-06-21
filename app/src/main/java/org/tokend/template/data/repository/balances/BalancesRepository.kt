@@ -25,6 +25,8 @@ import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.op_extensions.CreateBalanceOp
 
 class BalancesRepository(
+        // TODO: Apply filter
+        private val assetOwnerId: String?,
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val urlConfigProvider: UrlConfigProvider,

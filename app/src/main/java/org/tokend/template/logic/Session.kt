@@ -1,6 +1,8 @@
 package org.tokend.template.logic
 
 import org.tokend.template.di.providers.AccountProvider
+import org.tokend.template.di.providers.CompanyInfoProvider
+import org.tokend.template.di.providers.CompanyInfoProviderImpl
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.signin.logic.SignInMethod
 import org.tokend.template.logic.persistance.SessionInfoStorage
@@ -12,7 +14,9 @@ class Session(
         walletInfoProvider: WalletInfoProvider,
         accountProvider: AccountProvider,
         private val sessionInfoStorage: SessionInfoStorage? = null
-) : WalletInfoProvider by walletInfoProvider, AccountProvider by accountProvider {
+) : WalletInfoProvider by walletInfoProvider,
+        AccountProvider by accountProvider,
+        CompanyInfoProvider by CompanyInfoProviderImpl() {
 
     /**
      * @returns true if session is expired and so sign out is required
@@ -51,5 +55,6 @@ class Session(
 
         setWalletInfo(null)
         setAccount(null)
+        setCompany(null)
     }
 }
