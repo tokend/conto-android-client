@@ -7,21 +7,13 @@
     android:orientation="vertical"
     tools:context=".features.assets.AssetDetailsActivity">
 
-    <include layout="@layout/appbar_with_tabs" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar" />
+    <include layout="@layout/appbar" />
 
     <FrameLayout
+        android:id="@+id/fragment_container_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/appbar">
-
-        <include layout="@layout/include_appbar_elevation" />
-    </FrameLayout>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>
