@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TokenD Loyalty</string>
+    <string name="app_name">Conto</string>
     <string name="authenticator_app_name">TokenD Android client</string>
 
     <string name="sign_up">Sign up</string>
