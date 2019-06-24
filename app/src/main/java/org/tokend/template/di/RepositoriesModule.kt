@@ -6,13 +6,12 @@ import dagger.Module
 import dagger.Provides
 import org.tokend.template.di.providers.*
 import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
+import javax.inject.Singleton
 
 @Module
 class RepositoriesModule {
-    private var currentProvider: RepositoryProvider? = null
-    private var currentCompanyId: String? = null
-
     @Provides
+    @Singleton
     fun repositoriesProvider(
             apiProvider: ApiProvider,
             walletInfoProvider: WalletInfoProvider,
@@ -22,18 +21,7 @@ class RepositoriesModule {
             context: Context,
             kycStatePersistor: SubmittedKycStatePersistor
     ): RepositoryProvider {
-        val company = companyInfoProvider.getCompany()
-        val currentProvider = this.currentProvider
-
-        return if (currentCompanyId != company?.id
-                || currentProvider == null) {
-            currentCompanyId = company?.id
-
-            RepositoryProviderImpl(apiProvider, walletInfoProvider, urlConfigProvider,
-                    mapper, context, company, kycStatePersistor)
-                    .also { this.currentProvider = it }
-        } else {
-            return currentProvider
-        }
+        return RepositoryProviderImpl(apiProvider, walletInfoProvider, urlConfigProvider,
+                mapper, context, companyInfoProvider, kycStatePersistor)
     }
 }

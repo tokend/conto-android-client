@@ -174,7 +174,7 @@ class CompaniesActivity : BaseActivity() {
 
     private fun onCompanySelected(company: CompanyRecord) {
         session.setCompany(company)
-        Navigator.from(this).openMainActivity()
+        Navigator.from(this).openCompanyLoading()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

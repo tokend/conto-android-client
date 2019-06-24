@@ -17,7 +17,7 @@ class PostSignInManager(
     fun doPostSignIn(): Completable {
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
-                repositoryProvider.balances().updateDeferred()
+                repositoryProvider.companies().updateDeferred()
         )
         val syncActions = listOf<Completable>(
                 // Added actions will be performed on after another in
