@@ -1,7 +1,9 @@
 package org.tokend.template.features.invest.view.fragments
 
 import android.os.Bundle
+import android.view.View
 import kotlinx.android.synthetic.main.fragment_asset_details.*
+import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import org.tokend.template.R
 import org.tokend.template.features.assets.AssetDetailsFragment
 import org.tokend.template.features.invest.logic.InvestmentInfoHolder
@@ -18,6 +20,10 @@ class SaleDetailsFragment : AssetDetailsFragment() {
         sale = (requireActivity() as? InvestmentInfoHolder)
                 ?.sale
                 ?: throw IllegalStateException("Parent activity must hold SaleRecord")
+    }
+
+    override fun initScrollElevation() {
+        appbar_elevation_view.visibility = View.GONE
     }
 
     override fun displaySummary() {

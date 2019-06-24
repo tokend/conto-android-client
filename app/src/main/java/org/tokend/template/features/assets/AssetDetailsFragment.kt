@@ -78,7 +78,8 @@ open class AssetDetailsFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
-        ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
+        initScrollElevation()
+
         getAsset()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .doOnSubscribe { loadingIndicator.show() }
@@ -94,6 +95,10 @@ open class AssetDetailsFragment : BaseFragment() {
                         }
                 )
                 .addTo(compositeDisposable)
+    }
+
+    protected open fun initScrollElevation() {
+        ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
     }
 
     private fun getAsset(): Single<AssetRecord> {
