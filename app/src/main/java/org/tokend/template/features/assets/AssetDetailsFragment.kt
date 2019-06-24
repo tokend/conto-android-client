@@ -78,6 +78,7 @@ open class AssetDetailsFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
+        ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
         getAsset()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .doOnSubscribe { loadingIndicator.show() }
@@ -87,7 +88,6 @@ open class AssetDetailsFragment : BaseFragment() {
                             asset = it
                             displayDetails()
                             initButtons()
-                            ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
                         },
                         onError = {
                             errorHandlerFactory.getDefault().handle(it)

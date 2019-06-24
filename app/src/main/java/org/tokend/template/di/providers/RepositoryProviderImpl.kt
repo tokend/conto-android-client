@@ -111,6 +111,11 @@ class RepositoryProviderImpl(
         CompaniesRepository(MemoryOnlyRepositoryCache())
     }
 
+    private val pollsRepository: PollsRepository by lazy {
+        PollsRepository(companyId, apiProvider, walletInfoProvider,
+                MemoryOnlyRepositoryCache())
+    }
+
     private val balanceChangesRepositoriesByBalanceId =
             LruCache<String, BalanceChangesRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
@@ -246,8 +251,7 @@ class RepositoryProviderImpl(
     }
 
     override fun polls(): PollsRepository {
-        return PollsRepository(companyId, apiProvider, walletInfoProvider,
-                MemoryOnlyRepositoryCache())
+        return pollsRepository
     }
 
     override fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository {
