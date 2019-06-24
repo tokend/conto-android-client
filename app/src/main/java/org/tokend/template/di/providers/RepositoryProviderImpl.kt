@@ -4,7 +4,6 @@ import android.content.Context
 import android.support.v4.util.LruCache
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.template.BuildConfig
-import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.converter.DefaultParticipantEffectConverter
 import org.tokend.template.data.repository.*
 import org.tokend.template.data.repository.assets.AssetChartRepository
@@ -40,7 +39,7 @@ class RepositoryProviderImpl(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         private val context: Context? = null,
-        company: CompanyRecord? = null,
+        private val companyInfoProvider: CompanyInfoProvider? = null,
         private val kycStatePersistor: SubmittedKycStatePersistor? = null
 ) : RepositoryProvider {
     private val conversionAssetCode =
@@ -49,19 +48,11 @@ class RepositoryProviderImpl(
             else
                 null
 
-    private val companyId: String? = company?.id
+    private val companyId: String?
+        get() = companyInfoProvider?.getCompany()?.id
 
-    private val balancesRepository: BalancesRepository by lazy {
-        BalancesRepository(
-                companyId,
-                apiProvider,
-                walletInfoProvider,
-                urlConfigProvider,
-                mapper,
-                conversionAssetCode,
-                MemoryOnlyRepositoryCache()
-        )
-    }
+    private val balancesRepositories =
+            LruCache<String, BalancesRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val accountDetails: AccountDetailsRepository by lazy {
         AccountDetailsRepository(apiProvider)
     }
@@ -71,9 +62,8 @@ class RepositoryProviderImpl(
     private val tfaFactorsRepository: TfaFactorsRepository by lazy {
         TfaFactorsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
     }
-    private val assetsRepository: AssetsRepository by lazy {
-        AssetsRepository(companyId, apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
-    }
+    private val assetsRepositories =
+            LruCache<String, AssetsRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val orderBookRepositories =
             LruCache<String, OrderBookRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val assetPairsRepository: AssetPairsRepository by lazy {
@@ -85,14 +75,10 @@ class RepositoryProviderImpl(
     private val accountRepository: AccountRepository by lazy {
         AccountRepository(apiProvider, walletInfoProvider)
     }
-    private val salesRepository: SalesRepository by lazy {
-        SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
-    }
-
-    private val filteredSalesRepository: SalesRepository by lazy {
-        SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
-    }
-
+    private val salesRepositories =
+            LruCache<String, SalesRepository>(MAX_SAME_REPOSITORIES_COUNT)
+    private val filteredSalesRepositories =
+            LruCache<String, SalesRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val contactsRepository: ContactsRepository by lazy {
         context ?: throw IllegalStateException("This provider has no context " +
                 "required to provide contacts repository")
@@ -130,7 +116,18 @@ class RepositoryProviderImpl(
             LruCache<String, AtomicSwapRequestsRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     override fun balances(): BalancesRepository {
-        return balancesRepository
+        val key = companyId.toString()
+        return balancesRepositories.getOrPut(key) {
+            BalancesRepository(
+                    companyId,
+                    apiProvider,
+                    walletInfoProvider,
+                    urlConfigProvider,
+                    mapper,
+                    conversionAssetCode,
+                    MemoryOnlyRepositoryCache()
+            )
+        }
     }
 
     override fun accountDetails(): AccountDetailsRepository {
@@ -146,7 +143,11 @@ class RepositoryProviderImpl(
     }
 
     override fun assets(): AssetsRepository {
-        return assetsRepository
+        val key = companyId.toString()
+        return assetsRepositories.getOrPut(key) {
+            AssetsRepository(companyId, apiProvider, urlConfigProvider,
+                    mapper, MemoryOnlyRepositoryCache())
+        }
     }
 
     override fun assetPairs(): AssetPairsRepository {
@@ -177,11 +178,17 @@ class RepositoryProviderImpl(
     }
 
     override fun sales(): SalesRepository {
-        return salesRepository
+        val key = companyId.toString()
+        return salesRepositories.getOrPut(key) {
+            SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+        }
     }
 
     override fun filteredSales(): SalesRepository {
-        return filteredSalesRepository
+        val key = companyId.toString()
+        return filteredSalesRepositories.getOrPut(key) {
+            SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+        }
     }
 
     override fun contacts(): ContactsRepository {
