@@ -174,27 +174,30 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
     private fun getProfileHeaderItem(email: String?,
                                      kycState: KycState?): ProfileDrawerItem {
-        val submittedForm = (kycState as? KycState.Submitted<*>)?.formData
-        val approvedType = when (kycState) {
-            is KycState.Submitted.Approved<*> -> {
-                when (submittedForm) {
-                    is SimpleKycForm -> submittedForm.formType
-                    else -> KycFormType.UNKNOWN
-                }
-            }
-            else -> null
-        }
+//        Still here because of temporary company indication solution
+
+//        val submittedForm = (kycState as? KycState.Submitted<*>)?.formData
+//        val approvedType = when (kycState) {
+//            is KycState.Submitted.Approved<*> -> {
+//                when (submittedForm) {
+//                    is SimpleKycForm -> submittedForm.formType
+//                    else -> KycFormType.UNKNOWN
+//                }
+//            }
+//            else -> null
+//        }
         val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)
                 .withName(email)
                 .withEmail(
-                        when {
-                            kycState == null -> getString(R.string.loading_data)
-                            approvedType == null -> getString(R.string.unverified_account)
-                            else -> LocalizedName(this).forKycFormType(approvedType)
-                        }
+//                        when {
+//                            kycState == null -> getString(R.string.loading_data)
+//                            approvedType == null -> getString(R.string.unverified_account)
+//                            else -> LocalizedName(this).forKycFormType(approvedType)
+//                        }
+                        session.getCompany()?.name ?: ""
                 )
                 .apply {
                     avatarUrl?.also { withIcon(it) }
