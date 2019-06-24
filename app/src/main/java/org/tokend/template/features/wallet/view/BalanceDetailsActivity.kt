@@ -204,7 +204,8 @@ class BalanceDetailsActivity : BaseActivity() {
         buy_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_buy_fab))
 
         redeem_fab.onClick {
-            toastManager.short(R.string.redeem)
+            val assetCode = balance?.assetCode ?: return@onClick
+            navigator.openRedemptionCreation(assetCode)
             menu_fab.close(false)
         }
         redeem_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_redeem))
