@@ -38,7 +38,7 @@ interface RepositoryProvider {
     fun assetChart(baseAsset: String, quoteAsset: String): AssetChartRepository
     fun kycState(): KycStateRepository
     fun investmentInfo(sale: SaleRecord): InvestmentInfoRepository
-    fun polls(ownerAccountId: String): PollsRepository
+    fun polls(): PollsRepository
     fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository
     fun companies(): CompaniesRepository
 }
