@@ -13,8 +13,8 @@ class CompaniesRepository(
 
     override fun getItems(): Single<List<CompanyRecord>> {
         return listOf(
-                CompanyRecord("0", "UA Hardware", null),
-                CompanyRecord("1", "Pub Lolek", null),
+                CompanyRecord("GBA4EX43M25UPV4WIE6RRMQOFTWXZZRIPFAI5VPY6Z2ZVVXVWZ6NEOOB", "UA Hardware", null),
+                CompanyRecord("GDLWLDE33BN7SG6V4P63V2HFA56JYRMODESBLR2JJ5F3ITNQDUVKS2JE", "Pub Lolek", null),
                 CompanyRecord("2", "Mama mia santa Maria", null)
         ).toSingle()
                 .delay(1, TimeUnit.SECONDS)
