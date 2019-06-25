@@ -2,6 +2,7 @@ package org.tokend.template.features.redeem.create.logic
 
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
+import io.reactivex.rxkotlin.toSingle
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
@@ -17,6 +18,10 @@ import org.tokend.wallet.xdr.PaymentFeeData
 import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
 import java.math.BigDecimal
 
+/**
+ * Creates [RedemptionRequest] based on payment
+ * transaction addressed to [assetCode] owner account
+ */
 class CreateRedemptionRequestUseCase(
         private val amount: BigDecimal,
         private val assetCode: String,
@@ -24,12 +29,18 @@ class CreateRedemptionRequestUseCase(
         private val walletInfoProvider: WalletInfoProvider,
         private val accountProvider: AccountProvider
 ) {
+    data class Result(
+            val request: RedemptionRequest,
+            val networkParams: NetworkParams
+    )
+
     private lateinit var account: Account
     private lateinit var networkParams: NetworkParams
     private lateinit var senderAccountId: String
     private lateinit var balance: BalanceRecord
+    private lateinit var transaction: Transaction
 
-    fun perform(): Single<RedemptionRequest> {
+    fun perform(): Single<Result> {
         return getNetworkParams()
                 .doOnSuccess { networkParams ->
                     this.networkParams = networkParams
@@ -54,6 +65,15 @@ class CreateRedemptionRequestUseCase(
                 }
                 .flatMap {
                     getTransaction()
+                }
+                .doOnSuccess { transaction ->
+                    this.transaction = transaction
+                }
+                .flatMap {
+                    getRedemptionRequest()
+                }
+                .map { redemptionRequest ->
+                    Result(redemptionRequest, networkParams)
                 }
     }
 
@@ -110,5 +130,11 @@ class CreateRedemptionRequestUseCase(
                 account,
                 Operation.OperationBody.Payment(op)
         )
+    }
+
+    private fun getRedemptionRequest(): Single<RedemptionRequest> {
+        return RedemptionRequest
+                .fromTransaction(transaction, assetCode)
+                .toSingle()
     }
 }
