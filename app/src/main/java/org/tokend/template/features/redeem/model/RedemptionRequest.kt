@@ -67,6 +67,13 @@ class RedemptionRequest(
                             "Redemption transaction must have only a single signature"
                     )
 
+            val salt = transaction.salt
+
+            if (op.reference.toLongOrNull() != salt) {
+                throw IllegalArgumentException("Redemption transaction salt must be equal " +
+                        "to the payment operation reference")
+            }
+
             return RedemptionRequest(
                     sourceAccountId = Base32Check.encodeAccountId(
                             sourceAccountId

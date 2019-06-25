@@ -3,20 +3,22 @@ package org.tokend.template.features.redeem.create.logic
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
+import io.reactivex.schedulers.Schedulers
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.redeem.model.RedemptionRequest
-import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.Account
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
+import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.Fee
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.PaymentFeeData
 import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
 import java.math.BigDecimal
+import kotlin.random.Random
 
 /**
  * Creates [RedemptionRequest] based on payment
@@ -112,6 +114,8 @@ class CreateRedemptionRequestUseCase(
 
         val emptyFee = Fee(0L, 0L, Fee.FeeExt.EmptyVersion())
 
+        val salt = Random.nextLong() and 0xffffffffL
+
         val op = SimplePaymentOp(
                 sourceBalanceId = balance.id,
                 destAccountId = recipientAccountId,
@@ -121,20 +125,23 @@ class CreateRedemptionRequestUseCase(
                         destinationFee = emptyFee,
                         sourcePaysForDest = false,
                         ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
-                )
+                ),
+                reference = salt.toString()
         )
 
-        return TxManager.createSignedTransaction(
-                networkParams,
-                senderAccountId,
-                account,
-                Operation.OperationBody.Payment(op)
-        )
+        return {
+            TransactionBuilder(networkParams, senderAccountId)
+                    .addOperation(Operation.OperationBody.Payment(op))
+                    .setSalt(salt)
+                    .addSigner(account)
+                    .build()
+        }.toSingle().subscribeOn(Schedulers.computation())
     }
 
     private fun getRedemptionRequest(): Single<RedemptionRequest> {
-        return RedemptionRequest
-                .fromTransaction(transaction, assetCode)
-                .toSingle()
+        return {
+            RedemptionRequest
+                    .fromTransaction(transaction, assetCode)
+        }.toSingle()
     }
 }

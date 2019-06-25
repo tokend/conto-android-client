@@ -49,6 +49,7 @@ class RedemptionTest {
         val amount = BigDecimal("1.5")
         val destinationAccountId = Base32Check.encodeAccountId(ByteArray(32))
         val assetCode = "OLE"
+        val salt = 12345L
 
         val emptyFee = Fee(0L, 0L, Fee.FeeExt.EmptyVersion())
 
@@ -60,7 +61,7 @@ class RedemptionTest {
                 ),
                 feeData = PaymentFeeData(emptyFee, emptyFee, false,
                         PaymentFeeData.PaymentFeeDataExt.EmptyVersion()),
-                reference = "",
+                reference = "$salt",
                 subject = "",
                 ext = PaymentOp.PaymentOpExt.EmptyVersion()
         )
@@ -68,9 +69,9 @@ class RedemptionTest {
         val tx = TransactionBuilder(netParams, sourceAccountId)
                 .addOperation(Operation.OperationBody.Payment(op))
                 .addSigner(account)
+                .setSalt(salt)
                 .build()
 
-        val salt = tx.salt
         val timeBounds = tx.timeBounds
 
         val request = RedemptionRequest.fromTransaction(tx, assetCode)
