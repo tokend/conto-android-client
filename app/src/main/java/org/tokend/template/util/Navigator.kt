@@ -46,6 +46,8 @@ import org.tokend.template.features.offers.view.details.PendingOfferDetailsActiv
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.features.recovery.RecoveryActivity
 import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
+import org.tokend.template.features.redeem.view.ConfirmRedemptionActivity
+import org.tokend.template.features.redeem.view.ScanRedemptionActivity
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -441,5 +443,21 @@ class Navigator private constructor() {
                 CreateRedemptionActivity.ASSET_CODE_EXTRA to assetCode
         )
         performIntent(intent)
+    }
+
+    fun openScanRedemption(balanceId: String) {
+        val intent = context?.intentFor<ScanRedemptionActivity>(
+                ScanRedemptionActivity.EXTRA_BALANCE_ID to balanceId
+        )
+        performIntent(intent)
+    }
+
+    fun toAcceptRedemption(balanceId: String, request: String) {
+        val intent = context?.intentFor<ConfirmRedemptionActivity>(
+                ConfirmRedemptionActivity.EXTRA_BALANCE_ID to balanceId,
+                ConfirmRedemptionActivity.EXTRA_REDEMPTION to request
+        )
+        performIntent(intent)
+        activity?.let { fadeOut(it) }
     }
 }

@@ -417,4 +417,7 @@
     <string name="redeem">Redeem</string>
     <string name="share_redemption_request">Share redemption request</string>
     <string name="template_redemption_qr_explanation_amount">Use this QR code to redeem %1$s</string>
+    <string name="redemption_title">Redemption</string>
+    <string name="error_different_asset">Request contains different asset</string>
+    <string name="tx_requestor">Requestor</string>
 </resources>

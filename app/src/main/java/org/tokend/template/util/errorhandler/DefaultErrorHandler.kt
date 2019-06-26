@@ -3,6 +3,8 @@ package org.tokend.template.util.errorhandler
 import android.content.Context
 import org.tokend.sdk.api.transactions.model.TransactionFailedException
 import org.tokend.template.R
+import org.tokend.template.features.redeem.view.ConfirmRedemptionActivity
+import org.tokend.template.features.redeem.view.ScanRedemptionActivity
 import org.tokend.template.view.ToastManager
 import retrofit2.HttpException
 import java.io.IOException
@@ -50,6 +52,10 @@ open class DefaultErrorHandler(
             error is TransactionFailedException -> {
                 errorLogger?.log(error)
                 getTransactionFailedMessage(error)
+            }
+            error is ScanRedemptionActivity.WrongAssetException -> {
+                errorLogger?.log(error)
+                context.getString(R.string.error_different_asset)
             }
             else -> {
                 errorLogger?.log(error)
