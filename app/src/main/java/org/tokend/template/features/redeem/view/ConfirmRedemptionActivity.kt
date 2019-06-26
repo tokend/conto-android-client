@@ -18,11 +18,9 @@ import org.tokend.sdk.utils.extentions.decodeBase64
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.features.redeem.logic.ConfirmRedemptionRequestUseCase
 import org.tokend.template.features.redeem.model.RedemptionRequest
-import org.tokend.template.features.wallet.details.PaymentDetailsActivity
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem

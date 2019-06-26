@@ -420,4 +420,5 @@
     <string name="redemption_title">Redemption</string>
     <string name="error_different_asset">Request contains different asset</string>
     <string name="tx_requestor">Requestor</string>
+    <string name="accept_redemption">Accept redemption</string>
 </resources>
