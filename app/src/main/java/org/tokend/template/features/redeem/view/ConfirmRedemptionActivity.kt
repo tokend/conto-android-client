@@ -29,7 +29,6 @@ import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.util.CopyDataDialogFactory
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.ProgressDialogFactory
-import org.tokend.wallet.NetworkParams
 import java.math.BigDecimal
 
 class ConfirmRedemptionActivity : BaseActivity() {
@@ -43,14 +42,9 @@ class ConfirmRedemptionActivity : BaseActivity() {
                 .find { it.id == balanceId }
                 ?.asset
 
-    private val networkParams: NetworkParams?
-        get() = repositoryProvider
-                .systemInfo()
-                .item?.toNetworkParams()
-
     private val formattedId: String by lazy {
         val id = request.sourceAccountId
-        "${id.substring(0..3)}…${id.substring(id.length-4 until id.length)}"
+        "${id.substring(0..3)}…${id.substring(id.length - 4 until id.length)}"
     }
 
     private lateinit var balanceId: String
@@ -64,11 +58,40 @@ class ConfirmRedemptionActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_balance_change_confirmation)
 
-        balanceId = intent.getStringExtra(EXTRA_BALANCE_ID) ?: return
-        val requestString = intent.getStringExtra(EXTRA_REDEMPTION) ?: return
-        networkParams?.let {
-            request = RedemptionRequest.fromSerialized(it, requestString.decodeBase64())
-        } ?: return
+        val errorHandler = errorHandlerFactory.getDefault()
+
+        val balanceId = intent.getStringExtra(EXTRA_BALANCE_ID)
+        if (balanceId == null) {
+            errorHandler.handle(IllegalArgumentException(
+                    "No $EXTRA_BALANCE_ID specified"
+            ))
+            finish()
+            return
+        }
+        this.balanceId = balanceId
+
+        val requestString = intent.getStringExtra(EXTRA_REDEMPTION)
+        if (requestString == null) {
+            errorHandler.handle(IllegalArgumentException(
+                    "No $EXTRA_REDEMPTION specified"
+            ))
+            finish()
+            return
+        }
+
+        try {
+            val networkParams = repositoryProvider
+                    .systemInfo()
+                    .item
+                    ?.toNetworkParams()
+                    ?: throw IllegalArgumentException("No loaded network params found")
+
+            request = RedemptionRequest.fromSerialized(networkParams, requestString.decodeBase64())
+        } catch (e: Exception) {
+            errorHandler.handle(e)
+            finish()
+            return
+        }
 
         initViews()
         displayDetails()

@@ -38,7 +38,16 @@ class ScanRedemptionActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_scan_redemption)
 
-        balanceId = intent.getStringExtra(EXTRA_BALANCE_ID) ?: return
+        val balanceId = intent.getStringExtra(EXTRA_BALANCE_ID)
+        if (balanceId == null) {
+            errorHandlerFactory.getDefault().handle(
+                    IllegalArgumentException("No $EXTRA_BALANCE_ID specified")
+            )
+            finish()
+            return
+        }
+        this.balanceId = balanceId
+
         tryOpenQrScanner()
     }
 
@@ -99,9 +108,8 @@ class ScanRedemptionActivity : BaseActivity() {
             finish()
         }
 
-        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
-            onScannerResult(it)
-        }
+        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
+                ?.also(this::onScannerResult)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
