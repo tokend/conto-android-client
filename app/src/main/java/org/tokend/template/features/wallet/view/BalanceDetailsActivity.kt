@@ -2,6 +2,7 @@ package org.tokend.template.features.wallet.view
 
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
@@ -216,7 +217,7 @@ class BalanceDetailsActivity : BaseActivity() {
             navigator.openScanRedemption(balanceId)
             menu_fab.close(false)
         }
-        accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_redeem))
+        accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_qrcode_fab))
     }
 
     private val hideFabScrollListener =
