@@ -421,4 +421,5 @@
     <string name="error_different_asset">Request contains different asset</string>
     <string name="tx_requestor">Requestor</string>
     <string name="accept_redemption">Accept redemption</string>
+    <string name="successfully_accepted_redemption">Redemption has been accepted</string>
 </resources>

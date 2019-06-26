@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_change_confirmation.*
-import kotlinx.android.synthetic.main.appbar_with_balance_change_main_data.appbar
+import kotlinx.android.synthetic.main.appbar_with_balance_change_main_data.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_balance_change_main_data.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -122,7 +122,8 @@ class ConfirmRedemptionActivity : BaseActivity() {
                 .doOnTerminate { dialog.dismiss() }
                 .subscribeBy(
                         onComplete = {
-
+                            toastManager.short(R.string.successfully_accepted_redemption)
+                            finish()
                         },
                         onError = {
                             errorHandlerFactory.getDefault().handle(it)
