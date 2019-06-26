@@ -1,4 +1,4 @@
-package org.tokend.template.features.redeem.view
+package org.tokend.template.features.redeem.accept.view
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -19,7 +19,7 @@ import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.balances.BalancesRepository
-import org.tokend.template.features.redeem.logic.ConfirmRedemptionRequestUseCase
+import org.tokend.template.features.redeem.accept.logic.ConfirmRedemptionRequestUseCase
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.template.util.ObservableTransformers

@@ -1,4 +1,4 @@
-package org.tokend.template.features.redeem.view
+package org.tokend.template.features.redeem.accept.view
 
 import android.Manifest
 import android.app.Activity

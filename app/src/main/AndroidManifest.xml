@@ -218,10 +218,10 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
-            android:name=".features.redeem.view.ScanRedemptionActivity"
+            android:name=".features.redeem.accept.view.ScanRedemptionActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".features.redeem.view.ConfirmRedemptionActivity"
+            android:name=".features.redeem.accept.view.ConfirmRedemptionActivity"
             android:configChanges="orientation|screenSize" />
     </application>
 

@@ -1,4 +1,4 @@
-package org.tokend.template.features.redeem.logic
+package org.tokend.template.features.redeem.accept.logic
 
 import io.reactivex.Completable
 import io.reactivex.Single
