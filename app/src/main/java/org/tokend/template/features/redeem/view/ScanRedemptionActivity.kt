@@ -6,17 +6,18 @@ import android.content.Intent
 import android.os.Bundle
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import org.spongycastle.util.encoders.DecoderException
 import org.tokend.sdk.utils.extentions.decodeBase64
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.features.redeem.model.RedemptionRequest
+import org.tokend.template.features.redeem.model.RedemptionRequestFormatException
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
-import org.tokend.template.view.util.ProgressDialogFactory
 
 class ScanRedemptionActivity : BaseActivity() {
 
@@ -66,12 +67,29 @@ class ScanRedemptionActivity : BaseActivity() {
                         onComplete = {
                             Navigator.from(this).toAcceptRedemption(balanceId, result)
                         },
-                        onError = {
-                            errorHandlerFactory.getDefault().handle(it)
-                            tryOpenQrScanner()
-                        }
+                        onError = this::onRequestParsingError
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onRequestParsingError(error: Throwable) {
+        when (error) {
+            is WrongAssetException ->
+                toastManager.short(
+                        getString(
+                                R.string.template_error_redemption_request_asset_mismatch,
+                                asset?.code
+                        )
+                )
+            is RedemptionRequestFormatException,
+            is DecoderException -> {
+                toastManager.short(R.string.error_invalid_redemption_request)
+                error.cause?.printStackTrace()
+            }
+            else ->
+                errorHandlerFactory.getDefault().handle(error)
+        }
+        tryOpenQrScanner()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

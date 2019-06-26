@@ -8,7 +8,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.Serializable
 import java.math.BigDecimal
 
 /**
@@ -89,28 +88,32 @@ class RedemptionRequest(
 
         fun fromSerialized(networkParams: NetworkParams,
                            serializedRequest: ByteArray): RedemptionRequest {
-            DataInputStream(ByteArrayInputStream(serializedRequest)).use { stream ->
-                return RedemptionRequest(
-                        sourceAccountId = Base32Check.encodeAccountId(
-                                ByteArray(32).also { stream.read(it) }
-                        ),
-                        assetCode = String(
-                                ByteArray(stream.readInt()).also { stream.read(it) },
-                                STRING_CHARSET
-                        ),
-                        amount = networkParams.amountFromPrecised(stream.readLong()),
-                        salt = stream.readLong(),
-                        timeBounds = TimeBounds(
-                                minTime = stream.readLong(),
-                                maxTime = stream.readLong()
-                        ),
-                        signature = DecoratedSignature(
-                                hint = XdrByteArrayFixed4(
-                                        ByteArray(4).also { stream.read(it) }
-                                ),
-                                signature = ByteArray(stream.available()).also { stream.read(it) }
-                        )
-                )
+            try {
+                DataInputStream(ByteArrayInputStream(serializedRequest)).use { stream ->
+                    return RedemptionRequest(
+                            sourceAccountId = Base32Check.encodeAccountId(
+                                    ByteArray(32).also { stream.read(it) }
+                            ),
+                            assetCode = String(
+                                    ByteArray(stream.readInt()).also { stream.read(it) },
+                                    STRING_CHARSET
+                            ),
+                            amount = networkParams.amountFromPrecised(stream.readLong()),
+                            salt = stream.readLong(),
+                            timeBounds = TimeBounds(
+                                    minTime = stream.readLong(),
+                                    maxTime = stream.readLong()
+                            ),
+                            signature = DecoratedSignature(
+                                    hint = XdrByteArrayFixed4(
+                                            ByteArray(4).also { stream.read(it) }
+                                    ),
+                                    signature = ByteArray(stream.available()).also { stream.read(it) }
+                            )
+                    )
+                }
+            } catch (e: Exception) {
+                throw RedemptionRequestFormatException(e)
             }
         }
     }
