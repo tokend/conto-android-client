@@ -25,7 +25,6 @@ import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.op_extensions.CreateBalanceOp
 
 class BalancesRepository(
-        // TODO: Apply filter
         private val assetOwnerId: String?,
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
@@ -80,10 +79,16 @@ class BalancesRepository(
                 .toSingle()
                 .map { convertedBalances ->
                     conversionAsset = SimpleAsset(convertedBalances.asset)
-                    convertedBalances.states.mapSuccessful {
-                        BalanceRecord(it, urlConfigProvider.getConfig(),
-                                mapper, conversionAsset)
-                    }
+                    convertedBalances
+                            .states
+                            .filter {
+                                assetOwnerId == null ||
+                                        it.balance.asset.owner.id == assetOwnerId
+                            }
+                            .mapSuccessful {
+                                BalanceRecord(it, urlConfigProvider.getConfig(),
+                                        mapper, conversionAsset)
+                            }
                 }
     }
 
@@ -95,9 +100,14 @@ class BalancesRepository(
                 .getBalances(accountId)
                 .toSingle()
                 .map { sourceList ->
-                    sourceList.mapSuccessful {
-                        BalanceRecord(it, urlConfigProvider.getConfig(), mapper)
-                    }
+                    sourceList
+                            .filter {
+                                assetOwnerId == null ||
+                                        it.asset.owner.id == assetOwnerId
+                            }
+                            .mapSuccessful {
+                                BalanceRecord(it, urlConfigProvider.getConfig(), mapper)
+                            }
                 }
     }
 
