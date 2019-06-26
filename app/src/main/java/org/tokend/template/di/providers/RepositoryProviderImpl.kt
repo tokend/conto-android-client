@@ -23,6 +23,7 @@ import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
 import org.tokend.template.features.offers.repository.OffersCache
 import org.tokend.template.features.offers.repository.OffersRepository
+import org.tokend.template.features.polls.repository.PollsCache
 import org.tokend.template.features.polls.repository.PollsRepository
 import org.tokend.template.features.send.recipient.repository.ContactsRepository
 import org.tokend.template.features.trade.orderbook.repository.OrderBookRepository
@@ -258,8 +259,7 @@ class RepositoryProviderImpl(
     override fun polls(): PollsRepository {
         val key = companyId.toString()
         return pollsRepositories.getOrPut(key) {
-            PollsRepository(companyId, apiProvider, walletInfoProvider,
-                    MemoryOnlyRepositoryCache())
+            PollsRepository(companyId, apiProvider, walletInfoProvider, PollsCache())
         }
     }
 

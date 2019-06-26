@@ -15,14 +15,10 @@ import org.tokend.template.view.adapter.base.BaseViewHolder
 class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
     private val context = view.context
     private val subjectTextView: TextView = view.findViewById(R.id.subject_text_view)
+    private val endedHintTextView: TextView = view.findViewById(R.id.ended_hint_text_view)
     private val choicesLayout: ViewGroup = view.findViewById(R.id.choices_layout)
     private val actionButton: TextView = view.findViewById(R.id.vote_button)
     private val actionButtonPlaceholder: View = view.findViewById(R.id.button_placeholder)
-
-    private val choiceDefaultBackground =
-            ContextCompat.getDrawable(context, R.drawable.poll_choice_background)
-    private val choiceSelectedBackground =
-            ContextCompat.getDrawable(context, R.drawable.poll_choice_selected_background)
 
     private val actionButtonVoteTitle =
             context.getString(R.string.vote_action)
@@ -39,6 +35,7 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
     fun bindWithActionListener(item: PollListItem,
                                actionListener: PollActionListener?) {
         subjectTextView.text = item.subject
+        endedHintTextView.visibility = if (item.isEnded) View.VISIBLE else View.GONE
 
         val themedHintTextContext = ContextThemeWrapper(context, R.style.HintText)
 
@@ -96,9 +93,9 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
 
             choiceView.background =
                     if (choiceIndex == currentChoice)
-                        choiceSelectedBackground
+                        ContextCompat.getDrawable(context, R.drawable.poll_choice_selected_background)
                     else
-                        choiceDefaultBackground
+                        ContextCompat.getDrawable(context, R.drawable.poll_choice_background)
 
             val resultData = item.choices.getOrNull(choiceIndex)?.result
             choiceView.background.level =
@@ -112,7 +109,7 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
     private fun updateActionButtonState(currentChoice: Int?,
                                         item: PollListItem,
                                         actionListener: (PollActionListener)?) {
-        if (item.hasResults) {
+        if (item.hasResults || item.isEnded) {
             actionButton.visibility = View.GONE
             actionButtonPlaceholder.visibility = View.VISIBLE
             return

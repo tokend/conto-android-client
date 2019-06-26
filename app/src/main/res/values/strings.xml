@@ -216,8 +216,9 @@
     <string name="no_addresses_in_pool_title">No available addresses</string>
     <string name="no_addresses_in_pool_explanation">No addresses are currently available
         for this asset. Try again later or contact support</string>
-    <string name="template_deposit_address_with_expiration">Deposit %1$s:\n%2$s\nExpires at %3$s</string>
     <string name="template_deposit_address">Deposit %1$s:\n%2$s</string>
+    <string name="template_deposit_payload">\nPayload: %1$s</string>
+    <string name="template_deposit_expiration">\nExpires at %1$s</string>
 
     <string name="chart_highlight_at_hint">%1$s at %2$s</string>
     <string name="since_last_time_hint">since last %1$s</string>
@@ -423,4 +424,7 @@
     <string name="accept_redemption">Accept redemption</string>
     <string name="successfully_accepted_redemption">Redemption has been accepted</string>
     <string name="error_invalid_redemption_request">Invalid redemption request. Try again</string>
+    <string name="address_payload">Payload</string>
+    <string name="poll_ended">Ended</string>
+    <string name="you_have_no_balances">You have no balances yet</string>
 </resources>
