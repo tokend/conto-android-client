@@ -2,7 +2,6 @@ package org.tokend.template.features.wallet.view
 
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
@@ -137,9 +136,8 @@ class BalanceDetailsActivity : BaseActivity() {
         val canSend = asset?.isTransferable == true
         val canBuy = asset?.canBeBaseForAtomicSwap == true
         val canRedeem = true
-        val canAcceptRedemption = asset?.ownerAccountId == accountProvider.getAccount()?.accountId
 
-        if (!canWithdraw && !canDeposit && !canSend && !canBuy && !canRedeem && !canAcceptRedemption) {
+        if (!canWithdraw && !canDeposit && !canSend && !canBuy && !canRedeem) {
             menu_fab.visibility = View.GONE
             menu_fab.isEnabled = false
             return
@@ -153,7 +151,6 @@ class BalanceDetailsActivity : BaseActivity() {
             receive_fab.isEnabled = canSend
             buy_fab.isEnabled = canBuy
             redeem_fab.isEnabled = canRedeem
-            accept_redemption_fab.isEnabled = canAcceptRedemption
         }
 
         val navigator = Navigator.from(this)
@@ -217,7 +214,11 @@ class BalanceDetailsActivity : BaseActivity() {
             navigator.openScanRedemption(balanceId)
             menu_fab.close(false)
         }
-        accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_qrcode_fab))
+        accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_qr_code_scan_fab))
+        val canAcceptRedemption = asset?.ownerAccountId == accountProvider.getAccount()?.accountId
+        if (!canAcceptRedemption) {
+            menu_fab.removeMenuButton(accept_redemption_fab)
+        }
     }
 
     private val hideFabScrollListener =
