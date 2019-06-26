@@ -5,35 +5,39 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
-import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.send.model.PaymentFee
-import org.tokend.template.features.send.model.PaymentRecipient
-import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.PaymentFeeData
-import org.tokend.wallet.xdr.TransactionEnvelope
 import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
 import java.math.BigDecimal
-import java.util.concurrent.TimeUnit
 
 class ConfirmRedemptionRequestUseCase(
         private val request: RedemptionRequest,
-        private val balanceId: String,
         private val repositoryProvider: RepositoryProvider,
         private val walletInfoProvider: WalletInfoProvider,
-        private val apiProvider: ApiProvider
+        private val apiProvider: ApiProvider,
+        private val txManager: TxManager
 ) {
+    private val balanceId = repositoryProvider
+            .balances()
+            .itemsList
+            .find { it.assetCode == request.assetCode }
+            ?.id
+
     private lateinit var networkParams: NetworkParams
     private lateinit var senderBalanceId: String
+    private lateinit var transaction: Transaction
 
     fun perform(): Completable {
         return getNetworkParams()
@@ -49,12 +53,11 @@ class ConfirmRedemptionRequestUseCase(
                 .flatMap {
                     getTransaction()
                 }
-                .flatMap { transactionEnvelope ->
-                    apiProvider.getApi()
-                            .transactions
-                            .submit(transactionEnvelope)
-                            .toSingle()
-                            .delay(1, TimeUnit.SECONDS)
+                .doOnSuccess { transaction ->
+                    this.transaction = transaction
+                }
+                .flatMap {
+                    submitTransaction()
                 }
                 .doOnSuccess {
                     updateRepositories()
@@ -88,7 +91,7 @@ class ConfirmRedemptionRequestUseCase(
                 ))
     }
 
-    private fun getTransaction(): Single<TransactionEnvelope> {
+    private fun getTransaction(): Single<Transaction> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Single.error(IllegalStateException("Missing account ID"))
 
@@ -116,17 +119,21 @@ class ConfirmRedemptionRequestUseCase(
                     .setTimeBounds(request.timeBounds)
                     .build()
 
-            val transactionEnvelope = transaction.getEnvelope().apply {
-                signatures = arrayOf(request.signature)
-            }
+            transaction.addSignature(request.signature)
 
-            Single.just(transactionEnvelope)
+            Single.just(transaction)
         }.subscribeOn(Schedulers.newThread())
+    }
+
+    private fun submitTransaction(): Single<SubmitTransactionResponse> {
+        return txManager.submit(transaction)
     }
 
     private fun updateRepositories() {
         repositoryProvider.balances().updateIfEverUpdated()
-        repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()
+        if (balanceId != null) {
+            repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()
+        }
         repositoryProvider.balanceChanges(null).updateIfEverUpdated()
     }
 }

@@ -21,6 +21,7 @@ import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.features.redeem.logic.ConfirmRedemptionRequestUseCase
 import org.tokend.template.features.redeem.model.RedemptionRequest
+import org.tokend.template.logic.transactions.TxManager
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
@@ -111,10 +112,10 @@ class ConfirmRedemptionActivity : BaseActivity() {
 
         ConfirmRedemptionRequestUseCase(
                 request,
-                balanceId,
                 repositoryProvider,
                 walletInfoProvider,
-                apiProvider
+                apiProvider,
+                TxManager(apiProvider)
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
