@@ -1,6 +1,7 @@
 package org.tokend.template.activities
 
 import android.content.res.Configuration
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -175,50 +176,24 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .withOnlyMainProfileImageVisible(true)
                 .withCurrentProfileHiddenInList(true)
                 .withOnAccountHeaderListener { view, _, isCurrent ->
-                    return@withOnAccountHeaderListener if (isCurrent) {
+                    if (isCurrent) {
                         openAccountIdShare()
-                        true
                     } else {
                         (view.tag as? CompanyRecord)?.also(this::switchToAnotherCompany)
-                        false
                     }
+                    false
                 }
-//                .withOnAccountHeaderListener { _, _, _ ->
-//                    openAccountIdShare()
-//                    true
-//                }
                 .build()
-//                .apply {
-//                    view.findViewById<View>(R.id.material_drawer_account_header)
-//                            .setOnClickListener { openAccountIdShare() }
-//                }
     }
 
     private fun getProfileHeaderItem(email: String?,
                                      kycState: KycState?): ProfileDrawerItem {
-//        Still here because of temporary company indication solution
-
-//        val submittedForm = (kycState as? KycState.Submitted<*>)?.formData
-//        val approvedType = when (kycState) {
-//            is KycState.Submitted.Approved<*> -> {
-//                when (submittedForm) {
-//                    is SimpleKycForm -> submittedForm.formType
-//                    else -> KycFormType.UNKNOWN
-//                }
-//            }
-//            else -> null
-//        }
         val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)
                 .withName(email)
                 .withEmail(
-//                        when {
-//                            kycState == null -> getString(R.string.loading_data)
-//                            approvedType == null -> getString(R.string.unverified_account)
-//                            else -> LocalizedName(this).forKycFormType(approvedType)
-//                        }
                         session.getCompany()?.name ?: ""
                 )
                 .apply {
@@ -234,7 +209,13 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                             .withEmail(company.name)
                             .withIdentifier(company.hashCode().toLong())
                             .withSelectable(false)
-                            .withPostOnBindViewListener { drawerItem, view ->
+                            .withTypeface(
+                                    if (session.getCompany() == company)
+                                        Typeface.DEFAULT_BOLD
+                                    else
+                                        Typeface.DEFAULT
+                            )
+                            .withPostOnBindViewListener { _, view ->
                                 view.tag = company
                             }
                             .apply {
@@ -349,10 +330,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
     private fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-
         Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
-
-        navigationDrawer?.closeDrawer()
     }
 
     private var fragmentToolbarDisposable: Disposable? = null
