@@ -435,13 +435,9 @@ class Navigator private constructor() {
         activity?.let { fadeOut(it) }
     }
 
-    fun openCompanyLoading() {
+    fun toCompanyLoading() {
         val intent = context?.intentFor<CompanyLoadingActivity>()
         performIntent(intent)
-    }
-
-    fun toCompanyLoading() {
-        openCompanyLoading()
         activity?.finish()
     }
 

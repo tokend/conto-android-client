@@ -174,7 +174,7 @@ class CompaniesActivity : BaseActivity() {
 
     private fun onCompanySelected(company: CompanyRecord) {
         session.setCompany(company)
-        Navigator.from(this).openCompanyLoading()
+        Navigator.from(this).toCompanyLoading()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -190,7 +190,9 @@ class CompaniesActivity : BaseActivity() {
     override fun onBackPressed() {
         if (searchItem?.isActionViewExpanded == true) {
             searchItem?.collapseActionView()
-        } else moveTaskToBack(true)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     companion object {
