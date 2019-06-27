@@ -22,13 +22,14 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_main.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
+import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.data.repository.CompaniesRepository
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycState
-import org.tokend.template.features.kyc.model.form.KycFormType
-import org.tokend.template.features.kyc.model.form.SimpleKycForm
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -43,7 +44,6 @@ import org.tokend.template.logic.wallet.WalletEventsListener
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
-import org.tokend.template.view.util.LocalizedName
 import org.tokend.template.view.util.PicassoDrawerImageLoader
 import org.tokend.template.view.util.input.SoftInputUtil
 
@@ -68,6 +68,14 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
     private val kycStateRepository: KycStateRepository
         get() = repositoryProvider.kycState()
+
+    private val companiesRepository: CompaniesRepository
+        get() = repositoryProvider.companies()
+
+    private val logoFactory = LogoFactory(this)
+    private val companyLogoSize: Int by lazy {
+        resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon)
+    }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
@@ -160,16 +168,30 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .withSelectionListEnabledForSingleProfile(false)
                 .withProfileImagesVisible(true)
                 .withDividerBelowHeader(true)
-                .addProfiles(getProfileHeaderItem(email, null))
-                .withOnAccountHeaderListener { _, _, _ ->
-                    openAccountIdShare()
-                    true
+                .addProfiles(
+                        getProfileHeaderItem(email, null),
+                        *getCompaniesProfileItems().toTypedArray()
+                )
+                .withOnlyMainProfileImageVisible(true)
+                .withCurrentProfileHiddenInList(true)
+                .withOnAccountHeaderListener { view, _, isCurrent ->
+                    return@withOnAccountHeaderListener if (isCurrent) {
+                        openAccountIdShare()
+                        true
+                    } else {
+                        (view.tag as? CompanyRecord)?.also(this::switchToAnotherCompany)
+                        false
+                    }
                 }
+//                .withOnAccountHeaderListener { _, _, _ ->
+//                    openAccountIdShare()
+//                    true
+//                }
                 .build()
-                .apply {
-                    view.findViewById<View>(R.id.material_drawer_account_header)
-                            .setOnClickListener { openAccountIdShare() }
-                }
+//                .apply {
+//                    view.findViewById<View>(R.id.material_drawer_account_header)
+//                            .setOnClickListener { openAccountIdShare() }
+//                }
     }
 
     private fun getProfileHeaderItem(email: String?,
@@ -201,6 +223,32 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 )
                 .apply {
                     avatarUrl?.also { withIcon(it) }
+                }
+    }
+
+    private fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> {
+        return companiesRepository
+                .itemsList
+                .map { company ->
+                    ProfileDrawerItem()
+                            .withEmail(company.name)
+                            .withIdentifier(company.hashCode().toLong())
+                            .withSelectable(false)
+                            .withPostOnBindViewListener { drawerItem, view ->
+                                view.tag = company
+                            }
+                            .apply {
+                                if (company.logoUrl != null) {
+                                    withIcon(company.logoUrl)
+                                } else {
+                                    withIcon(
+                                            logoFactory.getWithAutoBackground(
+                                                    company.name,
+                                                    companyLogoSize
+                                            )
+                                    )
+                                }
+                            }
                 }
     }
 
@@ -348,6 +396,11 @@ class MainActivity : BaseActivity(), WalletEventsListener {
             toolbar?.setNavigationIcon(R.drawable.ic_menu)
             side_shadow_view.visibility = View.GONE
         }
+    }
+
+    private fun switchToAnotherCompany(company: CompanyRecord) {
+        session.setCompany(company)
+        Navigator.from(this).toCompanyLoading()
     }
 
     override fun onBackPressed() {
