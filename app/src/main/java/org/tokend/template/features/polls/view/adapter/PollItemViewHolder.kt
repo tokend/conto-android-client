@@ -22,8 +22,6 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
 
     private val actionButtonVoteTitle =
             context.getString(R.string.vote_action)
-    private val actionButtonRemoveVoteTitle =
-            context.getString(R.string.remove_vote_action)
 
     private val votesCountTopMargin =
             context.resources.getDimensionPixelSize(R.dimen.quarter_standard_margin)
@@ -36,6 +34,7 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
                                actionListener: PollActionListener?) {
         subjectTextView.text = item.subject
         endedHintTextView.visibility = if (item.isEnded) View.VISIBLE else View.GONE
+        actionButton.text = actionButtonVoteTitle
 
         val themedHintTextContext = ContextThemeWrapper(context, R.style.HintText)
 
@@ -112,7 +111,7 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
     private fun updateActionButtonState(currentChoice: Int?,
                                         item: PollListItem,
                                         actionListener: (PollActionListener)?) {
-        if (item.hasResults || item.isEnded) {
+        if (item.hasResults || item.isEnded || !item.canVote) {
             actionButton.visibility = View.GONE
             actionButtonPlaceholder.visibility = View.VISIBLE
             return
@@ -121,27 +120,10 @@ class PollItemViewHolder(view: View) : BaseViewHolder<PollListItem>(view) {
         actionButton.visibility = View.VISIBLE
         actionButtonPlaceholder.visibility = View.GONE
 
-        if (currentChoice == null) {
-            actionButton.text = actionButtonVoteTitle
-            actionButton.isEnabled = false
-        } else {
-            actionButton.text =
-                    if (item.canVote)
-                        actionButtonVoteTitle
-                    else
-                        actionButtonRemoveVoteTitle
+        actionButton.isEnabled = currentChoice != null
 
-            actionButton.isEnabled = true
-
-            if (actionListener != null) {
-                actionButton.setOnClickListener {
-                    if (item.canVote) {
-                        actionListener.invoke(item, currentChoice)
-                    } else {
-                        actionListener.invoke(item, null)
-                    }
-                }
-            }
+        actionButton.setOnClickListener {
+            actionListener?.invoke(item, currentChoice)
         }
     }
 }
