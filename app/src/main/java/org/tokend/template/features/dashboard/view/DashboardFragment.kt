@@ -11,13 +11,10 @@ import android.view.ViewGroup
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.OnBackPressedListener
-import org.tokend.template.extensions.disableShifting
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.util.Navigator
 import org.tokend.template.view.util.input.SoftInputUtil
 
 class DashboardFragment : BaseFragment(), ToolbarProvider {
@@ -36,7 +33,6 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         toolbar.title = getString(R.string.dashboard_title)
 
         initViewPager()
-        initTabs()
     }
 
     // region Init
@@ -60,7 +56,6 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
 
         val onPageSelected = { pagePosition: Int ->
             inflatePageMenu(pagePosition)
-            bottom_tabs.selectedItemId = adapter.getItemId(pagePosition).toInt()
             SoftInputUtil.hideSoftInput(requireActivity())
         }
 
@@ -75,53 +70,6 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         })
 
         onPageSelected(0)
-    }
-
-    private fun initTabs() {
-        bottom_tabs.disableShifting()
-
-        if (!BuildConfig.IS_SEND_ALLOWED) {
-            bottom_tabs.menu.removeItem(R.id.send)
-            bottom_tabs.menu.removeItem(R.id.receive)
-        }
-
-        bottom_tabs.setOnNavigationItemSelectedListener {
-            navigateToPage(it.itemId)
-        }
-    }
-    // endregion
-
-    // region Navigation
-    private fun navigateToPage(pageId: Int): Boolean {
-        return when (pageId) {
-            R.id.send -> {
-                openSend()
-                false
-            }
-            R.id.receive -> {
-                openReceive()
-                false
-            }
-            else -> {
-                val index = adapter.getIndexOf(pageId.toLong())
-                if (index >= 0) {
-                    pager.currentItem = index
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-    }
-
-    private fun openSend() {
-        Navigator.from(this).openSend()
-    }
-
-    private fun openReceive() {
-        val walletInfo = walletInfoProvider.getWalletInfo()
-                ?: return
-        Navigator.from(this).openAccountQrShare(walletInfo)
     }
     // endregion
 

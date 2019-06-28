@@ -16,12 +16,7 @@ class DashboardPagerAdapter(context: Context,
             Triple(
                     fragmentFactory.getBalancesFragment(),
                     context.getString(R.string.balances_screen_title),
-                    R.id.balances.toLong()
-            ),
-            Triple(
-                    fragmentFactory.getAccountMovementsFragment(),
-                    context.getString(R.string.movements_screen_title),
-                    R.id.movements.toLong()
+                    1L
             )
     )
 
