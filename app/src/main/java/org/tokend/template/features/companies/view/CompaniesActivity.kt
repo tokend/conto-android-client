@@ -46,6 +46,9 @@ class CompaniesActivity : BaseActivity() {
             }
         }
 
+    private val forceCompanyLoad: Boolean
+        get() = intent.getBooleanExtra(EXTRA_FORCE_COMPANY_LOAD, false)
+
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_companies)
         initToolbar()
@@ -152,6 +155,17 @@ class CompaniesActivity : BaseActivity() {
             onCompanySelected(company)
             return
         }
+
+        if (forceCompanyLoad) {
+            companiesRepository
+                    .itemsList
+                    .find { it.id == session.lastCompanyId }
+                    ?.let { company ->
+                        onCompanySelected(company)
+                        return
+                    }
+        }
+
         displayCompanies()
     }
 
@@ -206,5 +220,6 @@ class CompaniesActivity : BaseActivity() {
 
     companion object {
         const val ID = 1141L
+        const val EXTRA_FORCE_COMPANY_LOAD = "force_company_load"
     }
 }
