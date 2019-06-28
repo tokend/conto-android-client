@@ -448,10 +448,8 @@ class Navigator private constructor() {
         performIntent(intent)
     }
 
-    fun openScanRedemption(balanceId: String) {
-        val intent = context?.intentFor<ScanRedemptionActivity>(
-                ScanRedemptionActivity.EXTRA_BALANCE_ID to balanceId
-        )
+    fun openScanRedemption() {
+        val intent = context?.intentFor<ScanRedemptionActivity>()
         performIntent(intent)
     }
 

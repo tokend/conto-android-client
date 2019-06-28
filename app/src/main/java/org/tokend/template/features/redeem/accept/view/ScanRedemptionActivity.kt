@@ -10,7 +10,6 @@ import org.spongycastle.util.encoders.DecoderException
 import org.tokend.sdk.utils.extentions.decodeBase64
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.redeem.model.RedemptionRequestFormatException
@@ -28,25 +27,8 @@ class ScanRedemptionActivity : BaseActivity() {
 
     private var redemptionRequest: RedemptionRequest? = null
 
-    private val asset: AssetRecord?
-        get() = balancesRepository.itemsList
-                .find { it.id == balanceId }
-                ?.asset
-
-    private lateinit var balanceId: String
-
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_scan_redemption)
-
-        val balanceId = intent.getStringExtra(EXTRA_BALANCE_ID)
-        if (balanceId == null) {
-            errorHandlerFactory.getDefault().handle(
-                    IllegalArgumentException("No $EXTRA_BALANCE_ID specified")
-            )
-            finish()
-            return
-        }
-        this.balanceId = balanceId
 
         tryOpenQrScanner()
     }
@@ -66,15 +48,22 @@ class ScanRedemptionActivity : BaseActivity() {
                     RedemptionRequest.fromSerialized(it, result.decodeBase64())
                 }
                 .doOnSuccess { redemptionRequest = it }
-                .map {
-                    if (asset?.code != it.assetCode) {
+                .map { request ->
+                    val accountId = walletInfoProvider.getWalletInfo()?.accountId
+                    val balance = balancesRepository
+                            .itemsList
+                            .find { it.assetCode == request.assetCode }
+
+                    if (balance == null
+                            || balance.asset.ownerAccountId != accountId) {
                         throw WrongAssetException()
+                    } else {
+                        balance
                     }
                 }
-                .ignoreElement()
                 .subscribeBy(
-                        onComplete = {
-                            Navigator.from(this).toAcceptRedemption(balanceId, result)
+                        onSuccess = { balance ->
+                            Navigator.from(this).toAcceptRedemption(balance.id, result)
                         },
                         onError = this::onRequestParsingError
                 )
@@ -84,12 +73,7 @@ class ScanRedemptionActivity : BaseActivity() {
     private fun onRequestParsingError(error: Throwable) {
         when (error) {
             is WrongAssetException ->
-                toastManager.short(
-                        getString(
-                                R.string.template_error_redemption_request_asset_mismatch,
-                                asset?.code
-                        )
-                )
+                toastManager.long(R.string.error_redemption_not_owned_asset)
             is RedemptionRequestFormatException,
             is DecoderException -> {
                 toastManager.short(R.string.error_invalid_redemption_request)
@@ -120,8 +104,4 @@ class ScanRedemptionActivity : BaseActivity() {
     }
 
     class WrongAssetException : Exception()
-
-    companion object {
-        const val EXTRA_BALANCE_ID = "balance_id"
-    }
 }

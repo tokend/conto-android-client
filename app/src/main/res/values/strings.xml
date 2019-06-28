@@ -419,7 +419,7 @@
     <string name="share_redemption_request">Share redemption request</string>
     <string name="template_redemption_qr_explanation_amount">Use this QR code to redeem %1$s</string>
     <string name="redemption_title">Redemption</string>
-    <string name="template_error_redemption_request_asset_mismatch">Only %1$s redemptions can be accepted</string>
+    <string name="error_redemption_not_owned_asset">You can accept only redemptions of assets that you own</string>
     <string name="tx_requestor">Requestor</string>
     <string name="accept_redemption">Accept redemption</string>
     <string name="successfully_accepted_redemption">Redemption has been accepted</string>

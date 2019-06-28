@@ -211,7 +211,7 @@ class BalanceDetailsActivity : BaseActivity() {
         redeem_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_redeem))
 
         accept_redemption_fab.onClick {
-            navigator.openScanRedemption(balanceId)
+            navigator.openScanRedemption()
             menu_fab.close(false)
         }
         accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_qr_code_scan_fab))
