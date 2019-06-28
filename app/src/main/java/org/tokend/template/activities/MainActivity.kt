@@ -120,7 +120,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         PrimaryDrawerItem()
                 .withName(R.string.dashboard_title)
                 .withIdentifier(DashboardFragment.ID)
-                .withIcon(R.drawable.ic_dashboard)
+                .withIcon(R.drawable.ic_coins)
                 .also { items[DashboardFragment.ID] = it }
 
         PrimaryDrawerItem()

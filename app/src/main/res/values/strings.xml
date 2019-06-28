@@ -115,10 +115,10 @@
     <string name="asset_can_be_withdrawn">Can be withdrawn</string>
     <string name="asset_can_not_be_withdrawn">Can\'t be withdrawn</string>
 
-    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_title">Balances</string>
     <string name="deposit_title">Deposit</string>
     <string name="withdraw_title">Withdraw</string>
-    <string name="explore_assets_title">Explore assets</string>
+    <string name="explore_assets_title">Assets</string>
     <string name="send_title">Send</string>
     <string name="trade_title">Trade</string>
     <string name="settings_title">Settings</string>
@@ -239,7 +239,7 @@
     <string name="template_sale_name_asset">%1$s (%2$s)</string>
     <string name="sales_search_name_hint">Name</string>
     <string name="sales_search_asset_hint">Asset code (exact match)</string>
-    <string name="explore_sales_title">Explore sales</string>
+    <string name="explore_sales_title">Sales</string>
     <string name="no_sales_found">No sales found</string>
     <string name="pending_investments_title">Pending investments</string>
     <string name="no_pending_investments">No pending investments</string>
