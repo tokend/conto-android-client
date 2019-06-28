@@ -99,24 +99,9 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
     // region Account
     private fun initAccountCategory() {
-        initAccountIdItem()
         initKycItem()
         initSecretSeedItem()
         initSignOutItem()
-    }
-
-    private fun initAccountIdItem() {
-        val accountIdPreference = findPreference("account_id")
-        accountIdPreference?.setOnPreferenceClickListener {
-            val walletInfo = walletInfoProvider.getWalletInfo()
-                    ?: return@setOnPreferenceClickListener false
-
-            activity?.let { parentActivity ->
-                Navigator.from(parentActivity).openAccountQrShare(walletInfo)
-            }
-
-            true
-        }
     }
 
     private fun initKycItem() {
