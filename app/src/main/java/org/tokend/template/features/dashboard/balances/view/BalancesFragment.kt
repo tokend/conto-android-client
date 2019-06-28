@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.*
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.github.clans.fab.FloatingActionButton
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_balances.*
@@ -269,22 +272,6 @@ class BalancesFragment : BaseFragment() {
         Navigator.from(this).openBalanceDetails(balanceId)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.balances, menu)
-
-        val assetsExplorerItem = menu.findItem(R.id.add)
-
-        if (!BuildConfig.IS_EXPLORE_ALLOWED) {
-            assetsExplorerItem.isVisible = false
-            return
-        }
-
-        assetsExplorerItem.setOnMenuItemClickListener {
-            openAssetsExplorer()
-            true
-        }
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateListColumnsCount()
@@ -293,10 +280,6 @@ class BalancesFragment : BaseFragment() {
     private fun updateListColumnsCount() {
         layoutManager.spanCount = ColumnCalculator.getColumnCount(requireActivity())
         adapter.drawDividers = layoutManager.spanCount == 1
-    }
-
-    private fun openAssetsExplorer() {
-        Navigator.from(this).openAssetsExplorer()
     }
 
     override fun onBackPressed(): Boolean {
