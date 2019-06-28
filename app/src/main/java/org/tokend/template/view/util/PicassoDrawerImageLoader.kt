@@ -10,16 +10,20 @@ import com.squareup.picasso.Picasso
 import org.tokend.template.util.imagetransform.RemoveAlphaTransform
 
 class PicassoDrawerImageLoader(private val context: Context,
-                               private val placeholder: Drawable?,
+                               private val mainPlaceholder: Drawable?,
                                @ColorInt
-                               private val backgroundColor: Int
+                               private val backgroundColor: Int,
+                               private val profileListItemPlaceholder: Drawable? = mainPlaceholder
 ) : DrawerImageLoader.IDrawerImageLoader {
     override fun placeholder(ctx: Context?): Drawable? {
-        return placeholder
+        return mainPlaceholder
     }
 
     override fun placeholder(ctx: Context?, tag: String?): Drawable? {
-        return placeholder
+        return if (tag == DrawerImageLoader.Tags.PROFILE_DRAWER_ITEM.name)
+            profileListItemPlaceholder
+        else
+            mainPlaceholder
     }
 
     override fun set(imageView: ImageView?, uri: Uri?, placeholder: Drawable?) {

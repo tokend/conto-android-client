@@ -45,9 +45,9 @@ import org.tokend.template.features.offers.view.details.PendingInvestmentDetails
 import org.tokend.template.features.offers.view.details.PendingOfferDetailsActivity
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.features.recovery.RecoveryActivity
-import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
 import org.tokend.template.features.redeem.accept.view.ConfirmRedemptionActivity
 import org.tokend.template.features.redeem.accept.view.ScanRedemptionActivity
+import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -435,9 +435,10 @@ class Navigator private constructor() {
         activity?.let { fadeOut(it) }
     }
 
-    fun openCompanyLoading() {
+    fun toCompanyLoading() {
         val intent = context?.intentFor<CompanyLoadingActivity>()
         performIntent(intent)
+        activity?.finish()
     }
 
     fun openRedemptionCreation(assetCode: String) {
