@@ -139,7 +139,7 @@ ext {
 
     // Controls balance amounts conversion
     // into `balances_conversion_asset`
-    enable_balances_conversion = true
+    enable_balances_conversion = false
 
     // Sets asset to convert balance amounts into
     balances_conversion_asset = 'USD'
