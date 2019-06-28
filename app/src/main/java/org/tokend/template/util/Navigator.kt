@@ -429,10 +429,8 @@ class Navigator private constructor() {
         performIntent(intent)
     }
 
-    fun toCompaniesActivity(forceCompanyLoad: Boolean = false) {
-        val intent = context?.intentFor<CompaniesActivity>(
-                CompaniesActivity.EXTRA_FORCE_COMPANY_LOAD to forceCompanyLoad
-        )
+    fun toCompaniesActivity() {
+        val intent = context?.intentFor<CompaniesActivity>()
         performIntent(intent)
         activity?.let { fadeOut(it) }
     }

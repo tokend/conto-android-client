@@ -36,6 +36,7 @@ class SessionInfoStorage(
         sharedPreferences
                 .edit()
                 .remove(LAST_SIGN_IN_METHOD_KEY)
+                .remove(LAST_COMPANY_KEY)
                 .apply()
     }
 

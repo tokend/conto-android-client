@@ -214,7 +214,7 @@ class UnlockAppActivity : BaseActivity() {
                 .doOnDispose { password.fill('0') }
                 .subscribeBy(
                         onComplete = {
-                            Navigator.from(this).toCompaniesActivity(true)
+                            Navigator.from(this).toCompaniesActivity()
                         },
                         onError = {
                             it.printStackTrace()
