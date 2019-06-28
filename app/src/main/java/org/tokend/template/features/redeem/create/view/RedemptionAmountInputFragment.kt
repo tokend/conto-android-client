@@ -15,10 +15,10 @@ class RedemptionAmountInputFragment: AmountInputFragment() {
     companion object {
         private const val PRE_FILLED_AMOUNT = "1"
 
-        fun newInstance(assetCode: String): RedemptionAmountInputFragment {
+        fun newInstance(requiredAsset: String? = null): RedemptionAmountInputFragment {
             val fragment = RedemptionAmountInputFragment()
             fragment.arguments = Bundle().apply {
-                putString(ASSET_EXTRA, assetCode)
+                putString(ASSET_EXTRA, requiredAsset)
             }
             return fragment
         }
