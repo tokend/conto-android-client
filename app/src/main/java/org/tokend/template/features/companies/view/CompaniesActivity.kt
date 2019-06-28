@@ -138,11 +138,20 @@ class CompaniesActivity : BaseActivity() {
         companiesRepository
                 .itemsSubject
                 .compose(ObservableTransformers.defaultSchedulers())
-                .subscribe { displayCompanies() }
+                .subscribe { onCompaniesLoaded() }
                 .addTo(compositeDisposable)
     }
 
     private fun onFilterChanged() {
+        displayCompanies()
+    }
+
+    private fun onCompaniesLoaded() {
+        if (companiesRepository.itemsList.size == 1) {
+            val company = companiesRepository.itemsList.first()
+            onCompanySelected(company)
+            return
+        }
         displayCompanies()
     }
 
