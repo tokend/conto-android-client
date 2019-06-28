@@ -1,8 +1,12 @@
 package org.tokend.template.activities
 
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -26,7 +30,6 @@ import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.CompaniesRepository
 import org.tokend.template.features.assets.ExploreAssetsFragment
-import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
@@ -73,9 +76,18 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     private val companiesRepository: CompaniesRepository
         get() = repositoryProvider.companies()
 
-    private val logoFactory = LogoFactory(this)
-    private val companyLogoSize: Int by lazy {
-        resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon)
+    private val companyPlaceholderDrawable: Drawable? by lazy {
+        ContextCompat.getDrawable(this, R.drawable.company_logo_placeholder)
+    }
+    private val companyPlaceholderBitmap: Bitmap? by lazy {
+        val drawable = companyPlaceholderDrawable?.mutate()
+                ?: return@lazy null
+        val size = resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon)
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        bitmap
     }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
@@ -96,12 +108,11 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         val placeholderValue = (email ?: getString(R.string.app_name)).toUpperCase()
         val placeholderSize =
                 resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon_width)
-        val placeholderBackground =
-                ContextCompat.getColor(this, R.color.avatar_placeholder_background)
         val placeholderDrawable =
                 ProfileUtil.getAvatarPlaceholder(placeholderValue, this, placeholderSize)
         DrawerImageLoader.init(
-                PicassoDrawerImageLoader(this, placeholderDrawable, placeholderBackground)
+                PicassoDrawerImageLoader(this, placeholderDrawable, Color.WHITE,
+                        companyPlaceholderDrawable)
         )
 
         val items = HashMap<Long, PrimaryDrawerItem>()
@@ -222,12 +233,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                                 if (company.logoUrl != null) {
                                     withIcon(company.logoUrl)
                                 } else {
-                                    withIcon(
-                                            logoFactory.getWithAutoBackground(
-                                                    company.name,
-                                                    companyLogoSize
-                                            )
-                                    )
+                                    withIcon(companyPlaceholderBitmap)
                                 }
                             }
                 }
@@ -377,6 +383,10 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     private fun switchToAnotherCompany(company: CompanyRecord) {
+        if (session.getCompany() == company) {
+            return
+        }
+
         session.setCompany(company)
         Navigator.from(this).toCompanyLoading()
     }
