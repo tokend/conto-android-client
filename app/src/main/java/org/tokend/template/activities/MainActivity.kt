@@ -395,6 +395,12 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         if (navigationDrawer?.isDrawerOpen == true) {
             navigationDrawer?.closeDrawer()
         } else {
+            if (accountHeader?.isSelectionListShown == true) {
+                accountHeader?.toggleSelectionList(this)
+            }
+            if (landscapeAccountHeader?.isSelectionListShown == true) {
+                landscapeAccountHeader?.toggleSelectionList(this)
+            }
             if (navigationDrawer?.currentSelection == DEFAULT_FRAGMENT_ID) {
                 if (onBackPressedListener?.onBackPressed() != false)
                     moveTaskToBack(true)
