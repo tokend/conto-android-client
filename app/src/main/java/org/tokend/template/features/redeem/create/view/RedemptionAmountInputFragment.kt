@@ -7,10 +7,10 @@ class RedemptionAmountInputFragment: AmountInputFragment() {
     override fun getTitleText(): String? = null
 
     companion object {
-        fun newInstance(assetCode: String): RedemptionAmountInputFragment {
+        fun newInstance(requiredAsset: String? = null): RedemptionAmountInputFragment {
             val fragment = RedemptionAmountInputFragment()
             fragment.arguments = Bundle().apply {
-                putString(ASSET_EXTRA, assetCode)
+                putString(ASSET_EXTRA, requiredAsset)
             }
             return fragment
         }

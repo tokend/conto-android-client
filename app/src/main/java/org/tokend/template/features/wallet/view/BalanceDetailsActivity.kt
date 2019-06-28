@@ -157,7 +157,7 @@ class BalanceDetailsActivity : BaseActivity() {
 
         send_fab.onClick {
             val assetCode = balance?.assetCode ?: return@onClick
-            navigator.openSend(assetCode, 0)
+            navigator.openSend(assetCode)
             menu_fab.close(false)
         }
         send_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_fab))

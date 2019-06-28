@@ -20,7 +20,7 @@ import org.tokend.template.view.util.ProgressDialogFactory
 import java.math.BigDecimal
 
 class CreateRedemptionActivity : BaseActivity() {
-    private lateinit var assetCode: String
+    private var requestedAssetCode: String? = null
     private lateinit var amount: BigDecimal
     private lateinit var asset: Asset
 
@@ -30,15 +30,7 @@ class CreateRedemptionActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
 
-        val errorHandler = errorHandlerFactory.getDefault()
-
-        val assetCode = intent.getStringExtra(ASSET_CODE_EXTRA)
-        if (assetCode == null) {
-            errorHandler.handle(IllegalArgumentException("No $ASSET_CODE_EXTRA specified"))
-            finish()
-            return
-        }
-        this.assetCode = assetCode
+        this.requestedAssetCode = intent.getStringExtra(ASSET_CODE_EXTRA)
 
         initToolbar()
         initSwipeRefresh()
@@ -60,7 +52,7 @@ class CreateRedemptionActivity : BaseActivity() {
     // endregion
 
     private fun toAmountScreen() {
-        val fragment = RedemptionAmountInputFragment.newInstance(assetCode)
+        val fragment = RedemptionAmountInputFragment.newInstance(requestedAssetCode)
         fragment
                 .resultObservable
                 .map { it as AmountInputResult }
@@ -94,7 +86,7 @@ class CreateRedemptionActivity : BaseActivity() {
 
         disposable = CreateRedemptionRequestUseCase(
                 amount,
-                assetCode,
+                asset.code,
                 repositoryProvider,
                 walletInfoProvider,
                 accountProvider
