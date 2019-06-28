@@ -20,6 +20,7 @@
     <string name="retry">Retry</string>
     <string name="share">Share</string>
     <string name="share_account_id">Share Account ID</string>
+    <string name="share_account">Share Account</string>
     <string name="check_your_email_to_verify_account">Check your email to verify account</string>
     <string name="save_recovery_seed">Save your recovery seed</string>
     <string name="continue_action">Continue</string>
@@ -147,6 +148,7 @@
     <string name="settings_account_group">Account</string>
     <string name="settings_security_group">Security</string>
     <string name="account_id_title">Account ID</string>
+    <string name="account_title">Account</string>
     <string name="verification_title">Verification</string>
     <string name="verification_summary">In order to verify your account data use web client</string>
     <string name="tfa_title">Two-factor authentication</string>
