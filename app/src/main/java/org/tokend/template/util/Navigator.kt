@@ -225,12 +225,12 @@ class Navigator private constructor() {
         performIntent(intent, requestCode = requestCode)
     }
 
-    fun openSend(asset: String? = null, requestCode: Int) {
+    fun openSend(asset: String? = null) {
         val intent = context?.intentFor<SingleFragmentActivity>(
                 SingleFragmentActivity.ASSET_EXTRA to asset,
                 SingleFragmentActivity.SCREEN_ID to SendFragment.ID
         )
-        performIntent(intent, requestCode = requestCode)
+        performIntent(intent, requestCode = 0)
     }
 
     fun openAssetDetails(requestCode: Int,
@@ -441,7 +441,7 @@ class Navigator private constructor() {
         activity?.finish()
     }
 
-    fun openRedemptionCreation(assetCode: String) {
+    fun openRedemptionCreation(assetCode: String? = null) {
         val intent = context?.intentFor<CreateRedemptionActivity>(
                 CreateRedemptionActivity.ASSET_CODE_EXTRA to assetCode
         )
