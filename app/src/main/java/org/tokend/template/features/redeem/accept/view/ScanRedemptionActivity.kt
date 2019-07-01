@@ -63,7 +63,7 @@ class ScanRedemptionActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onSuccess = { balance ->
-                            Navigator.from(this).toAcceptRedemption(balance.id, result)
+                            Navigator.from(this).toAcceptRedemption(balance.id, result, ACCEPT_REQUEST_CODE)
                         },
                         onError = this::onRequestParsingError
                 )
@@ -88,6 +88,11 @@ class ScanRedemptionActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        if(requestCode == ACCEPT_REQUEST_CODE) {
+            tryOpenQrScanner()
+            return
+        }
+
         if (resultCode == Activity.RESULT_CANCELED) {
             finish()
         }
@@ -104,4 +109,8 @@ class ScanRedemptionActivity : BaseActivity() {
     }
 
     class WrongAssetException : Exception()
+
+    companion object {
+        private val ACCEPT_REQUEST_CODE = "accept_redemption".hashCode() and 0xffff
+    }
 }
