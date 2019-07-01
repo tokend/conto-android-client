@@ -1,5 +1,7 @@
 package org.tokend.template.activities
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -7,6 +9,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -25,6 +28,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import org.tokend.template.BuildConfig
@@ -51,12 +55,14 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
 import org.tokend.template.view.util.PicassoDrawerImageLoader
+import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
         private const val DEFAULT_FRAGMENT_ID = DashboardFragment.ID
+        private val CONTACT_ITEM_ID = "contact".hashCode().toLong()
     }
 
     private var navigationDrawer: Drawer? = null
@@ -107,6 +113,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     // region Init
+    @SuppressLint("UseSparseArrays")
     private fun initNavigation() {
         val email = walletInfoProvider.getWalletInfo()?.email
 
@@ -163,6 +170,13 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .withIdentifier(SettingsFragment.ID)
                 .withIcon(R.drawable.ic_settings)
                 .also { items[SettingsFragment.ID] = it }
+
+        PrimaryDrawerItem()
+                .withName(R.string.contact_company)
+                .withIdentifier(CONTACT_ITEM_ID)
+                .withIcon(R.drawable.ic_email_letter)
+                .withSelectable(false)
+                .also { items[CONTACT_ITEM_ID] = it }
 
         val accountHeader = getHeaderInstance(email)
         val landscapeAccountHeader = getHeaderInstance(email)
@@ -294,6 +308,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                     }
                 }
                 .addDrawerItems(
+                        items[CONTACT_ITEM_ID],
                         items[SettingsFragment.ID]
                 )
                 .withOnDrawerItemClickListener { _, _, item ->
@@ -319,7 +334,11 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     // region Navigation
     private fun onNavigationItemSelected(item: IDrawerItem<Any, RecyclerView.ViewHolder>)
             : Boolean {
-        navigateTo(item.identifier)
+        when (item.identifier) {
+            CONTACT_ITEM_ID -> contactCompany()
+            else -> navigateTo(item.identifier)
+
+        }
         return false
     }
 
@@ -379,6 +398,42 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     private fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
         Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
+    }
+
+    private fun contactCompany() {
+        val currentCompanyAccount = session.getCompany()?.id
+                ?: return
+
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getTunedDialog(this)
+        progress.setMessage(getString(R.string.loading_data))
+        progress.setCancelable(true)
+        progress.setOnCancelListener { disposable?.dispose() }
+
+        disposable = repositoryProvider
+                .accountDetails()
+                .getEmailByAccountId(currentCompanyAccount)
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::openEmailCreation,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun openEmailCreation(recipient: String) {
+        val emailIntent = Intent(Intent.ACTION_SENDTO,
+                Uri.fromParts("mailto", recipient, null))
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
+        startActivity(Intent.createChooser(emailIntent,
+                getString(
+                        R.string.template_contact_email,
+                        recipient
+                )
+        ))
     }
 
     private var fragmentToolbarDisposable: Disposable? = null

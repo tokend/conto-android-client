@@ -429,4 +429,6 @@
     <string name="address_payload">Payload</string>
     <string name="poll_ended">Ended</string>
     <string name="you_have_no_balances">You have no balances yet</string>
+    <string name="contact_company">Contact</string>
+    <string name="template_contact_email">Contact %1$s</string>
 </resources>
