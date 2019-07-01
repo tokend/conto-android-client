@@ -199,7 +199,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
     private fun getProfileHeaderItem(email: String?,
                                      kycState: KycState?): ProfileDrawerItem {
-        val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider)
+        val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)
