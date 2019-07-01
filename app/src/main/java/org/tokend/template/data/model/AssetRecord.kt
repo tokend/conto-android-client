@@ -13,6 +13,7 @@ class AssetRecord(
         override val code: String,
         val policy: Int,
         override val name: String?,
+        val description: String?,
         val logoUrl: String?,
         val terms: RemoteFile?,
         val externalSystemType: Int?,
@@ -68,10 +69,14 @@ class AssetRecord(
                             ?.takeIf { it.isNotEmpty() }
                             ?.toIntOrNull()
 
+            val description = source.details.get("description")
+                    ?.takeIf { it !is NullNode }?.asText()
+
             return AssetRecord(
                     code = source.id,
                     policy = source.policies.value,
                     name = name,
+                    description = description,
                     logoUrl = logo?.getUrl(urlConfig?.storage),
                     terms = terms,
                     externalSystemType = externalSystemType,

@@ -73,6 +73,17 @@
             </LinearLayout>
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/asset_description_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:lineSpacingExtra="@dimen/quarter_standard_margin"
+            android:paddingBottom="@dimen/standard_margin"
+            android:visibility="gone"
+            tools:text="Asset\nDescription" />
+
         <View
             android:id="@+id/asset_card_divider"
             android:layout_width="match_parent"

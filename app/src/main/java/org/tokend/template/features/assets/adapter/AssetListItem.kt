@@ -5,6 +5,7 @@ import org.tokend.template.data.model.AssetRecord
 class AssetListItem(
         val code: String,
         val name: String?,
+        val description: String?,
         val balanceId: String?,
         val logoUrl: String?,
         val source: AssetRecord
@@ -17,6 +18,7 @@ class AssetListItem(
     ) : this(
             code = asset.code,
             name = asset.name,
+            description = asset.description,
             logoUrl = asset.logoUrl,
             balanceId = balanceId,
             source = asset

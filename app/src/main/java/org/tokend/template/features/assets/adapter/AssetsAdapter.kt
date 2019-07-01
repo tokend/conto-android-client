@@ -10,7 +10,7 @@ class AssetsAdapter : BaseRecyclerAdapter<AssetListItem, AssetListItemViewHolder
     override fun createItemViewHolder(parent: ViewGroup): AssetListItemViewHolder {
         val view = parent.context.layoutInflater.inflate(R.layout.list_item_asset,
                 parent, false)
-        return AssetListItemViewHolder(view)
+        return AssetListItemViewHolder(view, false)
     }
 
     override fun getDiffCallback(newItems: List<AssetListItem>): DiffUtil.Callback? {

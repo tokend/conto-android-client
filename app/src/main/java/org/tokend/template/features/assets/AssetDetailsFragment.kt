@@ -118,7 +118,7 @@ open class AssetDetailsFragment : BaseFragment() {
     }
 
     private fun displayLogoAndName() {
-        AssetListItemViewHolder(asset_card).bind(
+        AssetListItemViewHolder(asset_card, true).bind(
                 AssetListItem(asset, balanceId)
         )
     }

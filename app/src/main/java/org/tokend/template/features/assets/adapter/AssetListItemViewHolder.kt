@@ -12,10 +12,13 @@ import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
 import org.tokend.template.view.util.LogoUtil
 
-class AssetListItemViewHolder(view: View) : BaseViewHolder<AssetListItem>(view) {
+class AssetListItemViewHolder(view: View,
+                              private val displayDescription: Boolean
+) : BaseViewHolder<AssetListItem>(view) {
     private val logoImageView: AppCompatImageView = view.find(R.id.asset_logo_image_view)
     private val codeTextView: TextView = view.find(R.id.asset_code_text_view)
     private val nameTextView: TextView = view.find(R.id.asset_name_text_view)
+    private val descriptionTextView: TextView = view.find(R.id.asset_description_text_view)
     private val detailsButton: TextView = view.find(R.id.asset_details_button)
     private val primaryActionButton: Button = view.find(R.id.asset_primary_action_button)
     private val balanceExistsIndicator: View = view.find(R.id.asset_balance_exists_image_view)
@@ -56,6 +59,13 @@ class AssetListItemViewHolder(view: View) : BaseViewHolder<AssetListItem>(view) 
         } else {
             balanceExistsIndicator.visibility = View.GONE
             primaryActionButton.text = view.context.getString(R.string.create_balance_action)
+        }
+
+        if (displayDescription && item.description != null) {
+            descriptionTextView.visibility = View.VISIBLE
+            descriptionTextView.text = item.description
+        } else {
+            descriptionTextView.visibility = View.GONE
         }
     }
 }
