@@ -100,7 +100,6 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     // region Account
     private fun initAccountCategory() {
         initKycItem()
-        initSecretSeedItem()
         initSignOutItem()
     }
 
@@ -108,19 +107,6 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         val kycPreference = findPreference("kyc")
         kycPreference?.setOnPreferenceClickListener {
             activity?.browse(urlConfigProvider.getConfig().kyc, true)
-            true
-        }
-    }
-
-    private fun initSecretSeedItem() {
-        val seedPreference = findPreference("secret_seed") ?: return
-
-        seedPreference.setOnPreferenceClickListener {
-            SecretSeedDialog(
-                    requireContext(),
-                    accountProvider
-            ).show()
-
             true
         }
     }

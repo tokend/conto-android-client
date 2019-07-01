@@ -1,7 +1,6 @@
 package org.tokend.template.features.signup
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -30,17 +29,12 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
-import org.tokend.template.util.confirmation.AbstractConfirmationProvider
-import org.tokend.template.util.confirmation.ConfirmationProvider
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.EditTextHelper
 import org.tokend.template.view.util.input.SimpleTextWatcher
 
 class SignUpActivity : BaseActivity() {
-    companion object {
-        private val SAVE_SEED_REQUEST = "save_recovery_seed".hashCode() and 0xffff
-    }
 
     override val allowUnauthorized = true
 
@@ -193,8 +187,7 @@ class SignUpActivity : BaseActivity() {
         SignUpUseCase(
                 email,
                 password,
-                apiProvider.getKeyServer(),
-                getRecoverySeedConfirmation()
+                apiProvider.getKeyServer()
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
@@ -224,26 +217,6 @@ class SignUpActivity : BaseActivity() {
 
         updateSignUpAvailability()
     }
-
-    // region Recovery seed confirmation
-    private lateinit var onRecoverySeedConfirmationResult: (Boolean) -> Unit
-
-    private fun getRecoverySeedConfirmation(): ConfirmationProvider<CharArray> {
-        return object : AbstractConfirmationProvider<CharArray>() {
-            override fun onConfirmationRequested(payload: CharArray,
-                                                 confirmationCallback: (Boolean) -> Unit) {
-                onRecoverySeedConfirmationResult = confirmationCallback
-                openRecoverySeedConfirmation(payload)
-            }
-        }
-    }
-
-    private fun openRecoverySeedConfirmation(seed: CharArray) {
-        Navigator.from(this).openRecoverySeedSaving(
-                SAVE_SEED_REQUEST,
-                seed.joinToString("")
-        )
-    }
     // endregion
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -254,12 +227,8 @@ class SignUpActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == SAVE_SEED_REQUEST) {
-            onRecoverySeedConfirmationResult(resultCode == Activity.RESULT_OK)
-        } else {
-            QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
-                urlConfigManager.setFromJson(it)
-            }
+        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
+            urlConfigManager.setFromJson(it)
         }
     }
 
