@@ -18,7 +18,7 @@ class SignUpUseCase(
         private val email: String,
         private val password: CharArray,
         private val keyServer: KeyServer,
-        private val recoverySeedConfirmation: ConfirmationProvider<CharArray>?
+        private val recoverySeedConfirmation: ConfirmationProvider<CharArray>? = null
 ) {
     private lateinit var rootAccount: Account
     private lateinit var recoveryAccount: Account
