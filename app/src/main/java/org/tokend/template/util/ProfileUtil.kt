@@ -14,14 +14,23 @@ import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.model.form.SimpleKycForm
 import org.tokend.template.util.imagetransform.CircleTransform
+import java.security.MessageDigest
 
 object ProfileUtil {
 
     fun getAvatarUrl(kycState: KycState?,
-                     urlConfigProvider: UrlConfigProvider): String? {
+                     urlConfigProvider: UrlConfigProvider,
+                     email: String?): String? {
         val submittedForm = (kycState as? KycState.Submitted<*>)?.formData
         val avatar = (submittedForm as? SimpleKycForm)?.avatar
-        return avatar?.getUrl(urlConfigProvider.getConfig().storage)
+        return avatar?.getUrl(urlConfigProvider.getConfig().storage) ?: email?.let {
+            getGravatarUrl(it)
+        }
+    }
+
+    private fun getGravatarUrl(email: String): String {
+        val hash = email.toLowerCase().md5()
+        return "https://www.gravatar.com/avatar/$hash?d=404"
     }
 
     fun getAvatarPlaceholder(email: String,
@@ -50,7 +59,7 @@ object ProfileUtil {
         )
         view.setImageDrawable(placeholderDrawable)
 
-        getAvatarUrl(savedKycState, urlConfigProvider)?.let {
+        getAvatarUrl(savedKycState, urlConfigProvider, email)?.let {
             Picasso.with(context)
                     .load(it)
                     .placeholder(placeholderDrawable)
@@ -59,5 +68,23 @@ object ProfileUtil {
                     .centerCrop()
                     .into(view)
         }
+    }
+
+    /***
+     * @returns hash string kind used on Gravatar.
+     */
+    private fun String.md5(): String {
+        val md = MessageDigest.getInstance("MD5")
+        md.update(this.toByteArray())
+
+        val byteData = md.digest()
+        val hexString = StringBuffer()
+        for (i in byteData.indices) {
+            val hex = Integer.toHexString(255 and byteData[i].toInt())
+            if (hex.length == 1) hexString.append('0')
+            hexString.append(hex)
+        }
+
+        return hexString.toString()
     }
 }
