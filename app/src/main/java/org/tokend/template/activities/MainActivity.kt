@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import com.mikepenz.fastadapter.IIdentifyable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -24,6 +25,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
@@ -50,6 +52,7 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
 import org.tokend.template.view.util.PicassoDrawerImageLoader
 import org.tokend.template.view.util.input.SoftInputUtil
+import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
@@ -67,6 +70,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         get() = resources.configuration.orientation
     private var accountHeader: AccountHeader? = null
     private var landscapeAccountHeader: AccountHeader? = null
+    private val profileUpdatesSubject = PublishSubject.create<Boolean>()
 
     private var toolbar: Toolbar? = null
 
@@ -97,6 +101,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         initNavigation()
 
         subscribeToKycChanges()
+        subscribeToCompanies()
 
         navigationDrawer?.setSelection(DEFAULT_FRAGMENT_ID)
     }
@@ -168,9 +173,17 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
         this.accountHeader = accountHeader
         this.landscapeAccountHeader = landscapeAccountHeader
+
+        profileUpdatesSubject
+                .debounce(50, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { updateProfileHeader() }
+                .addTo(compositeDisposable)
     }
 
     private fun getHeaderInstance(email: String?): AccountHeader {
+        var header: AccountHeader? = null
+
         return AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(
@@ -194,7 +207,15 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                     }
                     false
                 }
+                .withOnAccountHeaderSelectionViewClickListener { _, _ ->
+                    val selectionWasHidden = header?.isSelectionListShown == false
+                    if (selectionWasHidden) {
+                        companiesRepository.update()
+                    }
+                    false
+                }
                 .build()
+                .also { header = it }
     }
 
     private fun getProfileHeaderItem(email: String?,
@@ -284,9 +305,15 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     private fun subscribeToKycChanges() {
         kycStateRepository
                 .itemSubject
-                .compose(ObservableTransformers.defaultSchedulers())
-                .subscribe { updateProfileHeader() }
-                .addTo(compositeDisposable)
+                .map { true }
+                .subscribe(profileUpdatesSubject)
+    }
+
+    private fun subscribeToCompanies() {
+        companiesRepository
+                .itemsSubject
+                .map { true }
+                .subscribe(profileUpdatesSubject)
     }
 
     // region Navigation
@@ -329,9 +356,24 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         val email = walletInfoProvider.getWalletInfo()?.email
         val kycState = kycStateRepository.item
 
-        val h = getProfileHeaderItem(email, kycState)
-        accountHeader?.updateProfile(h)
-        landscapeAccountHeader?.updateProfile(h)
+        val mainProfile = getProfileHeaderItem(email, kycState)
+        val companyProfiles = getCompaniesProfileItems()
+
+        accountHeader?.also { updateProfiles(it, mainProfile, companyProfiles) }
+        landscapeAccountHeader?.also { updateProfiles(it, mainProfile, companyProfiles) }
+    }
+
+    private fun updateProfiles(header: AccountHeader,
+                               mainProfile: ProfileDrawerItem,
+                               companyProfiles: Collection<ProfileDrawerItem>) {
+        header.updateProfile(mainProfile)
+
+        header.profiles
+                ?.filter { it.identifier != mainProfile.identifier }
+                ?.map(IIdentifyable<Any>::getIdentifier)
+                ?.forEach(header::removeProfileByIdentifier)
+
+        header.addProfiles(*companyProfiles.toTypedArray())
     }
 
     private fun openAccountIdShare() {
