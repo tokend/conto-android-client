@@ -128,7 +128,7 @@
     <string name="template_tx_to">To %1$s</string>
     <string name="tx_action_issued">Issued</string>
     <string name="tx_action_withdrawn">Withdrawn</string>
-    <string name="tx_action_investment">Investment</string>
+    <string name="tx_action_investment">Contribution</string>
     <string name="tx_action_received">Received</string>
     <string name="tx_action_sent">Sent</string>
     <string name="tx_action_locked">Locked</string>
@@ -231,36 +231,36 @@
     <string name="no_price_chart_yet">There is no price history yet</string>
     <string name="no_sale_chart_yet">There is no progress history yet</string>
 
-    <string name="template_sale_invested">%1$s\ninvested</string>
+    <string name="template_sale_invested">%1$s\ngathered</string>
     <string name="template_sale_funded">%1$s\nfunded</string>
     <string name="template_sale_days_to_go">%1$d\n%2$s to go</string>
     <string name="template_sale_starts_in">%1$d\n%2$s to start</string>
-    <string name="template_sale_max_investment">Max investment is %1$s</string>
+    <string name="template_sale_max_investment">Max amount is %1$s</string>
     <string name="template_sale_name_asset">%1$s (%2$s)</string>
     <string name="sales_search_name_hint">Name</string>
-    <string name="explore_sales_title">Sales</string>
+    <string name="explore_sales_title">Crowdfunding</string>
     <string name="sales_search_asset_hint">Asset code</string>
-    <string name="no_sales_found">No sales found</string>
-    <string name="pending_investments_title">Pending investments</string>
-    <string name="no_pending_investments">No pending investments</string>
-    <string name="sale_investing">Investing</string>
-    <string name="invest_action">Invest</string>
+    <string name="no_sales_found">No campaigns found</string>
+    <string name="pending_investments_title">Pending contributions</string>
+    <string name="no_pending_investments">No pending contributions</string>
+    <string name="sale_investing">Contribution</string>
+    <string name="invest_action">Contribute</string>
     <string name="update_investment_action">Update</string>
-    <string name="cancel_investment_action">Cancel investment</string>
-    <string name="investment_confirmation_title">Investment confirmation</string>
-    <string name="investment_cancellation_title">Investment cancellation</string>
-    <string name="investment_updating_title">Investment update</string>
+    <string name="cancel_investment_action">Cancel contribution</string>
+    <string name="investment_confirmation_title">Contribution confirmation</string>
+    <string name="investment_cancellation_title">Contribution cancellation</string>
+    <string name="investment_updating_title">Contribution update</string>
     <string name="sale_asset">Asset</string>
-    <string name="successfully_invested">Investment has been placed</string>
-    <string name="investment_canceled">Investment has been canceled</string>
-    <string name="investment_updated">Investment has been updated</string>
-    <string name="cancel_investment_confirmation">Are you sure you want to cancel this investment?</string>
+    <string name="successfully_invested">Contribution has been accepted</string>
+    <string name="investment_canceled">Contribution has been canceled</string>
+    <string name="investment_updated">Contribution has been updated</string>
+    <string name="cancel_investment_confirmation">Are you sure you want to cancel this contribution?</string>
     <string name="sale_details_title">Details</string>
     <string name="sale_overview_title">Overview</string>
     <string name="sale_chart_title">Chart</string>
     <string name="invest_asset_hint">Asset</string>
-    <string name="sale_summary_title">Sale summary</string>
-    <string name="sale_title">Sale</string>
+    <string name="sale_summary_title">Campaign summary</string>
+    <string name="sale_title">Campaign</string>
 
     <string name="tokend_network_hint">Network</string>
     <string name="not_specified">Not specified</string>
@@ -279,14 +279,14 @@
     <string name="error_kyc_required_to_own_asset">Only verified accounts can own this asset</string>
 
     <string name="help">Help</string>
-    <string name="investment_help_title">Investment help</string>
+    <string name="investment_help_title">Contributing help</string>
     <string name="investment_help_content">
-        • You can make investments in this sale using proposed assets\n\n
-        • You can have one investment per asset\n\n
-        • While the sale is active, you can change the amount of your investment or cancel them\n\n
-        • If you cancel your investment, the paid amount and fee will be returned\n\n
-        • If the sale has reached it\s soft cap by it\s end date, you will receive the amount
-        of the sale asset according to your investments; otherwise, your investments will be returned.
+        • You can contribute in this campaign using proposed assets\n\n
+        • You can have one contribution per asset\n\n
+        • While the campaign is active, you can change the amount of your contributions or cancel them\n\n
+        • If you cancel your contribution, the paid amount and fee will be returned\n\n
+        • If the campaign has reached it\s soft cap by it\s end date, you will receive the amount
+        of the campaign asset according to your contributions; otherwise, your contributions will be returned.
     </string>
     <string name="limits_title">Limits</string>
     <string name="payment">Payment</string>
@@ -299,7 +299,7 @@
     <string name="offer_fee">Order</string>
     <string name="withdrawal_fee">Withdrawal</string>
     <string name="issuance_fee">Issuance</string>
-    <string name="invest_fee">Invest</string>
+    <string name="invest_fee">Crowdfunding contribution</string>
     <string name="capital_deployment_fee">Capital deployment</string>
     <string name="operation_fee">Operation</string>
     <string name="payout_fee">Payout</string>
@@ -325,8 +325,8 @@
 
     <string name="sale_info_start_time">Start time</string>
     <string name="sale_info_close_time">Close time</string>
-    <string name="sale_info_soft_cap">Soft cap</string>
-    <string name="sale_info_hard_cap">Hard cap</string>
+    <string name="sale_info_soft_cap">Min goal</string>
+    <string name="sale_info_hard_cap">Max goal</string>
     <string name="sale_info_to_sell_template">%1$s to sell</string>
 
     <string name="seed_alert_dialog">"You are about to show sensitive data.\nAnyone
@@ -337,14 +337,14 @@
 
     <string name="balance_change_cause_unknown">Unknown</string>
     <string name="balance_change_cause_aml">AML alert</string>
-    <string name="balance_change_cause_investment">Investment</string>
+    <string name="balance_change_cause_investment">Contribution</string>
     <string name="balance_change_cause_matched_offer">Order</string>
     <string name="balance_change_cause_issuance">Issuance/deposit</string>
     <string name="balance_change_cause_payment">Payment</string>
     <string name="balance_change_cause_withdrawal_request">Withdrawal request</string>
     <string name="balance_change_cause_pending_offer">Pending order</string>
-    <string name="balance_change_cause_pending_investment">Pending investment</string>
-    <string name="balance_change_cause_sale_cancellation">Sale cancellation</string>
+    <string name="balance_change_cause_pending_investment">Pending contribution</string>
+    <string name="balance_change_cause_sale_cancellation">Crowdfunding cancellation</string>
     <string name="balance_change_cause_asset_pair_update">Asset pair update</string>
     <string name="balance_change_cause_offer_cancellation">Order cancellation</string>
 
