@@ -31,8 +31,6 @@ import org.tokend.template.features.trade.orderbook.repository.OrderBookReposito
 /**
  * @param context if not specified then android-related repositories
  * will be unavailable
- * @param company if specified then asset-related repositories
- * will receive it as a filter criteria
  */
 class RepositoryProviderImpl(
         private val apiProvider: ApiProvider,
@@ -181,14 +179,16 @@ class RepositoryProviderImpl(
     override fun sales(): SalesRepository {
         val key = companyId.toString()
         return salesRepositories.getOrPut(key) {
-            SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+            SalesRepository(companyId, walletInfoProvider,
+                    apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
         }
     }
 
     override fun filteredSales(): SalesRepository {
         val key = companyId.toString()
         return filteredSalesRepositories.getOrPut(key) {
-            SalesRepository(companyId, apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+            SalesRepository(companyId, walletInfoProvider,
+                    apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
         }
     }
 
