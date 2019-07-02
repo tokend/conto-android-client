@@ -452,7 +452,7 @@ class Navigator private constructor() {
         performIntent(intent)
     }
 
-    fun toAcceptRedemption(balanceId: String, request: String, requestCode: Int? = null) {
+    fun openAcceptRedemption(balanceId: String, request: String, requestCode: Int? = null) {
         val intent = context?.intentFor<ConfirmRedemptionActivity>(
                 ConfirmRedemptionActivity.EXTRA_BALANCE_ID to balanceId,
                 ConfirmRedemptionActivity.EXTRA_REDEMPTION to request

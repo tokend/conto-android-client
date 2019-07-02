@@ -63,7 +63,7 @@ class ScanRedemptionActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onSuccess = { balance ->
-                            Navigator.from(this).toAcceptRedemption(balance.id, result, ACCEPT_REQUEST_CODE)
+                            Navigator.from(this).openAcceptRedemption(balance.id, result, ACCEPT_REQUEST_CODE)
                         },
                         onError = this::onRequestParsingError
                 )
