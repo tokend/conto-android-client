@@ -5,9 +5,11 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.generated.resources.BalanceResource
 import org.tokend.sdk.api.v3.accounts.AccountsApiV3
 import org.tokend.sdk.api.v3.balances.BalancesApi
 import org.tokend.sdk.api.v3.balances.params.ConvertedBalancesParams
+import org.tokend.sdk.utils.extentions.has
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.model.SimpleAsset
@@ -21,6 +23,7 @@ import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.extensions.mapSuccessful
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.*
+import org.tokend.wallet.xdr.AssetPolicy
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.op_extensions.CreateBalanceOp
 
@@ -35,6 +38,12 @@ class BalancesRepository(
 ) : SimpleMultipleItemsRepository<BalanceRecord>(itemsCache) {
 
     var conversionAsset: Asset? = null
+
+    private val ownerFilterPredicate = { balance: BalanceResource ->
+        assetOwnerId == null
+                || balance.asset.owner.id == assetOwnerId
+                || balance.asset.policies.has(AssetPolicy.BASE_ASSET.value)
+    }
 
     override fun getItems(): Single<List<BalanceRecord>> {
         val signedApi = apiProvider.getSignedApi()
@@ -82,8 +91,7 @@ class BalancesRepository(
                     convertedBalances
                             .states
                             .filter {
-                                assetOwnerId == null ||
-                                        it.balance.asset.owner.id == assetOwnerId
+                                ownerFilterPredicate(it.balance)
                             }
                             .mapSuccessful {
                                 BalanceRecord(it, urlConfigProvider.getConfig(),
@@ -101,10 +109,7 @@ class BalancesRepository(
                 .toSingle()
                 .map { sourceList ->
                     sourceList
-                            .filter {
-                                assetOwnerId == null ||
-                                        it.asset.owner.id == assetOwnerId
-                            }
+                            .filter(ownerFilterPredicate)
                             .mapSuccessful {
                                 BalanceRecord(it, urlConfigProvider.getConfig(), mapper)
                             }

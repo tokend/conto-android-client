@@ -7,10 +7,7 @@ import dagger.Provides
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.util.comparator.AssetCodeComparator
-import org.tokend.template.util.comparator.AssetComparator
-import org.tokend.template.util.comparator.BalancesByAmountExistenceComparator
-import org.tokend.template.util.comparator.BalancesByConvertedAmountComparator
+import org.tokend.template.util.comparator.*
 import org.tokend.template.util.errorhandler.DefaultErrorLogger
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.util.errorhandler.ErrorLogger
@@ -50,7 +47,13 @@ class UtilModule {
     @Provides
     @Singleton
     fun balanceComparator(): Comparator<BalanceRecord> {
-        return BalancesByAmountExistenceComparator(assetComparator())
+        return BalancesByBaseAssetComparator(
+                BalancesByAmountExistenceComparator(
+                        BalancesByAssetCodeComparator(
+                                assetCodeComparator()
+                        )
+                )
+        )
     }
 
     @Provides

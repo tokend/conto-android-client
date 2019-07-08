@@ -35,6 +35,9 @@ class AssetRecord(
     val canBeBaseForAtomicSwap: Boolean
         get() = checkPolicy(policy, org.tokend.wallet.xdr.AssetPolicy.CAN_BE_BASE_IN_ATOMIC_SWAP.value)
 
+    val isBase: Boolean
+        get() = checkPolicy(policy, org.tokend.wallet.xdr.AssetPolicy.BASE_ASSET.value)
+
     override fun equals(other: Any?): Boolean {
         return other is AssetRecord
                 && other.code == this.code
