@@ -217,6 +217,7 @@ class SignUpActivity : BaseActivity() {
 
         updateSignUpAvailability()
     }
+
     // endregion
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

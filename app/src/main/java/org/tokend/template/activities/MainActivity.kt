@@ -406,10 +406,9 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
         var disposable: Disposable? = null
 
-        val progress = ProgressDialogFactory.getTunedDialog(this)
-        progress.setMessage(getString(R.string.loading_data))
-        progress.setCancelable(true)
-        progress.setOnCancelListener { disposable?.dispose() }
+        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
+            disposable?.dispose()
+        }
 
         disposable = repositoryProvider
                 .accountDetails()

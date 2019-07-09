@@ -131,7 +131,7 @@ class ConfirmRedemptionActivity : BaseActivity() {
     }
 
     private fun acceptRedemption() {
-        val dialog = ProgressDialogFactory.getTunedDialog(this)
+        val dialog = ProgressDialogFactory.getDialog(this)
 
         ConfirmRedemptionRequestUseCase(
                 request,
@@ -226,9 +226,15 @@ class ConfirmRedemptionActivity : BaseActivity() {
     }
 
     companion object {
-        const val EXTRA_BALANCE_ID = "balance_id"
-        const val EXTRA_REDEMPTION = "extra_redemption"
+        private const val EXTRA_BALANCE_ID = "balance_id"
+        private const val EXTRA_REDEMPTION = "extra_redemption"
 
         private const val REQUESTOR_ITEM_ID = 1L
+
+        fun getBundle(balanceId: String,
+                      redemptionRequest: String) = Bundle().apply {
+            putString(EXTRA_BALANCE_ID, balanceId)
+            putString(EXTRA_REDEMPTION, redemptionRequest)
+        }
     }
 }

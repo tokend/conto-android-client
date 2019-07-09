@@ -79,10 +79,9 @@ class CreateRedemptionActivity : BaseActivity() {
     private fun createRedemptionRequest() {
         var disposable: Disposable? = null
 
-        val progress = ProgressDialogFactory.getTunedDialog(this)
-        progress.setMessage(getString(R.string.loading_data))
-        progress.setCancelable(true)
-        progress.setOnCancelListener { disposable?.dispose() }
+        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
+            disposable?.dispose()
+        }
 
         disposable = CreateRedemptionRequestUseCase(
                 amount,
@@ -124,6 +123,10 @@ class CreateRedemptionActivity : BaseActivity() {
     }
 
     companion object {
-        const val ASSET_CODE_EXTRA = "asset_code"
+        private const val ASSET_CODE_EXTRA = "asset_code"
+
+        fun getBundle(assetCode: String?) = Bundle().apply {
+            putString(ASSET_CODE_EXTRA, assetCode)
+        }
     }
 }
