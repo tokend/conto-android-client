@@ -104,6 +104,8 @@ class PaymentAmountFragment : AmountInputFragment() {
     }
 
     override fun getBalancePicker(): BalancePickerBottomDialog {
+        val companyId = companyInfoProvider.getCompany()?.id
+
         return BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
@@ -111,6 +113,7 @@ class PaymentAmountFragment : AmountInputFragment() {
                 balancesRepository
         ) { balance ->
             balance.asset.isTransferable
+                    && balance.asset.ownerAccountId == companyId
         }
     }
 

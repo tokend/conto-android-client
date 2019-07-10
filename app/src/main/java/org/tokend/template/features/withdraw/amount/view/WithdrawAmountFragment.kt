@@ -18,6 +18,8 @@ class WithdrawAmountFragment : AmountInputFragment() {
     }
 
     override fun getBalancePicker(): BalancePickerBottomDialog {
+        val companyId = companyInfoProvider.getCompany()?.id
+
         return BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
@@ -25,6 +27,7 @@ class WithdrawAmountFragment : AmountInputFragment() {
                 balancesRepository
         ) { balance ->
             balance.asset.isWithdrawable
+                    && balance.asset.ownerAccountId == companyId
         }
     }
 

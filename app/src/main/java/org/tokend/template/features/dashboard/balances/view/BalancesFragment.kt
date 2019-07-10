@@ -222,9 +222,12 @@ class BalancesFragment : BaseFragment() {
 
     // region Display
     private fun displayBalances() {
+        val companyId = companyInfoProvider.getCompany()?.id
+
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
+                .filter { it.asset.ownerAccountId == companyId }
                 .map(::BalanceListItem)
 
         adapter.setData(items)

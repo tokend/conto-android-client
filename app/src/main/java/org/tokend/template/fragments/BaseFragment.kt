@@ -40,6 +40,8 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     lateinit var balanceComparator: Comparator<BalanceRecord>
     @Inject
     lateinit var amountFormatter: AmountFormatter
+    @Inject
+    lateinit var companyInfoProvider: CompanyInfoProvider
 
     override fun onBackPressed() = true
 

@@ -118,7 +118,6 @@ class RepositoryProviderImpl(
         val key = companyId.toString()
         return balancesRepositories.getOrPut(key) {
             BalancesRepository(
-                    companyId,
                     apiProvider,
                     walletInfoProvider,
                     urlConfigProvider,
