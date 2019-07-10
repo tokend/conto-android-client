@@ -8,7 +8,7 @@ class CompanyRecord(
         val logoUrl: String?
 ) {
     constructor(source: BusinessResource) : this(
-            id = source.id,
+            id = source.accountId,
             name = source.name,
             logoUrl = source.logoUrl
     )
