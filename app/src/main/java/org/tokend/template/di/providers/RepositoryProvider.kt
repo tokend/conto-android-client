@@ -8,6 +8,7 @@ import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.data.repository.tfa.TfaFactorsRepository
 import org.tokend.template.data.repository.tradehistory.TradeHistoryRepository
+import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -41,4 +42,5 @@ interface RepositoryProvider {
     fun polls(): PollsRepository
     fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository
     fun companies(): CompaniesRepository
+    fun companyClients(): CompanyClientsRepository
 }
