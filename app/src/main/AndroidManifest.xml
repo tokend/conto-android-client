@@ -213,6 +213,11 @@
         <activity
             android:name=".features.redeem.accept.view.ConfirmRedemptionActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.CorporateMainActivity"
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

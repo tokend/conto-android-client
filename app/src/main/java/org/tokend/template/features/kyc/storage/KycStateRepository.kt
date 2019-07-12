@@ -21,6 +21,7 @@ import org.tokend.template.features.invest.logic.BlobManager
 import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.model.form.EmptyKycForm
 import org.tokend.template.features.kyc.model.form.KycForm
+import org.tokend.template.features.kyc.model.form.KycFormType
 import org.tokend.template.features.kyc.model.form.SimpleKycForm
 
 /**
@@ -60,6 +61,12 @@ class KycStateRepository(
         submittedStatePersistor?.saveState(item)
     }
     // endregion
+
+    val itemFormData: SimpleKycForm?
+        get() = (item as? KycState.Submitted<*>)?.formData as? SimpleKycForm
+
+    val itemFormType: KycFormType?
+        get() = itemFormData?.formType
 
     override fun getItem(): Observable<KycState> {
         val signedApi = apiProvider.getSignedApi()
