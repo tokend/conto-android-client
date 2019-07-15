@@ -4,6 +4,7 @@ import android.content.Context
 import org.tokend.template.R
 import org.tokend.template.data.model.history.BalanceChangeAction
 import org.tokend.template.data.model.history.details.BalanceChangeCause
+import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.fees.adapter.FeeListItem
 import org.tokend.template.features.kyc.model.form.KycFormType
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
@@ -141,5 +142,16 @@ class LocalizedName(private val context: Context) {
 
     fun forMonth(numberFromZero: Int): String {
         return context.resources.getStringArray(R.array.months)[numberFromZero]
+    }
+
+    fun forCompanyClientStatus(status: CompanyClientRecord.Status): String {
+        return when (status) {
+            CompanyClientRecord.Status.NOT_REGISTERED ->
+                context.getString(R.string.company_client_not_registered)
+            CompanyClientRecord.Status.ACTIVE ->
+                context.getString(R.string.company_client_active)
+            CompanyClientRecord.Status.BLOCKED ->
+                context.getString(R.string.company_client_blocked)
+        }
     }
 }

@@ -27,6 +27,8 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
+import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
+import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.companies.view.CompaniesActivity
 import org.tokend.template.features.companies.view.CompanyLoadingActivity
 import org.tokend.template.features.deposit.DepositFragment
@@ -440,5 +442,11 @@ class Navigator private constructor() {
         context?.intentFor<ConfirmRedemptionActivity>()
                 ?.putExtras(ConfirmRedemptionActivity.getBundle(balanceId, request))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openCompanyClientDetails(client: CompanyClientRecord) {
+        context?.intentFor<CompanyClientDetailsActivity>()
+                ?.putExtras(CompanyClientDetailsActivity.getBundle(client))
+                ?.also { performIntent(it) }
     }
 }
