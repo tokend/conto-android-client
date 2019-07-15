@@ -39,7 +39,6 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
-import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -59,16 +58,16 @@ import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.util.concurrent.TimeUnit
 
-class MainActivity : BaseActivity(), WalletEventsListener {
+open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
-        private const val DEFAULT_FRAGMENT_ID = DashboardFragment.ID
         private val CONTACT_ITEM_ID = "contact".hashCode().toLong()
     }
+    protected open val defaultFragmentId = DashboardFragment.ID
 
     private var navigationDrawer: Drawer? = null
     private var landscapeNavigationDrawer: Drawer? = null
     private var onBackPressedListener: OnBackPressedListener? = null
-    private val factory = FragmentFactory()
+    protected val factory = FragmentFactory()
     private val tablet by lazy {
         resources.getBoolean(R.bool.isTablet)
     }
@@ -80,7 +79,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
 
     private var toolbar: Toolbar? = null
 
-    private val kycStateRepository: KycStateRepository
+    protected val kycStateRepository: KycStateRepository
         get() = repositoryProvider.kycState()
 
     private val companiesRepository: CompaniesRepository
@@ -109,7 +108,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         subscribeToKycChanges()
         subscribeToCompanies()
 
-        navigationDrawer?.setSelection(DEFAULT_FRAGMENT_ID)
+        navigationDrawer?.setSelection(defaultFragmentId)
     }
 
     // region Init
@@ -127,56 +126,8 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                         companyPlaceholderDrawable)
         )
 
-        val items = HashMap<Long, PrimaryDrawerItem>()
-
-        PrimaryDrawerItem()
-                .withName(R.string.dashboard_title)
-                .withIdentifier(DashboardFragment.ID)
-                .withIcon(R.drawable.ic_coins)
-                .also { items[DashboardFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.deposit_title)
-                .withIdentifier(DepositFragment.ID)
-                .withIcon(R.drawable.ic_deposit)
-                .also { items[DepositFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.withdraw_title)
-                .withIdentifier(WithdrawFragment.ID)
-                .withIcon(R.drawable.ic_withdraw)
-                .also { items[WithdrawFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.explore_sales_title)
-                .withIdentifier(SalesFragment.ID)
-                .withIcon(R.drawable.ic_invest)
-                .also { items[SalesFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.trade_title)
-                .withIdentifier(TradeAssetPairsFragment.ID)
-                .withIcon(R.drawable.ic_trade)
-                .also { items[OrderBookFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.polls_title)
-                .withIdentifier(PollsFragment.ID)
-                .withIcon(R.drawable.ic_poll)
-                .also { items[PollsFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.settings_title)
-                .withIdentifier(SettingsFragment.ID)
-                .withIcon(R.drawable.ic_settings)
-                .also { items[SettingsFragment.ID] = it }
-
-        PrimaryDrawerItem()
-                .withName(R.string.contact_company)
-                .withIdentifier(CONTACT_ITEM_ID)
-                .withIcon(R.drawable.ic_email_letter)
-                .withSelectable(false)
-                .also { items[CONTACT_ITEM_ID] = it }
+        val items = getNavigationItems()
+                .associateBy(PrimaryDrawerItem::getIdentifier)
 
         val accountHeader = getHeaderInstance(email)
         val landscapeAccountHeader = getHeaderInstance(email)
@@ -195,7 +146,50 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .addTo(compositeDisposable)
     }
 
-    private fun getHeaderInstance(email: String?): AccountHeader {
+    protected open fun getNavigationItems() = listOf(
+            PrimaryDrawerItem()
+                    .withName(R.string.dashboard_title)
+                    .withIdentifier(DashboardFragment.ID)
+                    .withIcon(R.drawable.ic_coins),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.deposit_title)
+                    .withIdentifier(DepositFragment.ID)
+                    .withIcon(R.drawable.ic_deposit),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.withdraw_title)
+                    .withIdentifier(WithdrawFragment.ID)
+                    .withIcon(R.drawable.ic_withdraw),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.explore_sales_title)
+                    .withIdentifier(SalesFragment.ID)
+                    .withIcon(R.drawable.ic_invest),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.trade_title)
+                    .withIdentifier(TradeAssetPairsFragment.ID)
+                    .withIcon(R.drawable.ic_trade),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.polls_title)
+                    .withIdentifier(PollsFragment.ID)
+                    .withIcon(R.drawable.ic_poll),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.settings_title)
+                    .withIdentifier(SettingsFragment.ID)
+                    .withIcon(R.drawable.ic_settings),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.contact_company)
+                    .withIdentifier(CONTACT_ITEM_ID)
+                    .withIcon(R.drawable.ic_email_letter)
+                    .withSelectable(false)
+    )
+
+    protected open fun getHeaderInstance(email: String?): AccountHeader {
         var header: AccountHeader? = null
 
         return AccountHeaderBuilder()
@@ -208,7 +202,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .withProfileImagesVisible(true)
                 .withDividerBelowHeader(true)
                 .addProfiles(
-                        getProfileHeaderItem(email, null),
+                        getProfileHeaderItem(email),
                         *getCompaniesProfileItems().toTypedArray()
                 )
                 .withOnlyMainProfileImageVisible(true)
@@ -232,8 +226,8 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 .also { header = it }
     }
 
-    private fun getProfileHeaderItem(email: String?,
-                                     kycState: KycState?): ProfileDrawerItem {
+    protected open fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
+        val kycState = kycStateRepository.item
         val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
 
         return ProfileDrawerItem()
@@ -247,7 +241,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 }
     }
 
-    private fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> {
+    protected open fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> {
         return companiesRepository
                 .itemsList
                 .map { company ->
@@ -274,46 +268,50 @@ class MainActivity : BaseActivity(), WalletEventsListener {
                 }
     }
 
-    private fun initDrawerBuilder(items: Map<Long, PrimaryDrawerItem>,
-                                  profileHeader: AccountHeader): DrawerBuilder {
+    protected open fun initDrawerBuilder(items: Map<Long, PrimaryDrawerItem>,
+                                         profileHeader: AccountHeader): DrawerBuilder {
         return DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(profileHeader)
                 .withHeaderDivider(false)
                 .withTranslucentStatusBar(false)
                 .withSliderBackgroundColorRes(R.color.material_drawer_background)
-                .addDrawerItems(
-                        items[DashboardFragment.ID]
-                )
-                .apply {
-
-                    if (BuildConfig.IS_DEPOSIT_ALLOWED) {
-                        addDrawerItems(items[DepositFragment.ID])
-                    }
-
-                    if (BuildConfig.IS_WITHDRAW_ALLOWED) {
-                        addDrawerItems(items[WithdrawFragment.ID])
-                    }
-
-                    if (BuildConfig.IS_INVEST_ALLOWED) {
-                        addDrawerItems(items[SalesFragment.ID])
-                    }
-
-                    if (BuildConfig.IS_TRADE_ALLOWED) {
-                        addDrawerItems(items[OrderBookFragment.ID])
-                    }
-
-                    if (BuildConfig.ARE_POLLS_ALLOWED) {
-                        addDrawerItems(items[PollsFragment.ID])
-                    }
-                }
-                .addDrawerItems(
-                        items[CONTACT_ITEM_ID],
-                        items[SettingsFragment.ID]
-                )
+                .also { addRequiredNavigationItems(it, items) }
                 .withOnDrawerItemClickListener { _, _, item ->
                     return@withOnDrawerItemClickListener onNavigationItemSelected(item)
                 }
+    }
+
+    protected open fun addRequiredNavigationItems(builder: DrawerBuilder,
+                                                  items: Map<Long, PrimaryDrawerItem>) {
+        builder.apply {
+            addDrawerItems(items[DashboardFragment.ID])
+
+            if (BuildConfig.IS_DEPOSIT_ALLOWED) {
+                addDrawerItems(items[DepositFragment.ID])
+            }
+
+            if (BuildConfig.IS_WITHDRAW_ALLOWED) {
+                addDrawerItems(items[WithdrawFragment.ID])
+            }
+
+            if (BuildConfig.IS_INVEST_ALLOWED) {
+                addDrawerItems(items[SalesFragment.ID])
+            }
+
+            if (BuildConfig.IS_TRADE_ALLOWED) {
+                addDrawerItems(items[OrderBookFragment.ID])
+            }
+
+            if (BuildConfig.ARE_POLLS_ALLOWED) {
+                addDrawerItems(items[PollsFragment.ID])
+            }
+
+            addDrawerItems(
+                    items[CONTACT_ITEM_ID],
+                    items[SettingsFragment.ID]
+            )
+        }
     }
     // endregion
 
@@ -354,28 +352,29 @@ class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     private fun navigateTo(screenIdentifier: Long) {
-        val fragment =
-                when (screenIdentifier) {
-                    DashboardFragment.ID -> factory.getDashboardFragment()
-                    WithdrawFragment.ID -> factory.getWithdrawFragment()
-                    ExploreAssetsFragment.ID -> factory.getExploreFragment()
-                    SettingsFragment.ID -> factory.getSettingsFragment()
-                    DepositFragment.ID -> factory.getDepositFragment()
-                    SalesFragment.ID -> factory.getSalesFragment()
-                    TradeAssetPairsFragment.ID -> factory.getTradeAssetPairsFragment()
-                    PollsFragment.ID -> factory.getPollsFragment()
-                    else -> return
-                }
+        getFragment(screenIdentifier)
+                ?.also { navigateTo(screenIdentifier, it) }
+    }
 
-        navigateTo(screenIdentifier, fragment)
+    protected open fun getFragment(screenIdentifier: Long): Fragment? {
+        return when (screenIdentifier) {
+            DashboardFragment.ID -> factory.getDashboardFragment()
+            WithdrawFragment.ID -> factory.getWithdrawFragment()
+            ExploreAssetsFragment.ID -> factory.getExploreFragment()
+            SettingsFragment.ID -> factory.getSettingsFragment()
+            DepositFragment.ID -> factory.getDepositFragment()
+            SalesFragment.ID -> factory.getSalesFragment()
+            TradeAssetPairsFragment.ID -> factory.getTradeAssetPairsFragment()
+            PollsFragment.ID -> factory.getPollsFragment()
+            else -> null
+        }
     }
     // endregion
 
-    private fun updateProfileHeader() {
+    protected open fun updateProfileHeader() {
         val email = walletInfoProvider.getWalletInfo()?.email
-        val kycState = kycStateRepository.item
 
-        val mainProfile = getProfileHeaderItem(email, kycState)
+        val mainProfile = getProfileHeaderItem(email)
         val companyProfiles = getCompaniesProfileItems()
 
         accountHeader?.also { updateProfiles(it, mainProfile, companyProfiles) }
@@ -395,7 +394,7 @@ class MainActivity : BaseActivity(), WalletEventsListener {
         header.addProfiles(*companyProfiles.toTypedArray())
     }
 
-    private fun openAccountIdShare() {
+    protected fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
         Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
     }
@@ -497,12 +496,12 @@ class MainActivity : BaseActivity(), WalletEventsListener {
             if (landscapeAccountHeader?.isSelectionListShown == true) {
                 landscapeAccountHeader?.toggleSelectionList(this)
             }
-            if (navigationDrawer?.currentSelection == DEFAULT_FRAGMENT_ID) {
+            if (navigationDrawer?.currentSelection == defaultFragmentId) {
                 if (onBackPressedListener?.onBackPressed() != false)
                     moveTaskToBack(true)
             } else {
                 if (onBackPressedListener?.onBackPressed() != false)
-                    navigateTo(DEFAULT_FRAGMENT_ID)
+                    navigateTo(defaultFragmentId)
             }
         }
     }

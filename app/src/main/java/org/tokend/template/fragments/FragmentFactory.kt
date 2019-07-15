@@ -5,6 +5,7 @@ import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.AssetDetailsFragment
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.movements.view.AccountMovementsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
@@ -121,5 +122,9 @@ class FragmentFactory {
                         ownerAccountId = ownerAccountId
                 )
         )
+    }
+
+    fun getCompanyClientsFragment(): Fragment {
+        return CompanyClientsFragment()
     }
 }

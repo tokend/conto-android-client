@@ -26,6 +26,9 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.kyc.model.KycState
+import org.tokend.template.features.kyc.model.form.KycFormType
+import org.tokend.template.features.kyc.model.form.SimpleKycForm
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
 import org.tokend.template.features.signin.logic.SignInMethod
@@ -219,10 +222,7 @@ class SignInActivity : BaseActivity() {
                     password_edit_text.text.getChars()
                 }
                 .subscribeBy(
-                        onComplete = {
-                            canSignIn = false
-                            Navigator.from(this).toCompaniesActivity()
-                        },
+                        onComplete = this::onSignInComplete,
                         onError = {
                             it.printStackTrace()
                             handleSignInError(it)
@@ -241,6 +241,16 @@ class SignInActivity : BaseActivity() {
                 errorHandlerFactory.getDefault().handle(error)
         }
         updateSignInAvailability()
+    }
+
+    private fun onSignInComplete() {
+        canSignIn = false
+
+        if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+            Navigator.from(this).toCorporateMainActivity()
+        } else {
+            Navigator.from(this).toCompaniesActivity()
+        }
     }
 
     private fun updateAdditionalButtonsState(isEnabled: Boolean) {

@@ -392,7 +392,7 @@
     <string name="template_to_withdraw">%1$s к выводу</string>
 
     <string name="kyc_form_type_general">Стандартный аккаунт</string>
-    <string name="kyc_form_type_corporate">Корпоративный аккаунт</string>
+    <string name="kyc_form_type_corporate">Бизнес-аккаунт</string>
     <string name="kyc_form_type_unknown">Верифицированный аккаунт</string>
     <string name="unverified_account">Неверифицированный аккаунт</string>
 
@@ -457,4 +457,8 @@
     <string name="template_contact_email">Написать %1$s</string>
     <string name="template_redemption_qr_explanation_amount">Используйте этот QR код чтобы погасить %1$s</string>
     <string name="tx_requestor">Плательщик</string>
+    <string name="clients_title">Клиенты</string>
+    <string name="no_clients">Клиенты не найдены</string>
+    <string name="template_client_balances_and_some_more">+ еще %1$d</string>
+    <string name="invite_action">Пригласить</string>
 </resources>

@@ -15,6 +15,7 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.kyc.model.form.KycFormType
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.persistance.FingerprintAuthManager
@@ -213,9 +214,7 @@ class UnlockAppActivity : BaseActivity() {
                 }
                 .doOnDispose { password.fill('0') }
                 .subscribeBy(
-                        onComplete = {
-                            Navigator.from(this).toCompaniesActivity()
-                        },
+                        onComplete = this::onUnlockComplete,
                         onError = {
                             it.printStackTrace()
                             handleUnlockError(it)
@@ -239,6 +238,14 @@ class UnlockAppActivity : BaseActivity() {
                 errorHandlerFactory.getDefault().handle(error)
         }
         updateSignInAvailability()
+    }
+
+    private fun onUnlockComplete() {
+        if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+            Navigator.from(this).toCorporateMainActivity()
+        } else {
+            Navigator.from(this).toCompaniesActivity()
+        }
     }
 
     override fun onResume() {

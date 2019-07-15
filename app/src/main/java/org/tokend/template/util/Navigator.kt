@@ -14,6 +14,7 @@ import org.jetbrains.anko.newTask
 import org.jetbrains.anko.singleTop
 import org.tokend.sdk.keyserver.models.WalletInfo
 import org.tokend.template.R
+import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.activities.MainActivity
 import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.Asset
@@ -179,6 +180,12 @@ class Navigator private constructor() {
 
     fun toMainActivity() {
         context?.intentFor<MainActivity>()
+                ?.also { performIntent(it) }
+        activity?.let { fadeOut(it) }
+    }
+
+    fun toCorporateMainActivity() {
+        context?.intentFor<CorporateMainActivity>()
                 ?.also { performIntent(it) }
         activity?.let { fadeOut(it) }
     }

@@ -16,6 +16,7 @@ import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.data.repository.tfa.TfaFactorsRepository
 import org.tokend.template.data.repository.tradehistory.TradeHistoryRepository
 import org.tokend.template.extensions.getOrPut
+import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -113,6 +114,10 @@ class RepositoryProviderImpl(
 
     private val atomicSwapRepositoryByAsset =
             LruCache<String, AtomicSwapRequestsRepository>(MAX_SAME_REPOSITORIES_COUNT)
+
+    private val companyClientsRepository: CompanyClientsRepository by lazy {
+        CompanyClientsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
+    }
 
     override fun balances(): BalancesRepository {
         val key = companyId.toString()
@@ -271,6 +276,10 @@ class RepositoryProviderImpl(
 
     override fun companies(): CompaniesRepository {
         return companiesRepository
+    }
+
+    override fun companyClients(): CompanyClientsRepository {
+        return companyClientsRepository
     }
 
     companion object {
