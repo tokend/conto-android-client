@@ -137,7 +137,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                                     R.drawable.ic_accounts_add_fab)
                             )
                             setOnClickListener {
-                                // TODO
+                                Navigator.from(this@CompanyClientsFragment).openInvitation()
                                 menu_fab.close(false)
                             }
                         }

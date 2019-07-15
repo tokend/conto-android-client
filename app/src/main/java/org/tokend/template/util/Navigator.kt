@@ -37,6 +37,7 @@ import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.view.InvestmentConfirmationActivity
 import org.tokend.template.features.invest.view.SaleActivity
 import org.tokend.template.features.invest.view.SaleInvestActivity
+import org.tokend.template.features.invites.view.InviteNewUsersActivity
 import org.tokend.template.features.limits.LimitsActivity
 import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.OfferConfirmationActivity
@@ -447,6 +448,11 @@ class Navigator private constructor() {
     fun openCompanyClientDetails(client: CompanyClientRecord) {
         context?.intentFor<CompanyClientDetailsActivity>()
                 ?.putExtras(CompanyClientDetailsActivity.getBundle(client))
+                ?.also { performIntent(it) }
+    }
+
+    fun openInvitation() {
+        context?.intentFor<InviteNewUsersActivity>()
                 ?.also { performIntent(it) }
     }
 }

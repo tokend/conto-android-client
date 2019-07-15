@@ -40,10 +40,13 @@
         <item name="met_errorColor">@color/error</item>
         <item name="met_floatingLabel">highlight</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="EditText.OneLine" parent="EditText">
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="EditText.Dark" parent="EditText">
+    <style name="EditText.OneLine.Dark" parent="EditText.OneLine">
         <item name="met_textColorHint">@color/white_almost</item>
         <item name="met_baseColor">@color/white</item>
         <item name="android:textColor">@color/white</item>

@@ -220,6 +220,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".features.clients.details.view.CompanyClientDetailsActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".features.invites.view.InviteNewUsersActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>
