@@ -447,6 +447,13 @@
     <string name="no_clients">No customers found</string>
     <string name="template_client_balances_and_some_more">+ %1$d more</string>
     <string name="invite_action">Invite</string>
+    <string name="company_client_active">Active</string>
+    <string name="company_client_not_registered">Not registered</string>
+    <string name="company_client_blocked">Blocked</string>
+    <string name="company_client_status">Status</string>
+    <string name="company_client_main_info">Main info</string>
+    <string name="company_client_balances">Balances</string>
+    <string name="company_client_info_title">Client info</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

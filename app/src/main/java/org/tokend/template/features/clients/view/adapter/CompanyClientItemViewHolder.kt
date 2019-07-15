@@ -1,6 +1,6 @@
 package org.tokend.template.features.clients.view.adapter
 
-import android.util.TypedValue
+import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +8,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.list_item_company_client.view.*
 import org.apmem.tools.layouts.FlowLayout
-import org.jetbrains.anko.sp
 import org.tokend.template.R
+import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.util.LogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
@@ -20,6 +20,7 @@ class CompanyClientItemViewHolder(
 ) : BaseViewHolder<CompanyClientListItem>(view) {
     private val emailTextView: TextView = view.email_text_view
     private val logoImageView: ImageView = view.logo_image_view
+    private val statusImageView: ImageView = view.status_image_view
     private val balancesLayout: ViewGroup = view.balances_layout
     private val noBalancesTextView: TextView = view.no_balances_text_view
     private val dividerView: View = view.divider_view
@@ -36,6 +37,13 @@ class CompanyClientItemViewHolder(
     private val balanceThemedContext = ContextThemeWrapper(view.context, R.style.StrokedBadgeText)
     private val balanceTextViewMargin =
             view.context.resources.getDimensionPixelSize(R.dimen.quarter_standard_margin)
+
+    private val statusActiveDrawable =
+            ContextCompat.getDrawable(view.context, R.drawable.company_client_active)
+    private val statusNotRegisteredDrawable =
+            ContextCompat.getDrawable(view.context, R.drawable.company_client_not_registered)
+    private val statusBlockedDrawable =
+            ContextCompat.getDrawable(view.context, R.drawable.company_client_blocked)
 
     override fun bind(item: CompanyClientListItem) {
         emailTextView.text = item.email
@@ -73,6 +81,14 @@ class CompanyClientItemViewHolder(
             balancesLayout.visibility = View.GONE
             noBalancesTextView.visibility = View.VISIBLE
         }
+
+        statusImageView.setImageDrawable(
+                when (item.status) {
+                    CompanyClientRecord.Status.NOT_REGISTERED -> statusNotRegisteredDrawable
+                    CompanyClientRecord.Status.ACTIVE -> statusActiveDrawable
+                    CompanyClientRecord.Status.BLOCKED -> statusBlockedDrawable
+                }
+        )
     }
 
     private fun addBalanceBadge(text: String) {

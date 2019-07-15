@@ -63,4 +63,7 @@
     <dimen name="material_drawer_item_profile_icon_padding">0dp</dimen>
 
     <dimen name="single_check_dialog_left_margin">20dp</dimen>
+
+    <dimen name="company_client_status_size">18dp</dimen>
+    <dimen name="company_client_status_icon_padding">4dp</dimen>
 </resources>

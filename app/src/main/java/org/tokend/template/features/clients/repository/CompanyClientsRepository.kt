@@ -32,9 +32,9 @@ class CompanyClientsRepository(
                 CompanyClientRecord.Balance(BigDecimal("6.483"), SimpleAsset("GBI"))
         )
         return listOf(
-                CompanyClientRecord("0", "ole@mail.com", balances.shuffled()),
-                CompanyClientRecord("1", "bob@mail.com", balances.subList(0, 2)),
-                CompanyClientRecord("2", "dh@gmail.com", listOf())
+                CompanyClientRecord("0", "ole@mail.com", CompanyClientRecord.Status.ACTIVE, balances.shuffled().toList()),
+                CompanyClientRecord("1", "bob@mail.com", CompanyClientRecord.Status.ACTIVE, balances.subList(0, 2).toList()),
+                CompanyClientRecord("2", "dh@gmail.com", CompanyClientRecord.Status.NOT_REGISTERED, listOf())
 
         ).toSingle().map { DataPage(null, it, true) }
                 .delay(1, TimeUnit.SECONDS)

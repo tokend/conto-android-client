@@ -94,7 +94,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         clients_list.layoutManager = layoutManager
         clients_list.addOnScrollListener(hideFabScrollListener)
         adapter.onItemClick { _, item ->
-            // TODO
+            item.source?.also { Navigator.from(this).openCompanyClientDetails(it) }
         }
 
         error_empty_view.observeAdapter(adapter, R.string.no_clients)

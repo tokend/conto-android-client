@@ -461,4 +461,11 @@
     <string name="no_clients">Клиенты не найдены</string>
     <string name="template_client_balances_and_some_more">+ еще %1$d</string>
     <string name="invite_action">Пригласить</string>
+    <string name="company_client_active">Активен</string>
+    <string name="company_client_not_registered">Не зарегистрирован</string>
+    <string name="company_client_blocked">Заблокирован</string>
+    <string name="company_client_status">Статус</string>
+    <string name="company_client_main_info">Основное</string>
+    <string name="company_client_balances">Балансы</string>
+    <string name="company_client_info_title">Информация о клиенте</string>
 </resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="@color/icons"
+        android:pathData="M17,10 C14.5,10,12.4,11.3,11.1,13.2 C10.3,13.1,9.6,13,9,13 C6.3,13,1,14.3,1,17
+L1,20 L10.7,20 C11.8,22.4,14.2,24,17,24 C20.9,24,24,20.9,24,17 S20.9,10,17,10 Z
+M10.1,18.1 L2.9,18.1 L2.9,17 C2.9,16.4,6,14.9,9,14.9 C9.4,14.9,9.9,14.9,10.3,15
+C10.1,15.6,10,16.3,10,17 C10,17.4,10,17.7,10.1,18.1 Z M17,12
+C18,12,19,12.3,19.8,12.8 L12.9,19.7 C12.3,19,12,18,12,17 C12,14.2,14.2,12,17,12
+Z M17,22 C16,22,15,21.7,14.2,21.2 L21.1,14.3 C21.7,15,22,16,22,17
+C22,19.8,19.8,22,17,22 Z" />
+    <path
+        android:fillColor="@color/icons"
+        android:pathData="M9,12 C11.2,12,13,10.2,13,8 S11.2,4,9,4 S5,5.8,5,8 S6.8,12,9,12 Z M9,5.9
+C10.2,5.9,11.1,6.8,11.1,8 S10.2,10.1,9,10.1 S6.9,9.2,6.9,8 S7.8,5.9,9,5.9 Z" />
+</vector>

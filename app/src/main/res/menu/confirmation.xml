@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/confirm"
-        android:icon="@drawable/ic_check"
+        android:icon="@drawable/ic_check_white"
         android:title="@string/confirm_action"
         app:iconTint="@color/icons"
         app:showAsAction="always" />

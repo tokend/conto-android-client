@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <size
+                android:width="@dimen/company_client_status_size"
+                android:height="@dimen/company_client_status_size" />
+            <solid android:color="@color/white" />
+        </shape>
+    </item>
+
+    <item
+        android:bottom="@dimen/company_client_status_icon_padding"
+        android:drawable="@drawable/ic_time"
+        android:left="@dimen/company_client_status_icon_padding"
+        android:right="@dimen/company_client_status_icon_padding"
+        android:top="@dimen/company_client_status_icon_padding" />
+</layer-list>
