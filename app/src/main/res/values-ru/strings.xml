@@ -460,4 +460,5 @@
     <string name="clients_title">Клиенты</string>
     <string name="no_clients">Клиенты не найдены</string>
     <string name="template_client_balances_and_some_more">+ еще %1$d</string>
+    <string name="invite_action">Пригласить</string>
 </resources>

@@ -2,6 +2,7 @@ package org.tokend.template.features.signin.logic
 
 import io.reactivex.Completable
 import org.tokend.template.di.providers.RepositoryProvider
+import org.tokend.template.features.kyc.model.form.KycFormType
 import retrofit2.HttpException
 import java.net.HttpURLConnection
 
@@ -16,8 +17,14 @@ class PostSignInManager(
     fun doPostSignIn(): Completable {
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
-                repositoryProvider.companies().updateDeferred(),
-                repositoryProvider.kycState().updateDeferred()
+                repositoryProvider.kycState().updateDeferred().andThen(Completable.defer {
+                    // Update balances for corporate users, companies otherwise.
+                    if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+                        repositoryProvider.balances().updateDeferred()
+                    } else {
+                        repositoryProvider.companies().updateDeferred()
+                    }
+                })
         )
         val syncActions = listOf<Completable>(
                 // Added actions will be performed on after another in

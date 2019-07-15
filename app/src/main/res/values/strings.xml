@@ -446,6 +446,7 @@
     <string name="clients_title">Customers</string>
     <string name="no_clients">No customers found</string>
     <string name="template_client_balances_and_some_more">+ %1$d more</string>
+    <string name="invite_action">Invite</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
