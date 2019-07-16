@@ -151,6 +151,8 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
             menu_fab.isEnabled = true
             actions.forEach(menu_fab::addMenuButton)
         }
+
+        menu_fab.setClosedOnTouchOutside(true)
     }
     // endregion
 
