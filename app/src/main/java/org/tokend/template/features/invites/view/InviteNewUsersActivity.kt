@@ -111,7 +111,7 @@ class InviteNewUsersActivity : BaseActivity() {
                     progress.show()
                 }
                 .doOnEvent {
-                    progress.hide()
+                    progress.dismiss()
                 }
                 .subscribeBy(
                         onComplete = this::onInviteComplete,
