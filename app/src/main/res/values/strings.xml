@@ -454,11 +454,11 @@
     <string name="company_client_main_info">Main info</string>
     <string name="company_client_balances">Balances</string>
     <string name="company_client_info_title">Client info</string>
-    <string name="invite_new_users_title">Invitations</string>
-    <string name="list_all_invitees_emails_below_separate_them_with_commas">List all invitees emails below, separate them with commas.</string>
+    <string name="invite_new_users_title">Invite new clients</string>
+    <string name="list_all_invitees_emails_below_separate_them_with_commas">List all invitees emails below, separate them with commas</string>
     <string name="emails_title">Emails</string>
     <string name="error_missed_comma_or_invalid_email">Comma missed or invalid email</string>
-    <string name="message_invite_success">Customers invited successfully</string>
+    <string name="message_invite_success">Invites has been sent</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
