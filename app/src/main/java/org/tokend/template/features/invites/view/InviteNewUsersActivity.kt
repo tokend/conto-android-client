@@ -2,10 +2,10 @@ package org.tokend.template.features.invites.view
 
 import android.os.Bundle
 import android.text.Editable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_invite_new_users.*
-import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.onClick
 import org.tokend.template.R
@@ -14,15 +14,10 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.features.invites.logic.InviteNewUsersUseCase
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.EmailValidator
-import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SimpleTextWatcher
 
 class InviteNewUsersActivity : BaseActivity() {
-
-    private val loadingIndicator = LoadingIndicatorManager(
-            showLoading = { progress.show() },
-            hideLoading = { progress.hide() }
-    )
 
     private var invitees: List<String>? = null
 
@@ -30,13 +25,6 @@ class InviteNewUsersActivity : BaseActivity() {
         set(value) {
             field = value
             invite_button.isEnabled = value
-        }
-
-    private var isLoading: Boolean = false
-        set(value) {
-            field = value
-            loadingIndicator.setLoading(value, "main")
-            updateInviteAvailability()
         }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
@@ -74,8 +62,7 @@ class InviteNewUsersActivity : BaseActivity() {
     }
 
     private fun updateInviteAvailability() {
-        canInvite = !isLoading
-                && !emails_edit_text.hasError()
+        canInvite = !emails_edit_text.hasError()
                 && !emails_edit_text.text.isNullOrBlank()
     }
 
@@ -103,34 +90,41 @@ class InviteNewUsersActivity : BaseActivity() {
         }
     }
 
+    private var inviteDisposable: Disposable? = null
     private fun invite() {
-        invitees?.let {
-            InviteNewUsersUseCase(
-                    it,
-                    walletInfoProvider,
-                    apiProvider,
-                    repositoryProvider
-            )
-                    .perform()
-                    .compose(ObservableTransformers.defaultSchedulersCompletable())
-                    .doOnSubscribe {
-                        isLoading = true
-                    }
-                    .doOnTerminate {
-                        isLoading = false
-                    }
-                    .subscribeBy(
-                            onComplete = this::onInviteComplete,
-                            onError = { error ->
-                                errorHandlerFactory.getDefault().handle(error)
-                            }
-                    )
-                    .addTo(compositeDisposable)
+        val invitees = this.invitees ?: return
+
+        val progress = ProgressDialogFactory.getDialog(this) {
+            inviteDisposable?.dispose()
         }
+
+        inviteDisposable?.dispose()
+        inviteDisposable = InviteNewUsersUseCase(
+                invitees,
+                walletInfoProvider,
+                apiProvider,
+                repositoryProvider
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe {
+                    progress.show()
+                }
+                .doOnEvent {
+                    progress.hide()
+                }
+                .subscribeBy(
+                        onComplete = this::onInviteComplete,
+                        onError = { error ->
+                            errorHandlerFactory.getDefault().handle(error)
+                        }
+                )
+                .addTo(compositeDisposable)
     }
 
     private fun onInviteComplete() {
         toastManager.short(getString(R.string.message_invite_success))
+        finish()
     }
 
 }
