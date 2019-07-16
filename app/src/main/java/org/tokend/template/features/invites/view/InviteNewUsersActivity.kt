@@ -1,18 +1,28 @@
 package org.tokend.template.features.invites.view
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.text.Editable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_invite_new_users.*
+import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.onClick
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.extensions.hasError
+import org.tokend.template.features.invites.logic.InviteNewUsersUseCase
+import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.EmailValidator
+import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
 
-class InviteNewUsersActivity : AppCompatActivity() {
+class InviteNewUsersActivity : BaseActivity() {
+
+    private val loadingIndicator = LoadingIndicatorManager(
+            showLoading = { progress.show() },
+            hideLoading = { progress.hide() }
+    )
 
     private var invitees: List<String>? = null
 
@@ -22,8 +32,15 @@ class InviteNewUsersActivity : AppCompatActivity() {
             invite_button.isEnabled = value
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private var isLoading: Boolean = false
+        set(value) {
+            field = value
+            loadingIndicator.setLoading(value, "main")
+            updateInviteAvailability()
+        }
+
+    override fun onCreateAllowed(savedInstanceState: Bundle?) {
+        setContentView(R.layout.activity_invite_new_users)
 
         initViews()
         updateInviteAvailability()
@@ -36,7 +53,6 @@ class InviteNewUsersActivity : AppCompatActivity() {
     }
 
     private fun initToolbar() {
-        setContentView(R.layout.activity_invite_new_users)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = getString(R.string.invite_new_users_title)
@@ -58,7 +74,8 @@ class InviteNewUsersActivity : AppCompatActivity() {
     }
 
     private fun updateInviteAvailability() {
-        canInvite = !emails_edit_text.hasError()
+        canInvite = !isLoading
+                && !emails_edit_text.hasError()
                 && !emails_edit_text.text.isNullOrBlank()
     }
 
@@ -74,7 +91,7 @@ class InviteNewUsersActivity : AppCompatActivity() {
             return
         }
 
-
+        invite()
     }
 
     private fun checkEmails() {
@@ -85,4 +102,35 @@ class InviteNewUsersActivity : AppCompatActivity() {
             updateInviteAvailability()
         }
     }
+
+    private fun invite() {
+        invitees?.let {
+            InviteNewUsersUseCase(
+                    it,
+                    walletInfoProvider,
+                    apiProvider,
+                    repositoryProvider
+            )
+                    .perform()
+                    .compose(ObservableTransformers.defaultSchedulersCompletable())
+                    .doOnSubscribe {
+                        isLoading = true
+                    }
+                    .doOnTerminate {
+                        isLoading = false
+                    }
+                    .subscribeBy(
+                            onComplete = this::onInviteComplete,
+                            onError = { error ->
+                                errorHandlerFactory.getDefault().handle(error)
+                            }
+                    )
+                    .addTo(compositeDisposable)
+        }
+    }
+
+    private fun onInviteComplete() {
+        toastManager.short(getString(R.string.message_invite_success))
+    }
+
 }

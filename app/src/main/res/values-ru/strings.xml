@@ -470,7 +470,7 @@
     <string name="company_client_info_title">Информация о клиенте</string>
     <string name="invite_new_users_title">Приглашения</string>
     <string name="list_all_invitees_emails_below_separate_them_with_commas">Укажите ниже email приглашенных, разделяя их запятыми.</string>
-    <string name="invitees_label">Приглашенные</string>
     <string name="emails_title">Emails</string>
     <string name="error_missed_comma_or_invalid_email">Пропущена запятая или некорректный email</string>
+    <string name="message_invite_success">Клиенты были успешно приглашены</string>
 </resources>

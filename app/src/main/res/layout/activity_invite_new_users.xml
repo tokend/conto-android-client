@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.tokend.template.features.invites.view.InviteNewUsersActivity">
+    tools:context="org.tokend.template.features.invites.view.InviteNewUsersActivity"
+    android:background="@color/background">
 
     <include layout="@layout/appbar" />
 
@@ -16,6 +17,11 @@
         app:layout_constraintBottom_toTopOf="@id/invite_button"
         app:layout_constraintTop_toBottomOf="@id/appbar"
         app:layout_constraintTop_toTopOf="@null">
+
+        <include
+            layout="@layout/layout_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="match_parent"

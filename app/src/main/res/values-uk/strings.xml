@@ -470,7 +470,7 @@
     <string name="company_client_info_title">Інформація про клієнта</string>
     <string name="invite_new_users_title">Запрошення</string>
     <string name="list_all_invitees_emails_below_separate_them_with_commas">Вкажіть нижче email запрошених, розділяючи їх комами.</string>
-    <string name="invitees_label">Запрошені</string>
     <string name="emails_title">Emails</string>
-    <string name="error_missed_comma_or_invalid_email">Пропущена кома некоректний email </string>
+    <string name="error_missed_comma_or_invalid_email">Пропущена кома або некоректний email</string>
+    <string name="message_invite_success">Клієнтів успішно запрошено</string>
 </resources>

@@ -3,12 +3,14 @@ package org.tokend.template.features.invites.logic
 import io.reactivex.Completable
 import org.tokend.rx.extensions.toCompletable
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 
 class InviteNewUsersUseCase(
         private val emails: List<String>,
         private val walletInfoProvider: WalletInfoProvider,
-        private val apiProvider: ApiProvider
+        private val apiProvider: ApiProvider,
+        private val repositoryProvider: RepositoryProvider
 ) {
 
     fun perform(): Completable {
@@ -25,5 +27,8 @@ class InviteNewUsersUseCase(
                         accountId,
                         emails
                 ).toCompletable()
+                .doOnComplete {
+                    repositoryProvider.companyClients().updateIfEverUpdated()
+                }
     }
 }
