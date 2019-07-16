@@ -219,6 +219,8 @@ class BalanceDetailsActivity : BaseActivity() {
         if (!canAcceptRedemption) {
             menu_fab.removeMenuButton(accept_redemption_fab)
         }
+
+        menu_fab.setClosedOnTouchOutside(true)
     }
 
     private val hideFabScrollListener =
