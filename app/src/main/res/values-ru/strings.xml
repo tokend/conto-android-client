@@ -468,4 +468,9 @@
     <string name="company_client_main_info">Основное</string>
     <string name="company_client_balances">Балансы</string>
     <string name="company_client_info_title">Информация о клиенте</string>
+    <string name="invite_new_users_title">Пригласить новых клиентов</string>
+    <string name="list_all_invitees_emails_below_separate_them_with_commas">Укажите email адреса в поле ниже, разделяя их запятыми</string>
+    <string name="emails_title">Email адреса</string>
+    <string name="error_missed_comma_or_invalid_email">Пропущена запятая или некорректный email</string>
+    <string name="message_invite_success">Приглашения отправлены</string>
 </resources>

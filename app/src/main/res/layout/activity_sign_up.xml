@@ -22,7 +22,7 @@
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/email_edit_text"
-                style="@style/EditText"
+                style="@style/EditText.OneLine"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
@@ -39,7 +39,7 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/password_edit_text"
-                    style="@style/EditText"
+                    style="@style/EditText.OneLine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
@@ -49,7 +49,7 @@
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/confirm_password_edit_text"
-                style="@style/EditText"
+                style="@style/EditText.OneLine"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_padding"
