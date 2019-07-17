@@ -94,7 +94,8 @@ class RepositoryProviderImpl(
     }
 
     private val companiesRepository: CompaniesRepository by lazy {
-        CompaniesRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
+        CompaniesRepository(apiProvider, walletInfoProvider, urlConfigProvider,
+                MemoryOnlyRepositoryCache())
     }
 
     private val pollsRepositories =

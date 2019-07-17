@@ -11,12 +11,14 @@ import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import retrofit2.HttpException
 
 class CompaniesRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
+        private val urlConfigProvider: UrlConfigProvider,
         itemsCache: RepositoryCache<CompanyRecord>
 ) : SimpleMultipleItemsRepository<CompanyRecord>(itemsCache) {
 
@@ -43,7 +45,9 @@ class CompaniesRepository(
                 .loadAll()
                 .toSingle()
                 .map { companiesResources ->
-                    companiesResources.map(::CompanyRecord)
+                    companiesResources.map {
+                        CompanyRecord(it, urlConfigProvider.getConfig())
+                    }
                 }
                 .onErrorReturn { error ->
                     if (error is HttpException && (error.isBadRequest() || error.isNotFound()))
