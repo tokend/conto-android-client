@@ -143,6 +143,26 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                         }
         )
 
+
+        // Issuance
+        if (balances.any { it.asset.ownerAccountId == accountId }) {
+            actions.add(
+                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
+                            .apply {
+                                labelText = getString(R.string.issuance_title)
+                                setImageDrawable(ContextCompat.getDrawable(
+                                        requireContext(),
+                                        R.drawable.ic_issuance_white)
+                                )
+                                setOnClickListener {
+                                    Navigator.from(this@CompanyClientsFragment)
+                                            .openMassIssuance()
+                                    menu_fab.close(false)
+                                }
+                            }
+            )
+        }
+
         if (actions.isEmpty()) {
             menu_fab.visibility = View.GONE
             menu_fab.isEnabled = false

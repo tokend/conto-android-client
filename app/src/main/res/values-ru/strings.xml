@@ -474,4 +474,7 @@
     <string name="emails_title">Email адреса</string>
     <string name="error_missed_comma_or_invalid_email">Пропущена запятая или некорректный email</string>
     <string name="message_invite_success">Приглашения отправлены</string>
+    <string name="issuance_title">Начисление</string>
+    <string name="issue">Начислить</string>
+    <string name="successfully_issued">Начисление совершено</string>
 </resources>

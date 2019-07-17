@@ -39,6 +39,7 @@ import org.tokend.template.features.invest.view.SaleActivity
 import org.tokend.template.features.invest.view.SaleInvestActivity
 import org.tokend.template.features.invites.view.InviteNewUsersActivity
 import org.tokend.template.features.limits.LimitsActivity
+import org.tokend.template.features.massissuance.view.MassIssuanceActivity
 import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.OfferConfirmationActivity
 import org.tokend.template.features.offers.OffersActivity
@@ -451,6 +452,11 @@ class Navigator private constructor() {
 
     fun openInvitation() {
         context?.intentFor<InviteNewUsersActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openMassIssuance() {
+        context?.intentFor<MassIssuanceActivity>()
                 ?.also { performIntent(it) }
     }
 }

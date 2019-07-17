@@ -218,12 +218,17 @@
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".features.clients.details.view.CompanyClientDetailsActivity"
+        <activity
+            android:name=".features.clients.details.view.CompanyClientDetailsActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".features.invites.view.InviteNewUsersActivity"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".features.massissuance.view.MassIssuanceActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
     </application>
 
 </manifest>

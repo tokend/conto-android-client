@@ -460,6 +460,9 @@
     <string name="emails_title">Emails</string>
     <string name="error_missed_comma_or_invalid_email">Comma missed or invalid email</string>
     <string name="message_invite_success">Invites has been sent</string>
+    <string name="issuance_title">Issuance</string>
+    <string name="issue">Issue</string>
+    <string name="successfully_issued">Issuance has been done</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
