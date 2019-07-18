@@ -120,6 +120,10 @@ class RepositoryProviderImpl(
         CompanyClientsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
     }
 
+    private val keyValueEntries: KeyValueEntriesRepository by lazy {
+        KeyValueEntriesRepository(apiProvider, MemoryOnlyRepositoryCache())
+    }
+
     override fun balances(): BalancesRepository {
         val key = companyId.toString()
         return balancesRepositories.getOrPut(key) {
@@ -264,7 +268,8 @@ class RepositoryProviderImpl(
     override fun polls(): PollsRepository {
         val key = companyId.toString()
         return pollsRepositories.getOrPut(key) {
-            PollsRepository(companyId, apiProvider, walletInfoProvider, PollsCache())
+            PollsRepository(companyId, apiProvider, walletInfoProvider, keyValueEntries(),
+                    PollsCache())
         }
     }
 
@@ -281,6 +286,10 @@ class RepositoryProviderImpl(
 
     override fun companyClients(): CompanyClientsRepository {
         return companyClientsRepository
+    }
+
+    override fun keyValueEntries(): KeyValueEntriesRepository {
+        return keyValueEntries
     }
 
     companion object {

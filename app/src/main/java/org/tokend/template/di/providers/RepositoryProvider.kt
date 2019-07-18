@@ -43,4 +43,5 @@ interface RepositoryProvider {
     fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository
     fun companies(): CompaniesRepository
     fun companyClients(): CompanyClientsRepository
+    fun keyValueEntries(): KeyValueEntriesRepository
 }
