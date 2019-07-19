@@ -39,6 +39,7 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
+import org.tokend.template.features.kyc.model.form.KycFormType
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -61,7 +62,9 @@ import java.util.concurrent.TimeUnit
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
         private val CONTACT_ITEM_ID = "contact".hashCode().toLong()
+        private val ADD_COMPANY_ITEM_ID = "add_company".hashCode().toLong()
     }
+
     protected open val defaultFragmentId = DashboardFragment.ID
 
     private var navigationDrawer: Drawer? = null
@@ -212,6 +215,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                         openAccountIdShare()
                     } else {
                         (view.tag as? CompanyRecord)?.also(this::switchToAnotherCompany)
+                        (view.tag as? Long)
+                                ?.takeIf { it == ADD_COMPANY_ITEM_ID }
+                                ?.also { openCompanyAdd() }
                     }
                     false
                 }
@@ -265,6 +271,23 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                                     withIcon(companyPlaceholderBitmap)
                                 }
                             }
+                }
+                .toMutableList()
+                .apply {
+                    add(
+                            ProfileDrawerItem()
+                                    .withEmail(getString(R.string.add_company))
+                                    .withIdentifier(ADD_COMPANY_ITEM_ID)
+                                    .withSelectable(false)
+                                    .withPostOnBindViewListener { _, view ->
+                                        view.tag = ADD_COMPANY_ITEM_ID
+                                    }
+                                    .withTypeface(Typeface.DEFAULT)
+                                    .withIcon(ContextCompat.getDrawable(
+                                            this@MainActivity,
+                                            R.drawable.company_add
+                                    ))
+                    )
                 }
     }
 
@@ -396,7 +419,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-        Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
+        Navigator.from(this@MainActivity).openAccountQrShare(
+                walletInfo,
+                useAccountId = kycStateRepository.itemFormType == KycFormType.CORPORATE
+        )
     }
 
     private fun contactCompany() {
@@ -484,6 +510,11 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
         session.setCompany(company)
         Navigator.from(this).toCompanyLoading()
+    }
+
+    private fun openCompanyAdd() {
+        navigationDrawer?.closeDrawer()
+        Navigator.from(this).openCompanyAdd()
     }
 
     override fun onBackPressed() {

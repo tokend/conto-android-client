@@ -152,7 +152,7 @@ class KycStateRepository(
             return Single.just(EmptyKycForm())
         }
 
-        return BlobManager(apiProvider, walletInfoProvider)
+        return BlobManager(apiProvider)
                 .getPrivateBlob(blobId)
                 .map { blob ->
                     try {

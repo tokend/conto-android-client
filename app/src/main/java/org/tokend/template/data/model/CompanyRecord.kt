@@ -3,12 +3,13 @@ package org.tokend.template.data.model
 import org.tokend.sdk.api.base.model.RemoteFile
 import org.tokend.sdk.api.integrations.dns.model.BusinessResource
 import org.tokend.sdk.factory.GsonFactory
+import java.io.Serializable
 
 class CompanyRecord(
         val id: String,
         val name: String,
         val logoUrl: String?
-) {
+): Serializable {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
             name = source.name,

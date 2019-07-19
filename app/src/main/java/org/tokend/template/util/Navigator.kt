@@ -20,6 +20,7 @@ import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.assets.AssetDetailsActivity
@@ -29,6 +30,8 @@ import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
+import org.tokend.template.features.companies.add.view.AddCompanyActivity
+import org.tokend.template.features.companies.add.view.AddCompanyConfirmationActivity
 import org.tokend.template.features.companies.view.CompaniesActivity
 import org.tokend.template.features.companies.view.CompanyLoadingActivity
 import org.tokend.template.features.deposit.DepositFragment
@@ -391,9 +394,10 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAccountQrShare(walletInfo: WalletInfo) {
+    fun openAccountQrShare(walletInfo: WalletInfo,
+                           useAccountId: Boolean = false) {
         openQrShare(
-                data = walletInfo.email,
+                data = if (useAccountId) walletInfo.accountId else walletInfo.email,
                 title = context!!.getString(R.string.account_title),
                 shareLabel = context!!.getString(R.string.share_account)
         )
@@ -458,5 +462,17 @@ class Navigator private constructor() {
     fun openMassIssuance() {
         context?.intentFor<MassIssuanceActivity>()
                 ?.also { performIntent(it) }
+    }
+
+    fun openCompanyAdd() {
+        context?.intentFor<AddCompanyActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openCompanyAddConfirmation(company: CompanyRecord,
+                                   requestCode: Int = 0) {
+        context?.intentFor<AddCompanyConfirmationActivity>()
+                ?.putExtras(AddCompanyConfirmationActivity.getBundle(company))
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 }

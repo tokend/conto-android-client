@@ -1,6 +1,9 @@
 package org.tokend.template.data.repository
 
+import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
+import org.tokend.rx.extensions.toCompletable
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.integrations.dns.params.ClientsPageParams
@@ -54,6 +57,38 @@ class CompaniesRepository(
                         emptyList()
                     else
                         throw error
+                }
+    }
+
+    fun getCompanyById(companyAccountId: String): Maybe<CompanyRecord> {
+        return apiProvider
+                .getApi()
+                .integrations
+                .dns
+                .getBusiness(companyAccountId)
+                .toSingle()
+                .toMaybe()
+                .map {
+                    CompanyRecord(it, urlConfigProvider.getConfig())
+                }
+                .onErrorComplete { error ->
+                    error is HttpException && error.isNotFound()
+                }
+    }
+
+    fun addCompany(company: CompanyRecord): Completable {
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+                ?: return Completable.error(IllegalStateException("No wallet info found"))
+
+        return apiProvider
+                .getApi()
+                .integrations
+                .dns
+                .addClientBusiness(accountId, company.id)
+                .toCompletable()
+                .doOnComplete {
+                    itemsCache.add(company)
+                    broadcast()
                 }
     }
 }
