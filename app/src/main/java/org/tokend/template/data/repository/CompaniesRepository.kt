@@ -1,7 +1,9 @@
 package org.tokend.template.data.repository
 
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import org.tokend.rx.extensions.toCompletable
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.integrations.dns.params.ClientsPageParams
@@ -15,7 +17,6 @@ import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import retrofit2.HttpException
-import java.util.concurrent.TimeUnit
 
 class CompaniesRepository(
         private val apiProvider: ApiProvider,
@@ -60,13 +61,34 @@ class CompaniesRepository(
     }
 
     fun getCompanyById(companyAccountId: String): Maybe<CompanyRecord> {
-        return Maybe.just(
-                CompanyRecord(
-                        id = companyAccountId,
-                        name = "Acme LTD",
-                        logoUrl = "https://www.iconfinder.com/icons/1874854/download/png/128"
-                )
-        )
-                .delay(1, TimeUnit.SECONDS)
+        return apiProvider
+                .getApi()
+                .integrations
+                .dns
+                .getBusiness(companyAccountId)
+                .toSingle()
+                .toMaybe()
+                .map {
+                    CompanyRecord(it, urlConfigProvider.getConfig())
+                }
+                .onErrorComplete { error ->
+                    error is HttpException && error.isNotFound()
+                }
+    }
+
+    fun addCompany(company: CompanyRecord): Completable {
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+                ?: return Completable.error(IllegalStateException("No wallet info found"))
+
+        return apiProvider
+                .getApi()
+                .integrations
+                .dns
+                .addClientBusiness(accountId, company.id)
+                .toCompletable()
+                .doOnComplete {
+                    itemsCache.add(company)
+                    broadcast()
+                }
     }
 }

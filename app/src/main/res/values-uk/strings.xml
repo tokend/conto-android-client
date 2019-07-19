@@ -483,4 +483,5 @@
     <string name="error_camera_permission_is_required">Потрібен дозвіл на використання камери</string>
     <string name="error_company_not_found">Компанію не знайдено</string>
     <string name="template_error_company_name_already_added">Ви вже клієнт %1$s</string>
+    <string name="company_added_successfully">Компанію додано</string>
 </resources>
