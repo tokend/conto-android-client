@@ -39,6 +39,7 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
+import org.tokend.template.features.kyc.model.form.KycFormType
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -418,7 +419,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-        Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
+        Navigator.from(this@MainActivity).openAccountQrShare(
+                walletInfo,
+                useAccountId = kycStateRepository.itemFormType == KycFormType.CORPORATE
+        )
     }
 
     private fun contactCompany() {

@@ -394,9 +394,10 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAccountQrShare(walletInfo: WalletInfo) {
+    fun openAccountQrShare(walletInfo: WalletInfo,
+                           useAccountId: Boolean = false) {
         openQrShare(
-                data = walletInfo.email,
+                data = if (useAccountId) walletInfo.accountId else walletInfo.email,
                 title = context!!.getString(R.string.account_title),
                 shareLabel = context!!.getString(R.string.share_account)
         )
