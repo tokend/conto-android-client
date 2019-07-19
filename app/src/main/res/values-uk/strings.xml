@@ -477,4 +477,5 @@
     <string name="issuance_title">Нарахування</string>
     <string name="issue">Нарахувати</string>
     <string name="successfully_issued">Нарахування виконано</string>
+    <string name="add_company">Додати компанію</string>
 </resources>
