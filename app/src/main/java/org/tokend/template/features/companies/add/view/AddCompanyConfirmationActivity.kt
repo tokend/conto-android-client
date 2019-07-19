@@ -1,5 +1,6 @@
 package org.tokend.template.features.companies.add.view
 
+import android.app.Activity
 import android.os.Bundle
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -81,6 +82,7 @@ class AddCompanyConfirmationActivity : BaseActivity() {
 
     private fun onCompanyAdded() {
         toastManager.short(R.string.company_added_successfully)
+        setResult(Activity.RESULT_OK)
         finish()
     }
 

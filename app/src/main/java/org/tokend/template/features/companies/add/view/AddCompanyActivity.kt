@@ -1,6 +1,7 @@
 package org.tokend.template.features.companies.add.view
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import io.reactivex.rxkotlin.addTo
@@ -9,6 +10,7 @@ import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.features.companies.add.logic.CompanyLoader
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
@@ -63,7 +65,6 @@ class AddCompanyActivity : BaseActivity() {
     private fun tryToAddCompany(company: CompanyRecord) {
         if (!repositoryProvider.companies().itemsList.contains(company)) {
             openAddConfirmation(company)
-            finish()
         } else {
             onCompanyAddError(CompanyAlreadyAddedException(company))
         }
@@ -88,7 +89,8 @@ class AddCompanyActivity : BaseActivity() {
     }
 
     private fun openAddConfirmation(company: CompanyRecord) {
-        toastManager.short(company.name)
+        Navigator.from(this)
+                .openCompanyAddConfirmation(company, CONFIRM_ADD_REQUEST)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -99,12 +101,24 @@ class AddCompanyActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val qrResult = QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
-
-        if (qrResult != null) {
-            onQrScanResult(qrResult)
+        if (requestCode == CONFIRM_ADD_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish()
+            } else {
+                tryOpenQrScanner()
+            }
         } else {
-            finish()
+            val qrResult = QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
+
+            if (qrResult != null) {
+                onQrScanResult(qrResult)
+            } else {
+                finish()
+            }
         }
+    }
+
+    companion object {
+        private val CONFIRM_ADD_REQUEST = "confirm_add_company".hashCode() and 0xffff
     }
 }
