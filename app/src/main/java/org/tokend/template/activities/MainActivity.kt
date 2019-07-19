@@ -61,7 +61,9 @@ import java.util.concurrent.TimeUnit
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
         private val CONTACT_ITEM_ID = "contact".hashCode().toLong()
+        private val ADD_COMPANY_ITEM_ID = "add_company".hashCode().toLong()
     }
+
     protected open val defaultFragmentId = DashboardFragment.ID
 
     private var navigationDrawer: Drawer? = null
@@ -212,6 +214,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                         openAccountIdShare()
                     } else {
                         (view.tag as? CompanyRecord)?.also(this::switchToAnotherCompany)
+                        (view.tag as? Long)
+                                ?.takeIf { it == ADD_COMPANY_ITEM_ID }
+                                ?.also { openCompanyAdd() }
                     }
                     false
                 }
@@ -265,6 +270,23 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                                     withIcon(companyPlaceholderBitmap)
                                 }
                             }
+                }
+                .toMutableList()
+                .apply {
+                    add(
+                            ProfileDrawerItem()
+                                    .withEmail(getString(R.string.add_company))
+                                    .withIdentifier(ADD_COMPANY_ITEM_ID)
+                                    .withSelectable(false)
+                                    .withPostOnBindViewListener { _, view ->
+                                        view.tag = ADD_COMPANY_ITEM_ID
+                                    }
+                                    .withTypeface(Typeface.DEFAULT)
+                                    .withIcon(ContextCompat.getDrawable(
+                                            this@MainActivity,
+                                            R.drawable.company_add
+                                    ))
+                    )
                 }
     }
 
@@ -484,6 +506,11 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
         session.setCompany(company)
         Navigator.from(this).toCompanyLoading()
+    }
+
+    private fun openCompanyAdd() {
+        navigationDrawer?.closeDrawer()
+        Navigator.from(this).openCompanyAdd()
     }
 
     override fun onBackPressed() {
