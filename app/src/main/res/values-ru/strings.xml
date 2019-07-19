@@ -478,4 +478,5 @@
     <string name="issue">Начислить</string>
     <string name="successfully_issued">Начисление совершено</string>
     <string name="add_company">Добавить компанию</string>
+    <string name="add">Добавить</string>
 </resources>

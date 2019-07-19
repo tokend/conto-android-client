@@ -21,6 +21,7 @@ import org.tokend.template.features.companies.view.adapter.CompanyListItem
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.SearchUtil
+import org.tokend.template.view.ErrorEmptyView
 import org.tokend.template.view.util.*
 
 class CompaniesActivity : BaseActivity() {
@@ -85,6 +86,11 @@ class CompaniesActivity : BaseActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        menu?.findItem(R.id.add)?.setOnMenuItemClickListener {
+            addCompany()
+            true
+        }
     }
 
     private fun initSwipeRefresh() {
@@ -103,7 +109,11 @@ class CompaniesActivity : BaseActivity() {
                 ?.supportsChangeAnimations = false
 
         error_empty_view.setEmptyDrawable(R.drawable.ic_briefcase)
-        error_empty_view.observeAdapter(companiesAdapter, R.string.error_no_companies)
+        error_empty_view.observeAdapter(
+                companiesAdapter,
+                R.string.error_no_companies,
+                ErrorEmptyView.ButtonAction(getString(R.string.add), this::addCompany)
+        )
         error_empty_view.setEmptyViewDenial { companiesRepository.isNeverUpdated }
 
         companiesAdapter.registerAdapterDataObserver(
@@ -153,13 +163,13 @@ class CompaniesActivity : BaseActivity() {
             return
         }
 
-            companiesRepository
-                    .itemsList
-                    .find { it.id == session.lastCompanyId }
-                    ?.let { company ->
-                        onCompanySelected(company)
-                        return
-                    }
+        companiesRepository
+                .itemsList
+                .find { it.id == session.lastCompanyId }
+                ?.let { company ->
+                    onCompanySelected(company)
+                    return
+                }
 
         displayCompanies()
     }
@@ -193,6 +203,10 @@ class CompaniesActivity : BaseActivity() {
     private fun onCompanySelected(company: CompanyRecord) {
         session.setCompany(company)
         Navigator.from(this).toCompanyLoading()
+    }
+
+    private fun addCompany() {
+        toastManager.short("Add your damn company")
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

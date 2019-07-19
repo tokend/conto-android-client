@@ -464,6 +464,7 @@
     <string name="issue">Issue</string>
     <string name="successfully_issued">Issuance has been done</string>
     <string name="add_company">Add company</string>
+    <string name="add">Add</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
