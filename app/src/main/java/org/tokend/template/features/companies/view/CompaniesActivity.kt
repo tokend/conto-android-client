@@ -206,7 +206,7 @@ class CompaniesActivity : BaseActivity() {
     }
 
     private fun addCompany() {
-        toastManager.short("Add your damn company")
+        Navigator.from(this).openCompanyAdd()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

@@ -479,4 +479,8 @@
     <string name="successfully_issued">Нарахування виконано</string>
     <string name="add_company">Додати компанію</string>
     <string name="add">Додати</string>
+    <string name="error_invalid_company_qr_code">Некоректний QR код компанії</string>
+    <string name="error_camera_permission_is_required">Потрібен дозвіл на використання камери</string>
+    <string name="error_company_not_found">Компанію не знайдено</string>
+    <string name="template_error_company_name_already_added">Ви вже клієнт %1$s</string>
 </resources>

@@ -1,5 +1,6 @@
 package org.tokend.template.data.repository
 
+import io.reactivex.Maybe
 import io.reactivex.Single
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
@@ -14,6 +15,7 @@ import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import retrofit2.HttpException
+import java.util.concurrent.TimeUnit
 
 class CompaniesRepository(
         private val apiProvider: ApiProvider,
@@ -55,5 +57,16 @@ class CompaniesRepository(
                     else
                         throw error
                 }
+    }
+
+    fun getCompanyById(companyAccountId: String): Maybe<CompanyRecord> {
+        return Maybe.just(
+                CompanyRecord(
+                        id = companyAccountId,
+                        name = "Acme LTD",
+                        logoUrl = "https://www.iconfinder.com/icons/1874854/download/png/128"
+                )
+        )
+                .delay(1, TimeUnit.SECONDS)
     }
 }

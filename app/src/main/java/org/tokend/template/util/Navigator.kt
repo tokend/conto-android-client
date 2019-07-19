@@ -29,6 +29,7 @@ import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
+import org.tokend.template.features.companies.add.view.AddCompanyActivity
 import org.tokend.template.features.companies.view.CompaniesActivity
 import org.tokend.template.features.companies.view.CompanyLoadingActivity
 import org.tokend.template.features.deposit.DepositFragment
@@ -457,6 +458,11 @@ class Navigator private constructor() {
 
     fun openMassIssuance() {
         context?.intentFor<MassIssuanceActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openCompanyAdd() {
+        context?.intentFor<AddCompanyActivity>()
                 ?.also { performIntent(it) }
     }
 }
