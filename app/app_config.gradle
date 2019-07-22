@@ -14,22 +14,22 @@ ext {
     // ----- Network params -----
 
     // API URL - TokenD instance root URL
-    api_url = 'https://api.demo.tokend.io'
+    api_url = 'https://api.staging.conto.me'
 
     // Storage URL - Root URL of file storage
-    storage_url = 'https://s3.eu-west-1.amazonaws.com/demo-identity-storage-festive-colden/'
+    storage_url = 'https://s3.us-east-1.amazonaws.com/contostaging-identity-storage-festive-cannon'
 
     // App host - Host of the related web-client,
     // used to open verification and referral links in app
-    app_host = 'demo.tokend.io'
+    app_host = 'staging.conto.me'
 
     // Terms of Service URL - Link to the Terms of Service page of your project,
     // used during sign in
-    terms_url = 'https://demo.tokend.io/terms'
+    terms_url = 'https://staging.conto.me/terms'
 
     // KYC URL - Link to the user verification page of your project,
     // used on settings screen
-    kyc_url = 'https://demo.tokend.io/settings/verification/'
+    kyc_url = 'https://staging.conto.me/settings/verification/'
 
     //Allow to log request and response information.
     logs_enabled = true
