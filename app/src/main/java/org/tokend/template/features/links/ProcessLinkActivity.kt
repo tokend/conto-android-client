@@ -1,15 +1,17 @@
 package org.tokend.template.features.links
 
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.layout_progress.*
+import org.tokend.rx.extensions.toCompletable
 import org.tokend.sdk.redirects.ClientRedirectPayload
 import org.tokend.sdk.redirects.ClientRedirectType
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.rx.extensions.toCompletable
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 
@@ -41,7 +43,10 @@ class ProcessLinkActivity : BaseActivity() {
                 && payload.type == ClientRedirectType.EMAIL_VERIFICATION) {
             performVerification(payload)
         } else {
-            finish()
+            Log.i("LinkActivity", "Unknown URL $url, redirecting to the default activity")
+            startActivity(packageManager.getLaunchIntentForPackage(packageName))
+            overridePendingTransition(R.anim.stay_visible, R.anim.stay_visible)
+            ActivityCompat.finishAfterTransition(this)
             return
         }
     }
