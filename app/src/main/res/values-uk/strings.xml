@@ -484,4 +484,6 @@
     <string name="error_company_not_found">Компанію не знайдено</string>
     <string name="template_error_company_name_already_added">Ви вже клієнт %1$s</string>
     <string name="company_added_successfully">Компанію додано</string>
+    <string name="switch_to_company">До Компанії</string>
+    <string name="switch_to_client">До Клієнта</string>
 </resources>

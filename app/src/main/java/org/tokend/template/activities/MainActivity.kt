@@ -16,7 +16,14 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
 import com.mikepenz.fastadapter.IIdentifyable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -31,6 +38,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.dip
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
@@ -208,6 +216,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                         getProfileHeaderItem(email),
                         *getCompaniesProfileItems().toTypedArray()
                 )
+                .withThreeSmallProfileImages(true)
                 .withOnlyMainProfileImageVisible(true)
                 .withCurrentProfileHiddenInList(true)
                 .withOnAccountHeaderListener { view, _, isCurrent ->
@@ -229,7 +238,54 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     false
                 }
                 .build()
+                .also { initAccountTypeSwitchIfNeeded(it) }
                 .also { header = it }
+    }
+
+    protected open fun initAccountTypeSwitchIfNeeded(accountHeader: AccountHeader) {
+        if (kycStateRepository.itemFormType == KycFormType.CORPORATE) {
+            accountHeader.view.findViewById<ViewGroup>(
+                    com.mikepenz.materialdrawer.R.id.material_drawer_account_header
+            )?.addView(getAccountTypeSwitchView())
+        }
+    }
+
+    protected open fun getAccountTypeSwitchView(): View {
+        val button = ImageView(this).apply {
+            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.account_switch))
+            setOnClickListener {
+                switchAccountType()
+            }
+
+            val size = dip(36)
+            layoutParams = ViewGroup.LayoutParams(size, size)
+        }
+
+        val hint = TextView(ContextThemeWrapper(this, R.style.HintText), null, R.style.HintText).apply {
+            text = getAccountTypeSwitchHint()
+            setPadding(0, 0,
+                    context.resources.getDimensionPixelSize(R.dimen.half_standard_margin), 0)
+        }
+
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+
+            addView(hint)
+            addView(button)
+
+            layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+                topMargin = context.resources.getDimensionPixelSize(R.dimen.standard_margin)
+                marginEnd = context.resources.getDimensionPixelSize(R.dimen.half_standard_padding)
+            }
+        }
+    }
+
+    protected open fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_company)
+
+    protected open fun switchAccountType() {
+
     }
 
     protected open fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
@@ -417,12 +473,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         header.addProfiles(*companyProfiles.toTypedArray())
     }
 
-    protected fun openAccountIdShare() {
+    protected open fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-        Navigator.from(this@MainActivity).openAccountQrShare(
-                walletInfo,
-                useAccountId = kycStateRepository.itemFormType == KycFormType.CORPORATE
-        )
+        Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
     }
 
     private fun contactCompany() {

@@ -11,6 +11,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ProfileUtil
 
 class CorporateMainActivity : MainActivity() {
@@ -49,6 +50,7 @@ class CorporateMainActivity : MainActivity() {
                     false
                 }
                 .build()
+                .also { initAccountTypeSwitchIfNeeded(it) }
     }
 
     override fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
@@ -65,6 +67,13 @@ class CorporateMainActivity : MainActivity() {
     }
 
     override fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> = emptyList()
+
+    override fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_client)
+
+    override fun openAccountIdShare() {
+        val walletInfo = walletInfoProvider.getWalletInfo() ?: return
+        Navigator.from(this).openAccountQrShare(walletInfo, true)
+    }
 
     override fun getFragment(screenIdentifier: Long): Fragment? {
         return super.getFragment(screenIdentifier) ?: when (screenIdentifier) {

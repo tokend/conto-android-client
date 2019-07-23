@@ -470,6 +470,8 @@
     <string name="error_company_not_found">Company not found</string>
     <string name="template_error_company_name_already_added">You already belong to %1$s</string>
     <string name="company_added_successfully">Company has been added</string>
+    <string name="switch_to_company">Switch to Company</string>
+    <string name="switch_to_client">Switch to Client</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
