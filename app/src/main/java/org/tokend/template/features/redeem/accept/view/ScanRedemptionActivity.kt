@@ -10,7 +10,7 @@ import org.spongycastle.util.encoders.DecoderException
 import org.tokend.sdk.utils.extentions.decodeBase64
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.repository.balances.BalancesRepository
+import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.redeem.model.RedemptionRequestFormatException
 import org.tokend.template.util.Navigator

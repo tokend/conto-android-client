@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.repository.balances.BalancesRepository
+import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.clients.view.adapter.CompanyClientItemsAdapter
 import org.tokend.template.features.clients.view.adapter.CompanyClientListItem

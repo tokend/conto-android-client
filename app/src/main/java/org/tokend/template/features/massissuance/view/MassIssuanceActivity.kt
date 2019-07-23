@@ -13,7 +13,7 @@ import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.balances.BalancesRepository
+import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.hasError
 import org.tokend.template.features.massissuance.logic.PerformMassIssuanceUseCase
 import org.tokend.template.logic.transactions.TxManager
