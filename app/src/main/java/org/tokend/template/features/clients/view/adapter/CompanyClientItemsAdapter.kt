@@ -69,12 +69,14 @@ class CompanyClientItemsAdapter(
         this.onSelect = onSelect
     }
 
-    private var selectionListener: (String, Boolean) -> Unit = { itemId, isChecked ->
-        if (isChecked) {
-            selectedItems.add(itemId)
+    private var selectionListener: (CompanyClientListItem, Int) -> Unit = { item, index ->
+        item.isChecked = !item.isChecked
+        if (item.isChecked) {
+            selectedItems.add(item.id)
         } else {
-            selectedItems.remove(itemId)
+            selectedItems.remove(item.id)
         }
+        notifyItemChanged(index)
         onSelect?.invoke(selectedItems.size)
     }
 

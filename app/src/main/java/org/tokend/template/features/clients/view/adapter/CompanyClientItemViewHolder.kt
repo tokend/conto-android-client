@@ -1,7 +1,6 @@
 package org.tokend.template.features.clients.view.adapter
 
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.TransitionDrawable
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -29,7 +28,7 @@ class CompanyClientItemViewHolder(
     private val balancesLayout: ViewGroup = view.balances_layout
     private val noBalancesTextView: TextView = view.no_balances_text_view
     private val dividerView: View = view.divider_view
-    private val transition = view.background as TransitionDrawable
+    private val bgSelected = ContextCompat.getDrawable(view.context, R.drawable.bg_selection)
     private val checkIcon = ContextCompat.getDrawable(view.context, R.drawable.ic_check_colorized)
     private lateinit var clientIcon: Drawable
 
@@ -102,18 +101,18 @@ class CompanyClientItemViewHolder(
 
     fun bind(item: CompanyClientListItem,
              clickListener: SimpleItemClickListener<CompanyClientListItem>?,
-             selectionListener: (String, Boolean) -> Unit) {
+             selectionListener: (CompanyClientListItem, Int) -> Unit) {
         super.bind(item, clickListener)
         initState(item.isChecked)
         view.onLongClick {
-            changeSelectionState(item, selectionListener)
+            selectionListener.invoke(item, adapterPosition)
             true
         }
         logoImageView.onClick {
-            changeSelectionState(item, selectionListener)
+            selectionListener.invoke(item, adapterPosition)
         }
         logoImageView.onLongClick {
-            changeSelectionState(item, selectionListener)
+            selectionListener.invoke(item, adapterPosition)
             true
         }
     }
@@ -129,37 +128,17 @@ class CompanyClientItemViewHolder(
 
     private fun initState(isChecked: Boolean) {
         if(isChecked) {
-            transition.level = 1000
+            view.background = bgSelected
             logoImageView.setImageDrawable(checkIcon)
             statusImageView.visibility = View.INVISIBLE
         } else {
-            transition.resetTransition()
+            view.background = null
             logoImageView.setImageDrawable(clientIcon)
             statusImageView.visibility = View.VISIBLE
-        }
-    }
-
-    private fun changeSelectionState(item: CompanyClientListItem,
-                                     selectionListener: (String, Boolean) -> Unit) {
-        item.isChecked = !item.isChecked
-        selectionListener.invoke(item.id, item.isChecked)
-        animateSelection(item.isChecked)
-    }
-
-    private fun animateSelection(isChecked: Boolean) {
-        if(isChecked) {
-            transition.startTransition(TRANSITION_DURATION)
-            statusImageView.visibility = View.INVISIBLE
-            logoImageView.setImageDrawable(checkIcon)
-        } else {
-            transition.reverseTransition(TRANSITION_DURATION)
-            statusImageView.visibility = View.VISIBLE
-            logoImageView.setImageDrawable(clientIcon)
         }
     }
 
     companion object {
         private const val BALANCES_TO_DISPLAY = 3
-        private const val TRANSITION_DURATION = 250
     }
 }
