@@ -22,7 +22,7 @@ class AddCompanyActivity : BaseActivity() {
     private val cameraPermission = PermissionManager(Manifest.permission.CAMERA, 404)
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
-        setContentView(R.layout.activity_add_company)
+        setContentView(R.layout.activity_loading_data)
 
         tryOpenQrScanner()
     }

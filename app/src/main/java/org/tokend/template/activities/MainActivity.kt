@@ -52,6 +52,7 @@ import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.trade.orderbook.view.OrderBookFragment
 import org.tokend.template.features.trade.pairs.view.TradeAssetPairsFragment
 import org.tokend.template.features.withdraw.WithdrawFragment
@@ -285,7 +286,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_company)
 
     protected open fun switchAccountType() {
-
+        Navigator.from(this).toForcingAccountType(ForcedAccountType.CORPORATE)
     }
 
     protected open fun getProfileHeaderItem(email: String?): ProfileDrawerItem {

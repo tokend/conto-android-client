@@ -11,6 +11,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ProfileUtil
 
@@ -69,6 +70,10 @@ class CorporateMainActivity : MainActivity() {
     override fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> = emptyList()
 
     override fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_client)
+
+    override fun switchAccountType() {
+        Navigator.from(this).toForcingAccountType(ForcedAccountType.GENERAL)
+    }
 
     override fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return

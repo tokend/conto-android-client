@@ -28,7 +28,7 @@ class ScanRedemptionActivity : BaseActivity() {
     private var redemptionRequest: RedemptionRequest? = null
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
-        setContentView(R.layout.activity_scan_redemption)
+        setContentView(R.layout.activity_loading_data)
 
         tryOpenQrScanner()
     }
