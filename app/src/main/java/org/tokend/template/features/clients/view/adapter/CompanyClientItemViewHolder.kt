@@ -1,5 +1,6 @@
 package org.tokend.template.features.clients.view.adapter
 
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
@@ -29,6 +30,9 @@ class CompanyClientItemViewHolder(
     private val noBalancesTextView: TextView = view.no_balances_text_view
     private val dividerView: View = view.divider_view
     private val transition = view.background as TransitionDrawable
+    private val checkIcon = ContextCompat.getDrawable(view.context, R.drawable.ic_check_colorized)
+    private lateinit var clientIcon: Drawable
+
 
     var dividerIsVisible: Boolean
         get() = dividerView.visibility == View.VISIBLE
@@ -52,8 +56,8 @@ class CompanyClientItemViewHolder(
 
     override fun bind(item: CompanyClientListItem) {
         emailTextView.text = item.email
-        LogoUtil.setLogo(logoImageView, item.email.toUpperCase(), null, logoSize)
-
+        clientIcon = LogoUtil.generateLogo(item.email.toUpperCase(), view.context, logoSize)
+        initState(item.isChecked)
         balancesLayout.removeAllViews()
 
         val balancesToDisplay =
@@ -125,10 +129,12 @@ class CompanyClientItemViewHolder(
 
     private fun initState(isChecked: Boolean) {
         if(isChecked) {
-            transition.startTransition(0)
+            transition.level = 1000
+            logoImageView.setImageDrawable(checkIcon)
             statusImageView.visibility = View.INVISIBLE
         } else {
             transition.resetTransition()
+            logoImageView.setImageDrawable(clientIcon)
             statusImageView.visibility = View.VISIBLE
         }
     }
@@ -144,9 +150,11 @@ class CompanyClientItemViewHolder(
         if(isChecked) {
             transition.startTransition(TRANSITION_DURATION)
             statusImageView.visibility = View.INVISIBLE
+            logoImageView.setImageDrawable(checkIcon)
         } else {
             transition.reverseTransition(TRANSITION_DURATION)
             statusImageView.visibility = View.VISIBLE
+            logoImageView.setImageDrawable(clientIcon)
         }
     }
 

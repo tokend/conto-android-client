@@ -11,10 +11,10 @@ import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.util.imagetransform.CircleTransform
 
 object LogoUtil {
-    private fun generateLogo(value: String,
-                             context: Context,
-                             @Dimension
-                             logoSize: Int): Drawable {
+    fun generateLogo(value: String,
+                     context: Context,
+                     @Dimension
+                     logoSize: Int): Drawable {
         val bitmap = LogoFactory(context).getWithAutoBackground(
                 value,
                 logoSize

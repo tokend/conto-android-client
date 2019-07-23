@@ -106,7 +106,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                 return@onSelect
             }
             activateActionModeIfNeeded()
-            actionMode?.title = getString(R.string.template_selected, count.toString())
+            actionMode?.title = requireContext().getString(R.string.template_selected, count)
         }
 
         error_empty_view.observeAdapter(adapter, R.string.no_clients)
@@ -193,7 +193,8 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
             selectMode = true
             actionMode = (activity as? CorporateMainActivity)?.startSupportActionMode(object : ActionMode.Callback {
                 override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
-
+                    val emails = adapter.getSelected().joinToString(",\n") { it.email }
+                    Navigator.from(this@CompanyClientsFragment).openMassIssuance(emails)
                     return true
                 }
 
