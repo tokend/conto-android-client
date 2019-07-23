@@ -1,5 +1,6 @@
 package org.tokend.template.features.clients.view.adapter
 
+import android.graphics.drawable.TransitionDrawable
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -8,9 +9,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.list_item_company_client.view.*
 import org.apmem.tools.layouts.FlowLayout
+import org.jetbrains.anko.onClick
+import org.jetbrains.anko.onLongClick
 import org.tokend.template.R
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.view.adapter.base.BaseViewHolder
+import org.tokend.template.view.adapter.base.SimpleItemClickListener
 import org.tokend.template.view.util.LogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
@@ -24,6 +28,7 @@ class CompanyClientItemViewHolder(
     private val balancesLayout: ViewGroup = view.balances_layout
     private val noBalancesTextView: TextView = view.no_balances_text_view
     private val dividerView: View = view.divider_view
+    private val transition = view.background as TransitionDrawable
 
     var dividerIsVisible: Boolean
         get() = dividerView.visibility == View.VISIBLE
@@ -91,6 +96,24 @@ class CompanyClientItemViewHolder(
         )
     }
 
+    fun bind(item: CompanyClientListItem,
+             clickListener: SimpleItemClickListener<CompanyClientListItem>?,
+             selectionListener: (String, Boolean) -> Unit) {
+        super.bind(item, clickListener)
+        initState(item.isChecked)
+        view.onLongClick {
+            changeSelectionState(item, selectionListener)
+            true
+        }
+        logoImageView.onClick {
+            changeSelectionState(item, selectionListener)
+        }
+        logoImageView.onLongClick {
+            changeSelectionState(item, selectionListener)
+            true
+        }
+    }
+
     private fun addBalanceBadge(text: String) {
         val textView = TextView(balanceThemedContext, null, R.style.StrokedBadgeText)
         textView.text = text
@@ -100,7 +123,35 @@ class CompanyClientItemViewHolder(
         }
     }
 
+    private fun initState(isChecked: Boolean) {
+        if(isChecked) {
+            transition.startTransition(0)
+            statusImageView.visibility = View.INVISIBLE
+        } else {
+            transition.resetTransition()
+            statusImageView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun changeSelectionState(item: CompanyClientListItem,
+                                     selectionListener: (String, Boolean) -> Unit) {
+        item.isChecked = !item.isChecked
+        selectionListener.invoke(item.id, item.isChecked)
+        animateSelection(item.isChecked)
+    }
+
+    private fun animateSelection(isChecked: Boolean) {
+        if(isChecked) {
+            transition.startTransition(TRANSITION_DURATION)
+            statusImageView.visibility = View.INVISIBLE
+        } else {
+            transition.reverseTransition(TRANSITION_DURATION)
+            statusImageView.visibility = View.VISIBLE
+        }
+    }
+
     companion object {
         private const val BALANCES_TO_DISPLAY = 3
+        private const val TRANSITION_DURATION = 250
     }
 }

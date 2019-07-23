@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transition xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/white"/>
+    <item android:drawable="@drawable/bg_selected"
+        android:top="@dimen/quarter_standard_margin"
+        android:bottom="@dimen/quarter_standard_margin"
+        android:left="@dimen/quarter_standard_margin"
+        android:right="@dimen/quarter_standard_margin" />
+</transition>

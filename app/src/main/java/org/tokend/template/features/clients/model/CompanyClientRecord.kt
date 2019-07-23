@@ -8,6 +8,7 @@ import java.io.Serializable
 import java.math.BigDecimal
 
 class CompanyClientRecord(
+        val id: String,
         val accountId: String?,
         val email: String,
         val status: Status,
@@ -30,6 +31,7 @@ class CompanyClientRecord(
     }
 
     constructor(source: ClientResource) : this(
+            id = source.id,
             accountId = source.accountId,
             email = source.email,
             status = Status.valueOf(source.status.toUpperCase()),

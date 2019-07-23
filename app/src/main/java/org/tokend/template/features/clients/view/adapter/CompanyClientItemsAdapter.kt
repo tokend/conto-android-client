@@ -10,7 +10,7 @@ import org.tokend.template.view.util.formatter.AmountFormatter
 
 class CompanyClientItemsAdapter(
         private val amountFormatter: AmountFormatter
-): PaginationRecyclerAdapter<CompanyClientListItem,
+) : PaginationRecyclerAdapter<CompanyClientListItem,
         BaseViewHolder<CompanyClientListItem>>() {
 
     class FooterViewHolder(v: View) : BaseViewHolder<CompanyClientListItem>(v) {
@@ -30,10 +30,14 @@ class CompanyClientItemsAdapter(
     }
 
     override fun bindItemViewHolder(holder: BaseViewHolder<CompanyClientListItem>, position: Int) {
-        super.bindItemViewHolder(holder, position)
+        val clientHolder = holder as? CompanyClientItemViewHolder
+
+        clientHolder?.bind(items[position], onItemClickListener, selectionListener)
+                ?: super.bindItemViewHolder(holder, position)
+
         val isLastInSection =
                 position == itemCount - (if (needLoadingFooter) 2 else 1)
-        (holder as? CompanyClientItemViewHolder)?.dividerIsVisible = drawDividers && !isLastInSection
+        clientHolder?.dividerIsVisible = drawDividers && !isLastInSection
     }
 
     override fun createFooterViewHolder(parent: ViewGroup): BaseViewHolder<CompanyClientListItem> {
@@ -43,4 +47,61 @@ class CompanyClientItemsAdapter(
     }
 
     override fun bindFooterViewHolder(holder: BaseViewHolder<CompanyClientListItem>) {}
+
+    override fun setData(data: Collection<CompanyClientListItem>?) {
+        val updatedData = data?.toMutableList()
+        updatedData?.let {
+            val itemsToRemove = mutableListOf<String>()
+            selectedItems.forEach { id ->
+                updatedData.find { it.id == id }?.let {
+                    it.isChecked = true
+                } ?: itemsToRemove.add(id)
+            }
+            selectedItems.removeAll(itemsToRemove)
+        }
+        super.setData(updatedData)
+    }
+
+    private val selectedItems = mutableListOf<String>()
+
+    private var onSelect: ((Int) -> Unit)? = null
+    fun onSelect(onSelect: (Int) -> Unit) {
+        this.onSelect = onSelect
+    }
+
+    private var selectionListener: (String, Boolean) -> Unit = { itemId, isChecked ->
+        if (isChecked) {
+            selectedItems.add(itemId)
+        } else {
+            selectedItems.remove(itemId)
+        }
+        onSelect?.invoke(selectedItems.size)
+    }
+
+    fun getSelected(): List<CompanyClientListItem> {
+        val result = mutableListOf<CompanyClientListItem>()
+        selectedItems.forEach { id ->
+            items.find { it.id == id }?.let {
+                result.add(it)
+            }
+        }
+        return result
+    }
+
+    fun clearSelection() {
+        if (hasSelection) {
+            selectedItems.forEach { id ->
+                val index = items.indexOfFirst { it.id == id }
+                if(index >= 0) {
+                    items[index].isChecked = false
+                    notifyItemChanged(index)
+                }
+            }
+            selectedItems.clear()
+            onSelect?.invoke(0)
+        }
+    }
+
+    val hasSelection: Boolean
+        get() = selectedItems.size > 0
 }

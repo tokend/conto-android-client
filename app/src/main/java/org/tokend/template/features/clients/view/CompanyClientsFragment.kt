@@ -3,13 +3,11 @@ package org.tokend.template.features.clients.view
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.view.ActionMode
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.github.clans.fab.FloatingActionButton
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
@@ -19,6 +17,7 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.clients.view.adapter.CompanyClientItemsAdapter
@@ -47,6 +46,10 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
 
     private lateinit var adapter: CompanyClientItemsAdapter
     private lateinit var layoutManager: GridLayoutManager
+
+    private var actionMode: ActionMode? = null
+
+    private var selectMode = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_company_clients, container, false)
@@ -95,6 +98,15 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         clients_list.addOnScrollListener(hideFabScrollListener)
         adapter.onItemClick { _, item ->
             item.source?.also { Navigator.from(this).openCompanyClientDetails(it) }
+        }
+
+        adapter.onSelect { count ->
+            if(count == 0) {
+                actionMode?.finish()
+                return@onSelect
+            }
+            activateActionModeIfNeeded()
+            actionMode?.title = getString(R.string.template_selected, count.toString())
         }
 
         error_empty_view.observeAdapter(adapter, R.string.no_clients)
@@ -176,6 +188,32 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     }
     // endregion
 
+    private fun activateActionModeIfNeeded() {
+        if (!selectMode) {
+            selectMode = true
+            actionMode = (activity as? CorporateMainActivity)?.startSupportActionMode(object : ActionMode.Callback {
+                override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
+
+                    return true
+                }
+
+                override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+                    p0?.menuInflater?.inflate(R.menu.clients_action_mode, p1)
+                    return true
+                }
+
+                override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+                    return false
+                }
+
+                override fun onDestroyActionMode(p0: ActionMode?) {
+                    adapter.clearSelection()
+                    selectMode = false
+                }
+            })
+        }
+    }
+
     private fun subscribeToClients() {
         clientsRepository
                 .loadingSubject
@@ -225,6 +263,14 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     private fun updateListColumnsCount() {
         layoutManager.spanCount = ColumnCalculator.getColumnCount(requireActivity())
         adapter.drawDividers = layoutManager.spanCount == 1
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (adapter.hasSelection) {
+            adapter.clearSelection()
+            return false
+        }
+        return super.onBackPressed()
     }
 
     companion object {
