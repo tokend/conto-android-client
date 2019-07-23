@@ -127,7 +127,7 @@ ext {
     // Allow explore - Controls explore tokens functionality availability.
     allow_explore = true
     // Allow invest - Controls investment functionality availability.
-    allow_invest = true
+    allow_invest = false
     // Network specified by user - When set to 'true' user have to specify network to work with.
     network_specified_by_user = false
     // Allows to see an analytics for your app.
@@ -135,7 +135,7 @@ ext {
     // Allows TokenD Authenticator usage
     allow_authenticator_auth = false
     // Allows voting in polls
-    allow_polls = true
+    allow_polls = false
 
     // Controls balance amounts conversion
     // into `balances_conversion_asset`
