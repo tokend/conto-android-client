@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.ContextThemeWrapper
@@ -286,7 +287,13 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_company)
 
     protected open fun switchAccountType() {
-        Navigator.from(this).toForcingAccountType(ForcedAccountType.CORPORATE)
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setMessage(R.string.switch_to_company_confirmation)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    Navigator.from(this).toForcingAccountType(ForcedAccountType.CORPORATE)
+                }
+                .setNegativeButton(R.string.no, null)
+                .show()
     }
 
     protected open fun getProfileHeaderItem(email: String?): ProfileDrawerItem {

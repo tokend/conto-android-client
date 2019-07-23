@@ -472,6 +472,8 @@
     <string name="company_added_successfully">Company has been added</string>
     <string name="switch_to_company">Switch to Company</string>
     <string name="switch_to_client">Switch to Client</string>
+    <string name="switch_to_company_confirmation">Are you sure you want to switch to the Company interface?</string>
+    <string name="switch_to_client_confirmation">Are you sure you want to switch to the Client interface?</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

@@ -486,4 +486,6 @@
     <string name="company_added_successfully">Компанію додано</string>
     <string name="switch_to_company">До Компанії</string>
     <string name="switch_to_client">До Клієнта</string>
+    <string name="switch_to_company_confirmation">Перейти до інтерфейсу Компанії?</string>
+    <string name="switch_to_client_confirmation">Перейти до інтерфейсу Клієнта?</string>
 </resources>

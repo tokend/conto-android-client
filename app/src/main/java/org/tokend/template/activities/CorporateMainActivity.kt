@@ -3,6 +3,7 @@ package org.tokend.template.activities
 import android.graphics.drawable.ColorDrawable
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -72,7 +73,13 @@ class CorporateMainActivity : MainActivity() {
     override fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_client)
 
     override fun switchAccountType() {
-        Navigator.from(this).toForcingAccountType(ForcedAccountType.GENERAL)
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setMessage(R.string.switch_to_client_confirmation)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    Navigator.from(this).toForcingAccountType(ForcedAccountType.GENERAL)
+                }
+                .setNegativeButton(R.string.no, null)
+                .show()
     }
 
     override fun openAccountIdShare() {
