@@ -3,11 +3,13 @@ package org.tokend.template.features.signin.logic
 import io.reactivex.Completable
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.kyc.model.form.KycFormType
+import org.tokend.template.features.signin.model.ForcedAccountType
 import retrofit2.HttpException
 import java.net.HttpURLConnection
 
 class PostSignInManager(
-        private val repositoryProvider: RepositoryProvider
+        private val repositoryProvider: RepositoryProvider,
+        private val forcedAccountType: ForcedAccountType? = null
 ) {
     class AuthMismatchException : Exception()
 
@@ -17,19 +19,21 @@ class PostSignInManager(
     fun doPostSignIn(): Completable {
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
-                repositoryProvider.kycState().updateDeferred().andThen(Completable.defer {
+                repositoryProvider.kycState().updateIfNotFreshDeferred().andThen(Completable.defer {
                     // Update balances for corporate users, companies otherwise.
-                    if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
-                        repositoryProvider.balances().updateDeferred()
+                    if (forcedAccountType == ForcedAccountType.CORPORATE ||
+                            forcedAccountType == null
+                            && repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+                        repositoryProvider.balances().updateIfNotFreshDeferred()
                     } else {
-                        repositoryProvider.companies().updateDeferred()
+                        repositoryProvider.companies().updateIfNotFreshDeferred()
                     }
                 })
         )
         val syncActions = listOf<Completable>(
                 // Added actions will be performed on after another in
                 // provided order.
-                repositoryProvider.tfaFactors().updateDeferred()
+                repositoryProvider.tfaFactors().updateIfNotFreshDeferred()
                         .onErrorResumeNext {
                             if (it is HttpException
                                     && it.code() == HttpURLConnection.HTTP_NOT_FOUND)

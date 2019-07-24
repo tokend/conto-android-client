@@ -59,8 +59,10 @@ import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
+import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
 import org.tokend.template.features.signin.UnlockAppActivity
+import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.signup.RecoverySeedActivity
 import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
@@ -474,5 +476,12 @@ class Navigator private constructor() {
         context?.intentFor<AddCompanyConfirmationActivity>()
                 ?.putExtras(AddCompanyConfirmationActivity.getBundle(company))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun toForcingAccountType(accountType: ForcedAccountType) {
+        context?.intentFor<ForceAccountTypeActivity>()
+                ?.putExtras(ForceAccountTypeActivity.getBundle(accountType))
+                ?.also { performIntent(it) }
+        activity?.finish()
     }
 }
