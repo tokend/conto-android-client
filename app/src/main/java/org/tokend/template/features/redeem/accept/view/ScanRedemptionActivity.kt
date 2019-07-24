@@ -88,17 +88,18 @@ class ScanRedemptionActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == ACCEPT_REQUEST_CODE) {
-            tryOpenQrScanner()
-            return
+        if (requestCode == ACCEPT_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish()
+            } else {
+                tryOpenQrScanner()
+            }
+        } else {
+            if (QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
+                            ?.also(this::onScannerResult) == null) {
+                finish()
+            }
         }
-
-        if (resultCode == Activity.RESULT_CANCELED) {
-            finish()
-        }
-
-        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
-                ?.also(this::onScannerResult)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
