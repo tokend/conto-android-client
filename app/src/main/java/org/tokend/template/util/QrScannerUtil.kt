@@ -14,9 +14,10 @@ object QrScannerUtil {
      * Opens QR scanner with the default setup:
      * no beep, no orientation lock, no labels
      */
-    fun openScanner(activity: Activity) {
+    fun openScanner(activity: Activity,
+                    prompt: String = "") {
         IntentIntegrator(activity)
-                .defaultSetup()
+                .defaultSetup(prompt)
                 .initiateScan()
     }
 
@@ -24,17 +25,18 @@ object QrScannerUtil {
      * Opens QR scanner with the default setup:
      * no beep, no orientation lock, no labels
      */
-    fun openScanner(fragment: Fragment) {
+    fun openScanner(fragment: Fragment,
+                    prompt: String = "") {
         IntentIntegrator.forSupportFragment(fragment)
-                .defaultSetup()
+                .defaultSetup(prompt)
                 .initiateScan()
     }
 
-    private fun IntentIntegrator.defaultSetup(): IntentIntegrator {
+    private fun IntentIntegrator.defaultSetup(prompt: String): IntentIntegrator {
         return this
                 .setBeepEnabled(false)
                 .setOrientationLocked(true)
-                .setPrompt("")
+                .setPrompt(prompt + "\n")
                 .setCaptureActivity(CaptureActivityPortrait::class.java)
     }
 

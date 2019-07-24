@@ -31,7 +31,12 @@ class AddCompanyActivity : BaseActivity() {
     private fun tryOpenQrScanner() {
         cameraPermission.check(
                 this,
-                action = { QrScannerUtil.openScanner(this) },
+                action = {
+                    QrScannerUtil.openScanner(
+                            this,
+                            getString(R.string.add_company_scanner_prompt)
+                    )
+                },
                 deniedAction = this::onNoCameraPermission
         )
     }

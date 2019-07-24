@@ -45,6 +45,9 @@ class AddCompanyConfirmationActivity : BaseActivity() {
         confirm_button.setOnClickListener {
             addCompany()
         }
+        cancel_button.setOnClickListener {
+            finish()
+        }
     }
 
     private fun displayCompanyInfo() {

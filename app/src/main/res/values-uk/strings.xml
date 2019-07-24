@@ -490,4 +490,5 @@
     <string name="switch_to_client">До Клієнта</string>
     <string name="switch_to_company_confirmation">Перейти до інтерфейсу Компанії?</string>
     <string name="switch_to_client_confirmation">Перейти до інтерфейсу Клієнта?</string>
+    <string name="add_company_scanner_prompt">Відскануйте QR код компанії</string>
 </resources>
