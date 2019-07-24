@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/issuance"
+        android:title="@string/issuance_title"
+        android:icon="@drawable/ic_issuance_white"
+        app:iconTint="@color/icons"
+        app:showAsAction="always"/>
+</menu>

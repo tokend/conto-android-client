@@ -87,6 +87,8 @@ class MassIssuanceActivity : BaseActivity() {
                 updateIssuanceAvailability()
             }
         })
+
+        initEmails()
     }
 
     private fun initButtons() {
@@ -135,6 +137,12 @@ class MassIssuanceActivity : BaseActivity() {
                 dropDownArrow, null)
 
         issuanceAsset = ownedAssets.first()
+    }
+
+    private fun initEmails() {
+        val emails = intent.getStringExtra(EXTRA_EMAILS) ?: return
+        emails_edit_text.setText(emails)
+        amount_edit_text.requestFocus()
     }
     // endregion
 
@@ -240,5 +248,13 @@ class MassIssuanceActivity : BaseActivity() {
     private fun onSuccessfulIssuance() {
         toastManager.short(R.string.successfully_issued)
         finish()
+    }
+
+    companion object {
+        const val EXTRA_EMAILS = "extra_emails"
+
+        fun getBundle(emails: String?) = Bundle().apply {
+            putString(EXTRA_EMAILS, emails)
+        }
     }
 }

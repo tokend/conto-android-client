@@ -1,5 +1,6 @@
 package org.tokend.template.features.clients.view.adapter
 
+import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -8,9 +9,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.list_item_company_client.view.*
 import org.apmem.tools.layouts.FlowLayout
+import org.jetbrains.anko.onClick
+import org.jetbrains.anko.onLongClick
 import org.tokend.template.R
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.view.adapter.base.BaseViewHolder
+import org.tokend.template.view.adapter.base.SimpleItemClickListener
 import org.tokend.template.view.util.LogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
@@ -24,6 +28,10 @@ class CompanyClientItemViewHolder(
     private val balancesLayout: ViewGroup = view.balances_layout
     private val noBalancesTextView: TextView = view.no_balances_text_view
     private val dividerView: View = view.divider_view
+    private val bgSelected = ContextCompat.getDrawable(view.context, R.drawable.bg_selection)
+    private val checkIcon = ContextCompat.getDrawable(view.context, R.drawable.ic_check_colorized)
+    private lateinit var clientIcon: Drawable
+
 
     var dividerIsVisible: Boolean
         get() = dividerView.visibility == View.VISIBLE
@@ -47,8 +55,8 @@ class CompanyClientItemViewHolder(
 
     override fun bind(item: CompanyClientListItem) {
         emailTextView.text = item.email
-        LogoUtil.setLogo(logoImageView, item.email.toUpperCase(), null, logoSize)
-
+        clientIcon = LogoUtil.generateLogo(item.email.toUpperCase(), view.context, logoSize)
+        initState(item.isChecked)
         balancesLayout.removeAllViews()
 
         val balancesToDisplay =
@@ -91,12 +99,42 @@ class CompanyClientItemViewHolder(
         )
     }
 
+    fun bind(item: CompanyClientListItem,
+             clickListener: SimpleItemClickListener<CompanyClientListItem>?,
+             selectionListener: (CompanyClientListItem, Int) -> Unit) {
+        super.bind(item, clickListener)
+        initState(item.isChecked)
+        view.onLongClick {
+            selectionListener.invoke(item, adapterPosition)
+            true
+        }
+        logoImageView.onClick {
+            selectionListener.invoke(item, adapterPosition)
+        }
+        logoImageView.onLongClick {
+            selectionListener.invoke(item, adapterPosition)
+            true
+        }
+    }
+
     private fun addBalanceBadge(text: String) {
         val textView = TextView(balanceThemedContext, null, R.style.StrokedBadgeText)
         textView.text = text
         balancesLayout.addView(textView)
         textView.layoutParams = (textView.layoutParams as FlowLayout.LayoutParams).apply {
             setMargins(balanceTextViewMargin, balanceTextViewMargin, balanceTextViewMargin, balanceTextViewMargin)
+        }
+    }
+
+    private fun initState(isChecked: Boolean) {
+        if(isChecked) {
+            view.background = bgSelected
+            logoImageView.setImageDrawable(checkIcon)
+            statusImageView.visibility = View.INVISIBLE
+        } else {
+            view.background = null
+            logoImageView.setImageDrawable(clientIcon)
+            statusImageView.visibility = View.VISIBLE
         }
     }
 

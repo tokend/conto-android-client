@@ -461,8 +461,9 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openMassIssuance() {
+    fun openMassIssuance(emails: String? = null) {
         context?.intentFor<MassIssuanceActivity>()
+                ?.putExtras(MassIssuanceActivity.getBundle(emails))
                 ?.also { performIntent(it) }
     }
 

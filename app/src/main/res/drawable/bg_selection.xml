@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/shape_selection"
+        android:top="@dimen/quarter_standard_margin"
+        android:bottom="@dimen/quarter_standard_margin"
+        android:left="@dimen/quarter_standard_margin"
+        android:right="@dimen/quarter_standard_margin" />
+</layer-list>
