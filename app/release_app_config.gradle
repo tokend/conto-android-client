@@ -1,5 +1,6 @@
 // Following config will be merged with the default one
 // for "release" builds.
 ext {
+    enable_analytics = true
     logs_enabled = false
 }
