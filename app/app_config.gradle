@@ -4,10 +4,10 @@ ext {
     // Application ID - unique identifier of the app in Google Play and on user's device
     application_id = 'org.tokend.conto'
     // Version Name - human-readable app version
-    version_name = '0.3.1'
+    version_name = '0.3.2'
     // Version Code - code number for version,
     // must be incremented after each release
-    version_code = 4
+    version_code = 5
 
     // --------------------------
 
@@ -17,7 +17,7 @@ ext {
     api_url = 'https://api.staging.conto.me'
 
     // Storage URL - Root URL of file storage
-    storage_url = 'https://s3.us-east-1.amazonaws.com/contostaging-identity-storage-festive-cannon'
+    storage_url = 'https://s3.eu-north-1.amazonaws.com/contostaging-identity-storage-festive-cannon-2'
 
     // App host - Host of the related web-client,
     // used to open verification and referral links in app
