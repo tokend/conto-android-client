@@ -107,8 +107,10 @@ class FragmentFactory {
         )
     }
 
-    fun getAccountMovementsFragment(): Fragment {
-        return AccountMovementsFragment()
+    fun getAccountMovementsFragment(allowToolbar: Boolean): Fragment {
+        return AccountMovementsFragment.newInstance(
+                AccountMovementsFragment.getBundle(allowToolbar)
+        )
     }
 
     fun getBalancesFragment(): Fragment {

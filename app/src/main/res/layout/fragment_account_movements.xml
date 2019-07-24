@@ -1,46 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <include layout="@layout/appbar" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/background">
 
-        <include layout="@layout/include_error_empty_view" />
-
-        <android.support.constraint.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <org.tokend.template.view.PaginationRecyclerView
-                android:id="@+id/history_list"
-                style="@style/LimitedMatchParentWidthConstraint" />
+            <include layout="@layout/include_error_empty_view" />
 
-            <org.tokend.template.view.TxDateTextSwitcher
-                android:id="@+id/date_text_switcher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:background="@drawable/tx_date_text_switcher_background"
-                android:measureAllChildren="true"
-                android:visibility="invisible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/history_list" />
-
-            <FrameLayout
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="match_parent">
 
-                <include layout="@layout/include_appbar_elevation" />
-            </FrameLayout>
+                <org.tokend.template.view.PaginationRecyclerView
+                    android:id="@+id/history_list"
+                    style="@style/LimitedMatchParentWidthConstraint" />
 
-        </android.support.constraint.ConstraintLayout>
-    </LinearLayout>
+                <org.tokend.template.view.TxDateTextSwitcher
+                    android:id="@+id/date_text_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/tx_date_text_switcher_background"
+                    android:measureAllChildren="true"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/history_list" />
 
-</android.support.v4.widget.SwipeRefreshLayout>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <include layout="@layout/include_appbar_elevation" />
+                </FrameLayout>
+
+            </android.support.constraint.ConstraintLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

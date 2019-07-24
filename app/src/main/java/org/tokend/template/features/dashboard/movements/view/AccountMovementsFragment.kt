@@ -3,25 +3,32 @@ package org.tokend.template.features.dashboard.movements.view
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
+import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_account_movements.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
+import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
 import org.tokend.template.fragments.BaseFragment
+import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.LocalizedName
 
-class AccountMovementsFragment : BaseFragment() {
+class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
+    override val toolbarSubject = BehaviorSubject.create<Toolbar>()
+
     private val loadingIndicator = LoadingIndicatorManager(
             showLoading = { swipe_refresh.isRefreshing = true },
             hideLoading = { swipe_refresh.isRefreshing = false }
@@ -32,11 +39,16 @@ class AccountMovementsFragment : BaseFragment() {
 
     private lateinit var adapter: BalanceChangesAdapter
 
+    private val allowToolbar: Boolean by lazy {
+        arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, true) ?: true
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_account_movements, container, false)
     }
 
     override fun onInitAllowed() {
+        initToolbar()
         initSwipeRefresh()
         initHistory()
         ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
@@ -47,6 +59,18 @@ class AccountMovementsFragment : BaseFragment() {
     }
 
     // region Init
+    private fun initToolbar() {
+        if (allowToolbar) {
+            toolbar.title = getString(R.string.movements_screen_title)
+
+            ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
+        } else {
+            appbar_elevation_view.visibility = View.GONE
+            appbar.visibility = View.GONE
+        }
+        toolbarSubject.onNext(toolbar)
+    }
+
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
@@ -131,6 +155,21 @@ class AccountMovementsFragment : BaseFragment() {
             balanceChangesRepository.updateIfNotFresh()
         } else {
             balanceChangesRepository.update()
+        }
+    }
+
+    companion object {
+        val ID = "account_movements".hashCode().toLong()
+        private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+
+        fun newInstance(bundle: Bundle): AccountMovementsFragment {
+            val fragment = AccountMovementsFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
+
+        fun getBundle(allowToolbar: Boolean) = Bundle().apply {
+            putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
         }
     }
 }

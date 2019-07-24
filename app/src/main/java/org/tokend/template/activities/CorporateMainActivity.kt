@@ -11,6 +11,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
+import org.tokend.template.features.dashboard.movements.view.AccountMovementsFragment
 import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.util.Navigator
@@ -24,7 +25,11 @@ class CorporateMainActivity : MainActivity() {
                 PrimaryDrawerItem()
                         .withName(R.string.clients_title)
                         .withIdentifier(CompanyClientsFragment.ID)
-                        .withIcon(R.drawable.ic_accounts)
+                        .withIcon(R.drawable.ic_accounts),
+                PrimaryDrawerItem()
+                        .withName(R.string.movements_screen_title)
+                        .withIdentifier(AccountMovementsFragment.ID)
+                        .withIcon(R.drawable.ic_trade)
         ).apply { addAll(super.getNavigationItems()) }
     }
 
@@ -32,6 +37,7 @@ class CorporateMainActivity : MainActivity() {
                                             items: Map<Long, PrimaryDrawerItem>) {
         builder.apply {
             addDrawerItems(items[CompanyClientsFragment.ID])
+            addDrawerItems(items[AccountMovementsFragment.ID])
             addDrawerItems(items[SettingsFragment.ID])
         }
     }
@@ -90,6 +96,7 @@ class CorporateMainActivity : MainActivity() {
     override fun getFragment(screenIdentifier: Long): Fragment? {
         return super.getFragment(screenIdentifier) ?: when (screenIdentifier) {
             CompanyClientsFragment.ID -> factory.getCompanyClientsFragment()
+            AccountMovementsFragment.ID -> factory.getAccountMovementsFragment(true)
             else -> null
         }
     }
