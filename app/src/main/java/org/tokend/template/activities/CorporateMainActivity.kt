@@ -3,6 +3,7 @@ package org.tokend.template.activities
 import android.graphics.drawable.ColorDrawable
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -11,6 +12,8 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.signin.model.ForcedAccountType
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ProfileUtil
 
 class CorporateMainActivity : MainActivity() {
@@ -49,6 +52,7 @@ class CorporateMainActivity : MainActivity() {
                     false
                 }
                 .build()
+                .also { initAccountTypeSwitchIfNeeded(it) }
     }
 
     override fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
@@ -65,6 +69,23 @@ class CorporateMainActivity : MainActivity() {
     }
 
     override fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> = emptyList()
+
+    override fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_client)
+
+    override fun switchAccountType() {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setMessage(R.string.switch_to_client_confirmation)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    Navigator.from(this).toForcingAccountType(ForcedAccountType.GENERAL)
+                }
+                .setNegativeButton(R.string.no, null)
+                .show()
+    }
+
+    override fun openAccountIdShare() {
+        val walletInfo = walletInfoProvider.getWalletInfo() ?: return
+        Navigator.from(this).openAccountQrShare(walletInfo, true)
+    }
 
     override fun getFragment(screenIdentifier: Long): Fragment? {
         return super.getFragment(screenIdentifier) ?: when (screenIdentifier) {

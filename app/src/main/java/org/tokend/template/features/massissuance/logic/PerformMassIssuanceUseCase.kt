@@ -6,7 +6,6 @@ import io.reactivex.rxkotlin.toMaybe
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
-import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
@@ -20,7 +19,6 @@ import org.tokend.wallet.xdr.Fee
 import org.tokend.wallet.xdr.IssuanceRequest
 import org.tokend.wallet.xdr.Operation
 import java.math.BigDecimal
-import java.security.SecureRandom
 
 /**
  * Creates and submits transaction with
@@ -34,6 +32,7 @@ class PerformMassIssuanceUseCase(
         private val emails: List<String>,
         private val assetCode: String,
         private val amount: BigDecimal,
+        private val reference: String,
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val repositoryProvider: RepositoryProvider,
@@ -41,7 +40,6 @@ class PerformMassIssuanceUseCase(
         private val txManager: TxManager
 ) {
     private lateinit var accountId: String
-    private val reference: String = SecureRandom.getSeed(16).encodeBase64String()
     private lateinit var accounts: List<String>
     private lateinit var balances: List<String>
     private lateinit var networkParams: NetworkParams

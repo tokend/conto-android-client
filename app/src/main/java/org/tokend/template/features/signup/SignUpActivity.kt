@@ -35,7 +35,6 @@ import org.tokend.template.view.util.input.EditTextHelper
 import org.tokend.template.view.util.input.SimpleTextWatcher
 
 class SignUpActivity : BaseActivity() {
-
     override val allowUnauthorized = true
 
     private val loadingIndicator = LoadingIndicatorManager(
@@ -217,8 +216,6 @@ class SignUpActivity : BaseActivity() {
 
         updateSignUpAvailability()
     }
-
-    // endregion
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

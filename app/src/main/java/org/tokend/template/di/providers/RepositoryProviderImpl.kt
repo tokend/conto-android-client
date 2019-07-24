@@ -10,11 +10,8 @@ import org.tokend.template.data.repository.assets.AssetChartRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesCache
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
-import org.tokend.template.data.repository.balances.BalancesRepository
 import org.tokend.template.data.repository.base.MemoryOnlyRepositoryCache
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
-import org.tokend.template.data.repository.tfa.TfaFactorsRepository
-import org.tokend.template.data.repository.tradehistory.TradeHistoryRepository
 import org.tokend.template.extensions.getOrPut
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
@@ -124,6 +121,10 @@ class RepositoryProviderImpl(
         KeyValueEntriesRepository(apiProvider, MemoryOnlyRepositoryCache())
     }
 
+    private val blobs: BlobsRepository by lazy {
+        BlobsRepository(apiProvider)
+    }
+
     override fun balances(): BalancesRepository {
         val key = companyId.toString()
         return balancesRepositories.getOrPut(key) {
@@ -178,7 +179,7 @@ class RepositoryProviderImpl(
     }
 
     private val kycStateRepository: KycStateRepository by lazy {
-        KycStateRepository(apiProvider, walletInfoProvider, kycStatePersistor)
+        KycStateRepository(apiProvider, walletInfoProvider, kycStatePersistor, blobs())
     }
 
     override fun account(): AccountRepository {
@@ -290,6 +291,10 @@ class RepositoryProviderImpl(
 
     override fun keyValueEntries(): KeyValueEntriesRepository {
         return keyValueEntries
+    }
+
+    override fun blobs(): BlobsRepository {
+        return blobs
     }
 
     companion object {
