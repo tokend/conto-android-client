@@ -77,7 +77,7 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initHistory() {
-        adapter = BalanceChangesAdapter(amountFormatter, false)
+        adapter = BalanceChangesAdapter(amountFormatter)
         adapter.onItemClick { _, item ->
             item.source?.let { Navigator.from(this).openBalanceChangeDetails(it) }
         }
