@@ -79,6 +79,7 @@ class SignUpActivity : BaseActivity() {
 
         initFields()
         initButtons()
+        checkTerms()
         ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
 
         canSignUp = false
@@ -145,6 +146,13 @@ class SignUpActivity : BaseActivity() {
     }
     // endregion
 
+    private fun checkTerms() {
+        if(!BuildConfig.IS_TERMS_ALLOWED) {
+            terms_text_view.visibility = View.GONE
+            terms_of_service_checkbox.visibility = View.GONE
+        }
+    }
+
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
             QrScannerUtil.openScanner(this)
@@ -152,12 +160,14 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun updateSignUpAvailability() {
+        val terms = !BuildConfig.IS_TERMS_ALLOWED || terms_of_service_checkbox.isChecked
+
         canSignUp = !isLoading
                 && !email_edit_text.text.isNullOrBlank()
                 && passwordsMatch && !password_edit_text.text.isNullOrEmpty()
                 && !email_edit_text.hasError()
                 && !password_edit_text.hasError()
-                && terms_of_service_checkbox.isChecked
+                && terms
                 && urlConfigProvider.hasConfig()
     }
 
