@@ -235,7 +235,7 @@ class BalanceDetailsActivity : BaseActivity() {
             }
 
     private fun initHistory() {
-        adapter = BalanceChangesAdapter(amountFormatter)
+        adapter = BalanceChangesAdapter(amountFormatter, false)
         adapter.onItemClick { _, item ->
             item.source?.let { Navigator.from(this).openBalanceChangeDetails(it) }
             menu_fab.close(false)
@@ -348,10 +348,12 @@ class BalanceDetailsActivity : BaseActivity() {
         val availableString =
                 amountFormatter.formatAssetAmount(
                         balance.available,
-                        balance.asset
+                        balance.asset,
+                        withAssetCode = false
                 )
         balance_available_text_view.text = availableString
         toolbar.title = availableString
+        toolbar.subtitle = balance.asset.name ?: balance.assetCode
 
         asset_name_text_view.text = balance.asset.name ?: balance.assetCode
 
@@ -375,10 +377,8 @@ class BalanceDetailsActivity : BaseActivity() {
                     )
             balance_converted_text_view.visibility = View.VISIBLE
             balance_converted_text_view.text = convertedString
-            toolbar.subtitle = convertedString
         } else {
             balance_converted_text_view.visibility = View.GONE
-            toolbar.subtitle = null
         }
     }
 

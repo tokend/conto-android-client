@@ -10,8 +10,10 @@ import org.tokend.template.view.util.LocalizedName
 import org.tokend.template.view.util.formatter.AmountFormatter
 import org.tokend.template.view.util.formatter.DateFormatter
 
-class BalanceChangeItemViewHolder(view: View,
-                                  private val amountFormatter: AmountFormatter
+class BalanceChangeItemViewHolder(
+        view: View,
+        private val amountFormatter: AmountFormatter,
+        private val withAssetCodes: Boolean
 ) : BaseViewHolder<BalanceChangeListItem>(view),
         HistoryItemView by HistoryItemViewImpl(view) {
 
@@ -67,7 +69,7 @@ class BalanceChangeItemViewHolder(view: View,
         amountTextView.setTextColor(color)
 
         var formattedAmount = amountFormatter.formatAssetAmount(
-                item.amount, item.asset, abbreviation = true
+                item.amount, item.asset, abbreviation = true, withAssetCode = withAssetCodes
         )
 
         if (item.isReceived == false) {
