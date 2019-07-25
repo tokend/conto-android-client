@@ -491,4 +491,5 @@
     <string name="switch_to_company_confirmation">Перейти в интерфейс Компании?</string>
     <string name="switch_to_client_confirmation">Перейти в интерфейс Клиента?</string>
     <string name="add_company_scanner_prompt">Отсканируйте QR код компании</string>
+    <string name="error_redemption_request_no_more_valid">Погашение уже выполнено, запрос недействителен</string>
 </resources>

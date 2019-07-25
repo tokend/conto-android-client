@@ -5,6 +5,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.general.model.SystemInfo
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
 import org.tokend.template.data.model.history.SimpleFeeRecord
@@ -29,20 +30,25 @@ class ConfirmRedemptionRequestUseCase(
         private val apiProvider: ApiProvider,
         private val txManager: TxManager
 ) {
+    class RedemptionAlreadyProcessedException : Exception()
+
     private val balanceId = repositoryProvider
             .balances()
             .itemsList
             .find { it.assetCode == request.assetCode }
             ?.id
 
+    private lateinit var systemInfo: SystemInfo
     private lateinit var networkParams: NetworkParams
     private lateinit var senderBalanceId: String
     private lateinit var transaction: Transaction
+    private lateinit var submitTransactionResponse: SubmitTransactionResponse
 
     fun perform(): Completable {
-        return getNetworkParams()
-                .doOnSuccess { networkParams ->
-                    this.networkParams = networkParams
+        return getSystemInfo()
+                .doOnSuccess { systemInfo ->
+                    this.systemInfo = systemInfo
+                    this.networkParams = systemInfo.toNetworkParams()
                 }
                 .flatMap {
                     getSenderBalanceId()
@@ -59,16 +65,26 @@ class ConfirmRedemptionRequestUseCase(
                 .flatMap {
                     submitTransaction()
                 }
+                .doOnSuccess { submitTransactionResponse ->
+                    this.submitTransactionResponse = submitTransactionResponse
+                }
+                .flatMap {
+                    ensureActualSubmit()
+                }
                 .doOnSuccess {
                     updateRepositories()
                 }
                 .ignoreElement()
     }
 
-    private fun getNetworkParams(): Single<NetworkParams> {
-        return repositoryProvider
-                .systemInfo()
-                .getNetworkParams()
+    private fun getSystemInfo(): Single<SystemInfo> {
+        val systemInfoRepository = repositoryProvider.systemInfo()
+
+        return systemInfoRepository
+                .updateDeferred()
+                .andThen(Single.defer {
+                    Single.just(systemInfoRepository.item!!)
+                })
     }
 
     private fun getSenderBalanceId(): Single<String> {
@@ -127,6 +143,21 @@ class ConfirmRedemptionRequestUseCase(
 
     private fun submitTransaction(): Single<SubmitTransactionResponse> {
         return txManager.submit(transaction)
+    }
+
+    private fun ensureActualSubmit(): Single<Boolean> {
+        val latestBlockBeforeSubmit = systemInfo.ledgersState[SystemInfo.LEDGER_CORE]?.latest
+                ?: return Single.error(IllegalStateException("Cannot obtain latest core block"))
+
+        val transactionBlock = submitTransactionResponse.ledger ?: 0
+
+        // The exactly same transaction is always accepted without any errors
+        // but if it wasn't the first submit the block number will be lower than the latest one.
+        return if (transactionBlock <= latestBlockBeforeSubmit) {
+            Single.error(RedemptionAlreadyProcessedException())
+        } else {
+            Single.just(true)
+        }
     }
 
     private fun updateRepositories() {

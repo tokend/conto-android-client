@@ -477,6 +477,7 @@
     <string name="switch_to_client_confirmation">Are you sure you want to switch to the Client interface?</string>
     <string name="account_created_successfully">Account has been created</string>
     <string name="add_company_scanner_prompt">Scan company QR code</string>
+    <string name="error_redemption_request_no_more_valid">The request is already processed and no more valid</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

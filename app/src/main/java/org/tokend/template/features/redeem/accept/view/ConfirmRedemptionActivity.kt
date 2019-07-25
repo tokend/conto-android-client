@@ -1,5 +1,6 @@
 package org.tokend.template.features.redeem.accept.view
 
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -145,15 +146,27 @@ class ConfirmRedemptionActivity : BaseActivity() {
                 .doOnSubscribe { dialog.show() }
                 .doOnTerminate { dialog.dismiss() }
                 .subscribeBy(
-                        onComplete = {
-                            toastManager.short(R.string.successfully_accepted_redemption)
-                            finish()
-                        },
-                        onError = {
-                            errorHandlerFactory.getDefault().handle(it)
-                        }
+                        onComplete = this::onRedemptionConfirmed,
+                        onError = this::onRedemptionConfirmationError
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onRedemptionConfirmed() {
+        toastManager.short(R.string.successfully_accepted_redemption)
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
+    private fun onRedemptionConfirmationError(error: Throwable) {
+        when (error) {
+            is ConfirmRedemptionRequestUseCase.RedemptionAlreadyProcessedException -> {
+                toastManager.long(R.string.error_redemption_request_no_more_valid)
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
+            else -> errorHandlerFactory.getDefault().handle(error)
+        }
     }
 
     private fun displayDetails() {
