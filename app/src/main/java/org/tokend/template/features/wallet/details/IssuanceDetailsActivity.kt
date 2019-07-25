@@ -24,16 +24,6 @@ class IssuanceDetailsActivity : BalanceChangeDetailsActivity() {
         val reference = details.reference?.takeIf { it.isNotBlank() }
         val cause = details.cause?.takeIf { it.isNotBlank() }
 
-        if (reference != null) {
-            adapter.addData(
-                    DetailsItem(
-                            text = reference,
-                            hint = getString(R.string.tx_reference),
-                            icon = ContextCompat.getDrawable(this, R.drawable.ic_label_outline)
-                    )
-            )
-        }
-
         if (cause != null) {
             adapter.addData(
                     DetailsItem(
