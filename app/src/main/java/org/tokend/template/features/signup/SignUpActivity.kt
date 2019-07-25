@@ -79,6 +79,7 @@ class SignUpActivity : BaseActivity() {
 
         initFields()
         initButtons()
+        checkTerms()
         ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
 
         canSignUp = false
@@ -108,9 +109,9 @@ class SignUpActivity : BaseActivity() {
         password_edit_text.addTextChangedListener(passwordTextWatcher)
         confirm_password_edit_text.addTextChangedListener(passwordTextWatcher)
 
-//        terms_of_service_checkbox.onCheckedChange { _, _ ->
-//            updateSignUpAvailability()
-//        }
+        terms_of_service_checkbox.onCheckedChange { _, _ ->
+            updateSignUpAvailability()
+        }
     }
 
     private fun initNetworkField() {
@@ -135,15 +136,22 @@ class SignUpActivity : BaseActivity() {
             Navigator.from(this).toSignIn(false)
         }
 
-//        terms_text_view.onClick {
-//            if (urlConfigProvider.hasConfig()) {
-//                browse(urlConfigProvider.getConfig().terms, true)
-//            } else {
-//                toastManager.short(R.string.error_network_not_specified)
-//            }
-//        }
+        terms_text_view.onClick {
+            if (urlConfigProvider.hasConfig()) {
+                browse(urlConfigProvider.getConfig().terms, true)
+            } else {
+                toastManager.short(R.string.error_network_not_specified)
+            }
+        }
     }
     // endregion
+
+    private fun checkTerms() {
+        if(!BuildConfig.IS_TERMS_ALLOWED) {
+            terms_text_view.visibility = View.GONE
+            terms_of_service_checkbox.visibility = View.GONE
+        }
+    }
 
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
@@ -152,12 +160,14 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun updateSignUpAvailability() {
+        val terms = !BuildConfig.IS_TERMS_ALLOWED || terms_of_service_checkbox.isChecked
+
         canSignUp = !isLoading
                 && !email_edit_text.text.isNullOrBlank()
                 && passwordsMatch && !password_edit_text.text.isNullOrEmpty()
                 && !email_edit_text.hasError()
                 && !password_edit_text.hasError()
-//                && terms_of_service_checkbox.isChecked
+                && terms
                 && urlConfigProvider.hasConfig()
     }
 

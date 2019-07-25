@@ -136,6 +136,8 @@ ext {
     allow_authenticator_auth = false
     // Allows voting in polls
     allow_polls = false
+    // Show terms and conditions
+    allow_terms = false
 
     // Controls balance amounts conversion
     // into `balances_conversion_asset`
@@ -179,6 +181,7 @@ ext.applyAppConfig = { buildConfig ->
     b.buildConfigField 'Boolean', 'ENABLE_AUTHENTICATOR_AUTH', "${allow_authenticator_auth}"
     b.buildConfigField 'Boolean', 'ENABLE_BALANCES_CONVERSION', "${enable_balances_conversion}"
     b.buildConfigField 'String', 'BALANCES_CONVERSION_ASSET', "\"${balances_conversion_asset}\""
+    b.buildConfigField 'Boolean', 'IS_TERMS_ALLOWED', "${allow_terms}"
 
     b.resValue "string", "app_host", "${app_host}"
     b.resValue "color", "primary", "${color_primary}"
