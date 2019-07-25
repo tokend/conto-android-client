@@ -268,6 +268,8 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         termsPreference?.setOnPreferenceClickListener {
             requireContext().browse(urlConfigProvider.getConfig().terms)
         }
+        (findPreference("info") as? PreferenceCategory)
+                ?.removePreference(termsPreference)
     }
 
     private fun initOpenSourceLicensesItem() {

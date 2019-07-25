@@ -108,9 +108,9 @@ class SignUpActivity : BaseActivity() {
         password_edit_text.addTextChangedListener(passwordTextWatcher)
         confirm_password_edit_text.addTextChangedListener(passwordTextWatcher)
 
-        terms_of_service_checkbox.onCheckedChange { _, _ ->
-            updateSignUpAvailability()
-        }
+//        terms_of_service_checkbox.onCheckedChange { _, _ ->
+//            updateSignUpAvailability()
+//        }
     }
 
     private fun initNetworkField() {
@@ -135,13 +135,13 @@ class SignUpActivity : BaseActivity() {
             Navigator.from(this).toSignIn(false)
         }
 
-        terms_text_view.onClick {
-            if (urlConfigProvider.hasConfig()) {
-                browse(urlConfigProvider.getConfig().terms, true)
-            } else {
-                toastManager.short(R.string.error_network_not_specified)
-            }
-        }
+//        terms_text_view.onClick {
+//            if (urlConfigProvider.hasConfig()) {
+//                browse(urlConfigProvider.getConfig().terms, true)
+//            } else {
+//                toastManager.short(R.string.error_network_not_specified)
+//            }
+//        }
     }
     // endregion
 
@@ -157,7 +157,7 @@ class SignUpActivity : BaseActivity() {
                 && passwordsMatch && !password_edit_text.text.isNullOrEmpty()
                 && !email_edit_text.hasError()
                 && !password_edit_text.hasError()
-                && terms_of_service_checkbox.isChecked
+//                && terms_of_service_checkbox.isChecked
                 && urlConfigProvider.hasConfig()
     }
 
