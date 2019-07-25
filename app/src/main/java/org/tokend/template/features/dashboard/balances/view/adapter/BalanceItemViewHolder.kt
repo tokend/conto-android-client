@@ -29,14 +29,19 @@ class BalanceItemViewHolder(
 
         if (conversionAsset == null || item.asset == conversionAsset
                 || item.converted == null) {
-            amountTextView.text = amountFormatter.formatAssetAmount(
-                    item.available,
-                    item.asset
+            amountTextView.text = view.context.getString(
+                    R.string.template_available,
+                    amountFormatter.formatAssetAmount(
+                            item.available,
+                            item.asset,
+                            withAssetCode = false
+                    )
             )
         } else {
             val availableString = amountFormatter.formatAssetAmount(
                     item.available,
-                    item.asset
+                    item.asset,
+                    withAssetCode = false
             )
 
             val balanceString = view.context.getString(

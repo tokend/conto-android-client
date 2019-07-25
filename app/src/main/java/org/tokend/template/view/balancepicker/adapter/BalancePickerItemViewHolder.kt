@@ -19,7 +19,7 @@ class BalancePickerItemViewHolder(
     override fun bind(item: BalancePickerListItem) {
         displayLogo(item.logoUrl, item.asset.code)
 
-        nameTextView.text = item.asset.code
+        nameTextView.text = item.displayedName
 
         if (item.available != null) {
             amountTextView.text = view.context.getString(

@@ -11,6 +11,8 @@ class BalancePickerListItem(
         val isEnough: Boolean,
         val source: BalanceRecord?
 ) {
+    val displayedName: String = asset.name ?: asset.code
+
     constructor(source: BalanceRecord,
                 available: BigDecimal? = source.available,
                 required: BigDecimal = BigDecimal.ZERO) : this(
