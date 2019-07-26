@@ -33,6 +33,8 @@ class BalanceChangeMainDataView(
             containerAppbar.findViewById<TextView>(R.id.top_info_text_view)
     private val bottomInfoTextView =
             containerAppbar.findViewById<TextView>(R.id.bottom_info_text_view)
+    private val assetNameTextView =
+            containerAppbar.findViewById<TextView>(R.id.asset_name_text_view)
 
     init {
         initToolbarAnimations()
@@ -99,7 +101,19 @@ class BalanceChangeMainDataView(
             else -> null
         }
 
-        val amountString = sign + amountFormatter.formatAssetAmount(amount, asset)
+        val assetName = asset.name
+        if (assetName != null) {
+            assetNameTextView.visibility = View.VISIBLE
+            assetNameTextView.text = assetName
+        } else {
+            assetNameTextView.visibility = View.GONE
+        }
+
+        val amountString = sign + amountFormatter.formatAssetAmount(
+                amount,
+                asset,
+                withAssetCode = assetName == null
+        )
         toolbar.title = amountString
         amountTextView.text = amountString
 
@@ -122,7 +136,11 @@ class BalanceChangeMainDataView(
         if (fee.signum() > 0) {
             bottomInfoTextView.text = context.getString(
                     R.string.template_fee,
-                    amountFormatter.formatAssetAmount(fee, asset)
+                    amountFormatter.formatAssetAmount(
+                            fee,
+                            asset,
+                            withAssetCode = asset.name == null
+                    )
             )
         } else {
             bottomInfoTextView.text = context.getString(R.string.no_fee_charged)

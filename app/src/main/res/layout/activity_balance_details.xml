@@ -78,29 +78,30 @@
                             android:layout_height="@dimen/asset_list_item_logo_size"
                             tools:background="@color/md_pink_200" />
 
-                        <TextView
-                            android:id="@+id/asset_name_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/standard_margin"
-                            tools:text="My Awesome Token" />
-
                         <me.grantland.widget.AutofitTextView
                             android:id="@+id/balance_available_text_view"
                             style="@style/HeadingText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/half_standard_margin"
+                            android:layout_marginTop="@dimen/standard_margin"
                             android:maxLines="1"
                             android:textSize="@dimen/text_size_heading_large"
                             tools:text="12.74 MAT" />
+
+                        <TextView
+                            android:id="@+id/asset_name_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginTop="@dimen/quarter_standard_margin"
+                            tools:text="My Awesome Token" />
 
                         <TextView
                             android:id="@+id/balance_converted_text_view"
                             style="@style/SecondaryText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/quarter_standard_margin"
+                            android:layout_marginTop="@dimen/half_standard_margin"
                             android:gravity="center"
                             tools:text="6.37 USD" />
                     </LinearLayout>

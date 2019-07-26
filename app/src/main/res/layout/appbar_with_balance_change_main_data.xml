@@ -34,7 +34,7 @@
                 app:contentPaddingBottom="@dimen/double_margin"
                 app:contentPaddingLeft="0dp"
                 app:contentPaddingRight="0dp"
-                app:contentPaddingTop="@dimen/double_margin"
+                app:contentPaddingTop="@dimen/standard_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
