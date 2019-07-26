@@ -13,5 +13,11 @@
         android:icon="@drawable/ic_plus_white"
         android:title="@string/add_company"
         app:iconTint="@color/icons"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/sign_out"
+        android:icon="@drawable/ic_sign_out"
+        android:title="@string/sign_out"
+        app:iconTint="@color/icons"
+        app:showAsAction="never" />
 </menu>
