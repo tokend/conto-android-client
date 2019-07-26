@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
+import org.tokend.template.util.Navigator
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.util.CopyDataDialogFactory
@@ -50,6 +51,15 @@ class CompanyClientDetailsActivity : BaseActivity() {
         adapter.onItemClick { _, item ->
             when (item.id) {
                 CLIENT_EMAIL_ITEM_ID -> showEmailCopyDialog()
+                else -> if (item.id >= BALANCE_ITEM_ID_INDEX_OFFSET) {
+                    client.balances
+                            .getOrNull((item.id - BALANCE_ITEM_ID_INDEX_OFFSET).toInt())
+                            ?.asset
+                            ?.code
+                            ?.also { assetCode ->
+                                Navigator.from(this).openCompanyClientMovements(client, assetCode)
+                            }
+                }
             }
         }
 
@@ -96,25 +106,20 @@ class CompanyClientDetailsActivity : BaseActivity() {
             )
         } else {
             adapter.addData(
-                    DetailsItem(
-                            header = getString(R.string.company_client_balances),
-                            text = amountFormatter.formatAssetAmount(
-                                    client.balances.first().amount,
-                                    client.balances.first().asset
-                            ),
-                            icon = balanceIcon
-                    )
-            )
-            adapter.addData(
                     client.balances
-                            .subList(1, client.balances.size)
-                            .map { balance ->
+                            .mapIndexed { i, balance ->
                                 DetailsItem(
+                                        header =
+                                        if (i == 0)
+                                            getString(R.string.company_client_balances)
+                                        else
+                                            null,
                                         text = amountFormatter.formatAssetAmount(
                                                 balance.amount,
                                                 balance.asset
                                         ),
-                                        icon = balanceIcon
+                                        icon = balanceIcon,
+                                        id = BALANCE_ITEM_ID_INDEX_OFFSET + i
                                 )
                             }
             )
@@ -132,7 +137,8 @@ class CompanyClientDetailsActivity : BaseActivity() {
 
     companion object {
         private const val CLIENT_EXTRA = "client"
-        private val CLIENT_EMAIL_ITEM_ID = "email".hashCode().toLong()
+        private const val CLIENT_EMAIL_ITEM_ID = 1L
+        private const val BALANCE_ITEM_ID_INDEX_OFFSET = 100L
 
         fun getBundle(client: CompanyClientRecord) = Bundle().apply {
             putSerializable(CLIENT_EXTRA, client)

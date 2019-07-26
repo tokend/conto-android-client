@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity">
+
+    <include layout="@layout/appbar" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        style="@style/LimitedMatchParentWidthConstraint"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintTop_toTopOf="@null">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <org.tokend.template.view.PaginationRecyclerView
+                android:id="@+id/history_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:paddingStart="@dimen/quarter_standard_margin"
+                android:paddingEnd="@dimen/quarter_standard_margin" />
+
+            <org.tokend.template.view.TxDateTextSwitcher
+                android:id="@+id/date_text_switcher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="8dp"
+                android:background="@drawable/tx_date_text_switcher_background"
+                android:measureAllChildren="true"
+                android:visibility="invisible" />
+
+            <include layout="@layout/include_error_empty_view" />
+
+        </FrameLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/appbar">
+
+        <include layout="@layout/include_appbar_elevation" />
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

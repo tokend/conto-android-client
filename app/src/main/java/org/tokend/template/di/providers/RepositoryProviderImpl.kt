@@ -293,7 +293,7 @@ class RepositoryProviderImpl(
         return companyClientsRepository
     }
 
-    override fun clientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository {
+    override fun companyClientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository {
         val key = "${clientAccountId}_$assetCode"
         return clientBalanceChangesRepositories.getOrPut(key) {
             BalanceChangesRepository(

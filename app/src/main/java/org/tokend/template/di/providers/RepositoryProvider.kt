@@ -40,7 +40,7 @@ interface RepositoryProvider {
     fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository
     fun companies(): CompaniesRepository
     fun companyClients(): CompanyClientsRepository
-    fun clientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository
+    fun companyClientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository
     fun keyValueEntries(): KeyValueEntriesRepository
     fun blobs(): BlobsRepository
 }
