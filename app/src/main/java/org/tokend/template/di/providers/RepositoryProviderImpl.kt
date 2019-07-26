@@ -95,6 +95,9 @@ class RepositoryProviderImpl(
                 MemoryOnlyRepositoryCache())
     }
 
+    private val clientBalanceChangesRepositories =
+            LruCache<String, BalanceChangesRepository>(MAX_SAME_REPOSITORIES_COUNT)
+
     private val pollsRepositories =
             LruCache<String, PollsRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
@@ -219,6 +222,7 @@ class RepositoryProviderImpl(
             BalanceChangesRepository(
                     balanceId,
                     walletInfoProvider.getWalletInfo()?.accountId,
+                    null,
                     apiProvider,
                     DefaultParticipantEffectConverter(),
                     BalanceChangesCache()
@@ -287,6 +291,20 @@ class RepositoryProviderImpl(
 
     override fun companyClients(): CompanyClientsRepository {
         return companyClientsRepository
+    }
+
+    override fun clientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository {
+        val key = "${clientAccountId}_$assetCode"
+        return clientBalanceChangesRepositories.getOrPut(key) {
+            BalanceChangesRepository(
+                    null,
+                    clientAccountId,
+                    assetCode,
+                    apiProvider,
+                    DefaultParticipantEffectConverter(),
+                    BalanceChangesCache()
+            )
+        }
     }
 
     override fun keyValueEntries(): KeyValueEntriesRepository {

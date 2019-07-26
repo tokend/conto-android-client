@@ -23,6 +23,7 @@ import org.tokend.template.di.providers.ApiProvider
 class BalanceChangesRepository(
         private val balanceId: String?,
         private val accountId: String?,
+        private val assetCode: String?,
         private val apiProvider: ApiProvider,
         private val participantEffectConverter: ParticipantEffectConverter,
         itemsCache: RepositoryCache<BalanceChange>
@@ -60,6 +61,10 @@ class BalanceChangesRepository(
                                         withBalance(balanceId)
                                     } else {
                                         withAccount(accountId!!)
+                                    }
+
+                                    if (assetCode != null) {
+                                        withAsset(assetCode)
                                     }
                                 }
                                 .build()
