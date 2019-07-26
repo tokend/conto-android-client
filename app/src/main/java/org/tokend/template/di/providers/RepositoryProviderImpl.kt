@@ -225,6 +225,7 @@ class RepositoryProviderImpl(
                     null,
                     apiProvider,
                     DefaultParticipantEffectConverter(),
+                    accountDetails(),
                     BalanceChangesCache()
             )
         }
@@ -302,6 +303,7 @@ class RepositoryProviderImpl(
                     assetCode,
                     apiProvider,
                     DefaultParticipantEffectConverter(),
+                    accountDetails(),
                     BalanceChangesCache()
             )
         }
