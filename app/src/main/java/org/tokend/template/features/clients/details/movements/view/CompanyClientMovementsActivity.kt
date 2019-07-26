@@ -141,11 +141,9 @@ class CompanyClientMovementsActivity : BaseActivity() {
 
     private fun displayHistory() {
         val localizedName = LocalizedName(this)
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
-                ?: return
 
         adapter.setData(balanceChangesRepository.itemsList.map { balanceChange ->
-            BalanceChangeListItem(balanceChange, accountId, localizedName)
+            BalanceChangeListItem(balanceChange, client.accountId!!, localizedName)
         })
     }
 
