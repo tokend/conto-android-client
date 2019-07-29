@@ -3,4 +3,9 @@
 ext {
     enable_analytics = true
     logs_enabled = false
+
+    api_url = 'https://api.conto.me'
+    storage_url = 'https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver'
+    app_host = 'conto.me'
+    client_url = 'https://conto.me/'
 }
