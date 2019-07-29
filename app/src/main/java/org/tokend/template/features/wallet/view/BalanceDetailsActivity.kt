@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_details.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
@@ -149,7 +150,7 @@ class BalanceDetailsActivity : BaseActivity() {
             deposit_fab.isEnabled = canDeposit
             send_fab.isEnabled = canSend
             receive_fab.isEnabled = canSend
-            buy_fab.isEnabled = canBuy
+            buy_fab.isEnabled = false
             redeem_fab.isEnabled = canRedeem
         }
 
@@ -202,6 +203,9 @@ class BalanceDetailsActivity : BaseActivity() {
             menu_fab.close(false)
         }
         buy_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_buy_fab))
+        if (canBuy) {
+            enableBuyFabIfThereAreAsks()
+        }
 
         redeem_fab.onClick {
             val assetCode = balance?.assetCode ?: return@onClick
@@ -221,6 +225,24 @@ class BalanceDetailsActivity : BaseActivity() {
         }
 
         menu_fab.setClosedOnTouchOutside(true)
+    }
+
+    private fun enableBuyFabIfThereAreAsks() {
+        val asset = this.balance?.asset ?: return
+        val asksRepository = repositoryProvider.atomicSwapAsks(asset.code)
+
+        asksRepository
+                .updateIfNotFreshDeferred()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .subscribeBy(
+                        onComplete = {
+                            if (asksRepository.itemsList.isNotEmpty()) {
+                                buy_fab.isEnabled = true
+                            }
+                        },
+                        onError = {}
+                )
+                .addTo(compositeDisposable)
     }
 
     private val hideFabScrollListener =
