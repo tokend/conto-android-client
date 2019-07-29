@@ -62,6 +62,7 @@ class CorporateMainActivity : MainActivity() {
                 }
                 .build()
                 .also { initAccountTypeSwitchIfNeeded(it) }
+                .also { addQrCodeButton(it) }
     }
 
     override fun getProfileHeaderItem(email: String?): ProfileDrawerItem {

@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
@@ -35,6 +36,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
+import com.mikepenz.materialdrawer.view.BezelImageView
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -70,6 +72,7 @@ import org.tokend.template.view.util.PicassoDrawerImageLoader
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
@@ -252,7 +255,31 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                 }
                 .build()
                 .also { initAccountTypeSwitchIfNeeded(it) }
+                .also { addQrCodeButton(it) }
                 .also { header = it }
+    }
+
+    protected open fun addQrCodeButton(accountHeader: AccountHeader) {
+        val layout = accountHeader.view
+                .findViewById<RelativeLayout>(R.id.material_drawer_account_header)
+
+        val button = BezelImageView(this).apply {
+            ViewCompat.setElevation(this, dip(2).toFloat())
+            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.qr_code_round_button))
+            isClickable = false
+
+            val size = dip(28)
+
+            layoutParams = RelativeLayout.LayoutParams(size, size).apply {
+                addRule(RelativeLayout.ALIGN_BOTTOM,
+                        com.mikepenz.materialdrawer.R.id.material_drawer_account_header_current)
+                addRule(RelativeLayout.ALIGN_END,
+                        com.mikepenz.materialdrawer.R.id.material_drawer_account_header_current)
+                marginEnd = -(size.toFloat() / 3).roundToInt()
+            }
+        }
+
+        layout.addView(button)
     }
 
     protected open fun initAccountTypeSwitchIfNeeded(accountHeader: AccountHeader) {
