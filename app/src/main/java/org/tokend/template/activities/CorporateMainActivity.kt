@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.DrawerBuilder
+import com.mikepenz.materialdrawer.model.DividerDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
@@ -39,6 +40,8 @@ class CorporateMainActivity : MainActivity() {
             addDrawerItems(items[CompanyClientsFragment.ID])
             addDrawerItems(items[AccountMovementsFragment.ID])
             addDrawerItems(items[SettingsFragment.ID])
+            addDrawerItems(DividerDrawerItem())
+            addDrawerItems(items[CONTRIBUTE_ITEM_ID])
         }
     }
 

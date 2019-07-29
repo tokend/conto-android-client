@@ -30,6 +30,7 @@ import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
+import com.mikepenz.materialdrawer.model.DividerDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
@@ -39,6 +40,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.browse
 import org.jetbrains.anko.dip
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
@@ -72,7 +74,10 @@ import java.util.concurrent.TimeUnit
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
         private val CONTACT_ITEM_ID = "contact".hashCode().toLong()
+        val CONTRIBUTE_ITEM_ID = "contribute".hashCode().toLong()
         private val ADD_COMPANY_ITEM_ID = "add_company".hashCode().toLong()
+
+        private const val REPO_URL = "https://github.com/tokend/conto-android-client"
     }
 
     protected open val defaultFragmentId = DashboardFragment.ID
@@ -199,6 +204,12 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withName(R.string.contact_company)
                     .withIdentifier(CONTACT_ITEM_ID)
                     .withIcon(R.drawable.ic_email_letter)
+                    .withSelectable(false),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.contribute)
+                    .withIdentifier(CONTRIBUTE_ITEM_ID)
+                    .withIcon(R.drawable.ic_contribution)
                     .withSelectable(false)
     )
 
@@ -396,7 +407,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
             addDrawerItems(
                     items[CONTACT_ITEM_ID],
-                    items[SettingsFragment.ID]
+                    items[SettingsFragment.ID],
+                    DividerDrawerItem(),
+                    items[CONTRIBUTE_ITEM_ID]
             )
         }
     }
@@ -421,6 +434,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             : Boolean {
         when (item.identifier) {
             CONTACT_ITEM_ID -> contactCompany()
+            CONTRIBUTE_ITEM_ID -> contribute()
             else -> navigateTo(item.identifier)
 
         }
@@ -519,6 +533,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                         recipient
                 )
         ))
+    }
+
+    private fun contribute() {
+        browse(REPO_URL, true)
     }
 
     private var fragmentToolbarDisposable: Disposable? = null

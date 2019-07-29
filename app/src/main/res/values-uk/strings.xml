@@ -493,4 +493,5 @@
     <string name="add_company_scanner_prompt">Відскануйте QR код компанії</string>
     <string name="error_redemption_request_no_more_valid">Погашення вже виконано, запит недійсний</string>
     <string name="template_asset_code_movements">Операції з %1$s</string>
+    <string name="contribute">Внести вклад</string>
 </resources>
