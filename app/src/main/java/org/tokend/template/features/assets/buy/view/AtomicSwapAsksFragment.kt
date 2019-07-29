@@ -22,7 +22,6 @@ import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
-import org.tokend.template.view.util.SwipeRefreshDependencyUtil
 
 class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     private val loadingIndicator = LoadingIndicatorManager(
@@ -77,7 +76,6 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
-        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, hint_appbar)
     }
 
     private fun initHint() {
@@ -85,6 +83,7 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
                 R.string.template_atomic_swaps_hint,
                 assetCode
         )
+        hint_appbar.visibility = View.GONE
     }
     // endregion
 
@@ -134,7 +133,7 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
                 .map(::AtomicSwapAskListItem)
         adapter.setData(items)
 
-        hint_appbar.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+        hint_appbar.visibility = View.GONE
     }
 
     private fun openBuy(ask: AtomicSwapAskRecord) {
