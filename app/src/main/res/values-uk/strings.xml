@@ -447,7 +447,7 @@
     <string name="accept_redemption">Прийняти погашення</string>
     <string name="account_title">Акаунт</string>
     <string name="companies_title">Компанії</string>
-    <string name="contact_company">Зв\'язок</string>
+    <string name="contact_company">Зворотній зв\'язок</string>
     <string name="error_invalid_redemption_request">Некоректний запит на погашення. Спробуйте ще раз</string>
     <string name="error_no_companies">Компанії не знайдено</string>
     <string name="error_redemption_not_owned_asset">Ви можете приймати погашення лише створених вами активів</string>
