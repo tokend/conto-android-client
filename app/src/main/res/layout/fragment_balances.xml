@@ -26,6 +26,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
+                    android:overScrollMode="never"
                     android:paddingBottom="@dimen/quadra_margin"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
@@ -49,6 +50,11 @@
                             android:layout_marginStart="@dimen/standard_margin"
                             android:layout_marginEnd="@dimen/standard_margin"
                             android:orientation="vertical">
+
+                            <!-- Required for vertical-offset-based elevation -->
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp" />
 
                             <me.grantland.widget.AutofitTextView
                                 android:id="@+id/total_text_view"
