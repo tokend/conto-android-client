@@ -8,14 +8,17 @@ import java.io.Serializable
 class CompanyRecord(
         val id: String,
         val name: String,
-        val logoUrl: String?
+        val logoUrl: String?,
+        val conversionAssetCode: String?
 ): Serializable {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
             name = source.name,
             logoUrl = source.logoJson
                     .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
-                    .getUrl(urlConfig?.storage)
+                    .getUrl(urlConfig?.storage),
+            // TODO: get from resource
+            conversionAssetCode = null
     )
 
     override fun equals(other: Any?): Boolean {
