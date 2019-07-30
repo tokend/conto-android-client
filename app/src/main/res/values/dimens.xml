@@ -66,4 +66,6 @@
 
     <dimen name="company_client_status_size">18dp</dimen>
     <dimen name="company_client_status_icon_padding">4dp</dimen>
+
+    <dimen name="elevated_round_button_stroke_width">1dp</dimen>
 </resources>

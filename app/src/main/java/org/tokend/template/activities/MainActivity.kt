@@ -13,19 +13,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.ContextThemeWrapper
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
 import com.mikepenz.fastadapter.IIdentifyable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -36,14 +28,13 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
-import com.mikepenz.materialdrawer.view.BezelImageView
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.navigation_drawer_header.view.*
 import org.jetbrains.anko.browse
-import org.jetbrains.anko.dip
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
@@ -72,7 +63,6 @@ import org.tokend.template.view.util.PicassoDrawerImageLoader
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
@@ -221,6 +211,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
         return AccountHeaderBuilder()
                 .withActivity(this)
+                .withAccountHeader(R.layout.navigation_drawer_header)
                 .withHeaderBackground(
                         ColorDrawable(ContextCompat.getColor(this, R.color.white))
                 )
@@ -254,71 +245,21 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     false
                 }
                 .build()
-                .also { initAccountTypeSwitchIfNeeded(it) }
-                .also { addQrCodeButton(it) }
+                .also(this::initAccountTypeSwitch)
                 .also { header = it }
     }
 
-    protected open fun addQrCodeButton(accountHeader: AccountHeader) {
-        val layout = accountHeader.view
-                .findViewById<RelativeLayout>(R.id.material_drawer_account_header)
-
-        val button = BezelImageView(this).apply {
-            ViewCompat.setElevation(this, dip(2).toFloat())
-            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.qr_code_round_button))
-            isClickable = false
-
-            val size = dip(28)
-
-            layoutParams = RelativeLayout.LayoutParams(size, size).apply {
-                addRule(RelativeLayout.ALIGN_BOTTOM,
-                        com.mikepenz.materialdrawer.R.id.material_drawer_account_header_current)
-                addRule(RelativeLayout.ALIGN_END,
-                        com.mikepenz.materialdrawer.R.id.material_drawer_account_header_current)
-                marginEnd = -(size.toFloat() / 3).roundToInt()
-            }
-        }
-
-        layout.addView(button)
-    }
-
-    protected open fun initAccountTypeSwitchIfNeeded(accountHeader: AccountHeader) {
+    protected open fun initAccountTypeSwitch(accountHeader: AccountHeader) {
+        val view = accountHeader.view.findViewById<View>(R.id.account_type_switch_layout)
+                ?: return
         if (kycStateRepository.itemFormType == KycFormType.CORPORATE) {
-            accountHeader.view.findViewById<ViewGroup>(
-                    com.mikepenz.materialdrawer.R.id.material_drawer_account_header
-            )?.addView(getAccountTypeSwitchView())
-        }
-    }
-
-    protected open fun getAccountTypeSwitchView(): View {
-        val button = ImageView(this).apply {
-            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.account_switch))
-            setOnClickListener {
+            view.visibility = View.VISIBLE
+            view.account_type_switch_hint.text = getAccountTypeSwitchHint()
+            view.account_type_switch_button.setOnClickListener {
                 switchAccountType()
             }
-
-            val size = dip(36)
-            layoutParams = ViewGroup.LayoutParams(size, size)
-        }
-
-        val hint = TextView(ContextThemeWrapper(this, R.style.HintText), null, R.style.HintText).apply {
-            text = getAccountTypeSwitchHint()
-            setPadding(0, 0,
-                    context.resources.getDimensionPixelSize(R.dimen.half_standard_margin), 0)
-        }
-
-        return LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-
-            addView(hint)
-            addView(button)
-
-            layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-                topMargin = context.resources.getDimensionPixelSize(R.dimen.standard_margin)
-                marginEnd = context.resources.getDimensionPixelSize(R.dimen.half_standard_padding)
-            }
+        } else {
+            view.visibility = View.GONE
         }
     }
 

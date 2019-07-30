@@ -48,6 +48,7 @@ class CorporateMainActivity : MainActivity() {
     override fun getHeaderInstance(email: String?): AccountHeader {
         return AccountHeaderBuilder()
                 .withActivity(this)
+                .withAccountHeader(R.layout.navigation_drawer_header)
                 .withHeaderBackground(
                         ColorDrawable(ContextCompat.getColor(this, R.color.white))
                 )
@@ -61,8 +62,7 @@ class CorporateMainActivity : MainActivity() {
                     false
                 }
                 .build()
-                .also { initAccountTypeSwitchIfNeeded(it) }
-                .also { addQrCodeButton(it) }
+                .also(this::initAccountTypeSwitch)
     }
 
     override fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
