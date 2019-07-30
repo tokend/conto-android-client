@@ -1,5 +1,7 @@
 package org.tokend.template.features.assets.buy.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -19,6 +21,7 @@ import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAskListIte
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAsksAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
+import org.tokend.template.logic.wallet.WalletEventsListener
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -139,13 +142,27 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     private fun openBuy(ask: AtomicSwapAskRecord) {
         Navigator.from(this).openAtomicSwapBuy(
                 ask.asset.code,
-                ask.id
+                ask.id,
+                BUY_REQUEST
         )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                BUY_REQUEST -> {
+                    (activity as? WalletEventsListener)?.onAtomicSwapBuyConfirmed()
+                }
+            }
+        }
     }
 
     companion object {
         val ID = "aswap_asks".hashCode().toLong() and 0xffff
         private const val ASSET_CODE_EXTRA = "asset_code"
+        private val BUY_REQUEST = "buy".hashCode() and 0xffff
 
         fun newInstance(bundle: Bundle): AtomicSwapAsksFragment {
             val fragment = AtomicSwapAsksFragment()

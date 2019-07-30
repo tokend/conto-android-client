@@ -407,10 +407,11 @@ class Navigator private constructor() {
     }
 
     fun openAtomicSwapBuy(assetCode: String,
-                          askId: String) {
+                          askId: String,
+                          requestCode: Int = 0) {
         context?.intentFor<BuyWithAtomicSwapActivity>()
                 ?.putExtras(BuyWithAtomicSwapActivity.getBundle(assetCode, askId))
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 
     fun openAtomicSwapsAsks(assetCode: String) {

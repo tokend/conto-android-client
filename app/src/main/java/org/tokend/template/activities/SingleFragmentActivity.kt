@@ -82,6 +82,11 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
         finish()
     }
 
+    override fun onAtomicSwapBuyConfirmed() {
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
     override fun onBackPressed() {
         if (onBackPressedListener?.onBackPressed() != false) {
             super.onBackPressed()

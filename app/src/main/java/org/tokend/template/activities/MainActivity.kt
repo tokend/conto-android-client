@@ -655,4 +655,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     override fun onWithdrawalRequestConfirmed(withdrawalRequest: WithdrawalRequest) {
         navigateTo(DashboardFragment.ID)
     }
+
+    override fun onAtomicSwapBuyConfirmed() {
+        navigateTo(DashboardFragment.ID)
+    }
 }

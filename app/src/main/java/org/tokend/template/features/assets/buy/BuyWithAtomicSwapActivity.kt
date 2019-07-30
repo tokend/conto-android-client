@@ -1,5 +1,6 @@
 package org.tokend.template.features.assets.buy
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
@@ -173,6 +174,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 topText = getString(R.string.template_send_to_address, sendAmountString)
         )
 
+        setResult(Activity.RESULT_OK)
         finish()
     }
 
