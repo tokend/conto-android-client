@@ -19,6 +19,7 @@ class PostSignInManager(
     fun doPostSignIn(): Completable {
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
+                repositoryProvider.account().updateDeferred(),
                 repositoryProvider.kycState().updateIfNotFreshDeferred().andThen(Completable.defer {
                     // Update balances for corporate users, companies otherwise.
                     if (forcedAccountType == ForcedAccountType.CORPORATE ||

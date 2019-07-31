@@ -64,7 +64,6 @@ import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
 import org.tokend.template.features.signin.UnlockAppActivity
 import org.tokend.template.features.signin.model.ForcedAccountType
-import org.tokend.template.features.signup.RecoverySeedActivity
 import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
@@ -73,7 +72,6 @@ import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.WithdrawalConfirmationActivity
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
 import java.math.BigDecimal
-import java.util.*
 
 /**
  * Performs transitions between screens.
@@ -215,12 +213,6 @@ class Navigator private constructor() {
                         ShareQrFragment.ID,
                         ShareQrFragment.getBundle(data, title, shareLabel, shareText, topText, bottomText)
                 ))
-                ?.also { performIntent(it, requestCode = requestCode) }
-    }
-
-    fun openRecoverySeedSaving(requestCode: Int, seed: CharArray) {
-        context?.intentFor<RecoverySeedActivity>()
-                ?.putExtras(RecoverySeedActivity.getBundle(seed))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 

@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_network_field.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.browse
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.enabled
 import org.jetbrains.anko.onClick
@@ -22,13 +23,12 @@ import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
-import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.model.form.KycFormType
-import org.tokend.template.features.kyc.model.form.SimpleKycForm
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
 import org.tokend.template.features.signin.logic.SignInMethod
@@ -223,12 +223,25 @@ class SignInActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onComplete = this::onSignInComplete,
-                        onError = {
-                            it.printStackTrace()
-                            handleSignInError(it)
-                        }
+                        onError = this::handleSignInError
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onSignInComplete() {
+        // KYC recovery check.
+        val kycRecoveryStatus = repositoryProvider.account().item?.kycRecoveryStatus
+        if (kycRecoveryStatus != null && kycRecoveryStatus != AccountRecord.KycRecoveryStatus.NONE) {
+            showKycRecoveryStatusDialog(kycRecoveryStatus)
+        } else {
+            canSignIn = false
+
+            if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+                Navigator.from(this).toCorporateMainActivity()
+            } else {
+                Navigator.from(this).toCompaniesActivity()
+            }
+        }
     }
 
     private fun handleSignInError(error: Throwable) {
@@ -243,14 +256,27 @@ class SignInActivity : BaseActivity() {
         updateSignInAvailability()
     }
 
-    private fun onSignInComplete() {
-        canSignIn = false
-
-        if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
-            Navigator.from(this).toCorporateMainActivity()
-        } else {
-            Navigator.from(this).toCompaniesActivity()
-        }
+    private fun showKycRecoveryStatusDialog(status: AccountRecord.KycRecoveryStatus) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(R.string.kyc_recovery_status_dialog_title)
+                .setMessage(when(status) {
+                    AccountRecord.KycRecoveryStatus.PENDING ->
+                        R.string.kyc_recovery_pending_message
+                    AccountRecord.KycRecoveryStatus.REJECTED,
+                    AccountRecord.KycRecoveryStatus.PERMANENTLY_REJECTED ->
+                        R.string.kyc_recovery_pending_message
+                    else ->
+                        R.string.kyc_recovery_initiated_message
+                })
+                .setPositiveButton(R.string.ok, null)
+                .apply {
+                    if (status == AccountRecord.KycRecoveryStatus.INITIATED) {
+                        setNeutralButton(R.string.open_action) { _, _ ->
+                            browse(urlConfigProvider.getConfig().client, true)
+                        }
+                    }
+                }
+                .show()
     }
 
     private fun updateAdditionalButtonsState(isEnabled: Boolean) {
