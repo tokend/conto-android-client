@@ -35,6 +35,7 @@ import org.tokend.template.features.companies.add.view.AddCompanyActivity
 import org.tokend.template.features.companies.add.view.AddCompanyConfirmationActivity
 import org.tokend.template.features.companies.view.CompaniesActivity
 import org.tokend.template.features.companies.view.CompanyLoadingActivity
+import org.tokend.template.features.companies.view.ExploreCompaniesActivity
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
@@ -469,9 +470,9 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openCompanyAdd() {
+    fun openCompanyAdd(requestCode: Int = 0) {
         context?.intentFor<AddCompanyActivity>()
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 
     fun openCompanyAddConfirmation(company: CompanyRecord,
@@ -492,6 +493,11 @@ class Navigator private constructor() {
                                    assetCode: String) {
         context?.intentFor<CompanyClientMovementsActivity>()
                 ?.putExtras(CompanyClientMovementsActivity.getBundle(client, assetCode))
+                ?.also { performIntent(it) }
+    }
+
+    fun  openExploreCompanies() {
+        context?.intentFor<ExploreCompaniesActivity>()
                 ?.also { performIntent(it) }
     }
 }

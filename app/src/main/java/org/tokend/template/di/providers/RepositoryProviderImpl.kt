@@ -90,8 +90,8 @@ class RepositoryProviderImpl(
         FeesRepository(apiProvider, walletInfoProvider)
     }
 
-    private val companiesRepository: CompaniesRepository by lazy {
-        CompaniesRepository(apiProvider, walletInfoProvider, urlConfigProvider,
+    private val clientCompaniesRepository: ClientCompaniesRepository by lazy {
+        ClientCompaniesRepository(apiProvider, walletInfoProvider, urlConfigProvider,
                 MemoryOnlyRepositoryCache())
     }
 
@@ -126,6 +126,10 @@ class RepositoryProviderImpl(
 
     private val blobs: BlobsRepository by lazy {
         BlobsRepository(apiProvider)
+    }
+
+    private val companiesRepository: CompaniesRepository by lazy {
+        CompaniesRepository(apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
     }
 
     override fun balances(): BalancesRepository {
@@ -284,6 +288,10 @@ class RepositoryProviderImpl(
             AtomicSwapRequestsRepository(apiProvider, asset,
                     MemoryOnlyRepositoryCache())
         }
+    }
+
+    override fun clientCompanies(): ClientCompaniesRepository {
+        return clientCompaniesRepository
     }
 
     override fun companies(): CompaniesRepository {

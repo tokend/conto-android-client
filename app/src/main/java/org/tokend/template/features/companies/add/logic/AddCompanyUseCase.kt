@@ -2,14 +2,14 @@ package org.tokend.template.features.companies.add.logic
 
 import io.reactivex.Completable
 import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.CompaniesRepository
+import org.tokend.template.data.repository.ClientCompaniesRepository
 
 class AddCompanyUseCase(
         private val company: CompanyRecord,
-        private val companiesRepository: CompaniesRepository
+        private val clientCompaniesRepository: ClientCompaniesRepository
 ) {
     fun perform(): Completable {
-        return companiesRepository
+        return clientCompaniesRepository
                 .addCompany(company)
     }
 }

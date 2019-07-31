@@ -71,7 +71,7 @@ class AddCompanyConfirmationActivity : BaseActivity() {
 
         disposable = AddCompanyUseCase(
                 company,
-                repositoryProvider.companies()
+                repositoryProvider.clientCompanies()
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())

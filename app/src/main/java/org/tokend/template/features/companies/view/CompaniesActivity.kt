@@ -16,7 +16,7 @@ import org.tokend.template.App
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.CompaniesRepository
+import org.tokend.template.data.repository.ClientCompaniesRepository
 import org.tokend.template.features.companies.view.adapter.CompanyItemsAdapter
 import org.tokend.template.features.companies.view.adapter.CompanyListItem
 import org.tokend.template.util.Navigator
@@ -32,8 +32,8 @@ class CompaniesActivity : BaseActivity() {
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
 
-    private val companiesRepository: CompaniesRepository
-        get() = repositoryProvider.companies()
+    private val clientCompaniesRepository: ClientCompaniesRepository
+        get() = repositoryProvider.clientCompanies()
 
     private var searchItem: MenuItem? = null
 
@@ -120,7 +120,7 @@ class CompaniesActivity : BaseActivity() {
                 R.string.error_no_companies,
                 ErrorEmptyView.ButtonAction(getString(R.string.add), this::addCompany)
         )
-        error_empty_view.setEmptyViewDenial { companiesRepository.isNeverUpdated }
+        error_empty_view.setEmptyViewDenial { clientCompaniesRepository.isNeverUpdated }
 
         companiesAdapter.registerAdapterDataObserver(
                 ScrollOnTopItemUpdateAdapterObserver(companies_recycler_view)
@@ -131,13 +131,13 @@ class CompaniesActivity : BaseActivity() {
     }
 
     private fun subscribeToCompanies() {
-        companiesRepository
+        clientCompaniesRepository
                 .loadingSubject
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { loadingIndicator.setLoading(it) }
                 .addTo(compositeDisposable)
 
-        companiesRepository
+        clientCompaniesRepository
                 .errorsSubject
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { error ->
@@ -151,7 +151,7 @@ class CompaniesActivity : BaseActivity() {
                 }
                 .addTo(compositeDisposable)
 
-        companiesRepository
+        clientCompaniesRepository
                 .itemsSubject
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { onCompaniesLoaded() }
@@ -163,13 +163,13 @@ class CompaniesActivity : BaseActivity() {
     }
 
     private fun onCompaniesLoaded() {
-        if (companiesRepository.itemsList.size == 1) {
-            val company = companiesRepository.itemsList.first()
+        if (clientCompaniesRepository.itemsList.size == 1) {
+            val company = clientCompaniesRepository.itemsList.first()
             onCompanySelected(company)
             return
         }
 
-        companiesRepository
+        clientCompaniesRepository
                 .itemsList
                 .find { it.id == session.lastCompanyId }
                 ?.let { company ->
@@ -181,9 +181,9 @@ class CompaniesActivity : BaseActivity() {
     }
 
     private fun displayCompanies() {
-        val items = companiesRepository
+        val items = clientCompaniesRepository
                 .itemsList
-                .map(::CompanyListItem)
+                .map { CompanyListItem(it) }
                 .let { items ->
                     filter?.let {
                         items.filter { item ->
@@ -200,9 +200,9 @@ class CompaniesActivity : BaseActivity() {
 
     private fun update(force: Boolean = false) {
         if (!force) {
-            companiesRepository.updateIfNotFresh()
+            clientCompaniesRepository.updateIfNotFresh()
         } else {
-            companiesRepository.update()
+            clientCompaniesRepository.update()
         }
     }
 
@@ -212,7 +212,7 @@ class CompaniesActivity : BaseActivity() {
     }
 
     private fun addCompany() {
-        Navigator.from(this).openCompanyAdd()
+        Navigator.from(this).openExploreCompanies()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
