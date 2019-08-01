@@ -94,7 +94,10 @@ class ExploreCompaniesActivity : BaseActivity() {
         companiesAdapter.onItemClick { view, item ->
             if (!item.exist) {
                 addCompanyWithConfirmation(item)
+                return@onItemClick
             }
+            session.setCompany(item.source)
+            Navigator.from(this).toCompanyLoading()
         }
 
         companiesAdapter.registerAdapterDataObserver(
