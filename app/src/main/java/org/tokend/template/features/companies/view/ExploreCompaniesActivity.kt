@@ -97,7 +97,7 @@ class ExploreCompaniesActivity : BaseActivity() {
                 return@onItemClick
             }
             session.setCompany(item.source)
-            Navigator.from(this).toCompanyLoading()
+            Navigator.from(this).toCompanyLoading(true)
         }
 
         companiesAdapter.registerAdapterDataObserver(

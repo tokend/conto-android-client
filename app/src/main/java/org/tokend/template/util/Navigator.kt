@@ -424,10 +424,19 @@ class Navigator private constructor() {
         activity?.let { fadeOut(it) }
     }
 
-    fun toCompanyLoading() {
+    fun toCompanyLoading(finishAffinity: Boolean = false) {
         context?.intentFor<CompanyLoadingActivity>()
+                ?.singleTop()
+                ?.clearTop()
                 ?.also { performIntent(it) }
-        activity?.finish()
+        activity?.let {
+            if (finishAffinity) {
+                it.setResult(Activity.RESULT_CANCELED, null)
+                ActivityCompat.finishAffinity(it)
+            } else {
+                it.finish()
+            }
+        }
     }
 
     fun openRedemptionCreation(assetCode: String? = null) {
@@ -490,7 +499,7 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun  openExploreCompanies() {
+    fun openExploreCompanies() {
         context?.intentFor<ExploreCompaniesActivity>()
                 ?.also { performIntent(it) }
     }
