@@ -57,7 +57,7 @@ class AddCompanyActivity : BaseActivity() {
     // endregion
 
     private fun loadCompany(companyAccountId: String) {
-        CompanyLoader(repositoryProvider.companies())
+        CompanyLoader(repositoryProvider.clientCompanies())
                 .load(companyAccountId)
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .subscribeBy(
@@ -68,7 +68,7 @@ class AddCompanyActivity : BaseActivity() {
     }
 
     private fun tryToAddCompany(company: CompanyRecord) {
-        if (!repositoryProvider.companies().itemsList.contains(company)) {
+        if (!repositoryProvider.clientCompanies().itemsList.contains(company)) {
             openAddConfirmation(company)
         } else {
             onCompanyAddError(CompanyAlreadyAddedException(company))

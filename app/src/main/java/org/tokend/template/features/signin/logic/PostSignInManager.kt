@@ -27,7 +27,7 @@ class PostSignInManager(
                             && repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
                         repositoryProvider.balances().updateIfNotFreshDeferred()
                     } else {
-                        repositoryProvider.companies().updateIfNotFreshDeferred()
+                        repositoryProvider.clientCompanies().updateIfNotFreshDeferred()
                     }
                 })
         )

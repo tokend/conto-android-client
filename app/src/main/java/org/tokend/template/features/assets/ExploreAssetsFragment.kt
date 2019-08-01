@@ -94,9 +94,9 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
         val columns = ColumnCalculator.getColumnCount(requireActivity())
 
         layoutManager = GridLayoutManager(context, columns)
-        assets_recycler_view.layoutManager = layoutManager
+        recycler_view.layoutManager = layoutManager
 
-        assets_recycler_view.adapter = assetsAdapter
+        recycler_view.adapter = assetsAdapter
 
         error_empty_view.setEmptyDrawable(R.drawable.ic_coins)
         error_empty_view.observeAdapter(assetsAdapter, R.string.no_assets_found)
@@ -111,10 +111,10 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
         }
 
         assetsAdapter.registerAdapterDataObserver(
-                ScrollOnTopItemUpdateAdapterObserver(assets_recycler_view)
+                ScrollOnTopItemUpdateAdapterObserver(recycler_view)
         )
 
-        ElevationUtil.initScrollElevation(assets_recycler_view, appbar_elevation_view)
+        ElevationUtil.initScrollElevation(recycler_view, appbar_elevation_view)
     }
 
     private fun initMenu() {
@@ -299,12 +299,12 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
 
     override fun onStart() {
         super.onStart()
-        assets_recycler_view.isLayoutFrozen = false
+        recycler_view.isLayoutFrozen = false
     }
 
     override fun onStop() {
         super.onStop()
-        assets_recycler_view.isLayoutFrozen = true
+        recycler_view.isLayoutFrozen = true
     }
 
     override fun onBackPressed(): Boolean {

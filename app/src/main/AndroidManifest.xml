@@ -229,9 +229,13 @@
             android:name=".features.signin.ForceAccountTypeActivity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-        <activity android:name=".features.clients.details.movements.view.CompanyClientMovementsActivity"
+        <activity
+            android:name=".features.clients.details.movements.view.CompanyClientMovementsActivity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
+            android:name=".features.companies.view.ExploreCompaniesActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>

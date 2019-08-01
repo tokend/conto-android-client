@@ -486,4 +486,7 @@
     <string name="error_redemption_request_no_more_valid">Погашение уже выполнено, запрос недействителен</string>
     <string name="template_asset_code_movements">Операции с %1$s</string>
     <string name="contribute">Внести вклад</string>
+    <string name="explore_companies_title">Поиск компаний</string>
+    <string name="scan_title">Сканировать</string>
+    <string name="template_add_company_confirmation">Вы уверены что ходите добавить %1$s?</string>
 </resources>

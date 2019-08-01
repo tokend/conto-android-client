@@ -38,7 +38,7 @@ import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.CompaniesRepository
+import org.tokend.template.data.repository.ClientCompaniesRepository
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
@@ -93,8 +93,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected val kycStateRepository: KycStateRepository
         get() = repositoryProvider.kycState()
 
-    private val companiesRepository: CompaniesRepository
-        get() = repositoryProvider.companies()
+    private val clientCompaniesRepository: ClientCompaniesRepository
+        get() = repositoryProvider.clientCompanies()
 
     private val companyPlaceholderDrawable: Drawable? by lazy {
         ContextCompat.getDrawable(this, R.drawable.company_logo_placeholder)
@@ -240,7 +240,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                 .withOnAccountHeaderSelectionViewClickListener { _, _ ->
                     val selectionWasHidden = header?.isSelectionListShown == false
                     if (selectionWasHidden) {
-                        companiesRepository.update()
+                        clientCompaniesRepository.update()
                     }
                     false
                 }
@@ -291,7 +291,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     protected open fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> {
-        return companiesRepository
+        return clientCompaniesRepository
                 .itemsList
                 .map { company ->
                     ProfileDrawerItem()
@@ -391,7 +391,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     private fun subscribeToCompanies() {
-        companiesRepository
+        clientCompaniesRepository
                 .itemsSubject
                 .map { true }
                 .subscribe(profileUpdatesSubject)
@@ -561,7 +561,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     private fun openCompanyAdd() {
         navigationDrawer?.closeDrawer()
-        Navigator.from(this).openCompanyAdd()
+        Navigator.from(this).openExploreCompanies()
     }
 
     override fun onBackPressed() {

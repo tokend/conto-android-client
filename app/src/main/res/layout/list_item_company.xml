@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -26,11 +27,23 @@
         <TextView
             android:id="@+id/company_name_text_view"
             style="@style/HeadingText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
             android:textSize="18sp"
+            android:layout_weight="1"
             tools:text="Awesome Company" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/company_exists_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:contentDescription="@string/asset_balance_exists"
+            app:srcCompat="@drawable/ic_check_circle"
+            app:tint="@color/ok"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <View

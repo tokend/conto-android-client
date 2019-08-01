@@ -53,7 +53,7 @@ class CompanyItemsAdapter : BaseRecyclerAdapter<CompanyListItem, CompanyItemView
             val first = items[oldItemPosition]
             val second = newItems[newItemPosition]
 
-            return first.name == second.name
+            return first.name == second.name && first.exist == second.exist
         }
     }
 }
