@@ -31,6 +31,7 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         toolbarSubject.onNext(toolbar)
 
         toolbar.title = getString(R.string.dashboard_title)
+        toolbar.subtitle = companyInfoProvider.getCompany()?.name
 
         initViewPager()
     }
