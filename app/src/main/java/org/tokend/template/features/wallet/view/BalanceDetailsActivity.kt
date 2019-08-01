@@ -232,7 +232,7 @@ class BalanceDetailsActivity : BaseActivity() {
         val asksRepository = repositoryProvider.atomicSwapAsks(asset.code)
 
         asksRepository
-                .updateIfNotFreshDeferred()
+                .updateDeferred()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
                 .subscribeBy(
                         onComplete = {

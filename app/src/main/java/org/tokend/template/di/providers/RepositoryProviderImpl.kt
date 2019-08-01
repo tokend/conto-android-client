@@ -3,7 +3,6 @@ package org.tokend.template.di.providers
 import android.content.Context
 import android.support.v4.util.LruCache
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.tokend.template.BuildConfig
 import org.tokend.template.data.model.history.converter.DefaultParticipantEffectConverter
 import org.tokend.template.data.repository.*
 import org.tokend.template.data.repository.assets.AssetChartRepository
@@ -39,11 +38,8 @@ class RepositoryProviderImpl(
         private val companyInfoProvider: CompanyInfoProvider? = null,
         private val kycStatePersistor: SubmittedKycStatePersistor? = null
 ) : RepositoryProvider {
-    private val conversionAssetCode =
-            if (BuildConfig.ENABLE_BALANCES_CONVERSION)
-                BuildConfig.BALANCES_CONVERSION_ASSET
-            else
-                null
+    private val conversionAssetCode
+        get() = companyInfoProvider?.getCompany()?.conversionAssetCode
 
     private val companyId: String?
         get() = companyInfoProvider?.getCompany()?.id
@@ -63,10 +59,8 @@ class RepositoryProviderImpl(
             LruCache<String, AssetsRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val orderBookRepositories =
             LruCache<String, OrderBookRepository>(MAX_SAME_REPOSITORIES_COUNT)
-    private val assetPairsRepository: AssetPairsRepository by lazy {
-        AssetPairsRepository(apiProvider, urlConfigProvider, mapper,
-                conversionAssetCode, MemoryOnlyRepositoryCache())
-    }
+    private val assetPairsRepositories =
+            LruCache<String, AssetPairsRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val offersRepositories =
             LruCache<String, OffersRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val accountRepository: AccountRepository by lazy {
@@ -167,7 +161,11 @@ class RepositoryProviderImpl(
     }
 
     override fun assetPairs(): AssetPairsRepository {
-        return assetPairsRepository
+        val key = conversionAssetCode.toString()
+        return assetPairsRepositories.getOrPut(key) {
+            AssetPairsRepository(apiProvider, urlConfigProvider, mapper,
+                    conversionAssetCode, MemoryOnlyRepositoryCache())
+        }
     }
 
     override fun orderBook(baseAsset: String,

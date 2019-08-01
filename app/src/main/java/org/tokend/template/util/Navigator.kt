@@ -65,7 +65,6 @@ import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
 import org.tokend.template.features.signin.UnlockAppActivity
 import org.tokend.template.features.signin.model.ForcedAccountType
-import org.tokend.template.features.signup.RecoverySeedActivity
 import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
@@ -109,6 +108,7 @@ class Navigator private constructor() {
 
     private fun performIntent(intent: Intent?, requestCode: Int? = null, bundle: Bundle? = null) {
         if (intent != null) {
+            if (!IntentLock.checkIntent(intent, context)) return
             activity?.let {
                 if (requestCode != null) {
                     it.startActivityForResult(intent, requestCode, bundle ?: Bundle.EMPTY)
@@ -214,12 +214,6 @@ class Navigator private constructor() {
                         ShareQrFragment.ID,
                         ShareQrFragment.getBundle(data, title, shareLabel, shareText, topText, bottomText)
                 ))
-                ?.also { performIntent(it, requestCode = requestCode) }
-    }
-
-    fun openRecoverySeedSaving(requestCode: Int, seed: CharArray) {
-        context?.intentFor<RecoverySeedActivity>()
-                ?.putExtras(RecoverySeedActivity.getBundle(seed))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 

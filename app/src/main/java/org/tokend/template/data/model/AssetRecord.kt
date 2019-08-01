@@ -73,7 +73,8 @@ class AssetRecord(
                             ?.toIntOrNull()
 
             val description = source.details.get("description")
-                    ?.takeIf { it !is NullNode }?.asText()
+                    ?.asText("")
+                    ?.takeIf(String::isNotEmpty)
 
             return AssetRecord(
                     code = source.id,
