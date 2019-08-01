@@ -7,7 +7,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.view.MenuItem
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -161,8 +160,18 @@ class ExploreCompaniesActivity : BaseActivity() {
                 }
                 .addTo(compositeDisposable)
 
-        companiesRepository.errorsSubject
-                .observeOn(AndroidSchedulers.mainThread())
+        clientCompaniesRepository.loadingSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    loadingIndicator.setLoading(it, "client-companies")
+                }
+                .addTo(compositeDisposable)
+
+        Observable.merge(
+                companiesRepository.errorsSubject,
+                clientCompaniesRepository.errorsSubject
+        )
+                .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { error ->
                     if (!companiesAdapter.hasData) {
                         error_empty_view.showError(error, errorHandlerFactory.getDefault()) {
