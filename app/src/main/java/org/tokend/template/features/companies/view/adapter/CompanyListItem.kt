@@ -5,6 +5,7 @@ import org.tokend.template.data.model.CompanyRecord
 class CompanyListItem(
         val id: String,
         val name: String,
+        val industry: String?,
         val logoUrl: String?,
         var exist: Boolean,
         val source: CompanyRecord?
@@ -12,6 +13,7 @@ class CompanyListItem(
     constructor(source: CompanyRecord, exist: Boolean = false) : this(
             id = source.id,
             name = source.name,
+            industry = source.industry,
             logoUrl = source.logoUrl,
             exist = exist,
             source = source

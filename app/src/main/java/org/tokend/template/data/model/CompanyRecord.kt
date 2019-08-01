@@ -8,12 +8,15 @@ import java.io.Serializable
 class CompanyRecord(
         val id: String,
         val name: String,
+        val industry: String?,
         val logoUrl: String?,
         val conversionAssetCode: String?
 ): Serializable {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
             name = source.name,
+            // TODO: get from resource
+            industry = null,
             logoUrl = source.logoJson
                     .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
                     .getUrl(urlConfig?.storage),

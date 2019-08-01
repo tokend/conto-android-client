@@ -33,15 +33,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_margin"
-                android:layout_marginBottom="@dimen/standard_margin"
                 android:textSize="18sp"
                 tools:text="Company name" />
+
+            <TextView
+                android:id="@+id/company_industry_text_view"
+                style="@style/SecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/half_standard_margin"
+                android:visibility="gone"
+                tools:text="Company industry" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/standard_padding"
-                android:layout_marginTop="@dimen/triple_margin"
+                android:layout_marginTop="@dimen/quadra_margin"
                 android:layout_marginEnd="@dimen/standard_padding"
                 android:orientation="vertical">
 

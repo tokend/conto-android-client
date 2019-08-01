@@ -94,7 +94,10 @@ class ExploreCompaniesActivity : BaseActivity() {
         companiesAdapter.onItemClick { view, item ->
             if (!item.exist) {
                 addCompanyWithConfirmation(item)
+                return@onItemClick
             }
+            session.setCompany(item.source)
+            Navigator.from(this).toCompanyLoading(true)
         }
 
         companiesAdapter.registerAdapterDataObserver(
@@ -204,7 +207,7 @@ class ExploreCompaniesActivity : BaseActivity() {
                 .let { items ->
                     filter?.let {
                         items.filter { item ->
-                            SearchUtil.isMatchGeneralCondition(it, item.name)
+                            SearchUtil.isMatchGeneralCondition(it, item.name, item.industry)
                         }
                     } ?: items
                 }
