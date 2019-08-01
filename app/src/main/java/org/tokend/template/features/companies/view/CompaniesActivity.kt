@@ -189,7 +189,8 @@ class CompaniesActivity : BaseActivity() {
                         items.filter { item ->
                             SearchUtil.isMatchGeneralCondition(
                                     it,
-                                    item.name
+                                    item.name,
+                                    item.industry
                             )
                         }
                     } ?: items

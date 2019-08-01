@@ -24,15 +24,30 @@
             android:layout_marginStart="@dimen/standard_margin"
             tools:background="#ff0" />
 
-        <TextView
-            android:id="@+id/company_name_text_view"
-            style="@style/HeadingText"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
-            android:textSize="18sp"
             android:layout_weight="1"
-            tools:text="Awesome Company" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/company_name_text_view"
+                style="@style/HeadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                tools:text="Awesome Company" />
+
+            <TextView
+                android:id="@+id/company_industry_text_view"
+                style="@style/SecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/quarter_standard_margin"
+                android:visibility="gone"
+                tools:text="industry"/>
+        </LinearLayout>
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/company_exists_image_view"

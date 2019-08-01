@@ -204,7 +204,7 @@ class ExploreCompaniesActivity : BaseActivity() {
                 .let { items ->
                     filter?.let {
                         items.filter { item ->
-                            SearchUtil.isMatchGeneralCondition(it, item.name)
+                            SearchUtil.isMatchGeneralCondition(it, item.name, item.industry)
                         }
                     } ?: items
                 }

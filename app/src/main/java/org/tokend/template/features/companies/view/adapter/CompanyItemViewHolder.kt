@@ -13,6 +13,7 @@ class CompanyItemViewHolder(view: View) : BaseViewHolder<CompanyListItem>(view) 
     private val nameTextView = view.findViewById<TextView>(R.id.company_name_text_view)
     private val dividerView = view.findViewById<View>(R.id.divider_view)
     private val existIndicator = view.findViewById<ImageView>(R.id.company_exists_image_view)
+    private val industryTextView = view.findViewById<TextView>(R.id.company_industry_text_view)
 
     private val baseLogoSize: Int =
             view.context.resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
@@ -25,6 +26,14 @@ class CompanyItemViewHolder(view: View) : BaseViewHolder<CompanyListItem>(view) 
 
     override fun bind(item: CompanyListItem) {
         nameTextView.text = item.name
+
+        industryTextView.apply {
+            visibility = item.industry?.let {
+                text = it
+                View.VISIBLE
+            } ?: View.GONE
+        }
+
         LogoUtil.setLogo(logoImageView, item.name,
                 item.logoUrl, baseLogoSize)
 

@@ -2,6 +2,7 @@ package org.tokend.template.features.companies.add.view
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.View
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_add_company_confirmation.*
@@ -60,6 +61,13 @@ class AddCompanyConfirmationActivity : BaseActivity() {
         )
 
         company_name_text_view.text = company.name
+
+        company.industry?.let {
+            company_industry_text_view.apply {
+                visibility = View.VISIBLE
+                text = it
+            }
+        }
     }
 
     private fun addCompany() {
