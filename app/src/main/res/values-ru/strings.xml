@@ -496,6 +496,5 @@
     <string name="contribute">Внести вклад</string>
     <string name="explore_companies_title">Поиск компаний</string>
     <string name="scan_title">Сканировать</string>
-    <string name="no_companies_found">Компаний не найдено</string>
     <string name="template_add_company_confirmation">Вы уверены что ходите добавить %1$s?</string>
 </resources>

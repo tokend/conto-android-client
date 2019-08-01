@@ -86,7 +86,7 @@ class ExploreCompaniesActivity : BaseActivity() {
         recycler_view.adapter = companiesAdapter
 
         error_empty_view.setEmptyDrawable(R.drawable.ic_briefcase)
-        error_empty_view.observeAdapter(companiesAdapter, R.string.no_companies_found)
+        error_empty_view.observeAdapter(companiesAdapter, R.string.error_no_companies)
         error_empty_view.setEmptyViewDenial {
             companiesRepository.isNeverUpdated
                     || clientCompaniesRepository.isNeverUpdated

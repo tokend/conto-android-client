@@ -496,6 +496,5 @@
     <string name="contribute">Долучитися</string>
     <string name="explore_companies_title">Пошук компаній</string>
     <string name="scan_title">Сканувати</string>
-    <string name="no_companies_found">Компаній не знайдено</string>
     <string name="template_add_company_confirmation">Ви впевнені що хочете додати %1$s?</string>
 </resources>
