@@ -1,7 +1,5 @@
 package org.tokend.template.features.companies.view
 
-import android.app.Activity
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -12,7 +10,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_explore.*
@@ -132,7 +129,7 @@ class ExploreCompaniesActivity : BaseActivity() {
         }
 
         menu?.findItem(R.id.scan)?.setOnMenuItemClickListener {
-            Navigator.from(this).openCompanyAdd(CREATE_VIA_SCAN)
+            Navigator.from(this).openCompanyAdd()
             true
         }
     }
@@ -142,13 +139,15 @@ class ExploreCompaniesActivity : BaseActivity() {
     private fun subscribeToCompanies() {
         companiesDisposable?.dispose()
 
-        Observable.zip(
-                companiesRepository.itemsSubject
-                        .filter { companiesRepository.isFresh },
-                clientCompaniesRepository.itemsSubject
-                        .filter { clientCompaniesRepository.isFresh },
-                BiFunction { _: Any, _: Any -> }
-        )
+        Observable.combineLatest(
+                listOf(
+                        companiesRepository.itemsSubject,
+                        clientCompaniesRepository.itemsSubject
+                )
+        ) { true }
+                .filter {
+                    companiesRepository.isFresh && clientCompaniesRepository.isFresh
+                }
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe {
                     displayCompanies()
@@ -247,13 +246,6 @@ class ExploreCompaniesActivity : BaseActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CREATE_VIA_SCAN && resultCode == Activity.RESULT_OK) {
-            update(true)
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateListColumnsCount()
@@ -270,9 +262,5 @@ class ExploreCompaniesActivity : BaseActivity() {
         } else {
             super.onBackPressed()
         }
-    }
-
-    companion object {
-        private const val CREATE_VIA_SCAN = 349
     }
 }

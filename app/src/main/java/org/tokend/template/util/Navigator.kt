@@ -470,9 +470,9 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openCompanyAdd(requestCode: Int = 0) {
+    fun openCompanyAdd() {
         context?.intentFor<AddCompanyActivity>()
-                ?.also { performIntent(it, requestCode = requestCode) }
+                ?.also { performIntent(it) }
     }
 
     fun openCompanyAddConfirmation(company: CompanyRecord,
