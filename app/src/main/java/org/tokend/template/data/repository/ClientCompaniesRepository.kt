@@ -52,11 +52,11 @@ class ClientCompaniesRepository(
                         CompanyRecord(it, urlConfigProvider.getConfig())
                     }
                 }
-                .onErrorReturn { error ->
+                .onErrorResumeNext { error ->
                     if (error is HttpException && (error.isBadRequest() || error.isNotFound()))
-                        emptyList()
+                        Single.just(emptyList())
                     else
-                        throw error
+                        Single.error(error)
                 }
     }
 
