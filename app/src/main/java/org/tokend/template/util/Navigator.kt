@@ -60,6 +60,7 @@ import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
@@ -501,6 +502,11 @@ class Navigator private constructor() {
 
     fun openExploreCompanies() {
         context?.intentFor<ExploreCompaniesActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openPhoneNumberSettings() {
+        context?.intentFor<PhoneNumberSettingsActivity>()
                 ?.also { performIntent(it) }
     }
 }

@@ -30,7 +30,6 @@ import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.persistance.FingerprintUtil
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.SecretSeedDialog
 import org.tokend.template.view.SingleCheckDialog
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -105,6 +104,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     // region Account
     private fun initAccountCategory() {
         initKycItem()
+        initPhoneNumberItem()
         initSignOutItem()
     }
 
@@ -112,6 +112,14 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         val kycPreference = findPreference("kyc")
         kycPreference?.setOnPreferenceClickListener {
             activity?.browse(urlConfigProvider.getConfig().kyc, true)
+            true
+        }
+    }
+
+    private fun initPhoneNumberItem() {
+        val phoneNumberPreference = findPreference("phone")
+        phoneNumberPreference?.setOnPreferenceClickListener {
+            Navigator.from(this).openPhoneNumberSettings()
             true
         }
     }

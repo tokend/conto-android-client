@@ -1,6 +1,7 @@
 package org.tokend.template.util
 
 import io.reactivex.CompletableTransformer
+import io.reactivex.MaybeTransformer
 import io.reactivex.ObservableTransformer
 import io.reactivex.SingleTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -41,6 +42,17 @@ object ObservableTransformers {
      */
     fun <T> defaultSchedulersSingle(): SingleTransformer<T, T> {
         return SingleTransformer { upstream ->
+            upstream.subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+        }
+    }
+
+    /**
+     * Sets default schedulers for transformed Single:
+     * [Schedulers.newThread] for subscribe and [AndroidSchedulers.mainThread] for observe
+     */
+    fun <T> defaultSchedulersMaybe(): MaybeTransformer<T, T> {
+        return MaybeTransformer { upstream ->
             upstream.subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
         }

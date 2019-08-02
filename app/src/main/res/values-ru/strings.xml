@@ -486,4 +486,9 @@
     <string name="explore_companies_title">Поиск компаний</string>
     <string name="scan_title">Сканировать</string>
     <string name="template_add_company_confirmation">Вы уверены что ходите добавить %1$s?</string>
+    <string name="phone_number_settings_title">Номер телефона</string>
+    <string name="set_phone_number_explanation">Добавьте ваш номер телефона к аккаунту чтобы ваши друзья могли быстрее вас найти</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="set_phone_number">Сохранить номер</string>
+    <string name="error_invalid_phone_number">Некорректный номер</string>
 </resources>
