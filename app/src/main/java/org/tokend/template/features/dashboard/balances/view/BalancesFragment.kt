@@ -234,6 +234,7 @@ class BalancesFragment : BaseFragment() {
 
     private fun displayTotal() {
         val conversionAssetCode = balancesRepository.conversionAsset
+        val companyId = companyInfoProvider.getCompany()?.id
 
         if (conversionAssetCode == null) {
             total_text_view.visibility = View.GONE
@@ -242,6 +243,7 @@ class BalancesFragment : BaseFragment() {
 
         val total = balancesRepository
                 .itemsList
+                .filter { it.asset.ownerAccountId == companyId }
                 .fold(BigDecimal.ZERO) { sum, balance ->
                     sum.add(balance.convertedAmount ?: BigDecimal.ZERO)
                 }
