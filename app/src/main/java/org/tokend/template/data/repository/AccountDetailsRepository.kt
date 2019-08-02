@@ -128,7 +128,11 @@ class AccountDetailsRepository(
                 .doOnSuccess { identities.add(it) }
     }
 
+    fun getCachedIdentity(accountId: String): IdentityRecord? {
+        return identities.find { it.accountId == accountId }
+    }
+
     fun invalidateCachedIdentity(accountId: String) {
-        identities.removeAll { it.accountId == accountId }
+        identities.remove(getCachedIdentity(accountId))
     }
 }

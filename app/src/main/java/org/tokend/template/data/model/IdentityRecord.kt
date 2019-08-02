@@ -8,7 +8,7 @@ import org.tokend.sdk.api.identity.model.IdentityResource
 data class IdentityRecord(
         val email: String,
         val accountId: String,
-        val phoneNumber: String?
+        var phoneNumber: String?
 ) {
     constructor(source: IdentityResource) : this(
             email = source.email,

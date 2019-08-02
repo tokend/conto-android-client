@@ -491,4 +491,6 @@
     <string name="phone_number">Номер телефона</string>
     <string name="set_phone_number">Сохранить номер</string>
     <string name="error_invalid_phone_number">Некорректный номер</string>
+    <string name="phone_number_set_successfully">Номер сохранен</string>
+    <string name="error_phone_number_already_taken">Номер уже занят</string>
 </resources>

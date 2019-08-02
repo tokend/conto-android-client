@@ -16,6 +16,7 @@ import org.tokend.template.data.repository.AccountDetailsRepository
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.settings.phonenumber.logic.SetPhoneNumberUseCase
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.GlobalPhoneNumberValidator
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -105,16 +106,20 @@ class PhoneNumberSettingsActivity : BaseActivity() {
                     phone_number_edit_text.isEnabled = true
                 }
                 .subscribeBy(
-                        onSuccess = {
-                            phone_number_edit_text.setText(it)
-                        },
                         onComplete = {
                             phone_number_edit_text.requestFocus()
                             SoftInputUtil.showSoftInputOnView(phone_number_edit_text)
                         },
+                        onSuccess = this::onCurrentNumberLoaded,
                         onError = this::onCurrentNumberLoadingError
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onCurrentNumberLoaded(number: String) {
+        val toSet =  number.trimStart('+')
+        phone_number_edit_text.setText(toSet)
+        phone_number_edit_text.setSelection(toSet.length)
     }
 
     private fun onCurrentNumberLoadingError(error: Throwable) {
@@ -147,12 +152,42 @@ class PhoneNumberSettingsActivity : BaseActivity() {
         checkNumber()
         updateActionAvailability()
 
-        if (!canSet) {
+        if (canSet) {
             setNumber()
         }
     }
 
     private fun setNumber() {
+        val number = readNumber()
 
+        SetPhoneNumberUseCase(
+                number,
+                walletInfoProvider,
+                apiProvider,
+                accountDetailsRepository
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe {
+                    numberSettingLoadingIndicator.show()
+                    updateActionAvailability()
+                }
+                .doOnTerminate {
+                    numberSettingLoadingIndicator.hide()
+                    updateActionAvailability()
+                }
+                .subscribeBy(
+                        onError = this::onNumberSettingError,
+                        onComplete = { toastManager.short(R.string.phone_number_set_successfully) }
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun onNumberSettingError(error: Throwable) {
+        if (error is SetPhoneNumberUseCase.PhoneNumberAlreadyTakenException) {
+            phone_number_edit_text.setErrorAndFocus(R.string.error_phone_number_already_taken)
+        } else {
+            errorHandlerFactory.getDefault().handle(error)
+        }
     }
 }
