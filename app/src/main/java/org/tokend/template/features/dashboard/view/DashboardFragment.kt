@@ -30,8 +30,7 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
     override fun onInitAllowed() {
         toolbarSubject.onNext(toolbar)
 
-        toolbar.title = getString(R.string.dashboard_title)
-        toolbar.subtitle = companyInfoProvider.getCompany()?.name
+        toolbar.title = companyInfoProvider.getCompany()?.name
 
         initViewPager()
     }
