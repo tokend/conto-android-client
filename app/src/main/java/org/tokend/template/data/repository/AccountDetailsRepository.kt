@@ -18,19 +18,23 @@ class AccountDetailsRepository(
     private val identities = mutableSetOf<IdentityRecord>()
 
     /**
-     * Loads account ID for given email.
+     * Loads account ID for given identifier.
      * Result will be cached.
+     *
+     * @param identifier - email or phone number
      *
      * @see NoIdentityAvailableException
      */
-    fun getAccountIdByEmail(email: String): Single<String> {
-        val formattedEmail = email.toLowerCase()
-        val existing = identities.find { it.email == formattedEmail }?.accountId
+    fun getAccountIdByIdentifier(identifier: String): Single<String> {
+        val formattedIdentifier = identifier.toLowerCase()
+        val existing = identities.find {
+            it.email == formattedIdentifier || it.phoneNumber == formattedIdentifier
+        }?.accountId
         if (existing != null) {
             return Single.just(existing)
         }
 
-        return getIdentity(IdentitiesPageParams(email = formattedEmail))
+        return getIdentity(IdentitiesPageParams(identifier = formattedIdentifier))
                 .map(IdentityRecord::accountId)
     }
 
@@ -59,7 +63,7 @@ class AccountDetailsRepository(
     fun getPhoneByAccountId(accountId: String): Maybe<String> {
         val existingIdentity = identities.find { it.accountId == accountId }
 
-        if (existingIdentity != null ) {
+        if (existingIdentity != null) {
             return existingIdentity.phoneNumber.toMaybe()
         }
 

@@ -59,7 +59,7 @@
     <string name="template_file_download_location">Файл будет скачан в папку \"%1$s\"</string>
     <string name="template_asset_balance_created">Баланс %1$s создан</string>
     <string name="search">Поиск</string>
-    <string name="recipient_label">Email или аккаунт получателя</string>
+    <string name="recipient_label">Email или телефон получателя</string>
     <string name="payment_description_label">Комментарий (опционально)</string>
     <string name="payment_successfully_sent">Платеж отправлен</string>
     <string name="no_offers">Нет ордеров</string>

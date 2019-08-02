@@ -26,7 +26,7 @@ class PaymentRecipientLoader(
             Single.just(PaymentRecipient(recipient))
         else
             accountDetailsRepository
-                    .getAccountIdByEmail(recipient)
+                    .getAccountIdByIdentifier(recipient)
                     .map { accountId ->
                         PaymentRecipient(
                                 accountId = accountId,

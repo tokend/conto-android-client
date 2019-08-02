@@ -106,7 +106,7 @@ class PerformMassIssuanceUseCase(
         return Single.merge(
                 emails.map { email ->
                     accountDetailsRepository
-                            .getAccountIdByEmail(email)
+                            .getAccountIdByIdentifier(email)
                             .onErrorReturnItem("")
                 }
         )

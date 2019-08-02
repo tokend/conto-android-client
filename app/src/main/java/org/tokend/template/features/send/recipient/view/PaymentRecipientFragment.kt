@@ -33,6 +33,7 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
 import org.tokend.template.util.validator.EmailValidator
+import org.tokend.template.util.validator.GlobalPhoneNumberValidator
 import org.tokend.template.view.ContentLoadingProgressBar
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
 import org.tokend.template.view.util.ElevationUtil
@@ -181,16 +182,22 @@ class PaymentRecipientFragment : BaseFragment() {
         val recipient = recipient_edit_text.text
                 .toString()
                 .trim()
-                .split(' ', '\r', '\n')
+                .split('\r', '\n')
                 .first()
 
         val validAccountId = Base32Check.isValid(Base32Check.VersionByte.ACCOUNT_ID,
                 recipient.toCharArray())
         val validEmail = EmailValidator.isValid(recipient)
 
+        val recipientAsPhoneNumber = "+" + recipient
+                .mapNotNull { it.takeIf(Char::isDigit) }
+                .joinToString("")
+        val validPhoneNumber = GlobalPhoneNumberValidator.isValid(recipientAsPhoneNumber)
+
         return when {
             validAccountId -> Base32Check.encodeAccountId(Base32Check.decodeAccountId(recipient))
             validEmail -> recipient
+            validPhoneNumber -> recipientAsPhoneNumber
             else -> {
                 if (recipient.isEmpty()) {
                     recipient_edit_text.error = getString(R.string.error_cannot_be_empty)
