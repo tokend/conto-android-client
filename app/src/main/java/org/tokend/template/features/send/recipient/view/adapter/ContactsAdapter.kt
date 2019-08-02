@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import org.jetbrains.anko.layoutInflater
 import org.tokend.template.R
-import org.tokend.template.features.send.recipient.model.ContactEmail
+import org.tokend.template.features.send.recipient.model.ContactData
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
 
@@ -21,8 +21,8 @@ class ContactsAdapter : RecyclerView.Adapter<BaseViewHolder<Any>>() {
         when (getItemViewType(position)) {
             TYPE_CONTACT -> (holder as ContactViewHolder)
                     .bind(items[position] as ContactListItem, onContactClickListener)
-            else -> (holder as EmailViewHolder)
-                    .bind(items[position] as ContactEmail, onEmailClickListener)
+            else -> (holder as ContactDataViewHolder)
+                    .bind(items[position] as ContactData, onEmailClickListener)
         }
     }
 
@@ -30,20 +30,20 @@ class ContactsAdapter : RecyclerView.Adapter<BaseViewHolder<Any>>() {
         val inflater = parent.context.layoutInflater
         return when (viewType) {
             TYPE_CONTACT -> ContactViewHolder(inflater.inflate(R.layout.item_contact, parent, false))
-            else -> EmailViewHolder(inflater.inflate(R.layout.item_email, parent, false))
+            else -> ContactDataViewHolder(inflater.inflate(R.layout.item_email, parent, false))
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
             is ContactListItem -> TYPE_CONTACT
-            else -> TYPE_EMAIL
+            else -> TYPE_CONTACT_DATA
         }
     }
 
     companion object {
         private const val TYPE_CONTACT = 131
-        private const val TYPE_EMAIL = 141
+        private const val TYPE_CONTACT_DATA = 141
     }
 
     fun addData(data: Collection<ContactListItem>?) {
@@ -62,18 +62,18 @@ class ContactsAdapter : RecyclerView.Adapter<BaseViewHolder<Any>>() {
     private val onContactClickListener = object : SimpleItemClickListener<Any> {
         override fun invoke(view: View?, item: Any) {
             item as ContactListItem
-            val emails = item.emails
-            if (items.containsAll(emails)) {
-                notifyItemRangeRemoved(items.indexOf(emails[0]), emails.size)
-                items.removeAll(emails)
+            val contactData = item.data
+            if (items.containsAll(contactData)) {
+                notifyItemRangeRemoved(items.indexOf(contactData[0]), contactData.size)
+                items.removeAll(contactData)
             } else {
                 val index = items.indexOf(item)
                 if (index == items.size) {
-                    items.addAll(emails)
+                    items.addAll(contactData)
                 } else {
-                    items.addAll(index + 1, emails)
+                    items.addAll(index + 1, contactData)
                 }
-                notifyItemRangeInserted(index + 1, emails.size)
+                notifyItemRangeInserted(index + 1, contactData.size)
             }
         }
     }

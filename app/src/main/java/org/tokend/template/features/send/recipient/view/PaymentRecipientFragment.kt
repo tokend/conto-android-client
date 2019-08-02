@@ -24,7 +24,7 @@ import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import org.tokend.template.features.send.recipient.model.Contact
-import org.tokend.template.features.send.recipient.model.ContactEmail
+import org.tokend.template.features.send.recipient.model.ContactData
 import org.tokend.template.features.send.recipient.repository.ContactsRepository
 import org.tokend.template.features.send.recipient.view.adapter.ContactListItem
 import org.tokend.template.features.send.recipient.view.adapter.ContactsAdapter
@@ -127,9 +127,9 @@ class PaymentRecipientFragment : BaseFragment() {
 
         contactsAdapter.onEmailClickListener = object : SimpleItemClickListener<Any> {
             override fun invoke(view: View?, item: Any) {
-                item as ContactEmail
-                recipient_edit_text.setText(item.email)
-                recipient_edit_text.setSelection(item.email.length)
+                item as ContactData
+                recipient_edit_text.setText(item.data)
+                recipient_edit_text.setSelection(item.data.length)
                 tryToLoadRecipient()
             }
         }
