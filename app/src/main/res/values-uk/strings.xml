@@ -493,4 +493,5 @@
     <string name="error_invalid_phone_number">Некоректний номер</string>
     <string name="phone_number_set_successfully">Номер збережено</string>
     <string name="error_phone_number_already_taken">Номер вже зайнято</string>
+    <string name="sms_tfa_dialog_message">Введіть код з SMS</string>
 </resources>

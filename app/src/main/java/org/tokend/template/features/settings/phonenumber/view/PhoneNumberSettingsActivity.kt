@@ -178,9 +178,14 @@ class PhoneNumberSettingsActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onError = this::onNumberSettingError,
-                        onComplete = { toastManager.short(R.string.phone_number_set_successfully) }
+                        onComplete = this::onNumberSet
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onNumberSet() {
+        toastManager.short(R.string.phone_number_set_successfully)
+        finish()
     }
 
     private fun onNumberSettingError(error: Throwable) {
