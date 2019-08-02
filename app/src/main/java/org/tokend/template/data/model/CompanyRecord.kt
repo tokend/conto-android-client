@@ -11,17 +11,15 @@ class CompanyRecord(
         val industry: String?,
         val logoUrl: String?,
         val conversionAssetCode: String?
-): Serializable {
+) : Serializable {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
             name = source.name,
-            // TODO: get from resource
-            industry = null,
+            industry = source.industry.takeIf(String::isNotEmpty),
             logoUrl = source.logoJson
                     .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
                     .getUrl(urlConfig?.storage),
-            // TODO: get from resource
-            conversionAssetCode = null
+            conversionAssetCode = source.statsQuoteAsset.takeIf(String::isNotEmpty)
     )
 
     override fun equals(other: Any?): Boolean {
