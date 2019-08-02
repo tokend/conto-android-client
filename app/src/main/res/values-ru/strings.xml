@@ -486,4 +486,12 @@
     <string name="explore_companies_title">Поиск компаний</string>
     <string name="scan_title">Сканировать</string>
     <string name="template_add_company_confirmation">Вы уверены что ходите добавить %1$s?</string>
+    <string name="phone_number_settings_title">Номер телефона</string>
+    <string name="set_phone_number_explanation">Добавьте ваш номер телефона к аккаунту чтобы ваши друзья могли быстрее вас найти</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="set_phone_number">Сохранить номер</string>
+    <string name="error_invalid_phone_number">Некорректный номер</string>
+    <string name="phone_number_set_successfully">Номер сохранен</string>
+    <string name="error_phone_number_already_taken">Номер уже занят</string>
+    <string name="sms_tfa_dialog_message">Введите код из SMS</string>
 </resources>

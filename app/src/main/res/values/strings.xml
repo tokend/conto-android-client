@@ -473,6 +473,14 @@
     <string name="kyc_recovery_pending_message">Your request is waiting for review. Wait for notification</string>
     <string name="kyc_recovery_rejected_message">Your request has been rejected. Try again</string>
     <string name="share_sale">Share sale</string>
+    <string name="phone_number_settings_title">Phone number</string>
+    <string name="set_phone_number_explanation">Add your phone number to the account to let your friends find you faster</string>
+    <string name="phone_number">Phone number</string>
+    <string name="set_phone_number">Set number</string>
+    <string name="error_invalid_phone_number">Invalid number</string>
+    <string name="phone_number_set_successfully">Phone number has been set</string>
+    <string name="error_phone_number_already_taken">This number is already taken</string>
+    <string name="sms_tfa_dialog_message">Enter code from SMS</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

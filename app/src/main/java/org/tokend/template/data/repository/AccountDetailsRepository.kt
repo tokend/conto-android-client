@@ -1,6 +1,8 @@
 package org.tokend.template.data.repository
 
+import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.toMaybe
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.identity.params.IdentitiesPageParams
 import org.tokend.template.data.model.IdentityRecord
@@ -46,6 +48,23 @@ class AccountDetailsRepository(
 
         return getIdentity(IdentitiesPageParams(address = accountId))
                 .map(IdentityRecord::email)
+    }
+
+    /**
+     * Loads phone number for given account ID if it exists.
+     * Result will be cached.
+     *
+     * @see NoIdentityAvailableException
+     */
+    fun getPhoneByAccountId(accountId: String): Maybe<String> {
+        val existingIdentity = identities.find { it.accountId == accountId }
+
+        if (existingIdentity != null ) {
+            return existingIdentity.phoneNumber.toMaybe()
+        }
+
+        return getIdentity(IdentitiesPageParams(address = accountId))
+                .flatMapMaybe { it.phoneNumber.toMaybe() }
     }
 
     fun getEmailsByAccountIds(accountIds: List<String>): Single<Map<String, String>> {
@@ -107,5 +126,13 @@ class AccountDetailsRepository(
                 }
                 .map(::IdentityRecord)
                 .doOnSuccess { identities.add(it) }
+    }
+
+    fun getCachedIdentity(accountId: String): IdentityRecord? {
+        return identities.find { it.accountId == accountId }
+    }
+
+    fun invalidateCachedIdentity(accountId: String) {
+        identities.remove(getCachedIdentity(accountId))
     }
 }

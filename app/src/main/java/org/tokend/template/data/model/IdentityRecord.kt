@@ -7,10 +7,12 @@ import org.tokend.sdk.api.identity.model.IdentityResource
  */
 data class IdentityRecord(
         val email: String,
-        val accountId: String
+        val accountId: String,
+        var phoneNumber: String?
 ) {
-    constructor(source: IdentityResource): this(
+    constructor(source: IdentityResource) : this(
             email = source.email,
-            accountId = source.address
+            accountId = source.address,
+            phoneNumber = source.phoneNumber?.takeIf(String::isNotEmpty)
     )
 }

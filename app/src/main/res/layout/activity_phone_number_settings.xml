@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity">
+
+    <include layout="@layout/appbar" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        style="@style/LimitedMatchParentWidthConstraint"
+        app:layout_constraintBottom_toTopOf="@id/action_button"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintTop_toTopOf="@null">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/standard_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/set_phone_number_explanation" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/phone_number_edit_text"
+                    style="@style/EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standard_padding"
+                    android:digits="0123456789"
+                    android:hint="@string/phone_number"
+                    android:imeOptions="actionDone"
+                    android:inputType="phone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="44dp"
+                    android:layout_marginEnd="@dimen/half_standard_margin"
+                    android:maxLength="13"
+                    android:text="+"
+                    android:textSize="18sp" />
+            </FrameLayout>
+
+            <include
+                layout="@layout/layout_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <Button
+        android:id="@+id/action_button"
+        style="@style/PrimaryButton.NoBorders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/set_phone_number"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
