@@ -38,8 +38,6 @@ class BalancesFragment : BaseFragment() {
     private lateinit var adapter: BalanceItemsAdapter
     private lateinit var layoutManager: GridLayoutManager
 
-    private var chartEverAnimated = false
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_balances, container, false)
     }
@@ -218,7 +216,6 @@ class BalancesFragment : BaseFragment() {
 
     private fun onBalancesUpdated() {
         displayBalances()
-        displayDistribution()
         displayTotal()
     }
 
@@ -233,25 +230,6 @@ class BalancesFragment : BaseFragment() {
                 .map(::BalanceListItem)
 
         adapter.setData(items)
-    }
-
-    private fun displayDistribution() {
-        val conversionAsset = balancesRepository.conversionAsset
-
-        if (conversionAsset == null) {
-            distribution_chart.visibility = View.GONE
-            return
-        }
-
-        distribution_chart.apply {
-            setData(
-                    balancesRepository.itemsList,
-                    conversionAsset,
-                    !chartEverAnimated
-            )
-            chartEverAnimated = true
-            visibility = if (isEmpty) View.GONE else View.VISIBLE
-        }
     }
 
     private fun displayTotal() {
