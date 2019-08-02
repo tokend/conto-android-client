@@ -5,6 +5,8 @@ import android.provider.ContactsContract
 import io.reactivex.Single
 import org.tokend.template.features.send.recipient.model.Contact
 import org.tokend.template.features.send.recipient.model.ContactData
+import org.tokend.template.util.validator.GlobalPhoneNumberValidator
+import org.tokend.template.view.util.PhoneNumberUtil
 
 object ContactsManager {
     private val CONTACTS_CONTENT_URI = ContactsContract.Contacts.CONTENT_URI
@@ -50,8 +52,12 @@ object ContactsManager {
                 do {
                     val id = numbersCursor.getString(numbersCursor.getColumnIndex(NUMBER_CONTACT_ID))
                     val number = numbersCursor.getString(numbersCursor.getColumnIndex(NUMBER))
+                    val cleanedNumber = PhoneNumberUtil.getCleanGlobalNumber(number)
+                    if (!GlobalPhoneNumberValidator.isValid(cleanedNumber)) {
+                        continue
+                    }
                     idsWithNumbers.add(id)
-                    numbers.add(id to number)
+                    numbers.add(id to cleanedNumber)
                 } while (numbersCursor.moveToNext())
                 numbersCursor.close()
             }

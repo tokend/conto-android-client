@@ -38,6 +38,7 @@ import org.tokend.template.view.ContentLoadingProgressBar
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.PhoneNumberUtil
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.wallet.Base32Check
 
@@ -189,9 +190,7 @@ class PaymentRecipientFragment : BaseFragment() {
                 recipient.toCharArray())
         val validEmail = EmailValidator.isValid(recipient)
 
-        val recipientAsPhoneNumber = "+" + recipient
-                .mapNotNull { it.takeIf(Char::isDigit) }
-                .joinToString("")
+        val recipientAsPhoneNumber = PhoneNumberUtil.getCleanGlobalNumber(recipient)
         val validPhoneNumber = GlobalPhoneNumberValidator.isValid(recipientAsPhoneNumber)
 
         return when {
