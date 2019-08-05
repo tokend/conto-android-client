@@ -1,6 +1,7 @@
 package org.tokend.template.features.companies.view
 
 import android.os.Bundle
+import android.view.View
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_company_loading.*
@@ -32,6 +33,13 @@ class CompanyLoadingActivity : BaseActivity() {
         )
 
         company_name_text_view.text = company.name
+
+        company.industry?.let {
+            company_industry_text_view.apply {
+                visibility = View.VISIBLE
+                text = it
+            }
+        }
     }
 
     private fun performLoading() {
