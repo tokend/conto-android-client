@@ -28,14 +28,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_margin"
-                android:layout_marginBottom="@dimen/standard_margin"
                 android:textSize="18sp"
                 tools:text="Company name" />
+
+            <TextView
+                android:id="@+id/company_industry_text_view"
+                style="@style/SecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/half_standard_margin"
+                android:visibility="gone"
+                tools:text="Company Industry" />
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/triple_margin">
+                android:layout_marginTop="@dimen/quadra_margin">
 
                 <org.tokend.template.view.ContentLoadingProgressBar
                     android:id="@+id/progress"

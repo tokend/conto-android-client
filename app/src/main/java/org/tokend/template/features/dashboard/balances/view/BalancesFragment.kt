@@ -48,6 +48,7 @@ class BalancesFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
+        initCompanyLogo()
         initList()
         initSwipeRefresh()
         initToolbarElevation()
@@ -69,6 +70,21 @@ class BalancesFragment : BaseFragment() {
                     }
                 }
             }
+
+    private fun initCompanyLogo() {
+        val company = companyInfoProvider.getCompany()
+                ?: return
+
+        company_logo_image_view.visibility = View.VISIBLE
+
+        val logoSize = resources.getDimensionPixelSize(R.dimen.unlock_logo_size)
+        LogoUtil.setLogo(
+                company_logo_image_view,
+                company.name,
+                company.logoUrl,
+                logoSize
+        )
+    }
 
     private fun initList() {
         layoutManager = GridLayoutManager(requireContext(), 1)
