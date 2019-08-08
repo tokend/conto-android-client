@@ -117,7 +117,7 @@ class CreateRedemptionActivity : BaseActivity() {
 
         Navigator.from(this)
                 .openQrShare(
-                        title = "",
+                        title = session.getCompany()?.name ?: "",
                         data = serializedBase64,
                         shareLabel = getString(R.string.share_redemption_request),
                         shareText = explanation,
