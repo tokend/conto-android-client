@@ -157,7 +157,7 @@ class MassIssuanceActivity : BaseActivity() {
     }
 
     private fun onIssuanceAssetChanged() {
-        asset_edit_text.setText(issuanceAsset?.code)
+        asset_edit_text.setText(issuanceAsset?.name ?: issuanceAsset?.code)
         updateIssuanceAvailability()
     }
 
@@ -171,7 +171,12 @@ class MassIssuanceActivity : BaseActivity() {
             val asset = issuanceAsset ?: return
             amount_edit_text.setHelperText(
                     getString(R.string.template_available,
-                            amountFormatter.formatAssetAmount(available, asset))
+                            amountFormatter.formatAssetAmount(
+                                    available,
+                                    asset,
+                                    withAssetCode = false
+                            )
+                    )
             )
         }
     }
