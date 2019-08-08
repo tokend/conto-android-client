@@ -21,6 +21,9 @@ class AssetsRepository(
         private val mapper: ObjectMapper,
         itemsCache: RepositoryCache<AssetRecord>
 ) : SimpleMultipleItemsRepository<AssetRecord>(itemsCache) {
+    private val mItemsMap = mutableMapOf<String, AssetRecord>()
+    val itemsMap: Map<String, AssetRecord> = mItemsMap
+
     override fun getItems(): Single<List<AssetRecord>> {
 
         val loader = SimplePagedResourceLoader(
@@ -28,7 +31,10 @@ class AssetsRepository(
                     apiProvider.getApi().v3.assets.get(
                             AssetsPageParams(
                                     owner = ownerId,
-                                    pagingParams = PagingParamsV2(page = nextCursor)
+                                    pagingParams = PagingParamsV2(
+                                            page = nextCursor,
+                                            limit = PAGE_LIMIT
+                                    )
                             )
                     )
                 }
@@ -62,5 +68,15 @@ class AssetsRepository(
                                     itemsCache.updateOrAdd(it)
                                 }
                 )
+    }
+
+    override fun broadcast() {
+        mItemsMap.clear()
+        itemsCache.items.associateByTo(mItemsMap, AssetRecord::code)
+        super.broadcast()
+    }
+
+    private companion object {
+        private const val PAGE_LIMIT = 20
     }
 }

@@ -22,7 +22,8 @@ interface AmountFormatter {
                           asset: Asset,
                           minDecimalDigits: Int = 0,
                           abbreviation: Boolean = false,
-                          withAssetCode: Boolean = true): String
+                          withAssetCode: Boolean = true,
+                          withAssetName: Boolean = false): String
 
     /**
      * Formats given amount

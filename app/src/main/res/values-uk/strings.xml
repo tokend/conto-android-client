@@ -397,7 +397,7 @@
     <string name="vote_has_been_submitted">Голос прийнято</string>
     <string name="vote_has_been_removed">Голос видалено</string>
     <string name="with_price_of">За ціною</string>
-    <string name="template_buy_asset_code">Купити %1$s</string>
+    <string name="template_buy_asset">Купити %1$s</string>
     <string name="template_amount_available_for_buy">Доступно для купівлі: %1$s</string>
     <string name="error_too_big_amount">Сума занадто велика</string>
     <string name="atomic_swap_payment_method">Спосіб оплати</string>

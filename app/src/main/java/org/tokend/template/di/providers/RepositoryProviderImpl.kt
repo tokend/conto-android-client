@@ -55,8 +55,10 @@ class RepositoryProviderImpl(
     private val tfaFactorsRepository: TfaFactorsRepository by lazy {
         TfaFactorsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
     }
-    private val assetsRepositories =
-            LruCache<String, AssetsRepository>(MAX_SAME_REPOSITORIES_COUNT)
+    private val assetsRepository: AssetsRepository by lazy {
+        AssetsRepository(null, apiProvider, urlConfigProvider,
+                mapper, MemoryOnlyRepositoryCache())
+    }
     private val orderBookRepositories =
             LruCache<String, OrderBookRepository>(MAX_SAME_REPOSITORIES_COUNT)
     private val assetPairsRepositories =
@@ -153,11 +155,7 @@ class RepositoryProviderImpl(
     }
 
     override fun assets(): AssetsRepository {
-        val key = companyId.toString()
-        return assetsRepositories.getOrPut(key) {
-            AssetsRepository(companyId, apiProvider, urlConfigProvider,
-                    mapper, MemoryOnlyRepositoryCache())
-        }
+        return assetsRepository
     }
 
     override fun assetPairs(): AssetPairsRepository {
@@ -283,7 +281,10 @@ class RepositoryProviderImpl(
 
     override fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository {
         return atomicSwapRepositoryByAsset.getOrPut(asset) {
-            AtomicSwapRequestsRepository(apiProvider, asset,
+            AtomicSwapRequestsRepository(
+                    apiProvider,
+                    asset,
+                    assets(),
                     MemoryOnlyRepositoryCache())
         }
     }

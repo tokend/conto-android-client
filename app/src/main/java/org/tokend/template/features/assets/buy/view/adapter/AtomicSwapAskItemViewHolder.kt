@@ -1,5 +1,6 @@
 package org.tokend.template.features.assets.buy.view.adapter
 
+import android.annotation.SuppressLint
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
@@ -28,11 +29,13 @@ class AtomicSwapAskItemViewHolder(view: View,
         buyButton.setOnClickListener { clickListener?.invoke(view, item) }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun bind(item: AtomicSwapAskListItem) {
         availableTextView.text = amountFormatter.formatAssetAmount(
                 item.available,
                 item.asset,
-                withAssetCode = false
+                withAssetCode = false,
+                abbreviation = true
         )
 
         pricesHintTextView.text = view.context.getString(R.string.with_price_of)
@@ -42,7 +45,8 @@ class AtomicSwapAskItemViewHolder(view: View,
             val textView = TextView(priceThemedContext, null, R.style.StrokedBadgeText)
             textView.text = amountFormatter.formatAssetAmount(
                     quoteAsset.price,
-                    quoteAsset
+                    quoteAsset,
+                    withAssetName = true
             )
             pricesLayout.addView(textView)
             textView.layoutParams = (textView.layoutParams as FlowLayout.LayoutParams).apply {

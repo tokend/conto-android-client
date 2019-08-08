@@ -46,10 +46,11 @@ class AtomicSwapQuoteAssetFragment : BaseFragment() {
 
     private fun initTitle() {
         amount_text_view.text = getString(
-                R.string.template_buy_asset_code,
+                R.string.template_buy_asset,
                 amountFormatter.formatAssetAmount(
                         amount,
-                        ask.asset
+                        ask.asset,
+                        withAssetName = true
                 )
         )
     }

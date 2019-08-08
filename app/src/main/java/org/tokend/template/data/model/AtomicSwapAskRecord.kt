@@ -11,7 +11,8 @@ class AtomicSwapAskRecord(
         val isCanceled: Boolean,
         val quoteAssets: List<QuoteAsset>
 ) : Serializable {
-    constructor(source: AtomicSwapAskResource) : this(
+    constructor(source: AtomicSwapAskResource,
+                assetsMap: Map<String, Asset>) : this(
             id = source.id,
             asset = SimpleAsset(source.baseAsset),
             amount = source.availableAmount,
@@ -20,7 +21,8 @@ class AtomicSwapAskRecord(
                 QuoteAsset(
                         code = it.id,
                         trailingDigits = 6,
-                        price = it.price
+                        price = it.price,
+                        name = assetsMap[it.id]?.name
                 )
             }
     )
@@ -36,8 +38,7 @@ class AtomicSwapAskRecord(
     class QuoteAsset(
             override val code: String,
             override val trailingDigits: Int,
-            val price: BigDecimal
-    ) : Asset {
-        override val name: String? = null
-    }
+            val price: BigDecimal,
+            override val name: String?
+    ) : Asset
 }

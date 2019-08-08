@@ -1,20 +1,25 @@
 package org.tokend.template.data.repository
 
 import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
+import org.tokend.sdk.api.generated.resources.AtomicSwapAskResource
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAskParams
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAsksPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.template.data.model.AtomicSwapAskRecord
+import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.extensions.mapSuccessful
 
 class AtomicSwapRequestsRepository(
         private val apiProvider: ApiProvider,
         private val asset: String,
+        private val assetsRepository: AssetsRepository,
         itemsCache: RepositoryCache<AtomicSwapAskRecord>
 ) : SimpleMultipleItemsRepository<AtomicSwapAskRecord>(itemsCache) {
 
@@ -39,10 +44,15 @@ class AtomicSwapRequestsRepository(
             )
         }, distinct = true)
 
-        return loader.loadAll()
-                .toSingle()
-                .map {
-                    it.map { AtomicSwapAskRecord(it) }
+        return Single.zip(
+                loader.loadAll().toSingle(),
+                assetsRepository.updateIfNotFreshDeferred().toSingleDefault(true),
+                BiFunction { items: List<AtomicSwapAskResource>, _: Boolean ->
+                    items to assetsRepository.itemsMap
+                }
+        )
+                .map { (items, assetsMap) ->
+                    items.mapSuccessful { AtomicSwapAskRecord(it, assetsMap) }
                 }
     }
 }

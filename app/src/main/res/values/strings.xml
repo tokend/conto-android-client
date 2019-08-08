@@ -400,7 +400,7 @@
     <string name="vote_has_been_submitted">Your vote has been submitted</string>
     <string name="vote_has_been_removed">Your vote has been removed</string>
     <string name="with_price_of">With the price of</string>
-    <string name="template_buy_asset_code">Buy %1$s</string>
+    <string name="template_buy_asset">Buy %1$s</string>
     <string name="template_amount_available_for_buy">Available for buy: %1$s</string>
     <string name="error_too_big_amount">Amount is too big</string>
     <string name="atomic_swap_payment_method">Payment method</string>

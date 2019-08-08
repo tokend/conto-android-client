@@ -32,7 +32,7 @@ class AtomicSwapQuoteAssetsSpinnerAdapter(
 
         val item = getItem(position)!!
 
-        codeTextView.text = item.asset.code
+        codeTextView.text = item.asset.name ?: item.asset.code
         amountTextView.text = context.getString(
                 R.string.template_amount_to_pay,
                 amountFormatter.formatAssetAmount(

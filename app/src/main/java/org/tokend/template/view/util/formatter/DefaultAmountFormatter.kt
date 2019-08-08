@@ -15,7 +15,8 @@ class DefaultAmountFormatter : AmountFormatter {
                                    asset: Asset,
                                    minDecimalDigits: Int,
                                    abbreviation: Boolean,
-                                   withAssetCode: Boolean): String {
+                                   withAssetCode: Boolean,
+                                   withAssetName: Boolean): String {
         val amount = amount ?: BigDecimal.ZERO
         val maxDecimalDigits = asset.trailingDigits
 
@@ -26,9 +27,11 @@ class DefaultAmountFormatter : AmountFormatter {
             formatAmount(amount, maxDecimalDigits, minDecimalDigits)
         }
 
-        return if (withAssetCode) {
-            "$formattedAmount\u00A0${asset.code}"
-        } else formattedAmount
+        return when {
+            withAssetName -> "$formattedAmount\u00A0${asset.name ?: asset.code}"
+            withAssetCode -> "$formattedAmount\u00A0${asset.code}"
+            else -> formattedAmount
+        }
     }
 
     override fun formatAmount(amount: BigDecimal?,

@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.fragment_atomic_swap_asks.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.repository.AtomicSwapRequestsRepository
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAskListItem
@@ -39,6 +40,9 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
                 ?: throw IllegalArgumentException("$ASSET_CODE_EXTRA must be specified in arguments")
     }
 
+    private val asset: AssetRecord?
+        get() = repositoryProvider.assets().itemsMap[assetCode]
+
     private val asksRepository: AtomicSwapRequestsRepository
         get() = repositoryProvider.atomicSwapAsks(assetCode)
 
@@ -50,7 +54,10 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
 
     override fun onInitAllowed() {
         toolbarSubject.onNext(toolbar)
-        toolbar.title = getString(R.string.template_buy_asset_code, assetCode)
+        toolbar.title = getString(
+                R.string.template_buy_asset,
+                asset?.name ?: assetCode
+        )
 
         initList()
         initSwipeRefresh()
