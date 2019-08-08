@@ -113,7 +113,8 @@ class RepositoryProviderImpl(
             LruCache<String, AtomicSwapRequestsRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     private val companyClientsRepository: CompanyClientsRepository by lazy {
-        CompanyClientsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
+        CompanyClientsRepository(apiProvider, walletInfoProvider,
+                assets(), MemoryOnlyRepositoryCache())
     }
 
     private val keyValueEntries: KeyValueEntriesRepository by lazy {

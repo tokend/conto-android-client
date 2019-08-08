@@ -463,7 +463,7 @@
     <string name="account_created_successfully">Account has been created</string>
     <string name="add_company_scanner_prompt">Scan company QR code</string>
     <string name="error_redemption_request_no_more_valid">The request is already processed and no more valid</string>
-    <string name="template_asset_code_movements">%1$s movements</string>
+    <string name="template_asset_movements">%1$s movements</string>
     <string name="contribute">Contribute</string>
     <string name="explore_companies_title">Explore companies</string>
     <string name="scan_title">Scan</string>

@@ -66,10 +66,17 @@ class CompanyClientMovementsActivity : BaseActivity() {
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val asset = client
+                .balances
+                .find { it.asset.code == assetCode }
+                ?.asset
+
         title = getString(
-                R.string.template_asset_code_movements,
-                assetCode
+                R.string.template_asset_movements,
+                asset?.name ?: assetCode
         )
+
         toolbar.subtitle = client.email
     }
 

@@ -116,7 +116,8 @@ class CompanyClientDetailsActivity : BaseActivity() {
                                             null,
                                         text = amountFormatter.formatAssetAmount(
                                                 balance.amount,
-                                                balance.asset
+                                                balance.asset,
+                                                withAssetName = true
                                         ),
                                         icon = balanceIcon,
                                         id = BALANCE_ITEM_ID_INDEX_OFFSET + i

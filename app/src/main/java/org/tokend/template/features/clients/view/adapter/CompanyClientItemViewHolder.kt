@@ -73,7 +73,8 @@ class CompanyClientItemViewHolder(
                 addBalanceBadge(
                         amountFormatter.formatAssetAmount(
                                 balance.amount,
-                                balance.asset
+                                balance.asset,
+                                withAssetName = true
                         )
                 )
             }
@@ -127,7 +128,7 @@ class CompanyClientItemViewHolder(
     }
 
     private fun initState(isChecked: Boolean) {
-        if(isChecked) {
+        if (isChecked) {
             view.background = bgSelected
             logoImageView.setImageDrawable(checkIcon)
             statusImageView.visibility = View.INVISIBLE

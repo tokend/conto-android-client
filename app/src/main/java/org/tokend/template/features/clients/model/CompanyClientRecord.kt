@@ -1,9 +1,7 @@
 package org.tokend.template.features.clients.model
 
-import org.tokend.sdk.api.integrations.dns.model.ClientBalanceResource
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.SimpleAsset
 import java.io.Serializable
 import java.math.BigDecimal
 
@@ -17,12 +15,7 @@ class CompanyClientRecord(
     class Balance(
             val amount: BigDecimal,
             val asset: Asset
-    ) : Serializable {
-        constructor(source: ClientBalanceResource) : this(
-                asset = SimpleAsset(source.assetCode),
-                amount = source.amount
-        )
-    }
+    ) : Serializable
 
     enum class Status {
         NOT_REGISTERED,
@@ -30,13 +23,15 @@ class CompanyClientRecord(
         BLOCKED
     }
 
-    constructor(source: ClientResource) : this(
+    constructor(source: ClientResource,
+                assetsMap: Map<String, Asset>) : this(
             id = source.id,
             accountId = source.accountId,
             email = source.email,
             status = Status.valueOf(source.status.toUpperCase()),
             balances = source.balances
-                    ?.map(::Balance)
+                    ?.map { Balance(it.amount, assetsMap[it.assetCode]
+                            ?: throw IllegalStateException("Asset ${it.assetCode} is not in the map"))}
                     ?.sortedByDescending { it.amount.signum() > 0 }
                     ?: emptyList()
     )
