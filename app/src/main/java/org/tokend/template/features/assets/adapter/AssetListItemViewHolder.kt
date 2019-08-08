@@ -42,13 +42,13 @@ class AssetListItemViewHolder(view: View,
     override fun bind(item: AssetListItem) {
         LogoUtil.setLogo(logoImageView, item.code, item.logoUrl, logoSize)
 
-        codeTextView.text = item.code
+        nameTextView.text = item.name ?: item.code
 
-        nameTextView.text = item.name
         if (!item.name.isNullOrEmpty()) {
-            nameTextView.visibility = View.VISIBLE
+            codeTextView.visibility = View.VISIBLE
+            codeTextView.text = item.code
         } else {
-            nameTextView.visibility = View.GONE
+            codeTextView.visibility = View.GONE
         }
 
         detailsButton.onClick { view.callOnClick() }

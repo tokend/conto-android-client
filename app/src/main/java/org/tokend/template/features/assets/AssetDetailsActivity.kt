@@ -22,7 +22,7 @@ class AssetDetailsActivity : BaseActivity() {
         asset = (intent.getSerializableExtra(ASSET_EXTRA) as? AssetRecord)
                 ?: return
 
-        title = asset.name ?: getString(R.string.template_asset_code_asset, asset.code)
+        setTitle(R.string.asset_details)
 
         supportPostponeEnterTransition()
         setFragment()
