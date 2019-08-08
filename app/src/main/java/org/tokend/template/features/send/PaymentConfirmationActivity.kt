@@ -122,7 +122,11 @@ class PaymentConfirmationActivity : BaseActivity() {
         adapter.addOrUpdateItem(
                 DetailsItem(
                         id = TO_RECEIVE_AMOUNT_ITEM_ID,
-                        text = amountFormatter.formatAssetAmount(total, request.asset),
+                        text = amountFormatter.formatAssetAmount(
+                                total,
+                                request.asset,
+                                withAssetName = true
+                        ),
                         hint = getString(R.string.to_receive),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_coins)
                 )
@@ -132,7 +136,11 @@ class PaymentConfirmationActivity : BaseActivity() {
             adapter.addOrUpdateItem(
                     DetailsItem(
                             id = RECIPIENT_FEE_ITEM_ID,
-                            text = amountFormatter.formatAssetAmount(totalFee, request.asset),
+                            text = amountFormatter.formatAssetAmount(
+                                    totalFee,
+                                    request.asset,
+                                    withAssetName = true
+                            ),
                             hint = getString(R.string.tx_fee)
                     )
             )

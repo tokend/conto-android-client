@@ -1,5 +1,6 @@
 package org.tokend.template.view.balancechange
 
+import android.annotation.SuppressLint
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
@@ -86,6 +87,7 @@ class BalanceChangeMainDataView(
         )
     }
 
+    @SuppressLint("SetTextI18n")
     fun displayAmount(amount: BigDecimal,
                       asset: Asset,
                       isReceived: Boolean?) {
@@ -109,13 +111,16 @@ class BalanceChangeMainDataView(
             assetNameTextView.visibility = View.GONE
         }
 
-        val amountString = sign + amountFormatter.formatAssetAmount(
+        toolbar.title = sign + amountFormatter.formatAssetAmount(
+                amount,
+                asset,
+                withAssetName = true
+        )
+        amountTextView.text = sign + amountFormatter.formatAssetAmount(
                 amount,
                 asset,
                 withAssetCode = assetName == null
         )
-        toolbar.title = amountString
-        amountTextView.text = amountString
 
         if (color != null) {
             amountTextView.setTextColor(color)
