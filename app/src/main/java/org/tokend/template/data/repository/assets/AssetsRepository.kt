@@ -7,6 +7,7 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.v3.assets.params.AssetsPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
+import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
@@ -68,6 +69,17 @@ class AssetsRepository(
                                     itemsCache.updateOrAdd(it)
                                 }
                 )
+    }
+
+    /**
+     * Ensures that given assets are loaded
+     */
+    fun ensureAssets(codes: Collection<String>): Single<Map<String, Asset>> {
+        return if (itemsMap.keys.containsAll(codes))
+            Single.just(itemsMap)
+        else
+            updateDeferred()
+                    .toSingle { itemsMap }
     }
 
     override fun broadcast() {
