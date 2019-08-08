@@ -42,10 +42,7 @@ open class AmountInputFragment : BaseFragment() {
             onAssetChanged()
         }
 
-    protected val balance: BalanceRecord?
-        get() = balancesRepository
-                .itemsList
-                .find { it.assetCode == asset }
+    protected var balance: BalanceRecord? = null
 
     protected open val requestedAsset: String? by lazy {
         arguments?.getString(ASSET_EXTRA)
@@ -194,9 +191,10 @@ open class AmountInputFragment : BaseFragment() {
     }
 
     protected open fun onAssetChanged() {
+        balance = balancesRepository.itemsList.find { it.assetCode == asset }
         displayBalance()
         amountWrapper.maxPlacesAfterComa = balance?.asset?.trailingDigits ?: 0
-        asset_code_text_view.text = asset
+        asset_code_text_view.text = balance?.asset?.name ?: asset
     }
 
     protected open fun onBalancesUpdated() {
@@ -213,8 +211,8 @@ open class AmountInputFragment : BaseFragment() {
         val available = balance?.available ?: BigDecimal.ZERO
         val asset = balance?.asset ?: return
         balance_text_view.text = getString(
-                R.string.template_balance,
-                amountFormatter.formatAssetAmount(available, asset)
+                R.string.template_available,
+                amountFormatter.formatAssetAmount(available, asset, withAssetCode = false)
         )
     }
 
@@ -294,7 +292,7 @@ open class AmountInputFragment : BaseFragment() {
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { it.asset.ownerAccountId == companyId}
+        ) { it.asset.ownerAccountId == companyId }
     }
 
     /**
