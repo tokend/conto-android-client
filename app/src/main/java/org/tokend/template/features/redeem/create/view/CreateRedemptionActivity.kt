@@ -108,7 +108,11 @@ class CreateRedemptionActivity : BaseActivity() {
 
         val explanation = getString(
                 R.string.template_redemption_qr_explanation_amount,
-                amountFormatter.formatAssetAmount(amount, asset)
+                amountFormatter.formatAssetAmount(
+                        amount,
+                        asset,
+                        withAssetName = true
+                )
         )
 
         Navigator.from(this)
