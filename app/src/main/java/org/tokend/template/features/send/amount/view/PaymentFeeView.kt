@@ -104,7 +104,8 @@ constructor(
                     R.string.template_recipients_fee,
                     amountFormatter.formatAssetAmount(
                             recipientFee,
-                            asset
+                            asset,
+                            withAssetCode = false
                     )
             )
             recipientFeeLayout.visibility = View.VISIBLE
@@ -113,7 +114,8 @@ constructor(
                     R.string.template_fee,
                     amountFormatter.formatAssetAmount(
                             senderFeeTotal,
-                            asset
+                            asset,
+                            withAssetCode = false
                     )
             )
             recipientFeeLayout.visibility = View.GONE
@@ -122,7 +124,8 @@ constructor(
                     R.string.template_fee,
                     amountFormatter.formatAssetAmount(
                             senderFeeTotal,
-                            asset
+                            asset,
+                            withAssetCode = false
                     )
             )
             recipientFeeLayout.visibility = View.VISIBLE

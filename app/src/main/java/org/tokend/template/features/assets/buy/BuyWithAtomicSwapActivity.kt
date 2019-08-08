@@ -159,7 +159,11 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     private fun onBidSubmitted(invoice: AtomicSwapInvoice) {
         val asset = this.asset ?: return
         val sendAmountString = amountFormatter.formatAssetAmount(invoice.amount, asset)
-        val receiveAmountString = amountFormatter.formatAssetAmount(amount, ask.asset)
+        val receiveAmountString = amountFormatter.formatAssetAmount(
+                amount,
+                ask.asset,
+                withAssetName = true
+        )
 
         Navigator.from(this).openQrShare(
                 title = this.title.toString(),
