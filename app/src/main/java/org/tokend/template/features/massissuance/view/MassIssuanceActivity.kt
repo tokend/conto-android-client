@@ -1,5 +1,6 @@
 package org.tokend.template.features.massissuance.view
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
@@ -242,6 +243,7 @@ class MassIssuanceActivity : BaseActivity() {
 
     private fun onSuccessfulIssuance() {
         toastManager.short(R.string.successfully_issued)
+        setResult(Activity.RESULT_OK)
         finish()
     }
 

@@ -468,10 +468,11 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openMassIssuance(emails: String? = null) {
+    fun openMassIssuance(emails: String? = null,
+                         requestCode: Int = 0) {
         context?.intentFor<MassIssuanceActivity>()
                 ?.putExtras(MassIssuanceActivity.getBundle(emails))
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 
     fun openCompanyAdd() {

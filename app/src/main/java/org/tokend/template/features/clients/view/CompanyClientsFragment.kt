@@ -1,5 +1,7 @@
 package org.tokend.template.features.clients.view
 
+import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -104,7 +106,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         }
 
         adapter.onSelect { count ->
-            if(count == 0) {
+            if (count == 0) {
                 actionMode?.finish()
                 return@onSelect
             }
@@ -173,7 +175,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                                 )
                                 setOnClickListener {
                                     Navigator.from(this@CompanyClientsFragment)
-                                            .openMassIssuance()
+                                            .openMassIssuance(requestCode = MASS_ISSUANCE_REQUEST)
                                     menu_fab.close(false)
                                 }
                             }
@@ -199,7 +201,10 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
             actionMode = (activity as? CorporateMainActivity)?.startSupportActionMode(object : ActionMode.Callback {
                 override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
                     val emails = adapter.getSelected().joinToString(",\n") { it.email }
-                    Navigator.from(this@CompanyClientsFragment).openMassIssuance(emails)
+                    Navigator.from(this@CompanyClientsFragment).openMassIssuance(
+                            emails,
+                            MASS_ISSUANCE_REQUEST
+                    )
                     return true
                 }
 
@@ -290,7 +295,17 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         return super.onBackPressed()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                MASS_ISSUANCE_REQUEST -> adapter.clearSelection()
+            }
+        }
+    }
+
     companion object {
+        private val MASS_ISSUANCE_REQUEST = "mass_issuance".hashCode() and 0xffff
         val ID = "company_clients".hashCode().toLong()
     }
 }
