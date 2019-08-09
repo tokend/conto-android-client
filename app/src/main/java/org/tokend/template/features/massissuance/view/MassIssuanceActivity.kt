@@ -3,7 +3,6 @@ package org.tokend.template.features.massissuance.view
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_mass_issuance.*
@@ -215,13 +214,9 @@ class MassIssuanceActivity : BaseActivity() {
                 ?: return
         val amount = amountWrapper.scaledAmount
 
-        var disposable: Disposable? = null
+        val progress = ProgressDialogFactory.getDialog(this)
 
-        val progress = ProgressDialogFactory.getDialog(this) {
-            disposable?.dispose()
-        }
-
-        disposable = PerformMassIssuanceUseCase(
+        PerformMassIssuanceUseCase(
                 emails,
                 assetCode,
                 amount,
@@ -242,6 +237,7 @@ class MassIssuanceActivity : BaseActivity() {
                         onComplete = this::onSuccessfulIssuance,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
+                .addTo(compositeDisposable)
     }
 
     private fun onSuccessfulIssuance() {
