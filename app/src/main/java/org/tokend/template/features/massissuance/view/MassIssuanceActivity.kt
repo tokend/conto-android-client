@@ -46,6 +46,9 @@ class MassIssuanceActivity : BaseActivity() {
             onIssuanceAssetChanged()
         }
 
+    private val assetCode: String?
+        get() = intent.getStringExtra(EXTRA_ASSET)
+
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
@@ -151,7 +154,7 @@ class MassIssuanceActivity : BaseActivity() {
         asset_edit_text.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
                 dropDownArrow, null)
 
-        issuanceAsset = ownedAssets.first()
+        issuanceAsset = ownedAssets.find { it.code == assetCode } ?: ownedAssets.first()
     }
 
     private fun initEmails() {
@@ -292,9 +295,11 @@ class MassIssuanceActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_EMAILS = "extra_emails"
+        const val EXTRA_ASSET = "extra_asset"
 
-        fun getBundle(emails: String?) = Bundle().apply {
+        fun getBundle(emails: String?, assetCode: String?) = Bundle().apply {
             putString(EXTRA_EMAILS, emails)
+            putString(EXTRA_ASSET, assetCode)
         }
     }
 }

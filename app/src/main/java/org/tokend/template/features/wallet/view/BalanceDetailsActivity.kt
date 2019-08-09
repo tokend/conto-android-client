@@ -219,10 +219,20 @@ class BalanceDetailsActivity : BaseActivity() {
             menu_fab.close(false)
         }
         accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_qr_code_scan_fab))
-        val canAcceptRedemption = asset?.ownerAccountId == accountProvider.getAccount()?.accountId
-        if (!canAcceptRedemption) {
-            menu_fab.removeMenuButton(accept_redemption_fab)
+
+        issuance_fab.onClick {
+            navigator.openMassIssuance(assetCode = asset?.code)
+            menu_fab.close(false)
         }
+        issuance_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_issuance_white))
+
+        val canAcceptRedemptionAndIssue = asset?.ownerAccountId == accountProvider.getAccount()?.accountId
+        if (!canAcceptRedemptionAndIssue) {
+            menu_fab.removeMenuButton(accept_redemption_fab)
+            menu_fab.removeMenuButton(issuance_fab)
+        }
+
+
 
         menu_fab.setClosedOnTouchOutside(true)
     }

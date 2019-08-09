@@ -202,8 +202,8 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                 override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
                     val emails = adapter.getSelected().joinToString(",\n") { it.email }
                     Navigator.from(this@CompanyClientsFragment).openMassIssuance(
-                            emails,
-                            MASS_ISSUANCE_REQUEST
+                            emails = emails,
+                            requestCode = MASS_ISSUANCE_REQUEST
                     )
                     return true
                 }

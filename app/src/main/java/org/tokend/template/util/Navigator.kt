@@ -469,9 +469,10 @@ class Navigator private constructor() {
     }
 
     fun openMassIssuance(emails: String? = null,
+                         assetCode: String? = null,
                          requestCode: Int = 0) {
         context?.intentFor<MassIssuanceActivity>()
-                ?.putExtras(MassIssuanceActivity.getBundle(emails))
+                ?.putExtras(MassIssuanceActivity.getBundle(emails, assetCode))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
