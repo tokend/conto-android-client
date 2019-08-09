@@ -9,7 +9,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_mass_issuance.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
@@ -26,12 +25,9 @@ import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import java.math.BigDecimal
-import java.security.SecureRandom
 
 class MassIssuanceActivity : BaseActivity() {
     private lateinit var amountWrapper: AmountEditTextWrapper
-
-    private val reference: String = SecureRandom.getSeed(16).encodeBase64String()
 
     private var issuanceAsset: Asset? = null
         set(value) {
@@ -182,7 +178,7 @@ class MassIssuanceActivity : BaseActivity() {
     }
 
     private fun getAvailableIssuanceAmount(balance: BalanceRecord?): BigDecimal {
-        return balance?.asset?.available ?: BigDecimal.ZERO
+        return balance?.available ?: BigDecimal.ZERO
     }
 
     private fun updateIssuanceAvailability() {
@@ -229,8 +225,6 @@ class MassIssuanceActivity : BaseActivity() {
                 emails,
                 assetCode,
                 amount,
-                reference,
-                apiProvider,
                 walletInfoProvider,
                 repositoryProvider,
                 accountProvider,

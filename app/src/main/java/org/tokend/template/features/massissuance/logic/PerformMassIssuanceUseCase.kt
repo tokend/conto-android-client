@@ -3,21 +3,17 @@ package org.tokend.template.features.massissuance.logic
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
-import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
-import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
+import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
-import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
-import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.xdr.CreateIssuanceRequestOp
-import org.tokend.wallet.xdr.Fee
-import org.tokend.wallet.xdr.IssuanceRequest
 import org.tokend.wallet.xdr.Operation
+import org.tokend.wallet.xdr.PaymentFeeData
+import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
 import java.math.BigDecimal
 
 /**
@@ -32,21 +28,27 @@ class PerformMassIssuanceUseCase(
         private val emails: List<String>,
         private val assetCode: String,
         private val amount: BigDecimal,
-        private val reference: String,
-        private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val repositoryProvider: RepositoryProvider,
         private val accountProvider: AccountProvider,
         private val txManager: TxManager
 ) {
+    private val balancesRepository = repositoryProvider.balances()
+
+    private lateinit var balanceId: String
     private lateinit var accountId: String
     private lateinit var accounts: List<String>
-    private lateinit var balances: List<String>
     private lateinit var networkParams: NetworkParams
     private lateinit var transaction: Transaction
 
     fun perform(): Completable {
         return checkArguments()
+                .flatMap {
+                    getBalanceId()
+                }
+                .doOnSuccess { balanceId ->
+                    this.balanceId = balanceId
+                }
                 .flatMap {
                     getAccountId()
                 }
@@ -58,12 +60,6 @@ class PerformMassIssuanceUseCase(
                 }
                 .doOnSuccess { accounts ->
                     this.accounts = accounts
-                }
-                .flatMap {
-                    getBalances()
-                }
-                .doOnSuccess { balances ->
-                    this.balances = balances
                 }
                 .flatMap {
                     getNetworkParams()
@@ -93,6 +89,22 @@ class PerformMassIssuanceUseCase(
             Single.just(true)
     }
 
+    private fun getBalanceId(): Single<String> {
+        return balancesRepository
+                .updateIfNotFreshDeferred()
+                .toSingleDefault(true)
+                .flatMapMaybe {
+                    balancesRepository
+                            .itemsList
+                            .find { it.assetCode == assetCode }
+                            ?.id
+                            .toMaybe()
+                }
+                .switchIfEmpty(Single.error(
+                        IllegalStateException("No balance ID found for $assetCode")
+                ))
+    }
+
     private fun getAccountId(): Single<String> {
         return walletInfoProvider
                 .getWalletInfo()
@@ -114,34 +126,6 @@ class PerformMassIssuanceUseCase(
                 .toList()
     }
 
-    private fun getBalances(): Single<List<String>> {
-        val api = apiProvider.getApi()
-
-        return Single.merge(
-                accounts.map { accountId ->
-                    api
-                            .v3
-                            .accounts
-                            .getById(
-                                    accountId = accountId,
-                                    params = AccountParamsV3(
-                                            include = listOf(
-                                                    AccountParamsV3.Includes.BALANCES,
-                                                    AccountParamsV3.Includes.BALANCES_ASSET
-                                            )
-                                    ))
-                            .toSingle()
-                            .map { account ->
-                                account.balances.find { balance ->
-                                    balance.asset.id == assetCode
-                                }?.id ?: ""
-                            }
-                }
-        )
-                .filter(String::isNotBlank)
-                .toList()
-    }
-
     private fun getNetworkParams(): Single<NetworkParams> {
         return repositoryProvider
                 .systemInfo()
@@ -149,20 +133,20 @@ class PerformMassIssuanceUseCase(
     }
 
     private fun getTransaction(): Single<Transaction> {
-        val operations = balances.map { balanceId ->
-            Operation.OperationBody.CreateIssuanceRequest(
-                    CreateIssuanceRequestOp(
-                            request = IssuanceRequest(
-                                    amount = networkParams.amountToPrecised(amount),
-                                    asset = assetCode,
-                                    receiver = PublicKeyFactory.fromBalanceId(balanceId),
-                                    creatorDetails = "{}",
-                                    fee = Fee(0, 0, Fee.FeeExt.EmptyVersion()),
-                                    ext = IssuanceRequest.IssuanceRequestExt.EmptyVersion()
+        val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
+                .toXdrFee(networkParams)
+
+        val operations = accounts.map { accountId ->
+            Operation.OperationBody.Payment(
+                    SimplePaymentOp(
+                            sourceBalanceId = balanceId,
+                            destAccountId = accountId,
+                            amount = networkParams.amountToPrecised(amount),
+                            feeData = PaymentFeeData(
+                                    zeroFee, zeroFee, false,
+                                    PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                             ),
-                            reference = reference,
-                            allTasks = null,
-                            ext = CreateIssuanceRequestOp.CreateIssuanceRequestOpExt.EmptyVersion()
+                            subject = "Mass issuance"
                     )
             )
         }
@@ -181,5 +165,6 @@ class PerformMassIssuanceUseCase(
     private fun updateRepositories() {
         repositoryProvider.balances().updateIfEverUpdated()
         repositoryProvider.companyClients().updateIfEverUpdated()
+        repositoryProvider.balanceChanges(null).updateIfEverUpdated()
     }
 }
