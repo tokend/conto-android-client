@@ -16,6 +16,7 @@ import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.extensions.mapSuccessful
 import retrofit2.HttpException
 
 class ClientCompaniesRepository(
@@ -48,7 +49,7 @@ class ClientCompaniesRepository(
                 .loadAll()
                 .toSingle()
                 .map { companiesResources ->
-                    companiesResources.map {
+                    companiesResources.mapSuccessful {
                         CompanyRecord(it, urlConfigProvider.getConfig())
                     }
                 }

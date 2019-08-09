@@ -12,6 +12,7 @@ import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
+import org.tokend.template.extensions.mapSuccessful
 import retrofit2.HttpException
 
 class CompaniesRepository(
@@ -38,7 +39,7 @@ class CompaniesRepository(
                 .loadAll()
                 .toSingle()
                 .map { companiesResources ->
-                    companiesResources.map {
+                    companiesResources.mapSuccessful {
                         CompanyRecord(it, urlConfigProvider.getConfig())
                     }
                 }

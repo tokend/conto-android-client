@@ -14,7 +14,8 @@ class CompanyRecord(
 ) : Serializable {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
-            name = source.name,
+            name = source.name.takeIf(String::isNotEmpty)
+                    ?: throw IllegalArgumentException("Company name can't be empty"),
             industry = source.industry.takeIf(String::isNotEmpty),
             logoUrl = source.logoJson
                     .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
