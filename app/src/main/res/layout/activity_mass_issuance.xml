@@ -17,54 +17,60 @@
         <include layout="@layout/include_appbar_elevation" />
     </FrameLayout>
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scroll_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         style="@style/LimitedMatchParentWidthConstraint"
         app:layout_constraintBottom_toBottomOf="@null"
         app:layout_constraintBottom_toTopOf="@id/issue_button"
         app:layout_constraintTop_toBottomOf="@id/appbar"
         app:layout_constraintTop_toTopOf="@null">
 
-        <LinearLayout
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/standard_margin">
+            android:layout_height="match_parent">
 
-            <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/asset_edit_text"
-                style="@style/EditText.OneLine"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="none"
-                app:met_floatingLabelAlwaysShown="true"
-                app:met_floatingLabelText="@string/invest_asset_hint"
-                tools:text="BTC" />
+                android:orientation="vertical"
+                android:padding="@dimen/standard_margin">
 
-            <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/amount_edit_text"
-                style="@style/EditText.OneLine"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/standard_padding"
-                android:gravity="start"
-                android:hint="@string/amount_label"
-                android:inputType="numberDecimal" />
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/asset_edit_text"
+                    style="@style/EditText.OneLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="none"
+                    app:met_floatingLabelAlwaysShown="true"
+                    app:met_floatingLabelText="@string/invest_asset_hint"
+                    tools:text="BTC" />
 
-            <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/emails_edit_text"
-                style="@style/EditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/standard_padding"
-                android:hint="@string/emails_title"
-                android:inputType="text|textEmailAddress|textMultiLine"
-                android:minLines="1" />
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/amount_edit_text"
+                    style="@style/EditText.OneLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standard_padding"
+                    android:gravity="start"
+                    android:hint="@string/amount_label"
+                    android:inputType="numberDecimal" />
 
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/emails_edit_text"
+                    style="@style/EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standard_padding"
+                    android:hint="@string/emails_title"
+                    android:inputType="text|textEmailAddress|textMultiLine"
+                    android:minLines="1" />
+
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <Button
         android:id="@+id/issue_button"
