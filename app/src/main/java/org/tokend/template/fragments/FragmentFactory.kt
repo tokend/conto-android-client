@@ -7,6 +7,7 @@ import org.tokend.template.features.assets.AssetDetailsFragment
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
+import org.tokend.template.features.dashboard.balances.view.CompanyBalancesFragment
 import org.tokend.template.features.dashboard.movements.view.AccountMovementsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
@@ -128,5 +129,9 @@ class FragmentFactory {
 
     fun getCompanyClientsFragment(): Fragment {
         return CompanyClientsFragment()
+    }
+
+    fun getCompanyBalancesFragment(): Fragment {
+        return CompanyBalancesFragment.newInstance()
     }
 }

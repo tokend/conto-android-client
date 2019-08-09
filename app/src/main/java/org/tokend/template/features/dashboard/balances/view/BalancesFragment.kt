@@ -5,38 +5,49 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.clans.fab.FloatingActionButton
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
+import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_balances.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
+import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceItemsAdapter
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
 import org.tokend.template.fragments.BaseFragment
+import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.*
 import java.math.BigDecimal
 
 
-class BalancesFragment : BaseFragment() {
+open class BalancesFragment : BaseFragment(), ToolbarProvider {
+    override val toolbarSubject = BehaviorSubject.create<Toolbar>()
+
     private val loadingIndicator = LoadingIndicatorManager(
             showLoading = { swipe_refresh.isRefreshing = true },
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
 
-    private val balancesRepository: BalancesRepository
+    protected val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
-    private lateinit var adapter: BalanceItemsAdapter
+    protected lateinit var adapter: BalanceItemsAdapter
     private lateinit var layoutManager: GridLayoutManager
+
+    private val allowToolbar: Boolean by lazy {
+        arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, false) ?: false
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_balances, container, false)
@@ -51,7 +62,7 @@ class BalancesFragment : BaseFragment() {
         initCompanyLogo()
         initList()
         initSwipeRefresh()
-        initToolbarElevation()
+        initToolbar()
         initFab()
 
         subscribeToBalances()
@@ -109,11 +120,32 @@ class BalancesFragment : BaseFragment() {
         SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
     }
 
-    private fun initToolbarElevation() {
+    private fun initToolbar() {
+        if (allowToolbar) {
+            toolbar.title = getString(R.string.balances_screen_title)
+        } else {
+            appbar.visibility = View.GONE
+        }
         ElevationUtil.initScrollElevation(app_bar, appbar_elevation_view)
+        toolbarSubject.onNext(toolbar)
     }
 
     private fun initFab() {
+        val actions = getFabActions()
+
+        if (actions.isEmpty()) {
+            menu_fab.visibility = View.GONE
+            menu_fab.isEnabled = false
+        } else {
+            menu_fab.visibility = View.VISIBLE
+            menu_fab.isEnabled = true
+            actions.forEach(menu_fab::addMenuButton)
+        }
+
+        menu_fab.setClosedOnTouchOutside(true)
+    }
+
+    protected open fun getFabActions(): Collection<FloatingActionButton> {
         val themedContext = ContextThemeWrapper(requireContext(), R.style.FloatingButtonMenuItem)
         val actions = mutableListOf<FloatingActionButton>()
 
@@ -195,16 +227,7 @@ class BalancesFragment : BaseFragment() {
             )
         }
 
-        if (actions.isEmpty()) {
-            menu_fab.visibility = View.GONE
-            menu_fab.isEnabled = false
-        } else {
-            menu_fab.visibility = View.VISIBLE
-            menu_fab.isEnabled = true
-            actions.forEach(menu_fab::addMenuButton)
-        }
-
-        menu_fab.setClosedOnTouchOutside(true)
+        return actions
     }
     // endregion
 
@@ -236,7 +259,7 @@ class BalancesFragment : BaseFragment() {
     }
 
     // region Display
-    private fun displayBalances() {
+    protected open fun displayBalances() {
         val companyId = companyInfoProvider.getCompany()?.id
 
         val items = balancesRepository
@@ -248,7 +271,7 @@ class BalancesFragment : BaseFragment() {
         adapter.setData(items)
     }
 
-    private fun displayTotal() {
+    protected open fun displayTotal() {
         val conversionAssetCode = balancesRepository.conversionAsset
         val companyId = companyInfoProvider.getCompany()?.id
 
@@ -289,6 +312,20 @@ class BalancesFragment : BaseFragment() {
             false
         } else {
             super.onBackPressed()
+        }
+    }
+
+    companion object {
+        private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+
+        fun newInstance(bundle: Bundle): BalancesFragment {
+            val fragment = BalancesFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
+
+        fun getBundle(allowToolbar: Boolean) = Bundle().apply {
+            putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
         }
     }
 }

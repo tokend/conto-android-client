@@ -12,7 +12,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
-import org.tokend.template.features.dashboard.movements.view.AccountMovementsFragment
+import org.tokend.template.features.dashboard.balances.view.CompanyBalancesFragment
 import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.util.Navigator
@@ -28,9 +28,9 @@ class CorporateMainActivity : MainActivity() {
                         .withIdentifier(CompanyClientsFragment.ID)
                         .withIcon(R.drawable.ic_accounts),
                 PrimaryDrawerItem()
-                        .withName(R.string.movements_screen_title)
-                        .withIdentifier(AccountMovementsFragment.ID)
-                        .withIcon(R.drawable.ic_trade)
+                        .withName(R.string.balances_screen_title)
+                        .withIdentifier(CompanyBalancesFragment.ID)
+                        .withIcon(R.drawable.ic_coins)
         ).apply { addAll(super.getNavigationItems()) }
     }
 
@@ -38,7 +38,7 @@ class CorporateMainActivity : MainActivity() {
                                             items: Map<Long, PrimaryDrawerItem>) {
         builder.apply {
             addDrawerItems(items[CompanyClientsFragment.ID])
-            addDrawerItems(items[AccountMovementsFragment.ID])
+            addDrawerItems(items[CompanyBalancesFragment.ID])
             addDrawerItems(items[SettingsFragment.ID])
             addDrawerItems(DividerDrawerItem())
             addDrawerItems(items[CONTRIBUTE_ITEM_ID])
@@ -100,7 +100,7 @@ class CorporateMainActivity : MainActivity() {
     override fun getFragment(screenIdentifier: Long): Fragment? {
         return super.getFragment(screenIdentifier) ?: when (screenIdentifier) {
             CompanyClientsFragment.ID -> factory.getCompanyClientsFragment()
-            AccountMovementsFragment.ID -> factory.getAccountMovementsFragment(true)
+            CompanyBalancesFragment.ID -> factory.getCompanyBalancesFragment()
             else -> null
         }
     }
