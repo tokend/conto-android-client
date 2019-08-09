@@ -39,6 +39,8 @@ class PostSignInManager(
         val performParallelActions = Completable.merge(parallelActions)
         val performSyncActions = Completable.concat(syncActions)
 
+        repositoryProvider.tfaFactors().invalidate()
+
         return performSyncActions
                 .andThen(performParallelActions)
                 .onErrorResumeNext {
