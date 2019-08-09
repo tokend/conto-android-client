@@ -7,6 +7,7 @@ import android.text.Editable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_mass_issuance.*
+import kotlinx.android.synthetic.main.activity_mass_issuance.swipe_refresh
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.utils.extentions.encodeBase64String
@@ -22,6 +23,7 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.EmailValidator
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.ElevationUtil
+import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SimpleTextWatcher
@@ -30,6 +32,11 @@ import java.security.SecureRandom
 
 class MassIssuanceActivity : BaseActivity() {
     private lateinit var amountWrapper: AmountEditTextWrapper
+
+    private val loadingIndicator = LoadingIndicatorManager(
+            showLoading = { swipe_refresh.isRefreshing = true },
+            hideLoading = { swipe_refresh.isRefreshing = false }
+    )
 
     private val referenceSeed: String = SecureRandom.getSeed(16).encodeBase64String()
 
@@ -57,11 +64,14 @@ class MassIssuanceActivity : BaseActivity() {
         setContentView(R.layout.activity_mass_issuance)
 
         initToolbar()
+        initSwipeRefresh()
         initFields()
         initButtons()
         initAssetSelection()
 
         subscribeToBalances()
+
+        update()
     }
 
     // region Init
@@ -70,6 +80,11 @@ class MassIssuanceActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTitle(R.string.issuance_title)
         ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
+    }
+
+    private fun initSwipeRefresh() {
+        swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.accent))
+        swipe_refresh.setOnRefreshListener { update(true) }
     }
 
     private fun initFields() {
@@ -152,6 +167,21 @@ class MassIssuanceActivity : BaseActivity() {
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe {
                     updateIssuanceAvailability()
+                }
+                .addTo(compositeDisposable)
+
+        balancesRepository
+                .loadingSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    loadingIndicator.setLoading(it, "balances")
+                }
+                .addTo(compositeDisposable)
+
+        balancesRepository.errorsSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    errorHandlerFactory.getDefault().handle(it)
                 }
                 .addTo(compositeDisposable)
     }
@@ -250,6 +280,14 @@ class MassIssuanceActivity : BaseActivity() {
         toastManager.short(R.string.successfully_issued)
         setResult(Activity.RESULT_OK)
         finish()
+    }
+
+    private fun update(force: Boolean = false) {
+        if (force) {
+            balancesRepository.update()
+        } else {
+            balancesRepository.updateIfNotFresh()
+        }
     }
 
     companion object {
