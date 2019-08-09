@@ -11,7 +11,6 @@ import android.view.*
 import com.github.clans.fab.FloatingActionButton
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_company_clients.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
@@ -70,7 +69,6 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     private fun initToolbar() {
         toolbar.title = getString(R.string.clients_title)
         toolbarSubject.onNext(toolbar)
-        ElevationUtil.initScrollElevation(appbar, appbar_elevation_view)
     }
 
     private fun initSwipeRefresh() {
@@ -93,9 +91,14 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         adapter = CompanyClientItemsAdapter(amountFormatter)
         layoutManager = GridLayoutManager(requireContext(), 1)
         updateListColumnsCount()
+
         clients_list.adapter = adapter
         clients_list.layoutManager = layoutManager
         clients_list.addOnScrollListener(hideFabScrollListener)
+        clients_list.listenBottomReach({ adapter.getDataItemCount() }) {
+            clientsRepository.loadMore() || clientsRepository.noMoreItems
+        }
+
         adapter.onItemClick { _, item ->
             item.source?.also { Navigator.from(this).openCompanyClientDetails(it) }
         }
@@ -112,6 +115,8 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         error_empty_view.observeAdapter(adapter, R.string.no_clients)
         error_empty_view.setEmptyViewDenial { clientsRepository.isNeverUpdated }
         error_empty_view.setEmptyDrawable(R.drawable.ic_accounts)
+
+        ElevationUtil.initScrollElevation(clients_list, appbar_elevation_view)
     }
 
     private fun initFab() {
@@ -219,7 +224,18 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         clientsRepository
                 .loadingSubject
                 .compose(ObservableTransformers.defaultSchedulers())
-                .subscribe { loadingIndicator.setLoading(it) }
+                .subscribe { loading ->
+                    if (loading) {
+                        if (clientsRepository.isOnFirstPage) {
+                            loadingIndicator.show()
+                        } else {
+                            adapter.showLoadingFooter()
+                        }
+                    } else {
+                        loadingIndicator.hide()
+                        adapter.hideLoadingFooter()
+                    }
+                }
                 .addTo(compositeDisposable)
 
         clientsRepository

@@ -9,7 +9,6 @@ import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.integrations.dns.model.ClientBalanceResource
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
 import org.tokend.sdk.api.integrations.dns.params.ClientsPageParams
-import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
@@ -40,7 +39,8 @@ class CompanyClientsRepository(
                                 include = listOf(ClientsPageParams.Includes.BALANCES),
                                 pagingParams = PagingParamsV2(
                                         order = PagingOrder.DESC,
-                                        page = nextCursor
+                                        page = nextCursor,
+                                        limit = PAGE_LIMIT
                                 )
                         )
                 )
@@ -72,5 +72,9 @@ class CompanyClientsRepository(
                             clientsPage.isLast
                     )
                 }
+    }
+
+    private companion object {
+        private const val PAGE_LIMIT = 20
     }
 }
