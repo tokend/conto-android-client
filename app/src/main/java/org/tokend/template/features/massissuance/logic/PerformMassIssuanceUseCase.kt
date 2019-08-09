@@ -4,6 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
+import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
@@ -11,6 +12,7 @@ import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
+import org.tokend.wallet.utils.Hashing
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.PaymentFeeData
 import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
@@ -18,16 +20,18 @@ import java.math.BigDecimal
 
 /**
  * Creates and submits transaction with
- * many issuance operations.
+ * many payment operations.
  *
  * Updates balances and clients on success
  *
+ * @param referenceSeed base string for reference calculation for each op
  * @param emails list of issuance receivers, max size is 100
  */
 class PerformMassIssuanceUseCase(
         private val emails: List<String>,
         private val assetCode: String,
         private val amount: BigDecimal,
+        private val referenceSeed: String,
         private val walletInfoProvider: WalletInfoProvider,
         private val repositoryProvider: RepositoryProvider,
         private val accountProvider: AccountProvider,
@@ -146,6 +150,9 @@ class PerformMassIssuanceUseCase(
                                     zeroFee, zeroFee, false,
                                     PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                             ),
+                            reference = Hashing.sha256((accountId + referenceSeed)
+                                    .toByteArray())
+                                    .encodeBase64String(),
                             subject = "Mass issuance"
                     )
             )
