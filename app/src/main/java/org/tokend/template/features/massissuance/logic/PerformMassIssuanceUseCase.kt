@@ -171,6 +171,6 @@ class PerformMassIssuanceUseCase(
 
     private fun updateRepositories() {
         repositoryProvider.balances().updateIfEverUpdated()
-        repositoryProvider.balanceChanges(null).updateIfEverUpdated()
+        repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()
     }
 }
