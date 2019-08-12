@@ -1,24 +1,23 @@
 package org.tokend.template.features.massissuance.view
 
-import android.app.Activity
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_mass_issuance.*
-import kotlinx.android.synthetic.main.activity_mass_issuance.swipe_refresh
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.hasError
-import org.tokend.template.features.massissuance.logic.PerformMassIssuanceUseCase
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.massissuance.logic.CreateMassIssuanceRequestUseCase
+import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.EmailValidator
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
@@ -28,7 +27,6 @@ import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import java.math.BigDecimal
-import java.security.SecureRandom
 
 class MassIssuanceActivity : BaseActivity() {
     private lateinit var amountWrapper: AmountEditTextWrapper
@@ -37,8 +35,6 @@ class MassIssuanceActivity : BaseActivity() {
             showLoading = { swipe_refresh.isRefreshing = true },
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
-
-    private val referenceSeed: String = SecureRandom.getSeed(16).encodeBase64String()
 
     private var issuanceAsset: Asset? = null
         set(value) {
@@ -243,46 +239,55 @@ class MassIssuanceActivity : BaseActivity() {
         readAndCheckEmails()
 
         if (canIssue) {
-            issue()
+            createAndConfirmMassIssuanceRequest()
         }
     }
 
-    private fun issue() {
-        val assetCode = issuanceAsset?.code
-                ?: return
+    private fun createAndConfirmMassIssuanceRequest() {
+        val asset = issuanceAsset ?: return
         val amount = amountWrapper.scaledAmount
 
-        val progress = ProgressDialogFactory.getDialog(this)
+        var disposable: Disposable? = null
 
-        PerformMassIssuanceUseCase(
+        val progress = ProgressDialogFactory.getDialog(this) {
+            disposable?.dispose()
+        }
+
+        disposable = CreateMassIssuanceRequestUseCase(
                 emails,
-                assetCode,
+                asset,
                 amount,
-                referenceSeed,
                 walletInfoProvider,
-                repositoryProvider,
-                accountProvider,
-                TxManager(apiProvider)
+                repositoryProvider
         )
                 .perform()
-                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .compose(ObservableTransformers.defaultSchedulersSingle())
                 .doOnSubscribe {
                     progress.show()
                 }
-                .doOnEvent {
+                .doOnEvent { _, _ ->
                     progress.dismiss()
                 }
                 .subscribeBy(
-                        onComplete = this::onSuccessfulIssuance,
-                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                        onSuccess = this::onMassIssuanceRequestCreated,
+                        onError = this::onRequestCreationError
                 )
                 .addTo(compositeDisposable)
     }
 
-    private fun onSuccessfulIssuance() {
-        toastManager.short(R.string.successfully_issued)
-        setResult(Activity.RESULT_OK)
-        finish()
+    private fun onMassIssuanceRequestCreated(request: MassIssuanceRequest) {
+        // Navigator.from(this).openMassIssuanceConfirmation
+    }
+
+    private fun onRequestCreationError(error: Throwable) {
+        when (error) {
+            is CreateMassIssuanceRequestUseCase.NoValidRecipientsException -> {
+                emails_edit_text.setErrorAndFocus(R.string.error_no_recipients_for_issuance)
+                updateIssuanceAvailability()
+            }
+            else ->
+                errorHandlerFactory.getDefault().handle(error)
+        }
     }
 
     private fun update(force: Boolean = false) {

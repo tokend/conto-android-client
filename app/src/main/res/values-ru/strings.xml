@@ -494,4 +494,5 @@
     <string name="phone_number_set_successfully">Номер сохранен</string>
     <string name="error_phone_number_already_taken">Номер уже занят</string>
     <string name="sms_tfa_dialog_message">Введите код из SMS</string>
+    <string name="error_no_recipients_for_issuance">Не найдено получателей для начисления</string>
 </resources>
