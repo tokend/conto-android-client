@@ -226,13 +226,13 @@ class BalanceDetailsActivity : BaseActivity() {
         }
         issuance_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_issuance_white))
 
-        val canAcceptRedemptionAndIssue = asset?.ownerAccountId == accountProvider.getAccount()?.accountId
+        val canAcceptRedemptionAndIssue =
+                asset?.ownerAccountId == walletInfoProvider.getWalletInfo()?.accountId
+
         if (!canAcceptRedemptionAndIssue) {
             menu_fab.removeMenuButton(accept_redemption_fab)
             menu_fab.removeMenuButton(issuance_fab)
         }
-
-
 
         menu_fab.setClosedOnTouchOutside(true)
     }
