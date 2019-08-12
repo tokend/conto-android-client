@@ -451,7 +451,7 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAcceptRedemption(balanceId: String, request: String, requestCode: Int? = null) {
+    fun openRedemptionRequestConfirmation(balanceId: String, request: String, requestCode: Int? = null) {
         context?.intentFor<ConfirmRedemptionActivity>()
                 ?.putExtras(ConfirmRedemptionActivity.getBundle(balanceId, request))
                 ?.also { performIntent(it, requestCode = requestCode) }
