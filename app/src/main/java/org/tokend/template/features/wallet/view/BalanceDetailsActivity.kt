@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import com.github.clans.fab.FloatingActionButton
 import com.github.clans.fab.FloatingActionMenu
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -253,7 +254,7 @@ class BalanceDetailsActivity : BaseActivity() {
                 .subscribeBy(
                         onComplete = {
                             if (asksRepository.itemsList.isNotEmpty()) {
-                                menu_fab.findViewById<FloatingActionMenu>(BUY_MENU_ITEM_ID)
+                                menu_fab.findViewById<FloatingActionButton>(BUY_MENU_ITEM_ID)
                                         .isEnabled = true
                             }
                         },
