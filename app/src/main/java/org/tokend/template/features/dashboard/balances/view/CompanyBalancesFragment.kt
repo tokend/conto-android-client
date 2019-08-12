@@ -1,79 +1,56 @@
 package org.tokend.template.features.dashboard.balances.view
 
-import android.support.v4.content.ContextCompat
-import android.view.ContextThemeWrapper
 import android.view.View
-import com.github.clans.fab.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_balances.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
 import org.tokend.template.util.Navigator
+import org.tokend.template.view.util.fab.FloatingActionMenuAction
 
 class CompanyBalancesFragment : BalancesFragment() {
 
-    override fun getFabActions(): Collection<FloatingActionButton> {
-        val themedContext = ContextThemeWrapper(requireContext(), R.style.FloatingButtonMenuItem)
-        val actions = mutableListOf<FloatingActionButton>()
-
-        // Accept redemption.
+    override fun getFabActions(): Collection<FloatingActionMenuAction> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val balances = balancesRepository.itemsList
-        if (balances.any { it.asset.ownerAccountId == accountId }) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.accept_redemption)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_qr_code_scan_fab)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@CompanyBalancesFragment)
-                                            .openScanRedemption()
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
-        }
+        val navigator = Navigator.from(this)
+
+        val actions = mutableListOf<FloatingActionMenuAction>()
+
+        // Accept redemption.
+        actions.add(FloatingActionMenuAction(
+                requireContext(),
+                R.string.accept_redemption,
+                R.drawable.ic_qr_code_scan_fab,
+                {
+                    navigator.openScanRedemption()
+                },
+                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+        ))
 
         // Send.
         if (BuildConfig.IS_SEND_ALLOWED) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.send_title)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_send_fab)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@CompanyBalancesFragment)
-                                            .openSend()
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
+            actions.add(FloatingActionMenuAction(
+                    requireContext(),
+                    R.string.send_title,
+                    R.drawable.ic_send_fab,
+                    {
+                        navigator.openSend()
+                    },
+                    isEnabled = balances.any { it.asset.isTransferable }
+            ))
         }
 
-        // Issuance
-        if (balances.any { it.asset.ownerAccountId == accountId }) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.issuance_title)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_issuance_white)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@CompanyBalancesFragment)
-                                            .openMassIssuance()
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
-        }
+        // Issuance.
+        actions.add(FloatingActionMenuAction(
+                requireContext(),
+                R.string.issuance_title,
+                R.drawable.ic_issuance_white,
+                {
+                    navigator.openMassIssuance()
+                },
+                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+        ))
 
         return actions
     }

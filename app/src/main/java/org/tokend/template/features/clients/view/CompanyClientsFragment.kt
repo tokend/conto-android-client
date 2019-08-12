@@ -10,7 +10,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.*
-import com.github.clans.fab.FloatingActionButton
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.fragment_company_clients.*
@@ -30,6 +29,8 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.fab.FloatingActionMenuAction
+import org.tokend.template.view.util.fab.addActions
 
 class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
@@ -122,76 +123,50 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initFab() {
-        val themedContext = ContextThemeWrapper(requireContext(), R.style.FloatingButtonMenuItem)
-        val actions = mutableListOf<FloatingActionButton>()
+        menu_fab.addActions(getFabActions())
+        menu_fab.setClosedOnTouchOutside(true)
+    }
+
+    private fun getFabActions(): Collection<FloatingActionMenuAction> {
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+        val navigator = Navigator.from(this)
+
+        val actions = mutableListOf<FloatingActionMenuAction>()
 
         // Accept redemption.
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val balances = balancesRepository.itemsList
-        if (balances.any { it.asset.ownerAccountId == accountId }) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.accept_redemption)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_qr_code_scan_fab)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@CompanyClientsFragment)
-                                            .openScanRedemption()
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
-        }
+        actions.add(FloatingActionMenuAction(
+                requireContext(),
+                R.string.accept_redemption,
+                R.drawable.ic_qr_code_scan_fab,
+                {
+                    navigator.openScanRedemption()
+                },
+                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+        ))
 
-        // Invite
-        actions.add(
-                FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                        .apply {
-                            labelText = getString(R.string.invite_action)
-                            setImageDrawable(ContextCompat.getDrawable(
-                                    requireContext(),
-                                    R.drawable.ic_accounts_add_fab)
-                            )
-                            setOnClickListener {
-                                Navigator.from(this@CompanyClientsFragment).openInvitation()
-                                menu_fab.close(false)
-                            }
-                        }
-        )
+        // Invite.
+        actions.add(FloatingActionMenuAction(
+                requireContext(),
+                R.string.invite_action,
+                R.drawable.ic_accounts_add_fab,
+                {
+                    navigator.openInvitation()
+                }
+        ))
 
+        // Issuance.
+        actions.add(FloatingActionMenuAction(
+                requireContext(),
+                R.string.issuance_title,
+                R.drawable.ic_issuance_white,
+                {
+                    navigator.openMassIssuance(requestCode = MASS_ISSUANCE_REQUEST)
+                },
+                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+        ))
 
-        // Issuance
-        if (balances.any { it.asset.ownerAccountId == accountId }) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.issuance_title)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_issuance_white)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@CompanyClientsFragment)
-                                            .openMassIssuance(requestCode = MASS_ISSUANCE_REQUEST)
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
-        }
-
-        if (actions.isEmpty()) {
-            menu_fab.visibility = View.GONE
-            menu_fab.isEnabled = false
-        } else {
-            menu_fab.visibility = View.VISIBLE
-            menu_fab.isEnabled = true
-            actions.forEach(menu_fab::addMenuButton)
-        }
-
-        menu_fab.setClosedOnTouchOutside(true)
+        return actions
     }
     // endregion
 
@@ -288,7 +263,10 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onBackPressed(): Boolean {
-        if (adapter.hasSelection) {
+        if (menu_fab.isOpened) {
+            menu_fab.close(true)
+            return false
+        } else if (adapter.hasSelection) {
             adapter.clearSelection()
             return false
         }

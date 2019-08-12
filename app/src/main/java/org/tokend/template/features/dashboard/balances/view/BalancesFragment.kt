@@ -6,11 +6,9 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.github.clans.fab.FloatingActionButton
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.appbar.*
@@ -28,6 +26,8 @@ import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.*
+import org.tokend.template.view.util.fab.FloatingActionMenuAction
+import org.tokend.template.view.util.fab.addActions
 import java.math.BigDecimal
 
 
@@ -131,100 +131,48 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initFab() {
-        val actions = getFabActions()
-
-        if (actions.isEmpty()) {
-            menu_fab.visibility = View.GONE
-            menu_fab.isEnabled = false
-        } else {
-            menu_fab.visibility = View.VISIBLE
-            menu_fab.isEnabled = true
-            actions.forEach(menu_fab::addMenuButton)
-        }
-
+        menu_fab.addActions(getFabActions())
         menu_fab.setClosedOnTouchOutside(true)
     }
 
-    protected open fun getFabActions(): Collection<FloatingActionButton> {
-        val themedContext = ContextThemeWrapper(requireContext(), R.style.FloatingButtonMenuItem)
-        val actions = mutableListOf<FloatingActionButton>()
-
-        // Accept redemption.
+    protected open fun getFabActions(): Collection<FloatingActionMenuAction> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val balances = balancesRepository.itemsList
-        if (balances.any { it.asset.ownerAccountId == accountId }) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.accept_redemption)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_qr_code_scan_fab)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@BalancesFragment)
-                                            .openScanRedemption()
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
-        }
+        val navigator = Navigator.from(this)
+
+        val actions = mutableListOf<FloatingActionMenuAction>()
 
         // Redeem.
-        actions.add(
-                FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                        .apply {
-                            labelText = getString(R.string.redeem)
-                            setImageDrawable(ContextCompat.getDrawable(
-                                    requireContext(),
-                                    R.drawable.ic_redeem)
-                            )
-                            setOnClickListener {
-                                Navigator.from(this@BalancesFragment)
-                                        .openRedemptionCreation()
-                                menu_fab.close(false)
-                            }
-                        }
-        )
+        actions.add(FloatingActionMenuAction(
+                requireContext(),
+                R.string.redeem,
+                R.drawable.ic_redeem,
+                {
+                    navigator.openRedemptionCreation()
+                }
+        ))
 
-        // Send.
+        // Send, Receive.
         if (BuildConfig.IS_SEND_ALLOWED) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.send_title)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_send_fab)
-                                )
-                                setOnClickListener {
-                                    Navigator.from(this@BalancesFragment)
-                                            .openSend()
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
-        }
-
-        // Receive.
-        if (BuildConfig.IS_SEND_ALLOWED) {
-            actions.add(
-                    FloatingActionButton(themedContext, null, R.style.FloatingButtonMenuItem)
-                            .apply {
-                                labelText = getString(R.string.receive_title)
-                                setImageDrawable(ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_receive_fab)
-                                )
-                                setOnClickListener {
-                                    walletInfoProvider.getWalletInfo()?.also { walletInfo ->
-                                        Navigator.from(this@BalancesFragment)
-                                                .openAccountQrShare(walletInfo)
-                                    }
-                                    menu_fab.close(false)
-                                }
-                            }
-            )
+            actions.add(FloatingActionMenuAction(
+                    requireContext(),
+                    R.string.send_title,
+                    R.drawable.ic_send_fab,
+                    {
+                        navigator.openSend()
+                    },
+                    isEnabled = balances.any { it.asset.isTransferable }
+            ))
+            actions.add(FloatingActionMenuAction(
+                    requireContext(),
+                    R.string.receive_title,
+                    R.drawable.ic_receive_fab,
+                    {
+                        val walletInfo = walletInfoProvider.getWalletInfo()
+                                ?: return@FloatingActionMenuAction
+                        navigator.openAccountQrShare(walletInfo)
+                    }
+            ))
         }
 
         return actions

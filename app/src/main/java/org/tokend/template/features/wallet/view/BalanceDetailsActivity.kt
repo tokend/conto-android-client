@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import com.github.clans.fab.FloatingActionMenu
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_details.*
@@ -18,7 +19,6 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.childrenSequence
 import org.jetbrains.anko.dip
-import org.jetbrains.anko.onClick
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
@@ -30,6 +30,9 @@ import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.*
+import org.tokend.template.view.util.fab.FloatingActionMenuAction
+import org.tokend.template.view.util.fab.addActions
+import kotlin.math.max
 
 class BalanceDetailsActivity : BaseActivity() {
     private val loadingIndicator = LoadingIndicatorManager(
@@ -130,111 +133,114 @@ class BalanceDetailsActivity : BaseActivity() {
     }
 
     private fun initFab() {
+        menu_fab.addActions(getFabActions())
+        menu_fab.setClosedOnTouchOutside(true)
+    }
+
+    private fun getFabActions(): Collection<FloatingActionMenuAction> {
         val asset = this.balance?.asset
-
-        val canWithdraw = asset?.isWithdrawable == true
-        val canDeposit = asset?.isBackedByExternalSystem == true
-        val canSend = asset?.isTransferable == true
-        val canBuy = asset?.canBeBaseForAtomicSwap == true
-        val canRedeem = true
-
-        if (!canWithdraw && !canDeposit && !canSend && !canBuy && !canRedeem) {
-            menu_fab.visibility = View.GONE
-            menu_fab.isEnabled = false
-            return
-        } else {
-            menu_fab.visibility = View.VISIBLE
-            menu_fab.isEnabled = true
-
-            withdraw_fab.isEnabled = canWithdraw
-            deposit_fab.isEnabled = canDeposit
-            send_fab.isEnabled = canSend
-            receive_fab.isEnabled = canSend
-            buy_fab.isEnabled = false
-            redeem_fab.isEnabled = canRedeem
-        }
-
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val navigator = Navigator.from(this)
 
-        send_fab.onClick {
-            val assetCode = balance?.assetCode ?: return@onClick
-            navigator.openSend(assetCode)
-            menu_fab.close(false)
-        }
-        send_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_fab))
-        if (!BuildConfig.IS_SEND_ALLOWED) {
-            menu_fab.removeMenuButton(send_fab)
-        }
+        val actions = mutableListOf<FloatingActionMenuAction>()
 
-        receive_fab.onClick {
-            val walletInfo = walletInfoProvider.getWalletInfo()
-                    ?: return@onClick
-            navigator.openAccountQrShare(walletInfo)
-            menu_fab.close(false)
-        }
-        receive_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_receive_fab))
-        if (!BuildConfig.IS_SEND_ALLOWED) {
-            menu_fab.removeMenuButton(receive_fab)
-        }
+        if (BuildConfig.IS_DIRECT_BUY_ALLOWED) {
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.buy,
+                    R.drawable.ic_buy_fab,
+                    {
+                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        navigator.openAtomicSwapsAsks(assetCode)
+                    },
+                    isEnabled = false,
+                    id = BUY_MENU_ITEM_ID
+            ))
 
-        deposit_fab.onClick {
-            val assetCode = balance?.assetCode ?: return@onClick
-            navigator.openDeposit(0, assetCode)
-            menu_fab.close(false)
-        }
-        deposit_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_deposit_fab))
-        if (!BuildConfig.IS_DEPOSIT_ALLOWED) {
-            menu_fab.removeMenuButton(deposit_fab)
-        }
-
-        withdraw_fab.onClick {
-            val assetCode = balance?.assetCode ?: return@onClick
-            navigator.openWithdraw(0, assetCode)
-            menu_fab.close(false)
-        }
-        withdraw_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_withdraw_fab))
-        if (!BuildConfig.IS_WITHDRAW_ALLOWED) {
-            menu_fab.removeMenuButton(withdraw_fab)
-        }
-
-        buy_fab.onClick {
-            val assetCode = balance?.assetCode ?: return@onClick
-            navigator.openAtomicSwapsAsks(assetCode)
-            menu_fab.close(false)
-        }
-        buy_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_buy_fab))
-        if (canBuy) {
             enableBuyFabIfThereAreAsks()
         }
 
-        redeem_fab.onClick {
-            val assetCode = balance?.assetCode ?: return@onClick
-            navigator.openRedemptionCreation(assetCode)
-            menu_fab.close(false)
+        if (asset?.ownerAccountId == accountId) {
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.issuance_title,
+                    R.drawable.ic_issuance_white,
+                    {
+                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        navigator.openMassIssuance(assetCode = assetCode)
+                    }
+            ))
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.accept_redemption,
+                    R.drawable.ic_qr_code_scan_fab,
+                    {
+                        navigator.openScanRedemption()
+                    }
+            ))
+        } else {
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.redeem,
+                    R.drawable.ic_redeem,
+                    {
+                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        navigator.openRedemptionCreation(assetCode = assetCode)
+                    }
+            ))
         }
-        redeem_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_redeem))
 
-        accept_redemption_fab.onClick {
-            navigator.openScanRedemption()
-            menu_fab.close(false)
+        if (BuildConfig.IS_SEND_ALLOWED) {
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.send_title,
+                    R.drawable.ic_send_fab,
+                    {
+                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        navigator.openSend(assetCode)
+                    },
+                    isEnabled = asset?.isTransferable == true
+            ))
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.receive_title,
+                    R.drawable.ic_receive_fab,
+                    {
+                        val walletInfo = walletInfoProvider.getWalletInfo()
+                                ?: return@FloatingActionMenuAction
+                        navigator.openAccountQrShare(walletInfo)
+                    },
+                    isEnabled = asset?.isTransferable == true
+            ))
         }
-        accept_redemption_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_qr_code_scan_fab))
 
-        issuance_fab.onClick {
-            navigator.openMassIssuance(assetCode = asset?.code)
-            menu_fab.close(false)
-        }
-        issuance_fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_issuance_white))
-
-        val canAcceptRedemptionAndIssue =
-                asset?.ownerAccountId == walletInfoProvider.getWalletInfo()?.accountId
-
-        if (!canAcceptRedemptionAndIssue) {
-            menu_fab.removeMenuButton(accept_redemption_fab)
-            menu_fab.removeMenuButton(issuance_fab)
+        if (BuildConfig.IS_DEPOSIT_ALLOWED) {
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.deposit_title,
+                    R.drawable.ic_deposit_fab,
+                    {
+                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        navigator.openDeposit(0, assetCode)
+                    },
+                    isEnabled = asset?.isBackedByExternalSystem == true
+            ))
         }
 
-        menu_fab.setClosedOnTouchOutside(true)
+        if (BuildConfig.IS_WITHDRAW_ALLOWED) {
+            actions.add(FloatingActionMenuAction(
+                    this,
+                    R.string.withdraw_title,
+                    R.drawable.ic_withdraw_fab,
+                    {
+                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        navigator.openWithdraw(0, assetCode)
+                    },
+                    isEnabled = asset?.isBackedByExternalSystem == true
+            ))
+        }
+
+        return actions
     }
 
     private fun enableBuyFabIfThereAreAsks() {
@@ -247,7 +253,8 @@ class BalanceDetailsActivity : BaseActivity() {
                 .subscribeBy(
                         onComplete = {
                             if (asksRepository.itemsList.isNotEmpty()) {
-                                buy_fab.isEnabled = true
+                                menu_fab.findViewById<FloatingActionMenu>(BUY_MENU_ITEM_ID)
+                                        .isEnabled = true
                             }
                         },
                         onError = {}
@@ -309,7 +316,7 @@ class BalanceDetailsActivity : BaseActivity() {
 
         SwipeRefreshDependencyUtil.addDependency(swipe_refresh, appbar)
     }
-    // endregion
+// endregion
 
     private fun update(force: Boolean = false) {
         if (!force) {
@@ -428,10 +435,7 @@ class BalanceDetailsActivity : BaseActivity() {
     private fun adjustEmptyViewHeight() {
         root_layout.post {
             error_empty_view.layoutParams = error_empty_view.layoutParams.apply {
-                height = Math.max(
-                        root_layout.height - appbar.height,
-                        dip(256)
-                )
+                height = max(root_layout.height - appbar.height, dip(256))
             }
         }
     }
@@ -458,6 +462,7 @@ class BalanceDetailsActivity : BaseActivity() {
     companion object {
         private const val BALANCE_ID_EXTRA = "balance_id"
         private const val ASSET_DETAILS_REQUEST = 1132
+        private val BUY_MENU_ITEM_ID = "buy_fab".hashCode()
 
         fun getBundle(balanceId: String) = Bundle().apply {
             putString(BALANCE_ID_EXTRA, balanceId)
