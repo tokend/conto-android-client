@@ -342,6 +342,7 @@
     <string name="balance_change_cause_offer_cancellation">Order cancellation</string>
     <string name="balance_change_cause_aswap_ask_creation">Direct buy offer creation</string>
     <string name="balance_change_cause_aswap_bid_creation">Direct buy</string>
+    <string name="balance_change_cause_mass_issuance">Mass issuance</string>
 
     <string name="asset_pair_title">Asset pair</string>
     <string name="asset_pair_code">Code</string>
@@ -481,6 +482,8 @@
     <string name="phone_number_set_successfully">Phone number has been set</string>
     <string name="error_phone_number_already_taken">This number is already taken</string>
     <string name="sms_tfa_dialog_message">Enter code from SMS</string>
+    <string name="error_no_recipients_for_issuance">No valid recipients found</string>
+    <string name="issuance_recipients">Recipients</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

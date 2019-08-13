@@ -20,4 +20,9 @@
         <item quantity="one">%1$d vote – %2$.1f%%</item>
         <item quantity="other">%1$d votes – %2$.1f%%</item>
     </plurals>
+
+    <plurals name="issuance_recipient">
+        <item quantity="one">%1$d recipient</item>
+        <item quantity="other">%1$d recipients</item>
+    </plurals>
 </resources>
