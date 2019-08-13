@@ -516,5 +516,6 @@ class Navigator private constructor() {
     fun toClientKyc() {
         context?.intentFor<ClientKycActivity>()
                 ?.also { performIntent(it) }
+        activity?.finish()
     }
 }

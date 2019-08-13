@@ -64,6 +64,10 @@ class KycStateRepository(
     val itemFormData: KycForm?
         get() = (item as? KycState.Submitted<*>)?.formData
 
+    fun set(newState: KycState) {
+        onNewItem(newState)
+    }
+
     override fun getItem(): Observable<KycState> {
         val signedApi = apiProvider.getSignedApi()
                 ?: return Observable.error(IllegalStateException("No signed API instance found"))
