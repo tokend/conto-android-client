@@ -496,4 +496,5 @@
     <string name="error_phone_number_already_taken">Номер вже зайнято</string>
     <string name="sms_tfa_dialog_message">Введіть код з SMS</string>
     <string name="error_no_recipients_for_issuance">Не знайдено отримувачів для нарахування</string>
+    <string name="issuance_recipients">Отримувачі</string>
 </resources>

@@ -483,6 +483,7 @@
     <string name="error_phone_number_already_taken">This number is already taken</string>
     <string name="sms_tfa_dialog_message">Enter code from SMS</string>
     <string name="error_no_recipients_for_issuance">No valid recipients found</string>
+    <string name="issuance_recipients">Recipients</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

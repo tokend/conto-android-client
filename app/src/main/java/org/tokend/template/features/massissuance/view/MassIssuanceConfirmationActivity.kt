@@ -76,10 +76,23 @@ class MassIssuanceConfirmationActivity : BaseActivity() {
     }
 
     private fun displayRecipients() {
-        val icon = ContextCompat.getDrawable(this, R.drawable.ic_email)
+        mainDataView.displayBottomInfo(
+                resources.getQuantityString(
+                        R.plurals.issuance_recipient,
+                        request.recipients.size,
+                        request.recipients.size
+                )
+        )
+
+        val icon = ContextCompat.getDrawable(this, R.drawable.ic_account)
         adapter.setData(
-                request.recipients.map {
-                    DetailsItem(it.email, icon = icon, singleLineText = true)
+                request.recipients.mapIndexed { i, it ->
+                    DetailsItem(
+                            text = it.email,
+                            icon = icon,
+                            singleLineText = true,
+                            header = if (i == 0) getString(R.string.issuance_recipients) else null
+                    )
                 }
         )
     }

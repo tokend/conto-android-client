@@ -139,16 +139,25 @@ class BalanceChangeMainDataView(
     fun displayNonZeroFee(fee: BigDecimal,
                           asset: Asset) {
         if (fee.signum() > 0) {
-            bottomInfoTextView.text = context.getString(
+            displayBottomInfo(context.getString(
                     R.string.template_fee,
                     amountFormatter.formatAssetAmount(
                             fee,
                             asset,
                             withAssetCode = asset.name == null
                     )
-            )
+            ))
         } else {
-            bottomInfoTextView.text = context.getString(R.string.no_fee_charged)
+            displayBottomInfo(context.getString(R.string.no_fee_charged))
         }
+    }
+
+    fun displayBottomInfo(text: String?) {
+        bottomInfoTextView.text = text
+        bottomInfoTextView.visibility =
+                if (text != null)
+                    View.VISIBLE
+                else
+                    View.GONE
     }
 }
