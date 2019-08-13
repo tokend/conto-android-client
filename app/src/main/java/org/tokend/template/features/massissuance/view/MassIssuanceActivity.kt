@@ -1,5 +1,7 @@
 package org.tokend.template.features.massissuance.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
@@ -18,6 +20,7 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.massissuance.logic.CreateMassIssuanceRequestUseCase
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.EmailValidator
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
@@ -190,10 +193,11 @@ class MassIssuanceActivity : BaseActivity() {
         updateIssuanceAvailability()
     }
 
-    private fun updateAmountHelperAndError() {
+    private fun updateAmountHelperAndError(factor: Int = 1) {
         val available = getAvailableIssuanceAmount(balance)
+        val amount = amountWrapper.scaledAmount * BigDecimal(factor)
 
-        if (amountWrapper.scaledAmount > available) {
+        if (amount > available) {
             amount_edit_text.error = getString(R.string.error_insufficient_balance)
         } else {
             amount_edit_text.error = null
@@ -214,8 +218,8 @@ class MassIssuanceActivity : BaseActivity() {
         return balance?.available ?: BigDecimal.ZERO
     }
 
-    private fun updateIssuanceAvailability() {
-        updateAmountHelperAndError()
+    private fun updateIssuanceAvailability(factor: Int = 1) {
+        updateAmountHelperAndError(factor)
 
         canIssue = amountWrapper.scaledAmount.signum() > 0
                 && !amount_edit_text.hasError()
@@ -232,7 +236,10 @@ class MassIssuanceActivity : BaseActivity() {
         if (emails.any { !EmailValidator.isValid(it) }) {
             emails_edit_text.error = getString(R.string.error_missed_comma_or_invalid_email)
             updateIssuanceAvailability()
+            return
         }
+
+        updateIssuanceAvailability(emails.size)
     }
 
     private fun tryToIssue() {
@@ -276,7 +283,7 @@ class MassIssuanceActivity : BaseActivity() {
     }
 
     private fun onMassIssuanceRequestCreated(request: MassIssuanceRequest) {
-        // Navigator.from(this).openMassIssuanceConfirmation
+        Navigator.from(this).openMassIssuanceConfirmation(ISSUANCE_CONFIRMATION_REQUEST, request)
     }
 
     private fun onRequestCreationError(error: Throwable) {
@@ -298,9 +305,18 @@ class MassIssuanceActivity : BaseActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == ISSUANCE_CONFIRMATION_REQUEST && resultCode == Activity.RESULT_OK) {
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     companion object {
         const val EXTRA_EMAILS = "extra_emails"
         const val EXTRA_ASSET = "extra_asset"
+        private val ISSUANCE_CONFIRMATION_REQUEST = "issuance_confirmation_request".hashCode() and 0xffff
 
         fun getBundle(emails: String?, assetCode: String?) = Bundle().apply {
             putString(EXTRA_EMAILS, emails)
