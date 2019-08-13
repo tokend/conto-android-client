@@ -11,8 +11,8 @@ import com.squareup.picasso.Picasso
 import org.tokend.template.R
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.features.assets.LogoFactory
+import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycState
-import org.tokend.template.features.kyc.model.form.SimpleKycForm
 import org.tokend.template.util.imagetransform.CircleTransform
 import java.security.MessageDigest
 
@@ -22,10 +22,9 @@ object ProfileUtil {
                      urlConfigProvider: UrlConfigProvider,
                      email: String?): String? {
         val submittedForm = (kycState as? KycState.Submitted<*>)?.formData
-        val avatar = (submittedForm as? SimpleKycForm)?.avatar
-        return avatar?.getUrl(urlConfigProvider.getConfig().storage) ?: email?.let {
-            getGravatarUrl(it)
-        }
+        val avatar = (submittedForm as? KycForm.Corporate)?.avatar
+        return avatar?.getUrl(urlConfigProvider.getConfig().storage)
+                ?: email?.let(this::getGravatarUrl)
     }
 
     private fun getGravatarUrl(email: String): String {

@@ -43,7 +43,7 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
-import org.tokend.template.features.kyc.model.form.KycFormType
+import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -252,7 +252,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun initAccountTypeSwitch(accountHeader: AccountHeader) {
         val view = accountHeader.view.findViewById<View>(R.id.account_type_switch_layout)
                 ?: return
-        if (kycStateRepository.itemFormType == KycFormType.CORPORATE) {
+        if (kycStateRepository.itemFormData is KycForm.Corporate) {
             view.visibility = View.VISIBLE
             view.account_type_switch_hint.text = getAccountTypeSwitchHint()
             view.account_type_switch_button.setOnClickListener {

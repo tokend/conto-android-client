@@ -28,7 +28,7 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
-import org.tokend.template.features.kyc.model.form.KycFormType
+import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
 import org.tokend.template.features.signin.logic.SignInMethod
@@ -236,7 +236,7 @@ class SignInActivity : BaseActivity() {
         } else {
             canSignIn = false
 
-            if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+            if (repositoryProvider.kycState().itemFormData is KycForm.Corporate) {
                 Navigator.from(this).toCorporateMainActivity()
             } else {
                 Navigator.from(this).toCompaniesActivity()
