@@ -49,4 +49,12 @@ class KeyValueEntriesRepository(
     fun getEntry(key: String): KeyValueEntryRecord? {
         return entriesMap[key]
     }
+
+    fun ensureEntries(keys: Collection<String>): Single<Map<String, KeyValueEntryRecord>> {
+        return if (entriesMap.keys.containsAll(keys))
+            Single.just(entriesMap)
+        else
+            updateDeferred()
+                    .toSingle { entriesMap }
+    }
 }

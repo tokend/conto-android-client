@@ -132,7 +132,7 @@ ext {
     // Allows voting in polls
     allow_polls = false
     // Show terms and conditions
-    allow_terms = false
+    allow_terms = true
     // Allows direct buy through atomic swaps
     allow_direct_buy = true
 

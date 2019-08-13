@@ -494,6 +494,11 @@
     <string name="phone_number_set_successfully">Номер збережено</string>
     <string name="error_phone_number_already_taken">Номер вже зайнято</string>
     <string name="sms_tfa_dialog_message">Введіть код з SMS</string>
+    <string name="complete_account_setup">Завершення реєстрації</string>
+    <string name="first_name">Ім\'я</string>
+    <string name="last_name">Прізвище</string>
+    <string name="account_setup_completed">Реєстрацію завершено</string>
+    <string name="complete_account_setup_explanation">Доповніть ваші дані щоб завершити реєстрацію</string>
     <string name="error_no_recipients_for_issuance">Не знайдено отримувачів для нарахування</string>
     <string name="issuance_recipients">Отримувачі</string>
 </resources>

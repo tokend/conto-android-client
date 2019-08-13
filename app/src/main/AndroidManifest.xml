@@ -241,6 +241,10 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
+            android:name=".features.kyc.view.ClientKycActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
             android:name=".features.massissuance.view.MassIssuanceConfirmationActivity"
             android:configChanges="orientation|screenSize" />
     </application>

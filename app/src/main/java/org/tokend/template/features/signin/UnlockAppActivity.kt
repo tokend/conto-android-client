@@ -15,7 +15,7 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
-import org.tokend.template.features.kyc.model.form.KycFormType
+import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.persistance.FingerprintAuthManager
@@ -241,10 +241,13 @@ class UnlockAppActivity : BaseActivity() {
     }
 
     private fun onUnlockComplete() {
-        if (repositoryProvider.kycState().itemFormType == KycFormType.CORPORATE) {
+        val kycForm = repositoryProvider.kycState().itemFormData
+        if (kycForm is KycForm.Corporate) {
             Navigator.from(this).toCorporateMainActivity()
-        } else {
+        } else if (kycForm is KycForm.General){
             Navigator.from(this).toCompaniesActivity()
+        } else {
+            Navigator.from(this).toClientKyc()
         }
     }
 

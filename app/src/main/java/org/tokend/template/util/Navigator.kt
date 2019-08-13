@@ -43,6 +43,7 @@ import org.tokend.template.features.invest.view.InvestmentConfirmationActivity
 import org.tokend.template.features.invest.view.SaleActivity
 import org.tokend.template.features.invest.view.SaleInvestActivity
 import org.tokend.template.features.invites.view.InviteNewUsersActivity
+import org.tokend.template.features.kyc.view.ClientKycActivity
 import org.tokend.template.features.limits.LimitsActivity
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.massissuance.view.MassIssuanceActivity
@@ -512,6 +513,12 @@ class Navigator private constructor() {
     fun openPhoneNumberSettings() {
         context?.intentFor<PhoneNumberSettingsActivity>()
                 ?.also { performIntent(it) }
+    }
+
+    fun toClientKyc() {
+        context?.intentFor<ClientKycActivity>()
+                ?.also { performIntent(it) }
+        activity?.finish()
     }
 
     fun openMassIssuanceConfirmation(requestCode: Int, request: MassIssuanceRequest) {

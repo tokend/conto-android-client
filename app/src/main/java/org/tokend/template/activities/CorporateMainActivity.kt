@@ -45,7 +45,7 @@ class CorporateMainActivity : MainActivity() {
         }
     }
 
-    override fun getHeaderInstance(email: String?): AccountHeader {
+    override fun getHeaderInstance(email: String): AccountHeader {
         return AccountHeaderBuilder()
                 .withActivity(this)
                 .withAccountHeader(R.layout.navigation_drawer_header)
@@ -65,13 +65,14 @@ class CorporateMainActivity : MainActivity() {
                 .also(this::initAccountTypeSwitch)
     }
 
-    override fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
+    override fun getProfileHeaderItem(email: String): ProfileDrawerItem {
         val kycState = kycStateRepository.item
         val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
+        val name = ProfileUtil.getDisplayedName(kycState, email)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)
-                .withName(email)
+                .withName(name)
                 .withEmail(getString(R.string.kyc_form_type_corporate))
                 .apply {
                     avatarUrl?.also { withIcon(it) }
