@@ -37,7 +37,7 @@ import org.tokend.template.view.util.LocalizedName
 import org.tokend.template.view.util.SignOutDialogFactory
 
 class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
-    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create<Toolbar>()
+    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
 
     override fun getScreenKey(): String? = null
 
@@ -104,6 +104,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         initKycItem()
         initPhoneNumberItem()
         initSignOutItem()
+        hideCategoryIfEmpty("account")
     }
 
     private fun initKycItem() {
@@ -142,6 +143,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
             initFingerprintItem()
             initTfaItem()
             initChangePasswordItem()
+            hideCategoryIfEmpty("security")
         }
     }
 
@@ -246,6 +248,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         initFeesItem()
         initTermsItem()
         initOpenSourceLicensesItem()
+        hideCategoryIfEmpty("info")
     }
 
     private fun initLimitsItem() {
@@ -297,6 +300,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     // region App
     private fun initAppCategory() {
         initLanguageItem()
+        hideCategoryIfEmpty("app")
     }
 
     private fun initLanguageItem() {
@@ -328,7 +332,6 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
         if (availableLocales.size == 1) {
             languagePreference.isVisible = false
-            findPreference("app").isVisible = false
         }
     }
     // endregion
