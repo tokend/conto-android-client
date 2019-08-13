@@ -497,4 +497,5 @@
     <string name="first_name">Ім\'я</string>
     <string name="last_name">Прізвище</string>
     <string name="account_setup_completed">Реєстрацію завершено</string>
+    <string name="complete_account_setup_explanation">Доповніть ваші дані щоб завершити реєстрацію</string>
 </resources>
