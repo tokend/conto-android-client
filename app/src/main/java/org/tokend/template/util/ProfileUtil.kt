@@ -86,4 +86,17 @@ object ProfileUtil {
 
         return hexString.toString()
     }
+
+    /**
+     * @return person full name or company from KYC if it's available or [email] otherwise
+     */
+    fun getDisplayedName(kycState: KycState?, email: String): String {
+        val form = (kycState as? KycState.Submitted<*>)?.formData
+
+        return when (form) {
+            is KycForm.General -> form.firstName + " " + form.lastName
+            is KycForm.Corporate -> form.company
+            else -> email
+        }
+    }
 }

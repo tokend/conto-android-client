@@ -126,8 +126,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     @SuppressLint("UseSparseArrays")
     private fun initNavigation() {
         val email = walletInfoProvider.getWalletInfo()?.email
+                ?: throw IllegalStateException("No email found")
 
-        val placeholderValue = (email ?: getString(R.string.app_name)).toUpperCase()
+        val placeholderValue = email.toUpperCase()
         val placeholderSize =
                 resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon_width)
         val placeholderDrawable =
@@ -206,7 +207,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withSelectable(false)
     )
 
-    protected open fun getHeaderInstance(email: String?): AccountHeader {
+    protected open fun getHeaderInstance(email: String): AccountHeader {
         var header: AccountHeader? = null
 
         return AccountHeaderBuilder()
@@ -275,16 +276,15 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                 .show()
     }
 
-    protected open fun getProfileHeaderItem(email: String?): ProfileDrawerItem {
+    protected open fun getProfileHeaderItem(email: String): ProfileDrawerItem {
         val kycState = kycStateRepository.item
         val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
+        val name = ProfileUtil.getDisplayedName(kycState, email)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)
-                .withName(email)
-                .withEmail(
-                        session.getCompany()?.name ?: ""
-                )
+                .withName(name)
+                .withEmail(session.getCompany()?.name ?: "")
                 .apply {
                     avatarUrl?.also { withIcon(it) }
                 }
@@ -442,6 +442,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected open fun updateProfileHeader() {
         val email = walletInfoProvider.getWalletInfo()?.email
+                ?: throw IllegalStateException("No email found")
 
         val mainProfile = getProfileHeaderItem(email)
         val companyProfiles = getCompaniesProfileItems()
