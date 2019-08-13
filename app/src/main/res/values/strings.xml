@@ -342,6 +342,7 @@
     <string name="balance_change_cause_offer_cancellation">Order cancellation</string>
     <string name="balance_change_cause_aswap_ask_creation">Direct buy offer creation</string>
     <string name="balance_change_cause_aswap_bid_creation">Direct buy</string>
+    <string name="balance_change_cause_mass_issuance">Mass issuance</string>
 
     <string name="asset_pair_title">Asset pair</string>
     <string name="asset_pair_code">Code</string>

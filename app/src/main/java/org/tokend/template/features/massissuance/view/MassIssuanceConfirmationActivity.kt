@@ -1,7 +1,6 @@
 package org.tokend.template.features.massissuance.view
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -65,7 +64,7 @@ class MassIssuanceConfirmationActivity : BaseActivity() {
             top_info_text_view.layoutParams = it
         }
 
-        mainDataView.displayOperationName("Mass issuance")
+        mainDataView.displayOperationName(getString(R.string.balance_change_cause_mass_issuance))
 
         displayAmount()
         displayRecipients()
