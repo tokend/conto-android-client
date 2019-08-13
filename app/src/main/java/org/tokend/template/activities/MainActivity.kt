@@ -200,9 +200,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withSelectable(false),
 
             PrimaryDrawerItem()
-                    .withName(R.string.contribute)
+                    .withName(R.string.github)
                     .withIdentifier(CONTRIBUTE_ITEM_ID)
-                    .withIcon(R.drawable.ic_contribution)
+                    .withIcon(R.drawable.ic_github_circle)
                     .withSelectable(false)
     )
 

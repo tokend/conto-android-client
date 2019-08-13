@@ -464,7 +464,7 @@
     <string name="add_company_scanner_prompt">Scan company QR code</string>
     <string name="error_redemption_request_no_more_valid">The request is already processed and no more valid</string>
     <string name="template_asset_movements">%1$s movements</string>
-    <string name="contribute">Contribute</string>
+    <string name="github" translatable="false">GitHub</string>
     <string name="explore_companies_title">Explore companies</string>
     <string name="scan_title">Scan</string>
     <string name="template_add_company_confirmation">Are you sure you want to add %1$s?</string>

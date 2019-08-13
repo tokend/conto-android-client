@@ -482,7 +482,6 @@
     <string name="add_company_scanner_prompt">Відскануйте QR код компанії</string>
     <string name="error_redemption_request_no_more_valid">Погашення вже виконано, запит недійсний</string>
     <string name="template_asset_movements">Операції з %1$s</string>
-    <string name="contribute">Долучитися</string>
     <string name="explore_companies_title">Пошук компаній</string>
     <string name="scan_title">Сканувати</string>
     <string name="template_add_company_confirmation">Ви впевнені що хочете додати %1$s?</string>
