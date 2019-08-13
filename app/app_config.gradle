@@ -29,6 +29,8 @@ ext {
     //Allow to log request and response information.
     logs_enabled = true
 
+    default_env_id = 'staging'
+
     // --------------------------
 
     // ----- Appearance -----
@@ -179,6 +181,7 @@ ext.applyAppConfig = { buildConfig ->
     b.buildConfigField 'Boolean', 'ENABLE_BALANCES_CONVERSION', "${enable_balances_conversion}"
     b.buildConfigField 'String', 'BALANCES_CONVERSION_ASSET', "\"${balances_conversion_asset}\""
     b.buildConfigField 'Boolean', 'IS_TERMS_ALLOWED', "${allow_terms}"
+    b.buildConfigField 'String', 'DEFAULT_ENV_ID', "\"${default_env_id}\""
 
     b.resValue "string", "app_host", "${app_host}"
     b.resValue "color", "primary", "${color_primary}"

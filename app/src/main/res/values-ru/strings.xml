@@ -501,4 +501,8 @@
     <string name="complete_account_setup_explanation">Дополните ваши данные чтобы завершить регистрацию</string>
     <string name="error_no_recipients_for_issuance">Не найдено получателей для начисления</string>
     <string name="issuance_recipients">Получатели</string>
+    <string name="sign_out_by_env_change_explanation">Выход из-за смены окружения</string>
+    <string name="environment">Окружение</string>
+    <string name="select_environment">Выберите окружение</string>
+    <string name="environment_selection_sign_out_warning">Будет выполнен выход из аккаунта</string>
 </resources>

@@ -26,16 +26,12 @@ import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.subjects.BehaviorSubject
 import org.jetbrains.anko.defaultSharedPreferences
-import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.*
-import org.tokend.template.di.providers.AccountProviderFactory
-import org.tokend.template.di.providers.AppModule
-import org.tokend.template.di.providers.SessionModule
-import org.tokend.template.di.providers.WalletInfoProviderFactory
+import org.tokend.template.di.providers.*
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.persistance.SessionInfoStorage
-import org.tokend.template.logic.persistance.UrlConfigPersistor
 import org.tokend.template.util.Navigator
+import org.tokend.template.util.environments.AppEnvironmentsManager
 import org.tokend.template.util.locale.AppLocaleManager
 import java.io.IOException
 import java.net.SocketException
@@ -205,18 +201,17 @@ class App : MultiDexApplication() {
         cookiePersistor = SharedPrefsCookiePersistor(this)
         cookieCache = SetCookieCache()
 
-        val defaultUrlConfig = UrlConfig(BuildConfig.API_URL, BuildConfig.STORAGE_URL,
-                BuildConfig.CLIENT_URL)
+        val urlConfigProvider = UrlConfigProviderFactory().createUrlConfigProvider()
+        val appEnvironmentsManager = AppEnvironmentsManager(
+                defaultEnvId = BuildConfig.DEFAULT_ENV_ID,
+                urlConfigProvider = urlConfigProvider,
+                preferences = getAppPreferences()
+        )
+        appEnvironmentsManager.initEnvironment()
 
         stateComponent = DaggerAppStateComponent.builder()
                 .appModule(AppModule(this))
-                .urlConfigProviderModule(UrlConfigProviderModule(
-                        if (BuildConfig.IS_NETWORK_SPECIFIED_BY_USER)
-                            UrlConfigPersistor(getNetworkPreferences()).loadConfig()
-                                    ?: defaultUrlConfig
-                        else
-                            defaultUrlConfig
-                ))
+                .urlConfigProviderModule(UrlConfigProviderModule(urlConfigProvider))
                 .apiProviderModule(ApiProviderModule(
                         PersistentCookieJar(cookieCache, cookiePersistor)
                 ))
@@ -227,6 +222,7 @@ class App : MultiDexApplication() {
                 ))
                 .sessionModule(SessionModule(session))
                 .localeManagerModule(LocaleManagerModule(localeManager))
+                .environmentManagerModule(EnvironmentManagerModule(appEnvironmentsManager))
                 .build()
     }
 

@@ -13,6 +13,7 @@ import org.tokend.sdk.tfa.TfaCallback
 import org.tokend.sdk.tfa.TfaVerifier
 import org.tokend.template.App
 import org.tokend.template.BuildConfig
+import org.tokend.template.R
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
@@ -23,6 +24,7 @@ import org.tokend.template.logic.Session
 import org.tokend.template.logic.persistance.CredentialsPersistor
 import org.tokend.template.logic.persistance.UrlConfigPersistor
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.environments.AppEnvironmentsManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.util.locale.AppLocaleManager
 import org.tokend.template.view.ToastManager
@@ -64,6 +66,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     lateinit var kycStatePersistor: SubmittedKycStatePersistor
     @Inject
     lateinit var localeManager: AppLocaleManager
+    @Inject
+    lateinit var environmentManager: AppEnvironmentsManager
 
     /**
      * If set to true the activity will be operational
@@ -106,6 +110,7 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
         }
 
         subscribeToLocaleChanges()
+        subscribeToEnvChanges()
     }
 
     /**
@@ -161,6 +166,17 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
         super.attachBaseContext(App.localeManager.getLocalizeContext(newBase))
     }
     // endregion
+
+    private fun subscribeToEnvChanges() {
+        environmentManager
+                .environmentChanges
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    toastManager.long(R.string.sign_out_by_env_change_explanation)
+                    (application as? App)?.signOut(this)
+                }
+                .addTo(compositeDisposable)
+    }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == android.R.id.home) {

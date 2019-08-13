@@ -12,6 +12,12 @@
             android:layout="@layout/preference_layout"
             android:title="@string/language" />
 
+        <android.support.v7.preference.Preference
+            android:icon="@drawable/ic_cloud"
+            android:key="env"
+            android:layout="@layout/preference_layout"
+            android:title="@string/environment" />
+
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory

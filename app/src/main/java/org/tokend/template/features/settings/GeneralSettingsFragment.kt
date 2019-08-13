@@ -300,6 +300,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     // region App
     private fun initAppCategory() {
         initLanguageItem()
+        initEnvironmentItem()
         hideCategoryIfEmpty("app")
     }
 
@@ -332,6 +333,38 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
         if (availableLocales.size == 1) {
             languagePreference.isVisible = false
+        }
+    }
+
+    private fun initEnvironmentItem() {
+        val environmentPreference = findPreference("env")
+                ?: return
+
+        val currentEnvironment = environmentManager.getEnvironment()
+        val availableEnvironments = environmentManager.availableEnvironments
+
+        environmentPreference.summary = currentEnvironment.name
+
+        val dialog = SingleCheckDialog(
+                requireContext(),
+                availableEnvironments.map { it.name }
+        )
+        dialog.setTitle(R.string.select_environment)
+        dialog.setMessage(R.string.environment_selection_sign_out_warning)
+        dialog.setDefaultCheckIndex(availableEnvironments.indexOf(currentEnvironment))
+        dialog.setPositiveButtonListener { _, index ->
+            availableEnvironments
+                    .getOrNull(index)
+                    ?.also(environmentManager::setEnvironment)
+        }
+
+        environmentPreference.setOnPreferenceClickListener {
+            dialog.show()
+            true
+        }
+
+        if (availableEnvironments.size == 1) {
+            environmentPreference.isVisible = false
         }
     }
     // endregion

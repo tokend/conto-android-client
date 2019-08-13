@@ -501,4 +501,8 @@
     <string name="complete_account_setup_explanation">Доповніть ваші дані щоб завершити реєстрацію</string>
     <string name="error_no_recipients_for_issuance">Не знайдено отримувачів для нарахування</string>
     <string name="issuance_recipients">Отримувачі</string>
+    <string name="sign_out_by_env_change_explanation">Вихід через зміну оточення</string>
+    <string name="environment">Оточення</string>
+    <string name="select_environment">Оберіть оточення</string>
+    <string name="environment_selection_sign_out_warning">Буде виконано вихід з акаунта</string>
 </resources>
