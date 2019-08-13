@@ -339,6 +339,7 @@
     <string name="balance_change_cause_offer_cancellation">Отмена ордера</string>
     <string name="balance_change_cause_aswap_ask_creation">Создание прямой продажи</string>
     <string name="balance_change_cause_aswap_bid_creation">Прямая покупка</string>
+    <string name="balance_change_cause_mass_issuance">Массовое начисление</string>
 
     <string name="asset_pair_title">Торговая пара</string>
     <string name="asset_pair_code">Код</string>
@@ -498,4 +499,6 @@
     <string name="last_name">Фамилия</string>
     <string name="account_setup_completed">Регистрация завершена</string>
     <string name="complete_account_setup_explanation">Дополните ваши данные чтобы завершить регистрацию</string>
+    <string name="error_no_recipients_for_issuance">Не найдено получателей для начисления</string>
+    <string name="issuance_recipients">Получатели</string>
 </resources>
