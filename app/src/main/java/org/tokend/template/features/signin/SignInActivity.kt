@@ -236,10 +236,13 @@ class SignInActivity : BaseActivity() {
         } else {
             canSignIn = false
 
-            if (repositoryProvider.kycState().itemFormData is KycForm.Corporate) {
+            val kycForm = repositoryProvider.kycState().itemFormData
+            if (kycForm is KycForm.Corporate) {
                 Navigator.from(this).toCorporateMainActivity()
-            } else {
+            } else if (kycForm is KycForm.General){
                 Navigator.from(this).toCompaniesActivity()
+            } else {
+                Navigator.from(this).toClientKyc()
             }
         }
     }
