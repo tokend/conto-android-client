@@ -131,7 +131,6 @@ class ClientKycActivity : BaseActivity() {
     }
 
     private fun onFormSubmitted() {
-        toastManager.short(R.string.account_setup_completed)
-        Navigator.from(this).toCompaniesActivity()
+        Navigator.from(this).toWaitingForKycApproval()
     }
 }

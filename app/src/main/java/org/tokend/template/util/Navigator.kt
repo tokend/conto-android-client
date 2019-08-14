@@ -43,7 +43,10 @@ import org.tokend.template.features.invest.view.InvestmentConfirmationActivity
 import org.tokend.template.features.invest.view.SaleActivity
 import org.tokend.template.features.invest.view.SaleInvestActivity
 import org.tokend.template.features.invites.view.InviteNewUsersActivity
+import org.tokend.template.features.kyc.model.KycForm
+import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.view.ClientKycActivity
+import org.tokend.template.features.kyc.view.WaitForKycApprovalActivity
 import org.tokend.template.features.limits.LimitsActivity
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.massissuance.view.MassIssuanceActivity
@@ -521,9 +524,31 @@ class Navigator private constructor() {
         activity?.finish()
     }
 
+    fun toWaitingForKycApproval() {
+        context?.intentFor<WaitForKycApprovalActivity>()
+                ?.also { performIntent(it) }
+        activity?.also(this::fadeOut)
+    }
+
     fun openMassIssuanceConfirmation(requestCode: Int, request: MassIssuanceRequest) {
         context?.intentFor<MassIssuanceConfirmationActivity>()
                 ?.putExtras(MassIssuanceConfirmationActivity.getBundle(request))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun performPostSignInRouting(kycState: KycState?) {
+        val kycForm = (kycState as? KycState.Submitted<*>)?.formData
+
+        if (kycForm is KycForm.Corporate) {
+            toCorporateMainActivity()
+        } else if (kycForm is KycForm.General) {
+            if (kycState is KycState.Submitted.Pending<*>) {
+                toWaitingForKycApproval()
+            } else {
+                toCompaniesActivity()
+            }
+        } else {
+            toClientKyc()
+        }
     }
 }

@@ -16,6 +16,7 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.kyc.model.KycForm
+import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.persistance.FingerprintAuthManager
@@ -241,14 +242,8 @@ class UnlockAppActivity : BaseActivity() {
     }
 
     private fun onUnlockComplete() {
-        val kycForm = repositoryProvider.kycState().itemFormData
-        if (kycForm is KycForm.Corporate) {
-            Navigator.from(this).toCorporateMainActivity()
-        } else if (kycForm is KycForm.General){
-            Navigator.from(this).toCompaniesActivity()
-        } else {
-            Navigator.from(this).toClientKyc()
-        }
+        Navigator.from(this)
+                .performPostSignInRouting(repositoryProvider.kycState().item)
     }
 
     override fun onResume() {

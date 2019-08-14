@@ -505,4 +505,5 @@
     <string name="environment">Оточення</string>
     <string name="select_environment">Оберіть оточення</string>
     <string name="environment_selection_sign_out_warning">Буде виконано вихід з акаунта</string>
+    <string name="waiting_for_kyc_approval_message">Акаунт ось-ось активується…</string>
 </resources>

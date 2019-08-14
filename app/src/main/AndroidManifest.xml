@@ -247,6 +247,9 @@
         <activity
             android:name=".features.massissuance.view.MassIssuanceConfirmationActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".features.kyc.view.WaitForKycApprovalActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>

@@ -493,6 +493,7 @@
     <string name="environment">Environment</string>
     <string name="select_environment">Select environment</string>
     <string name="environment_selection_sign_out_warning">Requires sign out</string>
+    <string name="waiting_for_kyc_approval_message">Your account will be enabled in a moment…</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
