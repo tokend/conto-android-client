@@ -22,7 +22,7 @@ class CompanyClientItemViewHolder(
         view: View,
         private val amountFormatter: AmountFormatter
 ) : BaseViewHolder<CompanyClientListItem>(view) {
-    private val emailTextView: TextView = view.email_text_view
+    private val nameTextView: TextView = view.name_text_view
     private val logoImageView: ImageView = view.logo_image_view
     private val statusImageView: ImageView = view.status_image_view
     private val balancesLayout: ViewGroup = view.balances_layout
@@ -54,7 +54,7 @@ class CompanyClientItemViewHolder(
             ContextCompat.getDrawable(view.context, R.drawable.company_client_blocked)
 
     override fun bind(item: CompanyClientListItem) {
-        emailTextView.text = item.email
+        nameTextView.text = item.name ?: item.email
         clientIcon = LogoUtil.generateLogo(item.email.toUpperCase(), view.context, logoSize)
         initState(item.isChecked)
         balancesLayout.removeAllViews()

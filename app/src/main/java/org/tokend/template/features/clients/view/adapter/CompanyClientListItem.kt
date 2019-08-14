@@ -7,6 +7,7 @@ class CompanyClientListItem(
         val email: String,
         val status: CompanyClientRecord.Status,
         val balances: List<CompanyClientRecord.Balance>,
+        val name: String?,
         var isChecked: Boolean = false,
         val source: CompanyClientRecord?
 ) {
@@ -15,6 +16,7 @@ class CompanyClientListItem(
             email = source.email,
             status = source.status,
             balances = source.balances,
+            name = source.fullName,
             source = source
     )
 }

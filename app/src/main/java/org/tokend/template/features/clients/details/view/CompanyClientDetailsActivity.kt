@@ -68,9 +68,26 @@ class CompanyClientDetailsActivity : BaseActivity() {
     // endregion
 
     private fun displayDetails() {
+        val hasName = client.fullName != null
+
+        if (hasName) {
+            adapter.addData(
+                    DetailsItem(
+                            header = getString(R.string.company_client_main_info),
+                            hint = getString(R.string.person_name),
+                            text = client.fullName,
+                            icon = ContextCompat.getDrawable(this, R.drawable.ic_account)
+                    )
+            )
+        }
+
         adapter.addData(
                 DetailsItem(
-                        header = getString(R.string.company_client_main_info),
+                        header =
+                        if (!hasName)
+                            getString(R.string.company_client_main_info)
+                        else
+                            null,
                         hint = getString(R.string.email),
                         text = client.email,
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_email),
