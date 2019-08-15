@@ -16,7 +16,7 @@ class AppEnvironmentsManager(
 
     private val environments = listOf(
             AppEnvironment(
-                    name = "Staging (staging.conto.me)",
+                    name = "Staging",
                     id = "staging",
                     config = UrlConfig(
                             api = "https://api.staging.conto.me",
@@ -25,7 +25,7 @@ class AppEnvironmentsManager(
                     )
             ),
             AppEnvironment(
-                    name = "Production (conto.me)",
+                    name = "Production",
                     id = "production",
                     config = UrlConfig(
                             api = "https://api.conto.me",
@@ -34,7 +34,7 @@ class AppEnvironmentsManager(
                     )
             ),
             AppEnvironment(
-                    name = "Demo (demo.conto.me)",
+                    name = "Demo",
                     id = "demo",
                     config = UrlConfig(
                             api = "https://api.demo.conto.me",

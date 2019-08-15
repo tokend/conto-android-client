@@ -38,7 +38,10 @@ class BalanceChangesRepository(
         }
     }
 
-    override fun getPage(nextCursor: String?): Single<DataPage<BalanceChange>> {
+    override fun getPage(nextCursor: String?) = getPage(nextCursor, LIMIT)
+
+    fun getPage(nextCursor: String?,
+                limit: Int): Single<DataPage<BalanceChange>> {
         val signedApi = apiProvider.getSignedApi()
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
 
@@ -55,7 +58,7 @@ class BalanceChangesRepository(
                                 .withPagingParams(
                                         PagingParamsV2(
                                                 order = PagingOrder.DESC,
-                                                limit = LIMIT,
+                                                limit = limit,
                                                 page = nextCursor
                                         )
                                 )

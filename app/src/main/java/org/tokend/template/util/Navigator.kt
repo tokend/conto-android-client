@@ -63,6 +63,7 @@ import org.tokend.template.features.recovery.RecoveryActivity
 import org.tokend.template.features.redeem.accept.view.ConfirmRedemptionActivity
 import org.tokend.template.features.redeem.accept.view.ScanRedemptionActivity
 import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
+import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -557,6 +558,23 @@ class Navigator private constructor() {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         SettingsFragment.ID
+                ))
+                ?.also { performIntent(it) }
+    }
+
+    fun openRedemptionQrShare(serializedRequest: String,
+                              shareText: String,
+                              referenceToPoll: String,
+                              relatedBalanceId: String?) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        ShareRedemptionQrFragment.ID,
+                        ShareRedemptionQrFragment.getBundle(
+                                serializedRequest,
+                                shareText,
+                                referenceToPoll,
+                                relatedBalanceId
+                        )
                 ))
                 ?.also { performIntent(it) }
     }

@@ -8,4 +8,5 @@ interface WalletEventsListener {
     fun onPaymentRequestConfirmed(paymentRequest: PaymentRequest)
     fun onWithdrawalRequestConfirmed(withdrawalRequest: WithdrawalRequest)
     fun onAtomicSwapBuyConfirmed()
+    fun onRedemptionRequestAccepted()
 }

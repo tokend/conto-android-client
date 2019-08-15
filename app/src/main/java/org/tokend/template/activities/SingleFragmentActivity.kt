@@ -9,6 +9,7 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.qr.ShareQrFragment
+import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.GeneralSettingsFragment
@@ -50,6 +51,7 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
             ShareQrFragment.ID -> bundle?.let(ShareQrFragment.Companion::newInstance)
             AtomicSwapAsksFragment.ID -> bundle?.let(AtomicSwapAsksFragment.Companion::newInstance)
             SettingsFragment.ID -> GeneralSettingsFragment()
+            ShareRedemptionQrFragment.ID -> bundle?.let(ShareRedemptionQrFragment.Companion::newInstance)
             else -> null
         }
     }
@@ -86,6 +88,11 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
     }
 
     override fun onAtomicSwapBuyConfirmed() {
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
+    override fun onRedemptionRequestAccepted() {
         setResult(Activity.RESULT_OK)
         finish()
     }
