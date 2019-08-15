@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatRadioButton;
@@ -39,11 +41,14 @@ public class SingleCheckDialog {
     private String neutralButtonTitle;
     private List<Integer> itemsColors;
 
-    public SingleCheckDialog(Context context, List<? extends CharSequence> items) {
+    public SingleCheckDialog(Context context, List<? extends CharSequence> items,
+                             @StyleRes @Nullable Integer style) {
         this.context = context;
         this.items = items;
 
-        dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder = (style != null)
+                ? new AlertDialog.Builder(context, style)
+                : new AlertDialog.Builder(context);
         dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -52,8 +57,10 @@ public class SingleCheckDialog {
         });
     }
 
-    public SingleCheckDialog(Context context, List<? extends CharSequence> items, List<Integer> itemsColors) {
-        this(context, items);
+    public SingleCheckDialog(Context context, List<? extends CharSequence> items,
+                             @StyleRes @Nullable Integer style,
+                             List<Integer> itemsColors) {
+        this(context, items, style);
         this.itemsColors = itemsColors;
     }
 

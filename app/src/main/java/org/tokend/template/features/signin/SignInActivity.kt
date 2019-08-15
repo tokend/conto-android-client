@@ -28,6 +28,7 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
 import org.tokend.template.features.signin.logic.SignInMethod
@@ -38,6 +39,7 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
+import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
@@ -84,6 +86,7 @@ class SignInActivity : BaseActivity() {
         }
 
         initVersion()
+        initEnvironmentSwitch()
         initFields()
         initButtons()
 
@@ -108,6 +111,19 @@ class SignInActivity : BaseActivity() {
     // region Init
     private fun initVersion() {
         app_version_text_view.text = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    }
+
+    private fun initEnvironmentSwitch() {
+        app_env_text_view.text = environmentManager.getEnvironment().name
+
+        val dialog = EnvironmentSelectionDialog(
+                this, environmentManager,
+                withSignOutWarning = false
+        )
+
+        app_env_text_view.setOnClickListener {
+            dialog.show()
+        }
     }
 
     private fun initFields() {
@@ -334,6 +350,10 @@ class SignInActivity : BaseActivity() {
                 SIGN_IN_WITH_AUTHENTICATOR_REQUEST -> finish()
             }
         }
+    }
+
+    override fun onEnvironmentChange(newEnv: AppEnvironment) {
+        initEnvironmentSwitch()
     }
 
     companion object {

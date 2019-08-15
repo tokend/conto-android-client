@@ -107,8 +107,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_margin"
                 android:gravity="center"
-                android:paddingBottom="@dimen/standard_padding"
                 tools:text="0.1(1)" />
+
+            <TextView
+                android:id="@+id/app_env_text_view"
+                style="@style/HintText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/quarter_standard_margin"
+                android:gravity="center"
+                android:paddingBottom="@dimen/standard_padding"
+                tools:text="Staging" />
 
         </LinearLayout>
 
