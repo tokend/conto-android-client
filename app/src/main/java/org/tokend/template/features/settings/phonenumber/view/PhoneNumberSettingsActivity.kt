@@ -1,8 +1,14 @@
 package org.tokend.template.features.settings.phonenumber.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.credentials.Credential
+import com.google.android.gms.auth.api.credentials.HintRequest
+import com.google.android.gms.common.api.GoogleApiClient
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_phone_number_settings.*
@@ -22,6 +28,7 @@ import org.tokend.template.util.validator.GlobalPhoneNumberValidator
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
+
 
 class PhoneNumberSettingsActivity : BaseActivity() {
     private val currentNumberLoadingIndicator = LoadingIndicatorManager(
@@ -106,14 +113,17 @@ class PhoneNumberSettingsActivity : BaseActivity() {
                     phone_number_edit_text.isEnabled = true
                 }
                 .subscribeBy(
-                        onComplete = {
-                            phone_number_edit_text.requestFocus()
-                            SoftInputUtil.showSoftInputOnView(phone_number_edit_text)
-                        },
+                        onComplete = this::onNoCurrentNumber,
                         onSuccess = this::onCurrentNumberLoaded,
                         onError = this::onCurrentNumberLoadingError
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onNoCurrentNumber() {
+        phone_number_edit_text.requestFocus()
+        SoftInputUtil.showSoftInputOnView(phone_number_edit_text)
+        showPhoneAccountPicker()
     }
 
     private fun onCurrentNumberLoaded(number: String) {
@@ -126,6 +136,22 @@ class PhoneNumberSettingsActivity : BaseActivity() {
         if (error !is AccountDetailsRepository.NoIdentityAvailableException) {
             errorHandlerFactory.getDefault().handle(error)
         }
+    }
+
+    private fun showPhoneAccountPicker() {
+        val hintRequest = HintRequest.Builder()
+                .setPhoneNumberIdentifierSupported(true)
+                .build()
+
+        val apiClient = GoogleApiClient.Builder(this)
+                .addApi(Auth.CREDENTIALS_API)
+                .build()
+
+        val intent = Auth.CredentialsApi.getHintPickerIntent(
+                apiClient, hintRequest)
+
+        startIntentSenderForResult(intent.intentSender, PHONE_ACCOUNT_REQUEST,
+                null, 0, 0, 0)
     }
 
     private fun updateActionAvailability() {
@@ -194,5 +220,21 @@ class PhoneNumberSettingsActivity : BaseActivity() {
         } else {
             errorHandlerFactory.getDefault().handle(error)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PHONE_ACCOUNT_REQUEST && resultCode == Activity.RESULT_OK) {
+            data?.getParcelableExtra<Credential>(Credential.EXTRA_KEY)
+                    ?.also(this::onPhoneAccountPicked)
+        }
+    }
+
+    private fun onPhoneAccountPicked(credential: Credential) {
+        onCurrentNumberLoaded(credential.id)
+    }
+
+    companion object {
+        private val PHONE_ACCOUNT_REQUEST = "phone_account".hashCode() and 0xffff
     }
 }
