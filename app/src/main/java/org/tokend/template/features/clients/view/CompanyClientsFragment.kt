@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.view.ActionMode
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -17,7 +16,7 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.activities.CorporateMainActivity
+import org.tokend.template.activities.MainActivity
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.clients.view.adapter.CompanyClientItemsAdapter
@@ -49,8 +48,6 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     private lateinit var adapter: CompanyClientItemsAdapter
     private lateinit var layoutManager: GridLayoutManager
 
-    private var actionMode: ActionMode? = null
-
     private var selectMode = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -72,6 +69,16 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     private fun initToolbar() {
         toolbar.title = getString(R.string.clients_title)
         toolbarSubject.onNext(toolbar)
+        toolbar.inflateMenu(R.menu.clients_action_mode)
+
+        toolbar.setOnMenuItemClickListener {
+            val emails = adapter.getSelected().joinToString(",\n") { it.email }
+            Navigator.from(this@CompanyClientsFragment).openMassIssuance(
+                    emails = emails,
+                    requestCode = MASS_ISSUANCE_REQUEST
+            )
+            true
+        }
     }
 
     private fun initSwipeRefresh() {
@@ -108,11 +115,12 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
 
         adapter.onSelect { count ->
             if (count == 0) {
-                actionMode?.finish()
+                selectMode = false
+                updateToolbarState()
                 return@onSelect
             }
-            activateActionModeIfNeeded()
-            actionMode?.title = requireContext().getString(R.string.template_selected, count)
+            activateSelectModeIfNeeded()
+            toolbar.title = requireContext().getString(R.string.template_selected, count)
         }
 
         error_empty_view.observeAdapter(adapter, R.string.no_clients)
@@ -170,33 +178,28 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     }
     // endregion
 
-    private fun activateActionModeIfNeeded() {
+    private fun updateToolbarState() {
+        val menuItem = toolbar.menu.findItem(R.id.issuance)
+        if (selectMode) {
+            toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_close)
+            menuItem.isVisible = true
+            toolbar.setNavigationOnClickListener {
+                adapter.clearSelection()
+            }
+        } else {
+            toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_menu)
+            toolbar.title = getString(R.string.clients_title)
+            menuItem.isVisible = false
+            toolbar.setNavigationOnClickListener {
+                (activity as? MainActivity)?.navigationDrawer?.openDrawer()
+            }
+        }
+    }
+
+    private fun activateSelectModeIfNeeded() {
         if (!selectMode) {
             selectMode = true
-            actionMode = (activity as? CorporateMainActivity)?.startSupportActionMode(object : ActionMode.Callback {
-                override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
-                    val emails = adapter.getSelected().joinToString(",\n") { it.email }
-                    Navigator.from(this@CompanyClientsFragment).openMassIssuance(
-                            emails = emails,
-                            requestCode = MASS_ISSUANCE_REQUEST
-                    )
-                    return true
-                }
-
-                override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-                    p0?.menuInflater?.inflate(R.menu.clients_action_mode, p1)
-                    return true
-                }
-
-                override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-                    return false
-                }
-
-                override fun onDestroyActionMode(p0: ActionMode?) {
-                    adapter.clearSelection()
-                    selectMode = false
-                }
-            })
+            updateToolbarState()
         }
     }
 

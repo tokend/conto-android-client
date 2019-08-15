@@ -75,7 +75,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected open val defaultFragmentId = DashboardFragment.ID
 
-    private var navigationDrawer: Drawer? = null
+    var navigationDrawer: Drawer? = null
     private var landscapeNavigationDrawer: Drawer? = null
     private var onBackPressedListener: OnBackPressedListener? = null
     protected val factory = FragmentFactory()
