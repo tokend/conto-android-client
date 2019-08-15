@@ -203,6 +203,7 @@ class App : MultiDexApplication() {
 
         val urlConfigProvider = UrlConfigProviderFactory().createUrlConfigProvider()
         val appEnvironmentsManager = AppEnvironmentsManager(
+                availableEnvIds = BuildConfig.AVAILABLE_ENV_IDS,
                 defaultEnvId = BuildConfig.DEFAULT_ENV_ID,
                 urlConfigProvider = urlConfigProvider,
                 preferences = getAppPreferences()

@@ -7,13 +7,14 @@ import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.providers.UrlConfigProvider
 
 class AppEnvironmentsManager(
+        availableEnvIds: Array<String>,
         private val defaultEnvId: String,
         private val urlConfigProvider: UrlConfigProvider,
         private val preferences: SharedPreferences
 ) {
     private val environmentChangesSubject = PublishSubject.create<AppEnvironment>()
 
-    val availableEnvironments = listOf(
+    private val environments = listOf(
             AppEnvironment(
                     name = "Staging (staging.conto.me)",
                     id = "staging",
@@ -31,8 +32,19 @@ class AppEnvironmentsManager(
                             storage = "https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver",
                             client = "https://conto.me"
                     )
+            ),
+            AppEnvironment(
+                    name = "Demo (demo.conto.me)",
+                    id = "demo",
+                    config = UrlConfig(
+                            api = "https://api.demo.conto.me",
+                            storage = "https://s3.eu-north-1.amazonaws.com/contodemo-identity-storage-stoic-haslett",
+                            client = "https://demo.conto.me"
+                    )
             )
-    )
+    ).associateBy(AppEnvironment::id)
+
+    val availableEnvironments = availableEnvIds.mapNotNull(environments::get)
 
     val environmentChanges: Observable<AppEnvironment> = environmentChangesSubject
 

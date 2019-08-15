@@ -29,6 +29,7 @@ ext {
     //Allow to log request and response information.
     logs_enabled = true
 
+    available_envs = ['staging', 'production', 'demo']
     default_env_id = 'staging'
 
     // --------------------------
@@ -182,6 +183,8 @@ ext.applyAppConfig = { buildConfig ->
     b.buildConfigField 'String', 'BALANCES_CONVERSION_ASSET', "\"${balances_conversion_asset}\""
     b.buildConfigField 'Boolean', 'IS_TERMS_ALLOWED', "${allow_terms}"
     b.buildConfigField 'String', 'DEFAULT_ENV_ID', "\"${default_env_id}\""
+    b.buildConfigField 'String[]', 'AVAILABLE_ENV_IDS',
+            "{" + available_envs.collect { id -> '"' + id + '"' }.join(',') + "}"
 
     b.resValue "string", "app_host", "${app_host}"
     b.resValue "color", "primary", "${color_primary}"
