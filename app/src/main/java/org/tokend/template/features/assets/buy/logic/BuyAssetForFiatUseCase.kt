@@ -2,6 +2,7 @@ package org.tokend.template.features.assets.buy.logic
 
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
+import org.tokend.rx.extensions.toSingle
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
@@ -85,7 +86,11 @@ class BuyAssetForFiatUseCase(
     }
 
     private fun getInvoice(): Single<FiatInvoice> {
-        // TODO: Submit tx envelope
-        return Single.just(FiatInvoice("https://tokend.org"))
+        return apiProvider.getApi()
+                .integrations
+                .fiat
+                .submitBidTransaction(transaction)
+                .toSingle()
+                .map(::FiatInvoice)
     }
 }
