@@ -69,8 +69,9 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         toolbar.title = getString(R.string.clients_title)
         toolbarSubject.onNext(toolbar)
 
-        action_toolbar.inflateMenu(R.menu.clients_action_mode)
-        action_toolbar.setOnMenuItemClickListener {
+        val actionToolbar = action_toolbar as Toolbar
+        actionToolbar.inflateMenu(R.menu.clients_action_mode)
+        actionToolbar.setOnMenuItemClickListener {
             val emails = adapter.getSelected().joinToString(",\n") { it.email }
             Navigator.from(this@CompanyClientsFragment).openMassIssuance(
                     emails = emails,
@@ -78,8 +79,8 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
             )
             true
         }
-        action_toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_close)
-        action_toolbar.setNavigationOnClickListener {
+        actionToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_close)
+        actionToolbar.setNavigationOnClickListener {
             adapter.clearSelection()
         }
     }
@@ -123,7 +124,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                 return@onSelect
             }
             activateSelectModeIfNeeded()
-            action_toolbar.title = requireContext().getString(R.string.template_selected, count)
+            (action_toolbar as Toolbar).title = requireContext().getString(R.string.template_selected, count)
         }
 
         error_empty_view.observeAdapter(adapter, R.string.no_clients)

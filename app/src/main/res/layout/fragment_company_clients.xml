@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical">
 
-    <FrameLayout
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        style="@style/AppbarTheme.White"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include layout="@layout/appbar" />
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/action_toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ToolbarStyle.White"
-            android:visibility="gone"
-            app:popupTheme="@style/ToolbarStyle.White" />
-    </FrameLayout>
+            android:layout_height="wrap_content">
+
+            <include
+                android:id="@+id/action_toolbar"
+                layout="@layout/toolbar"
+                android:visibility="gone" />
+
+            <include layout="@layout/toolbar" />
+
+        </LinearLayout>
+    </android.support.design.widget.AppBarLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
