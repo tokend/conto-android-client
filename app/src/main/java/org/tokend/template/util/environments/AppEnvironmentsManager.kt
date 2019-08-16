@@ -7,15 +7,17 @@ import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.providers.UrlConfigProvider
 
 class AppEnvironmentsManager(
+        availableEnvIds: Array<String>,
         private val defaultEnvId: String,
         private val urlConfigProvider: UrlConfigProvider,
-        private val preferences: SharedPreferences
+        private val preferences: SharedPreferences,
+        private val extraEnv: AppEnvironment? = null
 ) {
     private val environmentChangesSubject = PublishSubject.create<AppEnvironment>()
 
-    val availableEnvironments = listOf(
+    private val environments = mutableListOf(
             AppEnvironment(
-                    name = "Staging (staging.conto.me)",
+                    name = "Staging",
                     id = "staging",
                     config = UrlConfig(
                             api = "https://api.staging.conto.me",
@@ -24,15 +26,26 @@ class AppEnvironmentsManager(
                     )
             ),
             AppEnvironment(
-                    name = "Production (conto.me)",
+                    name = "Production",
                     id = "production",
                     config = UrlConfig(
                             api = "https://api.conto.me",
                             storage = "https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver",
                             client = "https://conto.me"
                     )
+            ),
+            AppEnvironment(
+                    name = "Demo",
+                    id = "demo",
+                    config = UrlConfig(
+                            api = "https://api.demo.conto.me",
+                            storage = "https://s3.eu-north-1.amazonaws.com/contodemo-identity-storage-stoic-haslett",
+                            client = "https://demo.conto.me"
+                    )
             )
-    )
+    ).apply { extraEnv?.also { add(it) } }.associateBy(AppEnvironment::id)
+
+    val availableEnvironments = availableEnvIds.mapNotNull(environments::get)
 
     val environmentChanges: Observable<AppEnvironment> = environmentChangesSubject
 

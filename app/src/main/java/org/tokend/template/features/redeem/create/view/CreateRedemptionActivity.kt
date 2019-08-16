@@ -106,7 +106,7 @@ class CreateRedemptionActivity : BaseActivity() {
                 .serialize(result.networkParams)
                 .encodeBase64String()
 
-        val explanation = getString(
+        val shareText = getString(
                 R.string.template_redemption_qr_explanation_amount,
                 amountFormatter.formatAssetAmount(
                         amount,
@@ -115,14 +115,19 @@ class CreateRedemptionActivity : BaseActivity() {
                 )
         )
 
+        val balanceId = balancesRepository
+                .itemsList
+                .findLast { it.assetCode == asset.code }
+                ?.id
+
         Navigator.from(this)
-                .openQrShare(
-                        title = session.getCompany()?.name ?: "",
-                        data = serializedBase64,
-                        shareLabel = getString(R.string.share_redemption_request),
-                        shareText = explanation,
-                        topText = explanation
+                .openRedemptionQrShare(
+                        serializedBase64,
+                        shareText,
+                        result.request.salt.toString(),
+                        balanceId
                 )
+
         finish()
     }
 

@@ -12,7 +12,6 @@ import kotlinx.android.synthetic.main.fragment_polls.swipe_refresh
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.template.App
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.CompanyRecord
@@ -93,8 +92,8 @@ class CompaniesActivity : BaseActivity() {
             true
         }
 
-        menu?.findItem(R.id.sign_out)?.setOnMenuItemClickListener {
-            signOutWithConfirmation()
+        menu?.findItem(R.id.settings)?.setOnMenuItemClickListener {
+            Navigator.from(this).openSettings()
             true
         }
     }
@@ -224,12 +223,6 @@ class CompaniesActivity : BaseActivity() {
     private fun updateListColumnsCount() {
         layoutManager.spanCount = ColumnCalculator.getColumnCount(this)
         companiesAdapter.drawDividers = layoutManager.spanCount == 1
-    }
-
-    private fun signOutWithConfirmation() {
-        SignOutDialogFactory.getTunedDialog(this) {
-            (application as? App)?.signOut(this)
-        }.show()
     }
 
     override fun onBackPressed() {

@@ -9,8 +9,11 @@ import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.qr.ShareQrFragment
+import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.features.settings.GeneralSettingsFragment
+import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
 import org.tokend.template.fragments.ToolbarProvider
@@ -47,6 +50,8 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
             ExploreAssetsFragment.ID -> ExploreAssetsFragment()
             ShareQrFragment.ID -> bundle?.let(ShareQrFragment.Companion::newInstance)
             AtomicSwapAsksFragment.ID -> bundle?.let(AtomicSwapAsksFragment.Companion::newInstance)
+            SettingsFragment.ID -> GeneralSettingsFragment()
+            ShareRedemptionQrFragment.ID -> bundle?.let(ShareRedemptionQrFragment.Companion::newInstance)
             else -> null
         }
     }
@@ -87,6 +92,11 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
         finish()
     }
 
+    override fun onRedemptionRequestAccepted() {
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
     override fun onBackPressed() {
         if (onBackPressedListener?.onBackPressed() != false) {
             super.onBackPressed()
@@ -98,7 +108,7 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
         private const val FRAGMENT_BUNDLE_EXTRA = "fragment_bundle"
 
         fun getBundle(fragmentId: Long,
-                      fragmentBundle: Bundle?) = Bundle().apply {
+                      fragmentBundle: Bundle? = null) = Bundle().apply {
             putLong(FRAGMENT_ID_EXTRA, fragmentId)
             putBundle(FRAGMENT_BUNDLE_EXTRA, fragmentBundle)
         }

@@ -506,4 +506,5 @@
     <string name="select_environment">Выберите окружение</string>
     <string name="environment_selection_sign_out_warning">Будет выполнен выход из аккаунта</string>
     <string name="waiting_for_kyc_approval_message">Аккаунт вот-вот активируется…</string>
+    <string name="person_name">Имя</string>
 </resources>

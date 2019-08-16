@@ -21,6 +21,7 @@ import org.tokend.template.App
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.repository.TfaFactorsRepository
+import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
 import org.tokend.template.features.settings.view.OpenSourceLicensesDialog
 import org.tokend.template.features.tfa.logic.DisableTfaUseCase
 import org.tokend.template.features.tfa.logic.EnableTfaUseCase
@@ -316,7 +317,8 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
         val dialog = SingleCheckDialog(
                 requireContext(),
-                availableLocales.map(localizedName::forLocale)
+                availableLocales.map(localizedName::forLocale),
+                R.style.AlertDialogStyle
         )
         dialog.setDefaultCheckIndex(availableLocales.indexOf(currentLocale))
         dialog.setPositiveButtonListener { _, index ->
@@ -345,18 +347,10 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
         environmentPreference.summary = currentEnvironment.name
 
-        val dialog = SingleCheckDialog(
-                requireContext(),
-                availableEnvironments.map { it.name }
+        val dialog = EnvironmentSelectionDialog(
+                requireContext(), environmentManager,
+                withSignOutWarning = true
         )
-        dialog.setTitle(R.string.select_environment)
-        dialog.setMessage(R.string.environment_selection_sign_out_warning)
-        dialog.setDefaultCheckIndex(availableEnvironments.indexOf(currentEnvironment))
-        dialog.setPositiveButtonListener { _, index ->
-            availableEnvironments
-                    .getOrNull(index)
-                    ?.also(environmentManager::setEnvironment)
-        }
 
         environmentPreference.setOnPreferenceClickListener {
             dialog.show()

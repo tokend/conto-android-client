@@ -3,5 +3,6 @@
 ext {
     enable_analytics = true
     logs_enabled = false
+    available_envs = ['production', 'demo']
     default_env_id = 'production'
 }

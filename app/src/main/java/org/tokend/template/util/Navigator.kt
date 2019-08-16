@@ -63,9 +63,11 @@ import org.tokend.template.features.recovery.RecoveryActivity
 import org.tokend.template.features.redeem.accept.view.ConfirmRedemptionActivity
 import org.tokend.template.features.redeem.accept.view.ScanRedemptionActivity
 import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
+import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
@@ -550,5 +552,30 @@ class Navigator private constructor() {
         } else {
             toClientKyc()
         }
+    }
+
+    fun openSettings() {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        SettingsFragment.ID
+                ))
+                ?.also { performIntent(it) }
+    }
+
+    fun openRedemptionQrShare(serializedRequest: String,
+                              shareText: String,
+                              referenceToPoll: String,
+                              relatedBalanceId: String?) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        ShareRedemptionQrFragment.ID,
+                        ShareRedemptionQrFragment.getBundle(
+                                serializedRequest,
+                                shareText,
+                                referenceToPoll,
+                                relatedBalanceId
+                        )
+                ))
+                ?.also { performIntent(it) }
     }
 }

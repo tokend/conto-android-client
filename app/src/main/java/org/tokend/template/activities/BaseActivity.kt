@@ -24,6 +24,7 @@ import org.tokend.template.logic.Session
 import org.tokend.template.logic.persistance.CredentialsPersistor
 import org.tokend.template.logic.persistance.UrlConfigPersistor
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.util.environments.AppEnvironmentsManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.util.locale.AppLocaleManager
@@ -167,16 +168,20 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     }
     // endregion
 
+    // region Environment
     private fun subscribeToEnvChanges() {
         environmentManager
                 .environmentChanges
                 .compose(ObservableTransformers.defaultSchedulers())
-                .subscribe {
-                    toastManager.long(R.string.sign_out_by_env_change_explanation)
-                    (application as? App)?.signOut(this)
-                }
+                .subscribe(this::onEnvironmentChange)
                 .addTo(compositeDisposable)
     }
+
+    protected open fun onEnvironmentChange(newEnv: AppEnvironment) {
+        toastManager.long(R.string.sign_out_by_env_change_explanation)
+        (application as? App)?.signOut(this)
+    }
+    // endregion
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == android.R.id.home) {

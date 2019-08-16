@@ -148,7 +148,8 @@ sealed class BalanceChangeCause : Serializable {
             val isDestFeePaidBySource: Boolean,
             val subject: String?,
             var sourceName: String?,
-            var destName: String?
+            var destName: String?,
+            val reference: String
     ) : BalanceChangeCause() {
         constructor(op: OpPaymentDetailsResource) : this(
                 sourceAccountId = op.accountFrom.id,
@@ -158,7 +159,8 @@ sealed class BalanceChangeCause : Serializable {
                 isDestFeePaidBySource = op.sourcePayForDestination(),
                 subject = op.subject.takeIf { it.isNotEmpty() },
                 destName = null,
-                sourceName = null
+                sourceName = null,
+                reference = op.reference
         )
 
         /**

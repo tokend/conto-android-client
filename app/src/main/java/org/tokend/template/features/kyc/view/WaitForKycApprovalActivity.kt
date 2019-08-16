@@ -1,8 +1,8 @@
 package org.tokend.template.features.kyc.view
 
-import android.app.Activity
 import android.os.Bundle
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_loading_data.*
@@ -19,15 +19,15 @@ class WaitForKycApprovalActivity : BaseActivity() {
     private val kycStateRepository: KycStateRepository
         get() = repositoryProvider.kycState()
 
+    private var pollingDisposable: Disposable? = null
+
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_loading_data)
         loading_message_text_view.setText(R.string.waiting_for_kyc_approval_message)
-
-        waitForKycApproval()
     }
 
-    private fun waitForKycApproval() {
-        IntervalPoller(
+    private fun startKycStatePolling() {
+        pollingDisposable = IntervalPoller(
                 POLL_INTERVAL_S,
                 TimeUnit.SECONDS,
                 deferredDataSource = Single.defer {
@@ -51,6 +51,20 @@ class WaitForKycApprovalActivity : BaseActivity() {
                         onError = this::onCheckError
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun stopPolling() {
+        pollingDisposable?.dispose()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startKycStatePolling()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopPolling()
     }
 
     private fun onKycApproved() {

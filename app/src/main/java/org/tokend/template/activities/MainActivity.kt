@@ -601,4 +601,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     override fun onAtomicSwapBuyConfirmed() {
         navigateTo(DashboardFragment.ID)
     }
+
+    override fun onRedemptionRequestAccepted() {}
 }

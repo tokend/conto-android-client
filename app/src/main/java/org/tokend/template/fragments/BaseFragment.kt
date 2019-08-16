@@ -10,6 +10,7 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
 import org.tokend.template.logic.AppTfaCallback
+import org.tokend.template.logic.Session
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.view.ToastManager
 import org.tokend.template.view.util.formatter.AmountFormatter
@@ -42,6 +43,8 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     lateinit var amountFormatter: AmountFormatter
     @Inject
     lateinit var companyInfoProvider: CompanyInfoProvider
+    @Inject
+    lateinit var session: Session
 
     override fun onBackPressed() = true
 
