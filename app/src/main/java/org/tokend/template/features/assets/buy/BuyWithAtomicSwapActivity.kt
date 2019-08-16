@@ -11,18 +11,17 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.browse
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
-import org.tokend.template.features.assets.buy.logic.CreateAtomicSwapBidUseCase
-import org.tokend.template.features.assets.buy.model.AtomicSwapInvoice
+import org.tokend.template.features.assets.buy.logic.BuyAssetForFiatUseCase
+import org.tokend.template.features.assets.buy.model.FiatInvoice
 import org.tokend.template.features.assets.buy.view.AtomicSwapAmountFragment
 import org.tokend.template.features.assets.buy.view.quoteasset.AtomicSwapQuoteAssetFragment
-import org.tokend.template.logic.transactions.TxManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -135,15 +134,14 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 cancelListener = { disposable?.dispose() }
         )
 
-        disposable = CreateAtomicSwapBidUseCase(
+        disposable = BuyAssetForFiatUseCase(
                 amount = amount,
                 quoteAssetCode = assetCode,
                 ask = ask,
                 repositoryProvider = repositoryProvider,
                 walletInfoProvider = walletInfoProvider,
                 accountProvider = accountProvider,
-                apiProvider = apiProvider,
-                txManager = TxManager(apiProvider)
+                apiProvider = apiProvider
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
@@ -156,28 +154,8 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
-    private fun onBidSubmitted(invoice: AtomicSwapInvoice) {
-        val asset = this.asset ?: return
-        val sendAmountString = amountFormatter.formatAssetAmount(invoice.amount, asset)
-        val receiveAmountString = amountFormatter.formatAssetAmount(
-                amount,
-                ask.asset,
-                withAssetName = true
-        )
-
-        Navigator.from(this).openQrShare(
-                title = this.title.toString(),
-                shareLabel = getString(R.string.share_address_label),
-                data = invoice.address,
-                shareText = getString(
-                        R.string.template_atomic_swap_invoice_share_text,
-                        sendAmountString,
-                        receiveAmountString,
-                        invoice.address
-                ),
-                topText = getString(R.string.template_send_to_address, sendAmountString)
-        )
-
+    private fun onBidSubmitted(invoice: FiatInvoice) {
+        browse(invoice.paymentFormUrl, true)
         setResult(Activity.RESULT_OK)
         finish()
     }
