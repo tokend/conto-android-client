@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.activities.MainActivity
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.clients.view.adapter.CompanyClientItemsAdapter
@@ -69,15 +68,19 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     private fun initToolbar() {
         toolbar.title = getString(R.string.clients_title)
         toolbarSubject.onNext(toolbar)
-        toolbar.inflateMenu(R.menu.clients_action_mode)
 
-        toolbar.setOnMenuItemClickListener {
+        action_toolbar.inflateMenu(R.menu.clients_action_mode)
+        action_toolbar.setOnMenuItemClickListener {
             val emails = adapter.getSelected().joinToString(",\n") { it.email }
             Navigator.from(this@CompanyClientsFragment).openMassIssuance(
                     emails = emails,
                     requestCode = MASS_ISSUANCE_REQUEST
             )
             true
+        }
+        action_toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_close)
+        action_toolbar.setNavigationOnClickListener {
+            adapter.clearSelection()
         }
     }
 
@@ -116,11 +119,11 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         adapter.onSelect { count ->
             if (count == 0) {
                 selectMode = false
-                updateToolbarState()
+                updateActionToolbarVisibility()
                 return@onSelect
             }
             activateSelectModeIfNeeded()
-            toolbar.title = requireContext().getString(R.string.template_selected, count)
+            action_toolbar.title = requireContext().getString(R.string.template_selected, count)
         }
 
         error_empty_view.observeAdapter(adapter, R.string.no_clients)
@@ -178,28 +181,18 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     }
     // endregion
 
-    private fun updateToolbarState() {
-        val menuItem = toolbar.menu.findItem(R.id.issuance)
-        if (selectMode) {
-            toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_close)
-            menuItem.isVisible = true
-            toolbar.setNavigationOnClickListener {
-                adapter.clearSelection()
-            }
+    private fun updateActionToolbarVisibility() {
+        action_toolbar.visibility = if (selectMode) {
+            View.VISIBLE
         } else {
-            toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_menu)
-            toolbar.title = getString(R.string.clients_title)
-            menuItem.isVisible = false
-            toolbar.setNavigationOnClickListener {
-                (activity as? MainActivity)?.navigationDrawer?.openDrawer()
-            }
+            View.GONE
         }
     }
 
     private fun activateSelectModeIfNeeded() {
         if (!selectMode) {
             selectMode = true
-            updateToolbarState()
+            updateActionToolbarVisibility()
         }
     }
 
