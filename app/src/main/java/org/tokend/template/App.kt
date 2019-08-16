@@ -26,11 +26,13 @@ import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.subjects.BehaviorSubject
 import org.jetbrains.anko.defaultSharedPreferences
+import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.*
 import org.tokend.template.di.providers.*
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.persistance.SessionInfoStorage
 import org.tokend.template.util.Navigator
+import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.util.environments.AppEnvironmentsManager
 import org.tokend.template.util.locale.AppLocaleManager
 import java.io.IOException
@@ -202,11 +204,18 @@ class App : MultiDexApplication() {
         cookieCache = SetCookieCache()
 
         val urlConfigProvider = UrlConfigProviderFactory().createUrlConfigProvider()
+        val defaultUrlConfig = UrlConfig(BuildConfig.API_URL, BuildConfig.STORAGE_URL,
+                BuildConfig.CLIENT_URL)
         val appEnvironmentsManager = AppEnvironmentsManager(
                 availableEnvIds = BuildConfig.AVAILABLE_ENV_IDS,
                 defaultEnvId = BuildConfig.DEFAULT_ENV_ID,
                 urlConfigProvider = urlConfigProvider,
-                preferences = getAppPreferences()
+                preferences = getAppPreferences(),
+                extraEnv = AppEnvironment(
+                        id = "config",
+                        name = "Config (${defaultUrlConfig.apiDomain})",
+                        config = defaultUrlConfig
+                )
         )
         appEnvironmentsManager.initEnvironment()
 

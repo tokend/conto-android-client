@@ -10,11 +10,12 @@ class AppEnvironmentsManager(
         availableEnvIds: Array<String>,
         private val defaultEnvId: String,
         private val urlConfigProvider: UrlConfigProvider,
-        private val preferences: SharedPreferences
+        private val preferences: SharedPreferences,
+        private val extraEnv: AppEnvironment? = null
 ) {
     private val environmentChangesSubject = PublishSubject.create<AppEnvironment>()
 
-    private val environments = listOf(
+    private val environments = mutableListOf(
             AppEnvironment(
                     name = "Staging",
                     id = "staging",
@@ -42,7 +43,7 @@ class AppEnvironmentsManager(
                             client = "https://demo.conto.me"
                     )
             )
-    ).associateBy(AppEnvironment::id)
+    ).apply { extraEnv?.also { add(it) } }.associateBy(AppEnvironment::id)
 
     val availableEnvironments = availableEnvIds.mapNotNull(environments::get)
 
