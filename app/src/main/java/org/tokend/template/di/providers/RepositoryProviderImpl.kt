@@ -110,7 +110,7 @@ class RepositoryProviderImpl(
             LruCache<Long, InvestmentInfoRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     private val atomicSwapRepositoryByAsset =
-            LruCache<String, AtomicSwapRequestsRepository>(MAX_SAME_REPOSITORIES_COUNT)
+            LruCache<String, AtomicSwapAsksRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     private val companyClientsRepository: CompanyClientsRepository by lazy {
         CompanyClientsRepository(apiProvider, walletInfoProvider,
@@ -280,13 +280,14 @@ class RepositoryProviderImpl(
         }
     }
 
-    override fun atomicSwapAsks(asset: String): AtomicSwapRequestsRepository {
+    override fun atomicSwapAsks(asset: String): AtomicSwapAsksRepository {
         return atomicSwapRepositoryByAsset.getOrPut(asset) {
-            AtomicSwapRequestsRepository(
+            AtomicSwapAsksRepository(
                     apiProvider,
                     asset,
                     assets(),
-                    MemoryOnlyRepositoryCache())
+                    MemoryOnlyRepositoryCache()
+            )
         }
     }
 

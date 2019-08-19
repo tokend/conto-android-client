@@ -105,11 +105,12 @@ class LocalizedName(private val context: Context) {
         }
     }
 
-    fun forKycFormType(kycFormType: KycForm): String {
+    fun forKycForm(kycFormType: KycForm?): String {
         return when (kycFormType) {
             is KycForm.General -> context.getString(R.string.kyc_form_type_general)
             is KycForm.Corporate -> context.getString(R.string.kyc_form_type_corporate)
             is KycForm.Empty -> context.getString(R.string.kyc_form_type_unknown)
+            null -> context.getString(R.string.kyc_form_type_unknown)
         }
     }
 

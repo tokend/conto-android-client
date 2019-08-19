@@ -258,7 +258,7 @@ class BalanceDetailsActivity : BaseActivity() {
                                         .isEnabled = true
                             }
                         },
-                        onError = {}
+                        onError = { it.printStackTrace()}
                 )
                 .addTo(compositeDisposable)
     }

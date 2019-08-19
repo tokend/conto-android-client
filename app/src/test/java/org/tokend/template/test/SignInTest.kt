@@ -24,12 +24,11 @@ class SignInTest {
         val email = Util.getEmail()
         val password = Config.DEFAULT_PASSWORD
 
-        val (walletData, rootAccount, recoveryAccount)
+        val (walletData, rootAccount)
                 = apiProvider.getKeyServer().createAndSaveWallet(email, password)
                 .execute().get()
 
-        System.out.println("Email is $email")
-        System.out.println("Recovery seed is ${recoveryAccount.secretSeed!!.joinToString("")}")
+        println("Email is $email")
 
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
@@ -56,7 +55,7 @@ class SignInTest {
     private fun checkRepositories(repositoryProvider: RepositoryProvider) {
         Assert.assertTrue("Companies repository must be updated after sign in",
                 repositoryProvider.clientCompanies().isFresh)
-        Assert.assertTrue("TFA factors repository must be updated after sign in",
-                repositoryProvider.tfaFactors().isFresh)
+        Assert.assertTrue("Account repository must be updated after sign in",
+                repositoryProvider.account().isFresh)
     }
 }

@@ -6,7 +6,7 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.generated.resources.AtomicSwapAskResource
-import org.tokend.sdk.api.generated.resources.QuoteAssetResource
+import org.tokend.sdk.api.generated.resources.AtomicSwapQuoteAssetResource
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAskParams
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAsksPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
@@ -17,7 +17,7 @@ import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.extensions.mapSuccessful
 
-class AtomicSwapRequestsRepository(
+class AtomicSwapAsksRepository(
         private val apiProvider: ApiProvider,
         private val asset: String,
         private val assetsRepository: AssetsRepository,
@@ -56,7 +56,7 @@ class AtomicSwapRequestsRepository(
                     assetsRepository
                             .ensureAssets(
                                     items
-                                            .map { it.quoteAssets.map(QuoteAssetResource::getId) }
+                                            .map { it.quoteAssets.map(AtomicSwapQuoteAssetResource::getQuoteAsset) }
                                             .flatten()
                             )
                             .map { items to it }

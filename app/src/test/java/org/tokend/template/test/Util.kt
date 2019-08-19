@@ -40,11 +40,9 @@ object Util {
         val createResult = apiProvider.getKeyServer().createAndSaveWallet(email, password)
                 .execute().get()
 
-        System.out.println("Email is $email")
-        System.out.println("Account id is " + createResult.rootAccount.accountId)
-        System.out.println("Recovery seed is " +
-                createResult.recoveryAccount.secretSeed!!.joinToString(""))
-        System.out.println("Password is " +
+        println("Email is $email")
+        println("Account id is " + createResult.rootAccount.accountId)
+        println("Password is " +
                 password.joinToString(""))
 
         SignInUseCase(
@@ -63,13 +61,30 @@ object Util {
                            apiProvider: ApiProvider,
                            systemInfoRepository: SystemInfoRepository,
                            txManager: TxManager) {
+        setAccountRole("account_role:general", walletInfoProvider, apiProvider,
+                systemInfoRepository, txManager)
+    }
+
+    fun makeAccountCorporate(walletInfoProvider: WalletInfoProvider,
+                             apiProvider: ApiProvider,
+                             systemInfoRepository: SystemInfoRepository,
+                             txManager: TxManager) {
+        setAccountRole("account_role:corporate", walletInfoProvider, apiProvider,
+                systemInfoRepository, txManager)
+    }
+
+    private fun setAccountRole(roleKey: String,
+                               walletInfoProvider: WalletInfoProvider,
+                               apiProvider: ApiProvider,
+                               systemInfoRepository: SystemInfoRepository,
+                               txManager: TxManager) {
         val accountId = walletInfoProvider.getWalletInfo()!!.accountId
         val api = apiProvider.getApi()
 
         val roleToSet = api
                 .v3
                 .keyValue
-                .getById("account_role:general")
+                .getById(roleKey)
                 .execute()
                 .get()
                 .value

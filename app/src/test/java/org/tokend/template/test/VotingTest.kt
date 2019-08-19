@@ -35,8 +35,10 @@ class VotingTest {
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 
-        val (_, _, _) =
-                Util.getVerifiedWallet(email, password, apiProvider, session, repositoryProvider)
+        Util.getVerifiedWallet(email, password, apiProvider, session, repositoryProvider)
+
+        Util.makeAccountCorporate(session, apiProvider, repositoryProvider.systemInfo(),
+                TxManager(apiProvider))
 
         createPoll(repositoryProvider, apiProvider, session)
 
@@ -84,8 +86,10 @@ class VotingTest {
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 
-        val (_, _, _) =
-                Util.getVerifiedWallet(email, password, apiProvider, session, repositoryProvider)
+        Util.getVerifiedWallet(email, password, apiProvider, session, repositoryProvider)
+
+        Util.makeAccountCorporate(session, apiProvider, repositoryProvider.systemInfo(),
+                TxManager(apiProvider))
 
         createPoll(repositoryProvider, apiProvider, session)
 

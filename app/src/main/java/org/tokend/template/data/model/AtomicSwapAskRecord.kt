@@ -19,7 +19,7 @@ class AtomicSwapAskRecord(
             isCanceled = source.isCanceled,
             quoteAssets = source.quoteAssets.map {
                 QuoteAsset(
-                        code = it.id,
+                        code = it.quoteAsset,
                         trailingDigits = 6,
                         price = it.price,
                         name = assetsMap[it.id]?.name
@@ -40,5 +40,5 @@ class AtomicSwapAskRecord(
             override val trailingDigits: Int,
             val price: BigDecimal,
             override val name: String?
-    ) : Asset
+    ): Asset
 }

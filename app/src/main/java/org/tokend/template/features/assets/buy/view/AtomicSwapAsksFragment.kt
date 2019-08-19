@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.AtomicSwapAskRecord
-import org.tokend.template.data.repository.AtomicSwapRequestsRepository
+import org.tokend.template.data.repository.AtomicSwapAsksRepository
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAskListItem
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAsksAdapter
 import org.tokend.template.fragments.BaseFragment
@@ -33,7 +33,7 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
 
-    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create<Toolbar>()
+    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
 
     private val assetCode: String by lazy {
         arguments?.getString(ASSET_CODE_EXTRA)
@@ -43,7 +43,7 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     private val asset: AssetRecord?
         get() = repositoryProvider.assets().itemsMap[assetCode]
 
-    private val asksRepository: AtomicSwapRequestsRepository
+    private val asksRepository: AtomicSwapAsksRepository
         get() = repositoryProvider.atomicSwapAsks(assetCode)
 
     private lateinit var adapter: AtomicSwapAsksAdapter
