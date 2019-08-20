@@ -1,5 +1,7 @@
 // Following config will be merged with the default one
 // for "staging" builds.
 ext {
-    enable_analytics = true
+    enable_analytics = false
+    available_envs = ['staging','production', 'demo']
+    default_env_id = 'staging'
 }
