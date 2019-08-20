@@ -81,8 +81,10 @@ class ClientCompaniesRepository(
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Completable.error(IllegalStateException("No wallet info found"))
 
-        return apiProvider
-                .getApi()
+        val signedApi = apiProvider.getSignedApi()
+                ?: return Completable.error(IllegalStateException("No signed API instance found"))
+
+        return signedApi
                 .integrations
                 .dns
                 .addClientBusiness(accountId, company.id)
