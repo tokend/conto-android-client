@@ -4,6 +4,7 @@ import org.tokend.sdk.api.generated.resources.*
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.SimpleFeeRecord
+import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.util.PolicyChecker
 import org.tokend.wallet.xdr.AssetPairPolicy
 import java.io.Serializable
@@ -163,6 +164,22 @@ sealed class BalanceChangeCause : Serializable {
                 reference = op.reference
         )
 
+        constructor(request: PaymentRequest) : this(
+                sourceAccountId = request.senderAccountId,
+                destAccountId = request.recipient.accountId,
+                subject = request.paymentSubject,
+                sourceFee = request.fee.senderFee,
+                destFee =
+                if (request.fee.senderPaysForRecipient)
+                    SimpleFeeRecord.ZERO
+                else
+                    request.fee.recipientFee,
+                isDestFeePaidBySource = request.fee.senderPaysForRecipient,
+                destName = request.recipient.nickname,
+                sourceName = null,
+                reference = request.reference
+        )
+
         /**
          * @return true if given [accountId] is the receiver of the payment
          */
@@ -203,8 +220,7 @@ sealed class BalanceChangeCause : Serializable {
                                 counterpartyName: String) {
             if (isReceived(yourAccountId)) {
                 sourceName = counterpartyName
-            }
-            else {
+            } else {
                 destName = counterpartyName
             }
         }
@@ -228,7 +244,7 @@ sealed class BalanceChangeCause : Serializable {
             private val policies: Int
     ) : BalanceChangeCause(), PolicyChecker {
 
-        constructor(op: OpManageAssetPairDetailsResource): this(
+        constructor(op: OpManageAssetPairDetailsResource) : this(
                 baseAsset = SimpleAsset(op.baseAsset),
                 quoteAsset = SimpleAsset(op.quoteAsset),
                 physicalPrice = op.physicalPrice,
@@ -246,8 +262,8 @@ sealed class BalanceChangeCause : Serializable {
     }
 
     // ------- Atomic swap ask creation ------- //
-    object AtomicSwapAskCreation: BalanceChangeCause()
+    object AtomicSwapAskCreation : BalanceChangeCause()
 
     // ------- Atomic swap bid creation ------- //
-    object AtomicSwapBidCreation: BalanceChangeCause()
+    object AtomicSwapBidCreation : BalanceChangeCause()
 }
