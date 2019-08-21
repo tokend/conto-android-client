@@ -54,8 +54,11 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
             return
         }
         val askId = intent.getStringExtra(ASK_ID_EXTRA)
-        val ask = repositoryProvider.atomicSwapAsks(assetCode)
-                .itemsList
+        val ask = listOf(
+                repositoryProvider.atomicSwapAsks(assetCode).itemsList,
+                repositoryProvider.allAtomicSwapAsks().itemsList
+        )
+                .flatten()
                 .find { it.id == askId }
         if (ask == null) {
             errorHandler.handle(

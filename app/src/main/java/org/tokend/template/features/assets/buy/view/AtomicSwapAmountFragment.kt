@@ -11,8 +11,11 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
 
     override fun onInitAllowed() {
         val askId = arguments?.getString(ASK_ID_EXTRA)
-        this.ask = repositoryProvider.atomicSwapAsks(requestedAsset!!)
-                .itemsList
+        this.ask = listOf(
+                repositoryProvider.atomicSwapAsks(requestedAsset!!).itemsList,
+                repositoryProvider.allAtomicSwapAsks().itemsList
+        )
+                .flatten()
                 .find { it.id == askId }
                 ?: throw IllegalArgumentException("No ask found for ID $askId from $ASK_ID_EXTRA")
 
