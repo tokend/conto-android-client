@@ -508,4 +508,5 @@
     <string name="waiting_for_kyc_approval_message">Аккаунт вот-вот активируется…</string>
     <string name="person_name">Имя</string>
     <string name="shop_title">Магазин</string>
+    <string name="template_price">Цена: %1$s</string>
 </resources>

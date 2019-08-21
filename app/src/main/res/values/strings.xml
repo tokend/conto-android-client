@@ -496,6 +496,7 @@
     <string name="waiting_for_kyc_approval_message">Your account will be enabled in a moment…</string>
     <string name="person_name">Name</string>
     <string name="shop_title">Shop</string>
+    <string name="template_price">Price: %1$s</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
