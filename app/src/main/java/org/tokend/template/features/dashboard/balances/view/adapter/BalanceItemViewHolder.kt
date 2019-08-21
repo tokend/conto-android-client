@@ -34,14 +34,16 @@ class BalanceItemViewHolder(
                     amountFormatter.formatAssetAmount(
                             item.available,
                             item.asset,
-                            withAssetCode = false
+                            withAssetCode = false,
+                            abbreviation = true
                     )
             )
         } else {
             val availableString = amountFormatter.formatAssetAmount(
                     item.available,
                     item.asset,
-                    withAssetCode = false
+                    withAssetCode = false,
+                    abbreviation = true
             )
 
             val balanceString = view.context.getString(
