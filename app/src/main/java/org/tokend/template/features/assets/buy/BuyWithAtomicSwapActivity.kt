@@ -105,7 +105,11 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
 
     private fun onAmountEntered(amount: BigDecimal) {
         this.amount = amount
-        toQuoteAssetScreen()
+        if (ask.quoteAssets.size > 1) {
+            toQuoteAssetScreen()
+        } else {
+            onQuoteAssetSelected(ask.quoteAssets.first())
+        }
     }
 
     private fun toQuoteAssetScreen() {
