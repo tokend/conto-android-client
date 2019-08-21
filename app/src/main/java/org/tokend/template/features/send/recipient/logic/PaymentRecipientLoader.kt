@@ -2,14 +2,17 @@ package org.tokend.template.features.send.recipient.logic
 
 import io.reactivex.Single
 import org.tokend.template.data.repository.AccountDetailsRepository
+import org.tokend.template.data.repository.SystemInfoRepository
 import org.tokend.template.features.send.model.PaymentRecipient
+import org.tokend.template.util.validator.EmailValidator
 import org.tokend.wallet.Base32Check
 
 /**
  * Loads payment recipient info
  */
 class PaymentRecipientLoader(
-        private val accountDetailsRepository: AccountDetailsRepository
+        private val accountDetailsRepository: AccountDetailsRepository,
+        private val systemInfoRepository: SystemInfoRepository
 ) {
     class NoRecipientFoundException(recipient: String)
         : Exception("No recipient account ID found for $recipient")
@@ -35,9 +38,24 @@ class PaymentRecipientLoader(
                     }
                     .onErrorResumeNext { error ->
                         if (error is AccountDetailsRepository.NoIdentityAvailableException)
-                            Single.error(NoRecipientFoundException(recipient))
+                            if (EmailValidator.isValid(recipient))
+                                getRecipientForNotExistingAccount(recipient)
+                            else
+                                Single.error(NoRecipientFoundException(recipient))
                         else
                             Single.error(error)
                     }
+    }
+
+    private fun getRecipientForNotExistingAccount(email: String): Single<PaymentRecipient> {
+        return systemInfoRepository
+                .updateIfNotFreshDeferred()
+                .toSingle { systemInfoRepository.item!! }
+                .map { systemInfo ->
+                    PaymentRecipient.NotExisting(
+                            counterpartyAccountId = systemInfo.adminAccountId,
+                            actualEmail = email
+                    )
+                }
     }
 }

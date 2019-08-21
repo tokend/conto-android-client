@@ -3,6 +3,7 @@ package org.tokend.template.features.send.recipient.view
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
 import android.text.Editable
@@ -226,7 +227,8 @@ class PaymentRecipientFragment : BaseFragment() {
         recipientLoadingDisposable?.dispose()
         recipientLoadingDisposable =
                 PaymentRecipientLoader(
-                        repositoryProvider.accountDetails()
+                        repositoryProvider.accountDetails(),
+                        repositoryProvider.systemInfo()
                 )
                         .load(recipient)
                         .compose(ObservableTransformers.defaultSchedulersSingle())
@@ -251,6 +253,8 @@ class PaymentRecipientFragment : BaseFragment() {
         if (currentAccountId == recipient.accountId) {
             recipient_edit_text.error = getString(R.string.error_cannot_send_to_yourself)
             updateContinueAvailability()
+        } else if (recipient is PaymentRecipient.NotExisting) {
+            showNotExistingRecipientWarning(recipient)
         } else {
             resultSubject.onNext(recipient)
         }
@@ -264,6 +268,20 @@ class PaymentRecipientFragment : BaseFragment() {
                 errorHandlerFactory.getDefault().handle(e)
         }
         updateContinueAvailability()
+    }
+
+    private fun showNotExistingRecipientWarning(recipient: PaymentRecipient.NotExisting) {
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+                .setTitle(R.string.not_existing_payment_recipient_warning_title)
+                .setMessage(resources.getText(
+                        R.string.template_not_existing_payment_recipient_warning,
+                        recipient.actualEmail
+                ))
+                .setPositiveButton(R.string.continue_action) { _, _ ->
+                    resultSubject.onNext(recipient)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

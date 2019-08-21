@@ -507,4 +507,7 @@
     <string name="environment_selection_sign_out_warning">Будет выполнен выход из аккаунта</string>
     <string name="waiting_for_kyc_approval_message">Аккаунт вот-вот активируется…</string>
     <string name="person_name">Имя</string>
+    <string name="not_existing_payment_recipient_warning_title">Аккаунт не существует</string>
+    <string name="template_not_existing_payment_recipient_warning">У получателя еще нет аккаунта в системе.
+        Вы все равно можете отправить платеж, средства будут получены как только аккаунт <b>%1$s</b> будет зарегистрирован</string>
 </resources>
