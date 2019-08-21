@@ -32,12 +32,7 @@ class ConfirmRedemptionRequestUseCase(
 ) {
     class RedemptionAlreadyProcessedException : Exception()
 
-    private val balanceId = repositoryProvider
-            .balances()
-            .itemsList
-            .find { it.assetCode == request.assetCode }
-            ?.id
-
+    private lateinit var accountId: String
     private lateinit var systemInfo: SystemInfo
     private lateinit var networkParams: NetworkParams
     private lateinit var senderBalanceId: String
@@ -55,6 +50,12 @@ class ConfirmRedemptionRequestUseCase(
                 }
                 .doOnSuccess { senderBalanceId ->
                     this.senderBalanceId = senderBalanceId
+                }
+                .flatMap {
+                    getAccountId()
+                }
+                .doOnSuccess { accountId ->
+                    this.accountId = accountId
                 }
                 .flatMap {
                     getTransaction()
@@ -107,10 +108,15 @@ class ConfirmRedemptionRequestUseCase(
                 ))
     }
 
-    private fun getTransaction(): Single<Transaction> {
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
-                ?: return Single.error(IllegalStateException("Missing account ID"))
+    private fun getAccountId(): Single<String> {
+        return walletInfoProvider
+                .getWalletInfo()
+                ?.accountId
+                .toMaybe()
+                .switchIfEmpty(Single.error(IllegalStateException("Missing account ID")))
+    }
 
+    private fun getTransaction(): Single<Transaction> {
         val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
         val fee = PaymentFee(zeroFee, zeroFee)
 
@@ -161,10 +167,37 @@ class ConfirmRedemptionRequestUseCase(
     }
 
     private fun updateRepositories() {
-        repositoryProvider.balances().updateIfEverUpdated()
+        val balance = repositoryProvider.balances()
+                .itemsList
+                .find { it.assetCode == request.assetCode }
+        val balanceId = balance?.id
+        val asset = balance?.asset
+        val senderNickname = repositoryProvider.accountDetails()
+                .getCachedIdentity(request.sourceAccountId)
+                ?.email
+
+        val balanceChangesRepositories = mutableListOf(repositoryProvider.balanceChanges(null))
         if (balanceId != null) {
-            repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()
+            balanceChangesRepositories.add(repositoryProvider.balanceChanges(balanceId))
         }
-        repositoryProvider.balanceChanges(null).updateIfEverUpdated()
+
+        if (asset != null && balanceId != null) {
+            balanceChangesRepositories.forEach {
+                it.addAcceptedIncomingRedemption(
+                        request = request,
+                        asset = asset,
+                        balanceId = balanceId,
+                        accountId = accountId,
+                        senderNickname = senderNickname
+                )
+            }
+            repositoryProvider.balances().updateAssetBalance(
+                    request.assetCode,
+                    request.amount
+            )
+        } else {
+            balanceChangesRepositories.forEach { it.updateIfEverUpdated() }
+            repositoryProvider.balances().updateIfNotFresh()
+        }
     }
 }

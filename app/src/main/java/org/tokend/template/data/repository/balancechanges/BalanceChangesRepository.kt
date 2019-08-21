@@ -7,6 +7,7 @@ import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.v3.history.params.ParticipantEffectsPageParams
 import org.tokend.sdk.api.v3.history.params.ParticipantEffectsParams
+import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.BalanceChangeAction
 import org.tokend.template.data.model.history.SimpleFeeRecord
@@ -16,6 +17,7 @@ import org.tokend.template.data.repository.AccountDetailsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.send.model.PaymentRequest
 import java.util.*
 
@@ -132,6 +134,36 @@ class BalanceChangesRepository(
                         fixed = request.fee.totalFixedSenderFee
                 ),
                 cause = BalanceChangeCause.Payment(request)
+        )
+
+        itemsCache.add(balanceChange)
+        broadcast()
+    }
+
+    fun addAcceptedIncomingRedemption(request: RedemptionRequest,
+                                      asset: Asset,
+                                      balanceId: String,
+                                      accountId: String,
+                                      senderNickname: String?) {
+        val balanceChange = BalanceChange(
+                id = request.salt.toString(),
+                amount = request.amount,
+                date = Date(),
+                asset = asset,
+                balanceId = balanceId,
+                action = BalanceChangeAction.FUNDED,
+                fee = SimpleFeeRecord.ZERO,
+                cause = BalanceChangeCause.Payment(
+                        sourceAccountId = request.sourceAccountId,
+                        destAccountId = accountId,
+                        reference = request.salt.toString(),
+                        sourceFee = SimpleFeeRecord.ZERO,
+                        destFee = SimpleFeeRecord.ZERO,
+                        sourceName = senderNickname,
+                        destName = null,
+                        isDestFeePaidBySource = false,
+                        subject = null
+                )
         )
 
         itemsCache.add(balanceChange)
