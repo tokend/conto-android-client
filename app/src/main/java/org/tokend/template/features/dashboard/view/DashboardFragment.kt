@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.subjects.BehaviorSubject
+import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
@@ -41,7 +42,7 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         adapter = DashboardPagerAdapter(requireContext(), childFragmentManager)
         pager.adapter = adapter
         pager.offscreenPageLimit = adapter.count
-        pager.swipesEnabled = false
+        appbar_tabs.setupWithViewPager(pager)
 
         // Menu.
         val inflatePageMenu = { pagePosition: Int ->

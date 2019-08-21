@@ -17,6 +17,11 @@ class DashboardPagerAdapter(context: Context,
                     fragmentFactory.getBalancesFragment(),
                     context.getString(R.string.balances_screen_title),
                     1L
+            ),
+            Triple(
+                    fragmentFactory.getAllAtomicSwapAsksFragment(),
+                    context.getString(R.string.shop_title),
+                    2L
             )
     )
 

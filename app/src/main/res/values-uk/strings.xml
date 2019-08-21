@@ -507,4 +507,5 @@
     <string name="environment_selection_sign_out_warning">Буде виконано вихід з акаунта</string>
     <string name="waiting_for_kyc_approval_message">Акаунт ось-ось активується…</string>
     <string name="person_name">Ім\'я</string>
+    <string name="shop_title">Магазин</string>
 </resources>

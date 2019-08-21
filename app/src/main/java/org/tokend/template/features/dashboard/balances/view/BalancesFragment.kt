@@ -25,7 +25,10 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.*
+import org.tokend.template.view.util.ColumnCalculator
+import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
+import org.tokend.template.view.util.SwipeRefreshDependencyUtil
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 import org.tokend.template.view.util.fab.addActions
 import java.math.BigDecimal
@@ -59,7 +62,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onInitAllowed() {
-        initCompanyLogo()
         initList()
         initSwipeRefresh()
         initToolbar()
@@ -81,21 +83,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                     }
                 }
             }
-
-    private fun initCompanyLogo() {
-        val company = companyInfoProvider.getCompany()
-                ?: return
-
-        company_logo_image_view.visibility = View.VISIBLE
-
-        val logoSize = resources.getDimensionPixelSize(R.dimen.unlock_logo_size)
-        LogoUtil.setLogo(
-                company_logo_image_view,
-                company.name,
-                company.logoUrl,
-                logoSize
-        )
-    }
 
     private fun initList() {
         layoutManager = GridLayoutManager(requireContext(), 1)
@@ -126,7 +113,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         } else {
             appbar.visibility = View.GONE
         }
-        ElevationUtil.initScrollElevation(app_bar, appbar_elevation_view)
+        app_bar.visibility = View.GONE
+        appbar_elevation_view.visibility = View.GONE
         toolbarSubject.onNext(toolbar)
     }
 
