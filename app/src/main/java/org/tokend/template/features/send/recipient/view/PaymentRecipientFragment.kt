@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
 import android.text.Editable
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,7 +44,7 @@ import org.tokend.template.view.util.PhoneNumberUtil
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.wallet.Base32Check
 
-class PaymentRecipientFragment : BaseFragment() {
+open class PaymentRecipientFragment : BaseFragment() {
     private val loadingIndicator = LoadingIndicatorManager(
             showLoading = { (main_progress as? ContentLoadingProgressBar)?.show() },
             hideLoading = { (main_progress as? ContentLoadingProgressBar)?.hide() }
@@ -68,7 +69,7 @@ class PaymentRecipientFragment : BaseFragment() {
             continue_button.enabled = value
         }
 
-    protected val resultSubject = PublishSubject.create<PaymentRecipient>()
+    private val resultSubject = PublishSubject.create<PaymentRecipient>()
     val resultObservable: Observable<PaymentRecipient> = resultSubject
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -270,13 +271,14 @@ class PaymentRecipientFragment : BaseFragment() {
         updateContinueAvailability()
     }
 
+    @Suppress("DEPRECATION")
     private fun showNotExistingRecipientWarning(recipient: PaymentRecipient.NotExisting) {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.not_existing_payment_recipient_warning_title)
-                .setMessage(resources.getText(
+                .setMessage(Html.fromHtml(resources.getString(
                         R.string.template_not_existing_payment_recipient_warning,
                         recipient.actualEmail
-                ))
+                )))
                 .setPositiveButton(R.string.continue_action) { _, _ ->
                     resultSubject.onNext(recipient)
                 }

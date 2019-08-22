@@ -508,6 +508,6 @@
     <string name="waiting_for_kyc_approval_message">Аккаунт вот-вот активируется…</string>
     <string name="person_name">Имя</string>
     <string name="not_existing_payment_recipient_warning_title">Аккаунт не существует</string>
-    <string name="template_not_existing_payment_recipient_warning">У получателя еще нет аккаунта в системе.
-        Вы все равно можете отправить платеж, средства будут получены как только аккаунт <b>%1$s</b> будет зарегистрирован</string>
+    <string name="template_not_existing_payment_recipient_warning"><![CDATA[У получателя еще нет аккаунта в системе.
+        Вы все равно можете отправить платеж, средства будут получены как только аккаунт <b>%1$s</b> будет зарегистрирован]]></string>
 </resources>
