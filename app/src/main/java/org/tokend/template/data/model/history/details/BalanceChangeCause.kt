@@ -1,5 +1,6 @@
 package org.tokend.template.data.model.history.details
 
+import com.google.gson.annotations.SerializedName
 import org.tokend.sdk.api.generated.resources.*
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
@@ -152,6 +153,19 @@ sealed class BalanceChangeCause : Serializable {
             var destName: String?,
             val reference: String
     ) : BalanceChangeCause() {
+        /**
+         * Payment metadata which helps to perform payment
+         * to not existing recipient.
+         */
+        class PaymentToNotExistingRecipientMeta(
+                @SerializedName("sender")
+                val senderEmail: String,
+                @SerializedName("email")
+                val recipientEmail: String,
+                @SerializedName("subject")
+                val actualSubject: String?
+        )
+
         constructor(op: OpPaymentDetailsResource) : this(
                 sourceAccountId = op.accountFrom.id,
                 destAccountId = op.accountTo.id,

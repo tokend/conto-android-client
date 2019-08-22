@@ -83,7 +83,7 @@ class PaymentConfirmationActivity : BaseActivity() {
     }
 
     private fun displaySubjectIfNeeded() {
-        val subject = request.paymentSubject
+        val subject = request.actualPaymentSubject
                 ?: return
 
         adapter.addData(
