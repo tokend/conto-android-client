@@ -28,7 +28,6 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
-import org.tokend.template.view.util.SwipeRefreshDependencyUtil
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 import org.tokend.template.view.util.fab.addActions
 import java.math.BigDecimal
@@ -104,7 +103,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
-        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
+//        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
     }
 
     private fun initToolbar() {
@@ -113,8 +112,11 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         } else {
             appbar.visibility = View.GONE
         }
+
+        // Do not forget to add SwipeRefreshDependency when making visible.
         app_bar.visibility = View.GONE
         appbar_elevation_view.visibility = View.GONE
+
         toolbarSubject.onNext(toolbar)
     }
 
