@@ -35,6 +35,7 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         toolbar.title = companyInfoProvider.getCompany()?.name
 
         initViewPager()
+        switchToShopIfNeeded()
     }
 
     // region Init
@@ -76,6 +77,17 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         onPageSelected(0)
     }
     // endregion
+
+    private fun switchToShopIfNeeded() {
+        val hasNonZeroBalance = repositoryProvider
+                .balances()
+                .itemsList
+                .any { it.available.signum() > 0 }
+
+        if (!hasNonZeroBalance) {
+            pager.currentItem = adapter.getIndexOf(DashboardPagerAdapter.SHOP_PAGE)
+        }
+    }
 
     override fun onBackPressed(): Boolean {
         val currentPage = adapter.getItem(pager.currentItem)
