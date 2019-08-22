@@ -2,6 +2,7 @@ package org.tokend.template.features.dashboard.view
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.view.SupportMenuInflater
 import android.support.v7.widget.Toolbar
@@ -43,6 +44,8 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         pager.adapter = adapter
         pager.offscreenPageLimit = adapter.count
         appbar_tabs.setupWithViewPager(pager)
+        appbar_tabs.tabGravity = TabLayout.GRAVITY_FILL
+        appbar_tabs.tabMode = TabLayout.MODE_FIXED
 
         // Menu.
         val inflatePageMenu = { pagePosition: Int ->
