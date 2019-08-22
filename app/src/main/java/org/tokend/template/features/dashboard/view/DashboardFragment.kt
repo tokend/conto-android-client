@@ -2,6 +2,7 @@ package org.tokend.template.features.dashboard.view
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.view.SupportMenuInflater
 import android.support.v7.widget.Toolbar
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.subjects.BehaviorSubject
+import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
@@ -33,6 +35,7 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         toolbar.title = companyInfoProvider.getCompany()?.name
 
         initViewPager()
+        switchToShopIfNeeded()
     }
 
     // region Init
@@ -41,7 +44,9 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         adapter = DashboardPagerAdapter(requireContext(), childFragmentManager)
         pager.adapter = adapter
         pager.offscreenPageLimit = adapter.count
-        pager.swipesEnabled = false
+        appbar_tabs.setupWithViewPager(pager)
+        appbar_tabs.tabGravity = TabLayout.GRAVITY_FILL
+        appbar_tabs.tabMode = TabLayout.MODE_FIXED
 
         // Menu.
         val inflatePageMenu = { pagePosition: Int ->
@@ -72,6 +77,21 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         onPageSelected(0)
     }
     // endregion
+
+    private fun switchToShopIfNeeded() {
+        val companyId = companyInfoProvider.getCompany()?.id
+
+        val hasNonZeroBalance = repositoryProvider
+                .balances()
+                .itemsList
+                .any {
+                    it.asset.ownerAccountId == companyId && it.available.signum() > 0
+                }
+
+        if (!hasNonZeroBalance) {
+            pager.currentItem = adapter.getIndexOf(DashboardPagerAdapter.SHOP_PAGE)
+        }
+    }
 
     override fun onBackPressed(): Boolean {
         val currentPage = adapter.getItem(pager.currentItem)

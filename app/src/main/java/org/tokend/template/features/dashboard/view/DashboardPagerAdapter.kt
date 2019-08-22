@@ -16,7 +16,12 @@ class DashboardPagerAdapter(context: Context,
             Triple(
                     fragmentFactory.getBalancesFragment(),
                     context.getString(R.string.balances_screen_title),
-                    1L
+                    BALANCES_PAGE
+            ),
+            Triple(
+                    fragmentFactory.getAllAtomicSwapAsksFragment(),
+                    context.getString(R.string.shop_title),
+                    SHOP_PAGE
             )
     )
 
@@ -36,5 +41,10 @@ class DashboardPagerAdapter(context: Context,
 
     fun getIndexOf(id: Long): Int {
         return pages.indexOfFirst { it.third == id }
+    }
+
+    companion object {
+        const val BALANCES_PAGE = 1L
+        const val SHOP_PAGE = 2L
     }
 }

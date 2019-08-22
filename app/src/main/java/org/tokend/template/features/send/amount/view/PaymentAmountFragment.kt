@@ -114,6 +114,7 @@ class PaymentAmountFragment : AmountInputFragment() {
         ) { balance ->
             balance.asset.isTransferable
                     && balance.asset.ownerAccountId == companyId
+                    && balance.available.signum() > 0
         }
     }
 

@@ -6,6 +6,7 @@ import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
+import org.tokend.template.features.dashboard.shop.repository.AllAtomicSwapAsksRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -44,4 +45,5 @@ interface RepositoryProvider {
     fun companyClientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository
     fun keyValueEntries(): KeyValueEntriesRepository
     fun blobs(): BlobsRepository
+    fun allAtomicSwapAsks(): AllAtomicSwapAsksRepository
 }

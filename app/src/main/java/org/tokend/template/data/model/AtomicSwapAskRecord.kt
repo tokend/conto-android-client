@@ -1,20 +1,24 @@
 package org.tokend.template.data.model
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.sdk.api.generated.resources.AtomicSwapAskResource
 import java.io.Serializable
 import java.math.BigDecimal
 
 class AtomicSwapAskRecord(
         val id: String,
-        val asset: Asset,
+        val asset: AssetRecord,
         val amount: BigDecimal,
         val isCanceled: Boolean,
         val quoteAssets: List<QuoteAsset>
 ) : Serializable {
     constructor(source: AtomicSwapAskResource,
-                assetsMap: Map<String, Asset>) : this(
+                assetsMap: Map<String, Asset>,
+                urlConfig: UrlConfig?,
+                mapper: ObjectMapper
+    ) : this(
             id = source.id,
-            asset = SimpleAsset(source.baseAsset),
+            asset = AssetRecord.fromResource(source.baseAsset, urlConfig, mapper),
             amount = source.availableAmount,
             isCanceled = source.isCanceled,
             quoteAssets = source.quoteAssets.map {
@@ -40,5 +44,5 @@ class AtomicSwapAskRecord(
             override val trailingDigits: Int,
             val price: BigDecimal,
             override val name: String?
-    ): Asset
+    ) : Asset
 }

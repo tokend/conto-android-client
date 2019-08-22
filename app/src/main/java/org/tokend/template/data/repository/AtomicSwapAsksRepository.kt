@@ -1,5 +1,6 @@
 package org.tokend.template.data.repository
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import org.tokend.rx.extensions.toSingle
@@ -15,12 +16,15 @@ import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
 
 class AtomicSwapAsksRepository(
         private val apiProvider: ApiProvider,
         private val asset: String,
         private val assetsRepository: AssetsRepository,
+        private val urlConfigProvider: UrlConfigProvider,
+        private val objectMapper: ObjectMapper,
         itemsCache: RepositoryCache<AtomicSwapAskRecord>
 ) : SimpleMultipleItemsRepository<AtomicSwapAskRecord>(itemsCache) {
 
@@ -62,7 +66,10 @@ class AtomicSwapAsksRepository(
                             .map { items to it }
                 }
                 .map { (items, assetsMap) ->
-                    items.mapSuccessful { AtomicSwapAskRecord(it, assetsMap) }
+                    items.mapSuccessful {
+                        AtomicSwapAskRecord(it, assetsMap,
+                                urlConfigProvider.getConfig(), objectMapper)
+                    }
                 }
     }
 }
