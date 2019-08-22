@@ -201,7 +201,10 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
-                .filter { it.asset.ownerAccountId == companyId }
+                .filter {
+                    it.asset.ownerAccountId == companyId
+                            && it.available.signum() > 0
+                }
                 .map(::BalanceListItem)
 
         adapter.setData(items)

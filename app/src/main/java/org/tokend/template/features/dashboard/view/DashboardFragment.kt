@@ -79,10 +79,14 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
     // endregion
 
     private fun switchToShopIfNeeded() {
+        val companyId = companyInfoProvider.getCompany()?.id
+
         val hasNonZeroBalance = repositoryProvider
                 .balances()
                 .itemsList
-                .any { it.available.signum() > 0 }
+                .any {
+                    it.asset.ownerAccountId == companyId && it.available.signum() > 0
+                }
 
         if (!hasNonZeroBalance) {
             pager.currentItem = adapter.getIndexOf(DashboardPagerAdapter.SHOP_PAGE)
