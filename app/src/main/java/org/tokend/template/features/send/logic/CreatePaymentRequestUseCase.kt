@@ -30,7 +30,6 @@ class CreatePaymentRequestUseCase(
     class SendToYourselfException : Exception()
 
     private lateinit var senderAccount: String
-    private lateinit var senderEmail: String
     private lateinit var senderBalance: String
     private var subjectContent = subject
 
@@ -38,7 +37,6 @@ class CreatePaymentRequestUseCase(
         return getSenderInfo()
                 .doOnSuccess { senderInfo ->
                     this.senderAccount = senderInfo.accountId
-                    this.senderEmail = senderInfo.email
 
                     if (senderAccount == recipient.accountId) {
                         throw SendToYourselfException()
@@ -87,7 +85,7 @@ class CreatePaymentRequestUseCase(
     private fun getSubjectContent(): Single<String> {
         val content = if (recipient is PaymentRecipient.NotExisting)
             BalanceChangeCause.Payment.PaymentToNotExistingRecipientMeta(
-                    senderEmail = senderEmail,
+                    senderAccount = senderAccount,
                     recipientEmail = recipient.actualEmail,
                     actualSubject = subject
             ).let { GsonFactory().getBaseGson().toJson(it) }

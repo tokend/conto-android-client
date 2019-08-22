@@ -111,8 +111,8 @@ class BalanceChangesRepository(
                     .onErrorReturnItem(emptyMap())
                     .map { emailsMap ->
                         payments.forEach { payment ->
-                            payment.sourceName = emailsMap[payment.sourceAccountId]
-                            payment.destName = emailsMap[payment.destAccountId]
+                            emailsMap[payment.sourceAccountId]?.also { payment.sourceName = it }
+                            emailsMap[payment.destAccountId]?.also { payment.destName = it }
                         }
                     }
                     .map { changesPage }

@@ -2,6 +2,7 @@ package org.tokend.template.data.model.history.details
 
 import com.google.gson.annotations.SerializedName
 import org.tokend.sdk.api.generated.resources.*
+import org.tokend.sdk.factory.GsonFactory
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.SimpleFeeRecord
@@ -159,29 +160,50 @@ sealed class BalanceChangeCause : Serializable {
          */
         class PaymentToNotExistingRecipientMeta(
                 @SerializedName("sender")
-                val senderEmail: String,
+                val senderAccount: String,
                 @SerializedName("email")
                 val recipientEmail: String,
                 @SerializedName("subject")
                 val actualSubject: String?
         )
 
-        constructor(op: OpPaymentDetailsResource) : this(
-                sourceAccountId = op.accountFrom.id,
-                destAccountId = op.accountTo.id,
-                destFee = SimpleFeeRecord(op.destinationFee),
-                sourceFee = SimpleFeeRecord(op.sourceFee),
-                isDestFeePaidBySource = op.sourcePayForDestination(),
-                subject = op.subject.takeIf { it.isNotEmpty() },
-                destName = null,
-                sourceName = null,
-                reference = op.reference
-        )
+        companion object {
+            fun fromPaymentOp(op: OpPaymentDetailsResource): Payment {
+                val rawSubject = op.subject.takeIf { it.isNotEmpty() }
+
+                val meta = try {
+                    GsonFactory().getBaseGson().fromJson(
+                            rawSubject,
+                            PaymentToNotExistingRecipientMeta::class.java
+                    ).also { assert(it.senderAccount.isNotEmpty()) }
+                } catch (_: Exception) {
+                    null
+                }
+
+                val actualSubject =
+                        if (meta != null)
+                            meta.actualSubject
+                        else
+                            rawSubject
+
+                return Payment(
+                        sourceAccountId = meta?.senderAccount ?: op.accountFrom.id,
+                        destAccountId = op.accountTo.id,
+                        destFee = SimpleFeeRecord(op.destinationFee),
+                        sourceFee = SimpleFeeRecord(op.sourceFee),
+                        isDestFeePaidBySource = op.sourcePayForDestination(),
+                        subject = actualSubject,
+                        destName = meta?.recipientEmail,
+                        sourceName = null,
+                        reference = op.reference
+                )
+            }
+        }
 
         constructor(request: PaymentRequest) : this(
                 sourceAccountId = request.senderAccountId,
                 destAccountId = request.recipient.accountId,
-                subject = request.paymentSubject,
+                subject = request.actualPaymentSubject,
                 sourceFee = request.fee.senderFee,
                 destFee =
                 if (request.fee.senderPaysForRecipient)

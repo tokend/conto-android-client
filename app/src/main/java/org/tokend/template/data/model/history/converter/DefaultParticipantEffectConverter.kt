@@ -136,7 +136,7 @@ class DefaultParticipantEffectConverter: ParticipantEffectConverter {
         return try {
             when (operationDetails) {
                 is OpPaymentDetailsResource ->
-                    BalanceChangeCause.Payment(operationDetails)
+                    BalanceChangeCause.Payment.fromPaymentOp(operationDetails)
                 is OpCreateIssuanceRequestDetailsResource ->
                     BalanceChangeCause.Issuance(operationDetails)
                 is OpCreateWithdrawRequestDetailsResource ->
