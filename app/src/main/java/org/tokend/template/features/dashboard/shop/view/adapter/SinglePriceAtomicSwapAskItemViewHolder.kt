@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseViewHolder
+import org.tokend.template.view.adapter.base.SimpleItemClickListener
 import org.tokend.template.view.util.LogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
@@ -42,6 +43,11 @@ class SinglePriceAtomicSwapAskItemViewHolder(
                         abbreviation = true
                 )
         )
-        buyButton.isClickable = false
+    }
+
+    override fun bind(item: SinglePriceAtomicSwapAskListItem,
+                      clickListener: SimpleItemClickListener<SinglePriceAtomicSwapAskListItem>?) {
+        super.bind(item, clickListener)
+        buyButton.setOnClickListener { clickListener?.invoke(view, item) }
     }
 }
