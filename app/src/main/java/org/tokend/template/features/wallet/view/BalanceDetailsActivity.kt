@@ -23,6 +23,7 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
+import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
 import org.tokend.template.util.Navigator
@@ -142,7 +143,8 @@ class BalanceDetailsActivity : BaseActivity() {
 
         val actions = mutableListOf<FloatingActionMenuAction>()
 
-        if (asset?.ownerAccountId == accountId) {
+        if (asset?.ownerAccountId == accountId
+                && repositoryProvider.kycState().forcedType != ForcedAccountType.GENERAL) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,

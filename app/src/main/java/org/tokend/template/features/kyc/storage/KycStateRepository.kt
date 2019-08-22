@@ -21,6 +21,7 @@ import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycState
+import org.tokend.template.features.signin.model.ForcedAccountType
 
 /**
  * Holds user's KYC data and it's state
@@ -63,6 +64,8 @@ class KycStateRepository(
 
     val itemFormData: KycForm?
         get() = (item as? KycState.Submitted<*>)?.formData
+
+    var forcedType: ForcedAccountType? = null
 
     fun set(newState: KycState) {
         onNewItem(newState)
