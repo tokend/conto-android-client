@@ -21,6 +21,8 @@ class PostSignInManager(
                 // Added actions will be performed simultaneously.
                 repositoryProvider.account().updateDeferred(),
                 repositoryProvider.kycState().updateIfNotFreshDeferred().andThen(Completable.defer {
+                    repositoryProvider.kycState().forcedType = forcedAccountType
+
                     // Update balances for corporate users, companies otherwise.
                     if (forcedAccountType == ForcedAccountType.CORPORATE ||
                             forcedAccountType == null

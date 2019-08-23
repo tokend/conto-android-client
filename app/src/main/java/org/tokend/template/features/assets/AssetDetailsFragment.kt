@@ -126,17 +126,6 @@ open class AssetDetailsFragment : BaseFragment() {
     protected open fun displaySummary() {
         val card = InfoCard(cards_layout)
                 .setHeading(R.string.asset_summary_title, null)
-                .addRow(R.string.asset_available,
-                        amountFormatter.formatAssetAmount(asset.available, asset,
-                                withAssetCode = false))
-                .addRow(R.string.asset_issued,
-                        amountFormatter.formatAssetAmount(asset.issued, asset,
-                                withAssetCode = false))
-                .addRow(R.string.asset_maximum,
-                        amountFormatter.formatAssetAmount(asset.maximum, asset,
-                                withAssetCode = false))
-
-        card.addRow("", null)
 
         if (asset.isTransferable) {
             card.addRow(R.string.asset_can_be_transferred, null)

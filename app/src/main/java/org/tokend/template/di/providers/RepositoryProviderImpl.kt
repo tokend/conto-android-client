@@ -3,6 +3,7 @@ package org.tokend.template.di.providers
 import android.content.Context
 import android.support.v4.util.LruCache
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.tokend.template.BuildConfig
 import org.tokend.template.data.model.history.converter.DefaultParticipantEffectConverter
 import org.tokend.template.data.repository.*
 import org.tokend.template.data.repository.assets.AssetChartRepository
@@ -13,6 +14,7 @@ import org.tokend.template.data.repository.base.MemoryOnlyRepositoryCache
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.extensions.getOrPut
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
+import org.tokend.template.features.dashboard.shop.repository.AllAtomicSwapAsksRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -39,7 +41,11 @@ class RepositoryProviderImpl(
         private val kycStatePersistor: SubmittedKycStatePersistor? = null
 ) : RepositoryProvider {
     private val conversionAssetCode
-        get() = companyInfoProvider?.getCompany()?.conversionAssetCode
+        get() =
+            if (BuildConfig.ENABLE_BALANCES_CONVERSION)
+                companyInfoProvider?.getCompany()?.conversionAssetCode
+            else
+                null
 
     private val companyId: String?
         get() = companyInfoProvider?.getCompany()?.id
@@ -116,6 +122,9 @@ class RepositoryProviderImpl(
         CompanyClientsRepository(apiProvider, walletInfoProvider,
                 assets(), MemoryOnlyRepositoryCache())
     }
+
+    private val allAtomicSwapAsksRepositories =
+            LruCache<String, AllAtomicSwapAsksRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     private val keyValueEntries: KeyValueEntriesRepository by lazy {
         KeyValueEntriesRepository(apiProvider, MemoryOnlyRepositoryCache())
@@ -286,6 +295,8 @@ class RepositoryProviderImpl(
                     apiProvider,
                     asset,
                     assets(),
+                    urlConfigProvider,
+                    mapper,
                     MemoryOnlyRepositoryCache()
             )
         }
@@ -324,6 +335,19 @@ class RepositoryProviderImpl(
 
     override fun blobs(): BlobsRepository {
         return blobs
+    }
+
+    override fun allAtomicSwapAsks(): AllAtomicSwapAsksRepository {
+        val key = companyId.toString()
+        return allAtomicSwapAsksRepositories.getOrPut(key) {
+            AllAtomicSwapAsksRepository(
+                    companyId,
+                    apiProvider,
+                    urlConfigProvider,
+                    mapper,
+                    MemoryOnlyRepositoryCache()
+            )
+        }
     }
 
     companion object {

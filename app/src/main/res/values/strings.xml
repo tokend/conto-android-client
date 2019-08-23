@@ -498,6 +498,8 @@
     <string name="not_existing_payment_recipient_warning_title">Account doesn\'t exist</string>
     <string name="template_not_existing_payment_recipient_warning"><![CDATA[Recipient has no account in the system yet.
         You can perform a payment anyway, funds will be received once <b>%1$s</b> account is created]]></string>
+    <string name="shop_title">Shop</string>
+    <string name="template_price">Price: %1$s</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

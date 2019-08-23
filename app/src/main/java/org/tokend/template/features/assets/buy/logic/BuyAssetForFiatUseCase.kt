@@ -50,6 +50,9 @@ class BuyAssetForFiatUseCase(
                 .flatMap {
                     getInvoice()
                 }
+                .doOnSuccess {
+                    updateRepositories()
+                }
     }
 
     private fun getAccountId(): Single<String> {
@@ -92,5 +95,10 @@ class BuyAssetForFiatUseCase(
                 .submitBidTransaction(transaction)
                 .toSingle()
                 .map(::FiatInvoice)
+    }
+
+    private fun updateRepositories() {
+        repositoryProvider.allAtomicSwapAsks().updateIfEverUpdated()
+        repositoryProvider.atomicSwapAsks(ask.asset.code).updateIfEverUpdated()
     }
 }

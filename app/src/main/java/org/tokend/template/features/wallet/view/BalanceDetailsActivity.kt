@@ -10,10 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
-import com.github.clans.fab.FloatingActionButton
-import com.github.clans.fab.FloatingActionMenu
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_details.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
@@ -26,6 +23,7 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
+import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
 import org.tokend.template.util.Navigator
@@ -145,23 +143,8 @@ class BalanceDetailsActivity : BaseActivity() {
 
         val actions = mutableListOf<FloatingActionMenuAction>()
 
-        if (BuildConfig.IS_DIRECT_BUY_ALLOWED) {
-            actions.add(FloatingActionMenuAction(
-                    this,
-                    R.string.buy,
-                    R.drawable.ic_buy_fab,
-                    {
-                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
-                        navigator.openAtomicSwapsAsks(assetCode)
-                    },
-                    isEnabled = false,
-                    id = BUY_MENU_ITEM_ID
-            ))
-
-            enableBuyFabIfThereAreAsks()
-        }
-
-        if (asset?.ownerAccountId == accountId) {
+        if (asset?.ownerAccountId == accountId
+                && repositoryProvider.kycState().forcedType != ForcedAccountType.GENERAL) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,
@@ -242,25 +225,6 @@ class BalanceDetailsActivity : BaseActivity() {
         }
 
         return actions
-    }
-
-    private fun enableBuyFabIfThereAreAsks() {
-        val asset = this.balance?.asset ?: return
-        val asksRepository = repositoryProvider.atomicSwapAsks(asset.code)
-
-        asksRepository
-                .updateDeferred()
-                .compose(ObservableTransformers.defaultSchedulersCompletable())
-                .subscribeBy(
-                        onComplete = {
-                            if (asksRepository.itemsList.isNotEmpty()) {
-                                menu_fab.findViewById<FloatingActionButton>(BUY_MENU_ITEM_ID)
-                                        .isEnabled = true
-                            }
-                        },
-                        onError = { it.printStackTrace()}
-                )
-                .addTo(compositeDisposable)
     }
 
     private val hideFabScrollListener =

@@ -510,4 +510,6 @@
     <string name="not_existing_payment_recipient_warning_title">Аккаунт не существует</string>
     <string name="template_not_existing_payment_recipient_warning"><![CDATA[У получателя еще нет аккаунта в системе.
         Вы все равно можете отправить платеж, средства будут получены как только аккаунт <b>%1$s</b> будет зарегистрирован]]></string>
+    <string name="shop_title">Магазин</string>
+    <string name="template_price">Цена: %1$s</string>
 </resources>

@@ -25,7 +25,9 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.*
+import org.tokend.template.view.util.ColumnCalculator
+import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 import org.tokend.template.view.util.fab.addActions
 import java.math.BigDecimal
@@ -59,7 +61,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onInitAllowed() {
-        initCompanyLogo()
         initList()
         initSwipeRefresh()
         initToolbar()
@@ -82,21 +83,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                 }
             }
 
-    private fun initCompanyLogo() {
-        val company = companyInfoProvider.getCompany()
-                ?: return
-
-        company_logo_image_view.visibility = View.VISIBLE
-
-        val logoSize = resources.getDimensionPixelSize(R.dimen.unlock_logo_size)
-        LogoUtil.setLogo(
-                company_logo_image_view,
-                company.name,
-                company.logoUrl,
-                logoSize
-        )
-    }
-
     private fun initList() {
         layoutManager = GridLayoutManager(requireContext(), 1)
         adapter = BalanceItemsAdapter(amountFormatter)
@@ -117,7 +103,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
-        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
+//        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
     }
 
     private fun initToolbar() {
@@ -126,7 +112,11 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         } else {
             appbar.visibility = View.GONE
         }
-        ElevationUtil.initScrollElevation(app_bar, appbar_elevation_view)
+
+        // Do not forget to add SwipeRefreshDependency when making visible.
+        app_bar.visibility = View.GONE
+        appbar_elevation_view.visibility = View.GONE
+
         toolbarSubject.onNext(toolbar)
     }
 
@@ -213,7 +203,10 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
-                .filter { it.asset.ownerAccountId == companyId }
+                .filter {
+                    it.asset.ownerAccountId == companyId
+                            && it.available.signum() > 0
+                }
                 .map(::BalanceListItem)
 
         adapter.setData(items)
