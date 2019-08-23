@@ -16,6 +16,7 @@ class AccountDetailsRepository(
     class NoIdentityAvailableException : Exception()
 
     private val identities = mutableSetOf<IdentityRecord>()
+    private val notExistingIdentifiers = mutableSetOf<String>()
 
     /**
      * Loads account ID for given identifier.
@@ -82,7 +83,7 @@ class AccountDetailsRepository(
                     val cached = identitiesByAccountId[accountId]
                     if (cached != null) {
                         toReturn[accountId] = cached.email
-                    } else {
+                    } else if (!notExistingIdentifiers.contains(accountId)) {
                         toRequest.add(accountId)
                     }
                 }
@@ -113,6 +114,12 @@ class AccountDetailsRepository(
     }
 
     private fun getIdentity(params: IdentitiesPageParams): Single<IdentityRecord> {
+        val identifier = params.identifier ?: params.address
+
+        if (identifier != null && notExistingIdentifiers.contains(identifier)) {
+            return Single.error(NoIdentityAvailableException())
+        }
+
         return apiProvider
                 .getApi()
                 .identities
@@ -130,6 +137,11 @@ class AccountDetailsRepository(
                 }
                 .map(::IdentityRecord)
                 .doOnSuccess { identities.add(it) }
+                .doOnError {
+                    if (it is NoIdentityAvailableException && identifier != null) {
+                        notExistingIdentifiers.add(identifier)
+                    }
+                }
     }
 
     fun getCachedIdentity(accountId: String): IdentityRecord? {

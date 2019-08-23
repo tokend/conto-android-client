@@ -101,9 +101,14 @@ class BalanceChangesRepository(
                 .filterIsInstance(BalanceChangeCause.Payment::class.java)
 
         val accounts = payments
-                .map(BalanceChangeCause.Payment::sourceAccountId)
-                .toMutableList()
-        accounts.addAll(payments.map(BalanceChangeCause.Payment::destAccountId))
+                .map { payment ->
+                    listOf(
+                            payment.sourceAccountId.takeIf { payment.sourceName == null },
+                            payment.destAccountId.takeIf { payment.destName == null }
+                    )
+                }
+                .flatten()
+                .filterNotNull()
 
         return if (accounts.isNotEmpty() && accountDetailsRepository != null) {
             accountDetailsRepository
@@ -111,8 +116,8 @@ class BalanceChangesRepository(
                     .onErrorReturnItem(emptyMap())
                     .map { emailsMap ->
                         payments.forEach { payment ->
-                            payment.sourceName = emailsMap[payment.sourceAccountId]
-                            payment.destName = emailsMap[payment.destAccountId]
+                            emailsMap[payment.sourceAccountId]?.also { payment.sourceName = it }
+                            emailsMap[payment.destAccountId]?.also { payment.destName = it }
                         }
                     }
                     .map { changesPage }

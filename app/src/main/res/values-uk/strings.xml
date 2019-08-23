@@ -507,6 +507,9 @@
     <string name="environment_selection_sign_out_warning">Буде виконано вихід з акаунта</string>
     <string name="waiting_for_kyc_approval_message">Акаунт ось-ось активується…</string>
     <string name="person_name">Ім\'я</string>
+    <string name="not_existing_payment_recipient_warning_title">Акаунт не існує</string>
+    <string name="template_not_existing_payment_recipient_warning"><![CDATA[Отримувач ще не має акаунта в системі.
+        Ви все одно можете відправити платіж, кошти надійдуть як тільки акаунт <b>%1$s</b> буде зареєстровано]]></string>
     <string name="shop_title">Магазин</string>
     <string name="template_price">Ціна: %1$s</string>
 </resources>
