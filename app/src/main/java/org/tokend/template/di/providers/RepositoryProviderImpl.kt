@@ -3,6 +3,7 @@ package org.tokend.template.di.providers
 import android.content.Context
 import android.support.v4.util.LruCache
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.tokend.template.BuildConfig
 import org.tokend.template.data.model.history.converter.DefaultParticipantEffectConverter
 import org.tokend.template.data.repository.*
 import org.tokend.template.data.repository.assets.AssetChartRepository
@@ -40,7 +41,11 @@ class RepositoryProviderImpl(
         private val kycStatePersistor: SubmittedKycStatePersistor? = null
 ) : RepositoryProvider {
     private val conversionAssetCode
-        get() = companyInfoProvider?.getCompany()?.conversionAssetCode
+        get() =
+            if (BuildConfig.ENABLE_BALANCES_CONVERSION)
+                companyInfoProvider?.getCompany()?.conversionAssetCode
+            else
+                null
 
     private val companyId: String?
         get() = companyInfoProvider?.getCompany()?.id
