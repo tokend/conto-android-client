@@ -132,6 +132,6 @@ abstract class TfaDialog(protected val context: Context,
         }
     }
 
-    abstract fun getMessage(): String
+    abstract fun getMessage(): CharSequence
     abstract fun getInvalidInputError(): String
 }

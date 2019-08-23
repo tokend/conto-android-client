@@ -518,4 +518,5 @@
     <string name="connect_telegram">Подключить</string>
     <string name="telegram_connected_successfully">Telegram подключен</string>
     <string name="error_telegram_username_already_taken">Никнейм уже занят</string>
+    <string name="template_telegram_otp_dialog_message_bot_url"><![CDATA[Получите код у <a href=\"%1$s\">нашего Telegram бота</a>]]></string>
 </resources>

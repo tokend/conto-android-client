@@ -506,6 +506,7 @@
     <string name="connect_telegram">Connect</string>
     <string name="telegram_connected_successfully">Telegram has been connected</string>
     <string name="error_telegram_username_already_taken">This username is already taken</string>
+    <string name="template_telegram_otp_dialog_message_bot_url"><![CDATA[Get your verification code from <a href=\"%1$s\">our Telegram bot</a>]]></string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
