@@ -3,6 +3,7 @@ package org.tokend.template.features.settings.telegram.view
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
+import android.text.InputFilter
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_telegram_username_setting.*
@@ -70,6 +71,14 @@ class TelegramUsernameSettingsActivity : BaseActivity() {
 
     private fun initFields() {
         username_edit_text.setPaddings(sp(16), 0, 0, 0)
+        username_edit_text.filters = arrayOf(
+                InputFilter { source, _, _, _, _, _->
+                    if (source.contains('@'))
+                        source.toString().replace("@", "")
+                    else
+                        null
+                }
+        )
         username_edit_text.addTextChangedListener(object : SimpleTextWatcher() {
             override fun afterTextChanged(s: Editable?) {
                 username_edit_text.error = null
