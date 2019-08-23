@@ -2,9 +2,9 @@
 <android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <android.support.v7.preference.PreferenceCategory
+        android:key="app"
         android:layout="@layout/preference_category_layout_divider"
-        android:title="@string/settings_app_group"
-        android:key="app">
+        android:title="@string/settings_app_group">
 
         <android.support.v7.preference.Preference
             android:icon="@drawable/ic_language"
@@ -21,9 +21,9 @@
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory
+        android:key="account"
         android:layout="@layout/preference_category_layout"
-        android:title="@string/settings_account_group"
-        android:key="account">
+        android:title="@string/settings_account_group">
 
         <android.support.v7.preference.Preference
             android:icon="@drawable/ic_account_check"
@@ -37,6 +37,12 @@
             android:key="phone"
             android:layout="@layout/preference_layout"
             android:title="@string/phone_number_settings_title" />
+
+        <android.support.v7.preference.Preference
+            android:icon="@drawable/ic_telegram"
+            android:key="telegram"
+            android:layout="@layout/preference_layout"
+            android:title="@string/telegram_username_settings_title" />
 
         <android.support.v7.preference.Preference
             android:icon="@drawable/ic_sign_out"
@@ -75,9 +81,9 @@
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory
+        android:key="info"
         android:layout="@layout/preference_category_layout_divider"
-        android:title="@string/settings_information_group"
-        android:key="info">
+        android:title="@string/settings_information_group">
 
         <android.support.v7.preference.Preference
             android:icon="@drawable/ic_insert_chart"

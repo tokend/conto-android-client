@@ -69,6 +69,7 @@ import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
+import org.tokend.template.features.settings.telegram.view.TelegramUsernameSettingsActivity
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
@@ -517,6 +518,11 @@ class Navigator private constructor() {
 
     fun openPhoneNumberSettings() {
         context?.intentFor<PhoneNumberSettingsActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openTelegramUsernameSettings() {
+        context?.intentFor<TelegramUsernameSettingsActivity>()
                 ?.also { performIntent(it) }
     }
 

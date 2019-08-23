@@ -250,6 +250,9 @@
         <activity
             android:name=".features.kyc.view.WaitForKycApprovalActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
-    </application>
+        <activity
+            android:name=".features.settings.telegram.view.TelegramUsernameSettingsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" /></application>
 
 </manifest>
