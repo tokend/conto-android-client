@@ -102,7 +102,7 @@
     <string name="asset_can_be_withdrawn">Может выводиться</string>
     <string name="asset_can_not_be_withdrawn">Не может выводиться</string>
 
-    <string name="dashboard_title">@string/balances_screen_title</string>
+    <string name="dashboard_title">Кошелек</string>
     <string name="deposit_title">Депозит</string>
     <string name="withdraw_title">Вывод</string>
     <string name="explore_assets_title">Активы</string>

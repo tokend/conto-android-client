@@ -102,7 +102,7 @@
     <string name="asset_can_be_withdrawn">Може виводитися</string>
     <string name="asset_can_not_be_withdrawn">Не може виводитися</string>
 
-    <string name="dashboard_title">@string/balances_screen_title</string>
+    <string name="dashboard_title">Гаманець</string>
     <string name="deposit_title">Депозит</string>
     <string name="withdraw_title">Вивід</string>
     <string name="explore_assets_title">Активи</string>

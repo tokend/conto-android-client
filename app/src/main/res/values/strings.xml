@@ -104,7 +104,7 @@
     <string name="asset_can_be_withdrawn">Can be withdrawn</string>
     <string name="asset_can_not_be_withdrawn">Can\'t be withdrawn</string>
 
-    <string name="dashboard_title">@string/balances_screen_title</string>
+    <string name="dashboard_title">Wallet</string>
     <string name="deposit_title">Deposit</string>
     <string name="withdraw_title">Withdraw</string>
     <string name="explore_assets_title">Assets</string>
