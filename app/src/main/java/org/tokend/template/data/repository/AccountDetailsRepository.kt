@@ -72,6 +72,23 @@ class AccountDetailsRepository(
                 .flatMapMaybe { it.phoneNumber.toMaybe() }
     }
 
+    /**
+     * Loads Telegram username for given account ID if it exists.
+     * Result will be cached.
+     *
+     * @see NoIdentityAvailableException
+     */
+    fun getTelegramUsernameByAccountId(accountId: String): Maybe<String> {
+        val existingIdentity = identities.find { it.accountId == accountId }
+
+        if (existingIdentity != null) {
+            return existingIdentity.telegramUsername.toMaybe()
+        }
+
+        return getIdentity(IdentitiesPageParams(address = accountId))
+                .flatMapMaybe { it.telegramUsername.toMaybe() }
+    }
+
     fun getEmailsByAccountIds(accountIds: List<String>): Single<Map<String, String>> {
         val toReturn = mutableMapOf<String, String>()
         val toRequest = mutableListOf<String>()

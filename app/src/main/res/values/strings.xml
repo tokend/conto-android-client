@@ -500,6 +500,13 @@
         You can perform a payment anyway, funds will be received once <b>%1$s</b> account is created]]></string>
     <string name="shop_title">Shop</string>
     <string name="template_price">Price: %1$s</string>
+    <string name="telegram_username_settings_title">Telegram</string>
+    <string name="set_telegram_username_explanation">Connect Telegram to the account to let your friends find you faster</string>
+    <string name="telegram_username">Telegram username</string>
+    <string name="connect_telegram">Connect</string>
+    <string name="telegram_connected_successfully">Telegram has been connected</string>
+    <string name="error_telegram_username_already_taken">This username is already taken</string>
+    <string name="template_telegram_otp_dialog_message_bot_url"><![CDATA[Get your verification code from <a href=\"%1$s\">our Telegram bot</a>]]></string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

@@ -104,6 +104,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     private fun initAccountCategory() {
         initKycItem()
         initPhoneNumberItem()
+        initTelegramUsernameItem()
         initSignOutItem()
         hideCategoryIfEmpty("account")
     }
@@ -121,6 +122,14 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         val phoneNumberPreference = findPreference("phone")
         phoneNumberPreference?.setOnPreferenceClickListener {
             Navigator.from(this).openPhoneNumberSettings()
+            true
+        }
+    }
+
+    private fun initTelegramUsernameItem() {
+        val telegramUsernamePreference = findPreference("telegram")
+        telegramUsernamePreference?.setOnPreferenceClickListener {
+            Navigator.from(this).openTelegramUsernameSettings()
             true
         }
     }
