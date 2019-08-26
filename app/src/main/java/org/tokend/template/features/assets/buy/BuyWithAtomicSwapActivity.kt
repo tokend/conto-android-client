@@ -11,7 +11,6 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.jetbrains.anko.browse
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
@@ -22,6 +21,7 @@ import org.tokend.template.features.assets.buy.logic.BuyAssetForFiatUseCase
 import org.tokend.template.features.assets.buy.model.FiatInvoice
 import org.tokend.template.features.assets.buy.view.AtomicSwapAmountFragment
 import org.tokend.template.features.assets.buy.view.quoteasset.AtomicSwapQuoteAssetFragment
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -162,7 +162,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     }
 
     private fun onBidSubmitted(invoice: FiatInvoice) {
-        browse(invoice.paymentFormUrl, true)
+        Navigator.from(this).openWebInvoice(invoice.paymentFormUrl)
         setResult(Activity.RESULT_OK)
         finish()
     }

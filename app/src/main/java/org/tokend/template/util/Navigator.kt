@@ -27,6 +27,7 @@ import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
+import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
@@ -582,6 +583,12 @@ class Navigator private constructor() {
                                 relatedBalanceId
                         )
                 ))
+                ?.also { performIntent(it) }
+    }
+
+    fun openWebInvoice(invoiceUrl: String) {
+        context?.intentFor<WebInvoiceActivity>()
+                ?.putExtras(WebInvoiceActivity.getBundle(invoiceUrl))
                 ?.also { performIntent(it) }
     }
 }
