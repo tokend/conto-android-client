@@ -293,6 +293,7 @@ open class AmountInputFragment : BaseFragment() {
      */
     protected open fun getBalancePicker(): BalancePickerBottomDialog {
         val companyId = companyInfoProvider.getCompany()?.id
+                ?: walletInfoProvider.getWalletInfo()?.accountId
 
         return BalancePickerBottomDialog(
                 requireContext(),

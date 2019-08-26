@@ -94,6 +94,7 @@ class PaymentAmountFragment : AmountInputFragment() {
 
     override fun getBalancePicker(): BalancePickerBottomDialog {
         val companyId = companyInfoProvider.getCompany()?.id
+                ?: walletInfoProvider.getWalletInfo()?.accountId
 
         return BalancePickerBottomDialog(
                 requireContext(),
