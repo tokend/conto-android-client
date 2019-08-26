@@ -586,9 +586,10 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openWebInvoice(invoiceUrl: String) {
+    fun openWebInvoice(invoiceUrl: String,
+                       requestCode: Int = 0) {
         context?.intentFor<WebInvoiceActivity>()
                 ?.putExtras(WebInvoiceActivity.getBundle(invoiceUrl))
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 }

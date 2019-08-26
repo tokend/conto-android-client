@@ -1,6 +1,7 @@
 package org.tokend.template.features.assets.buy.view
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import kotlinx.android.synthetic.main.activity_web_invoice.*
 import kotlinx.android.synthetic.main.toolbar.*
+import okhttp3.HttpUrl
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 
@@ -39,8 +41,9 @@ class WebInvoiceActivity : BaseActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         web_view.webViewClient = object : WebViewClient() {
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            override fun onPageStarted(view: WebView?, url: String, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                finishIfNeeded(url)
                 progress.visibility = View.VISIBLE
             }
 
@@ -59,6 +62,19 @@ class WebInvoiceActivity : BaseActivity() {
 
     private fun navigate(url: String) {
         web_view.loadUrl(url)
+    }
+
+    private fun finishIfNeeded(url: String) {
+        val successRedirectUrl = HttpUrl.parse(urlConfigProvider.getConfig().client)
+                ?: return
+        val currentUrl = HttpUrl.parse(url)
+                ?: return
+
+        // Successful payment causes redirect to web client.
+        if (currentUrl.host() == successRedirectUrl.host()) {
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
     }
 
     companion object {

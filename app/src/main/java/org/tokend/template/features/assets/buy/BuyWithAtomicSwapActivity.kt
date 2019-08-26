@@ -1,6 +1,7 @@
 package org.tokend.template.features.assets.buy
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
@@ -25,6 +26,7 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
 
 class BuyWithAtomicSwapActivity : BaseActivity() {
@@ -162,9 +164,8 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     }
 
     private fun onBidSubmitted(invoice: FiatInvoice) {
-        Navigator.from(this).openWebInvoice(invoice.paymentFormUrl)
-        setResult(Activity.RESULT_OK)
-        finish()
+        Navigator.from(this).openWebInvoice(invoice.paymentFormUrl, WEB_INVOICE_REQUEST)
+        SoftInputUtil.hideSoftInput(this)
     }
 
     private fun displayFragment(
@@ -215,9 +216,18 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == WEB_INVOICE_REQUEST && resultCode == Activity.RESULT_OK) {
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+    }
+
     companion object {
         private const val ASSET_CODE_EXTRA = "asset_code"
         private const val ASK_ID_EXTRA = "ask_id"
+        private val WEB_INVOICE_REQUEST = "web_invoice".hashCode() and 0xffff
 
         fun getBundle(assetCode: String,
                       askId: String) = Bundle().apply {
