@@ -229,7 +229,7 @@ open class PaymentRecipientFragment : BaseFragment() {
         recipientLoadingDisposable =
                 PaymentRecipientLoader(
                         repositoryProvider.accountDetails(),
-                        repositoryProvider.systemInfo()
+                        apiProvider
                 )
                         .load(recipient)
                         .compose(ObservableTransformers.defaultSchedulersSingle())
