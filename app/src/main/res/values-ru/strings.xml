@@ -385,7 +385,7 @@
     <string name="template_amount_with_converted">%1$s ≈ %2$s</string>
     <string name="template_converted_amount">≈ %1$s</string>
     <string name="asset_distribution_other">Другое</string>
-    <string name="movements_screen_title">Операции</string>
+    <string name="movements_screen_title">История</string>
     <string name="balances_screen_title">Балансы</string>
     <string name="unlock_label">Войти</string>
     <string name="use_password">Ввести пароль</string>

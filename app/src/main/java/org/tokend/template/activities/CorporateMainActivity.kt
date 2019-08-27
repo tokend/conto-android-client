@@ -13,6 +13,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.dashboard.balances.view.CompanyBalancesFragment
+import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.util.Navigator
@@ -37,11 +38,14 @@ class CorporateMainActivity : MainActivity() {
     override fun addRequiredNavigationItems(builder: DrawerBuilder,
                                             items: Map<Long, PrimaryDrawerItem>) {
         builder.apply {
-            addDrawerItems(items[CompanyClientsFragment.ID])
-            addDrawerItems(items[CompanyBalancesFragment.ID])
-            addDrawerItems(items[SettingsFragment.ID])
-            addDrawerItems(DividerDrawerItem())
-            addDrawerItems(items[CONTRIBUTE_ITEM_ID])
+            addDrawerItems(
+                    items[CompanyClientsFragment.ID],
+                    items[CompanyBalancesFragment.ID],
+                    items[AssetMovementsFragment.ID],
+                    items[SettingsFragment.ID],
+                    DividerDrawerItem(),
+                    items[CONTRIBUTE_ITEM_ID]
+            )
         }
     }
 

@@ -1,4 +1,4 @@
-package org.tokend.template.features.dashboard.movements.view
+package org.tokend.template.features.movements.view
 
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -7,14 +7,18 @@ import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_movements.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
@@ -22,11 +26,13 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.LocalizedName
+import java.math.BigDecimal
 
-class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
+class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
 
     private val loadingIndicator = LoadingIndicatorManager(
@@ -34,14 +40,21 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
 
+    private val balancesRepository: BalancesRepository
+        get() = repositoryProvider.balances()
+
+    private var currentBalance: BalanceRecord? = null
+        set(value) {
+            field = value
+            onBalanceChanged()
+        }
+
     private val balanceChangesRepository: BalanceChangesRepository
-        get() = repositoryProvider.balanceChanges(null)
+        get() = repositoryProvider.balanceChanges(currentBalance?.id)
 
     private lateinit var adapter: BalanceChangesAdapter
 
-    private val allowToolbar: Boolean by lazy {
-        arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, true) ?: true
-    }
+    private lateinit var balancePicker: BalancePickerBottomDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_movements, container, false)
@@ -50,34 +63,63 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
     override fun onInitAllowed() {
         initToolbar()
         initSwipeRefresh()
-        initHistory()
-        ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
-
-        subscribeToHistory()
-
-        update()
+        initBalanceSelection()
+        initList()
     }
 
     // region Init
     private fun initToolbar() {
-        if (allowToolbar) {
-            toolbar.title = getString(R.string.movements_screen_title)
+        toolbar.title = getString(R.string.movements_screen_title)
 
-            ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
-        } else {
-            appbar_elevation_view.visibility = View.GONE
-            appbar.visibility = View.GONE
+        val dropDownButton = ImageButton(requireContext()).apply {
+            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_arrow_drop_down))
+            background = null
+
+            setOnClickListener {
+                openBalancePicker()
+            }
         }
+
+        toolbar.addView(dropDownButton)
+
+        ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
+
         toolbarSubject.onNext(toolbar)
     }
 
+    private fun initBalanceSelection() {
+        val companyId = companyInfoProvider.getCompany()?.id
+                ?: walletInfoProvider.getWalletInfo()?.accountId
+
+        balancePicker = object : BalancePickerBottomDialog(
+                requireContext(),
+                amountFormatter,
+                balanceComparator,
+                balancesRepository,
+                balancesFilter = { it.asset.ownerAccountId == companyId }
+        ) {
+            // Available amounts are useless on this screen.
+            override fun getAvailableAmount(assetCode: String,
+                                            balance: BalanceRecord?): BigDecimal? = null
+        }
+
+        val items = balancePicker.getItemsToDisplay()
+
+        if (items.isEmpty()) {
+            error_empty_view.showEmpty(R.string.no_transaction_history)
+            return
+        }
+
+        currentBalance = items.first().source
+    }
+
     private fun initSwipeRefresh() {
-        swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
+        swipe_refresh.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
     }
 
-    private fun initHistory() {
-        adapter = BalanceChangesAdapter(amountFormatter, true)
+    private fun initList() {
+        adapter = BalanceChangesAdapter(amountFormatter, false)
         adapter.onItemClick { _, item ->
             item.source?.let { Navigator.from(this).openBalanceChangeDetails(it) }
         }
@@ -89,7 +131,7 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
         error_empty_view.setEmptyViewDenial { balanceChangesRepository.isNeverUpdated }
 
         history_list.adapter = adapter
-        history_list.layoutManager = LinearLayoutManager(context!!)
+        history_list.layoutManager = LinearLayoutManager(requireContext())
 
         history_list.listenBottomReach({ adapter.getDataItemCount() }) {
             balanceChangesRepository.loadMore() || balanceChangesRepository.noMoreItems
@@ -99,12 +141,22 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
     }
     // endregion
 
+    private var historyDisposable: Disposable? = null
+
     private fun subscribeToHistory() {
+        val disposable = CompositeDisposable()
+        this.historyDisposable?.dispose()
+        this.historyDisposable = disposable
+
+        if (currentBalance == null) {
+            return
+        }
+
         balanceChangesRepository
                 .itemsSubject
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { displayHistory() }
-                .addTo(compositeDisposable)
+                .addTo(disposable)
 
         balanceChangesRepository
                 .loadingSubject
@@ -121,7 +173,7 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
                         adapter.hideLoadingFooter()
                     }
                 }
-                .addTo(compositeDisposable)
+                .addTo(disposable)
 
         balanceChangesRepository
                 .errorsSubject
@@ -135,7 +187,9 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
                         errorHandlerFactory.getDefault().handle(error)
                     }
                 }
-                .addTo(compositeDisposable)
+                .addTo(disposable)
+
+        disposable.addTo(compositeDisposable)
     }
 
     private fun displayHistory() {
@@ -146,30 +200,32 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
         adapter.setData(balanceChangesRepository.itemsList.map { balanceChange ->
             BalanceChangeListItem(balanceChange, accountId, localizedName)
         })
+    }
 
+    private fun openBalancePicker() {
+        balancePicker.show {
+            currentBalance = it.source
+        }
+    }
+
+    private fun onBalanceChanged() {
+        toolbar.subtitle = currentBalance?.asset?.name ?: currentBalance?.assetCode
         history_list.resetBottomReachHandled()
+        subscribeToHistory()
+        update()
     }
 
     private fun update(force: Boolean = false) {
         if (!force) {
+            balancesRepository.updateIfNotFresh()
             balanceChangesRepository.updateIfNotFresh()
         } else {
+            balancesRepository.update()
             balanceChangesRepository.update()
         }
     }
 
     companion object {
-        val ID = "account_movements".hashCode().toLong()
-        private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
-
-        fun newInstance(bundle: Bundle): AccountMovementsFragment {
-            val fragment = AccountMovementsFragment()
-            fragment.arguments = bundle
-            return fragment
-        }
-
-        fun getBundle(allowToolbar: Boolean) = Bundle().apply {
-            putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
-        }
+        val ID = "asset_movements".hashCode().toLong()
     }
 }

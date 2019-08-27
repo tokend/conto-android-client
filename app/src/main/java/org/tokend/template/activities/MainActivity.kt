@@ -45,6 +45,7 @@ import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.storage.KycStateRepository
+import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.SettingsFragment
@@ -204,7 +205,12 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withName(R.string.github)
                     .withIdentifier(CONTRIBUTE_ITEM_ID)
                     .withIcon(R.drawable.ic_github_circle)
-                    .withSelectable(false)
+                    .withSelectable(false),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.movements_screen_title)
+                    .withIdentifier(AssetMovementsFragment.ID)
+                    .withIcon(R.drawable.ic_history)
     )
 
     protected open fun getHeaderInstance(email: String): AccountHeader {
@@ -351,7 +357,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun addRequiredNavigationItems(builder: DrawerBuilder,
                                                   items: Map<Long, PrimaryDrawerItem>) {
         builder.apply {
-            addDrawerItems(items[DashboardFragment.ID])
+            addDrawerItems(
+                    items[DashboardFragment.ID],
+                    items[AssetMovementsFragment.ID]
+            )
 
             if (BuildConfig.IS_DEPOSIT_ALLOWED) {
                 addDrawerItems(items[DepositFragment.ID])
@@ -435,6 +444,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             SalesFragment.ID -> factory.getSalesFragment()
             TradeAssetPairsFragment.ID -> factory.getTradeAssetPairsFragment()
             PollsFragment.ID -> factory.getPollsFragment()
+            AssetMovementsFragment.ID -> factory.getAssetMovementsFragment()
             else -> null
         }
     }

@@ -16,6 +16,7 @@ import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.invest.view.fragments.SaleChartFragment
 import org.tokend.template.features.invest.view.fragments.SaleDetailsFragment
 import org.tokend.template.features.invest.view.fragments.SaleOverviewFragment
+import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.trade.chart.view.AssetPairChartFragment
@@ -138,5 +139,9 @@ class FragmentFactory {
 
     fun getAllAtomicSwapAsksFragment(): Fragment {
         return AllAtomicSwapAsksFragment()
+    }
+
+    fun getAssetMovementsFragment(): Fragment {
+        return AssetMovementsFragment()
     }
 }
