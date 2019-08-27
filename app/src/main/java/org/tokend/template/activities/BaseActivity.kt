@@ -21,6 +21,7 @@ import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
 import org.tokend.template.features.tfa.view.TfaDialogFactory
 import org.tokend.template.logic.AppTfaCallback
 import org.tokend.template.logic.Session
+import org.tokend.template.logic.persistance.BackgroundLockManager
 import org.tokend.template.logic.persistance.CredentialsPersistor
 import org.tokend.template.logic.persistance.UrlConfigPersistor
 import org.tokend.template.util.ObservableTransformers
@@ -69,6 +70,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     lateinit var localeManager: AppLocaleManager
     @Inject
     lateinit var environmentManager: AppEnvironmentsManager
+    @Inject
+    lateinit var backgroundLockManager: BackgroundLockManager
 
     /**
      * If set to true the activity will be operational
