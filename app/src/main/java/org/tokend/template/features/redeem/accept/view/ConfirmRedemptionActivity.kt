@@ -27,7 +27,7 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
-import org.tokend.template.view.util.CopyDataDialogFactory
+import org.tokend.template.view.dialog.CopyDataDialogFactory
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.ProgressDialogFactory
 import java.math.BigDecimal

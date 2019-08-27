@@ -28,15 +28,14 @@ import org.tokend.template.features.tfa.logic.EnableTfaUseCase
 import org.tokend.template.features.tfa.model.TfaFactorRecord
 import org.tokend.template.features.tfa.view.confirmation.TfaConfirmationDialogFactory
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.logic.persistance.BackgroundLockManager
 import org.tokend.template.logic.persistance.FingerprintUtil
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.SingleCheckDialog
+import org.tokend.template.view.dialog.SignOutDialogFactory
+import org.tokend.template.view.dialog.SingleCheckDialog
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.LocalizedName
-import org.tokend.template.view.util.SignOutDialogFactory
 
 class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
@@ -138,7 +137,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
     private fun initSignOutItem() {
         val signOutPreference = findPreference("sign_out")
         signOutPreference?.setOnPreferenceClickListener {
-            SignOutDialogFactory.getTunedDialog(requireContext()) {
+            SignOutDialogFactory.getDialog(requireContext()) {
                 (requireActivity().application as App).signOut(requireActivity())
             }.show()
             true

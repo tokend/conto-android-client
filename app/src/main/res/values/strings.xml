@@ -509,6 +509,8 @@
     <string name="template_telegram_otp_dialog_message_bot_url"><![CDATA[Get your verification code from <a href=\"%1$s\">our Telegram bot</a>]]></string>
     <string name="web_invoice_screen_title">Payment</string>
     <string name="lock_app_in_background">Lock app in background</string>
+    <string name="open_email_app">Open mailbox</string>
+    <string name="almost_done">Almost done</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

@@ -12,7 +12,7 @@ import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.util.Navigator
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
-import org.tokend.template.view.util.CopyDataDialogFactory
+import org.tokend.template.view.dialog.CopyDataDialogFactory
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LocalizedName
 

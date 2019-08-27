@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.annotation.StyleRes
 import org.tokend.template.R
 import org.tokend.template.util.environments.AppEnvironmentsManager
-import org.tokend.template.view.SingleCheckDialog
+import org.tokend.template.view.dialog.SingleCheckDialog
 
 class EnvironmentSelectionDialog(
         private val context: Context,
