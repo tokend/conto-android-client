@@ -27,7 +27,7 @@ class BackgroundLockManager(context: Context) {
         }
 
     companion object {
-        private const val ENABLED_BY_DEFAULT = true
+        private const val ENABLED_BY_DEFAULT = false
         private const val PREFERENCE_KEY = "background_lock"
     }
 }
