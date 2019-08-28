@@ -6,6 +6,7 @@ import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
 import org.tokend.template.util.Navigator
+import org.tokend.template.util.SearchUtil
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 
 class CompanyBalancesFragment : BalancesFragment() {
@@ -65,6 +66,11 @@ class CompanyBalancesFragment : BalancesFragment() {
                 .map {
                     BalanceListItem(it, ownerName = null)
                 }
+                .filter {item ->
+                    filter?.let {
+                        SearchUtil.isMatchGeneralCondition(it, item.assetName, item.ownerName)
+                    } ?: true
+                }
 
         adapter.setData(items)
     }
@@ -78,7 +84,7 @@ class CompanyBalancesFragment : BalancesFragment() {
 
         fun newInstance(): CompanyBalancesFragment {
             val fragment = CompanyBalancesFragment()
-            fragment.arguments = BalancesFragment.getBundle(true)
+            fragment.arguments = getBundle(true)
             return fragment
         }
     }

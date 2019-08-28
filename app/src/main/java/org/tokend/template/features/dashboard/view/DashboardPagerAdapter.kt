@@ -14,7 +14,7 @@ class DashboardPagerAdapter(context: Context,
 
     private val pages = arrayListOf(
             Triple(
-                    fragmentFactory.getBalancesFragment(),
+                    fragmentFactory.getBalancesFragment(withToolbar = false),
                     context.getString(R.string.balances_screen_title),
                     BALANCES_PAGE
             ),

@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.rxkotlin.addTo
@@ -25,13 +26,11 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.ColumnCalculator
-import org.tokend.template.view.util.LoadingIndicatorManager
-import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
+import org.tokend.template.util.SearchUtil
+import org.tokend.template.view.util.*
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 import org.tokend.template.view.util.fab.addActions
 import java.math.BigDecimal
-
 
 open class BalancesFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
@@ -46,10 +45,19 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     protected lateinit var adapter: BalanceItemsAdapter
     private lateinit var layoutManager: GridLayoutManager
+    protected var filter: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                onFilterChanged()
+            }
+        }
 
     private val allowToolbar: Boolean by lazy {
         arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, false) ?: false
     }
+
+    private var searchMenuItem: MenuItem? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_balances, container, false)
@@ -98,26 +106,50 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         error_empty_view.observeAdapter(adapter, R.string.you_have_no_balances)
         error_empty_view.setEmptyViewDenial { balancesRepository.isNeverUpdated }
         error_empty_view.setEmptyDrawable(R.drawable.ic_coins)
+
+        ElevationUtil.initScrollElevation(balances_list, appbar_elevation_view)
     }
 
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
-//        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
     }
 
     private fun initToolbar() {
         if (allowToolbar) {
             toolbar.title = getString(R.string.balances_screen_title)
+            initMenu()
         } else {
             appbar.visibility = View.GONE
         }
 
         // Do not forget to add SwipeRefreshDependency when making visible.
         app_bar.visibility = View.GONE
-        appbar_elevation_view.visibility = View.GONE
 
         toolbarSubject.onNext(toolbar)
+    }
+
+    private fun initMenu() {
+        toolbar.inflateMenu(R.menu.explore)
+        val menu = toolbar.menu
+
+        searchMenuItem = menu?.findItem(R.id.search) ?: return
+        val searchItem = menu.findItem(R.id.search) ?: return
+
+        try {
+            val searchManager = MenuSearchViewManager(searchItem, toolbar, compositeDisposable)
+
+            searchManager.queryHint = getString(R.string.search)
+            searchManager
+                    .queryChanges
+                    .compose(ObservableTransformers.defaultSchedulers())
+                    .subscribe { newValue ->
+                        filter = newValue.takeIf { it.isNotEmpty() }
+                    }
+                    .addTo(compositeDisposable)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun initFab() {
@@ -195,6 +227,10 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         displayTotal()
     }
 
+    private fun onFilterChanged() {
+        displayBalances()
+    }
+
     // region Display
     protected open fun displayBalances() {
         val systemAssetLabel = getString(R.string.system_asset)
@@ -205,6 +241,11 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                 .filter { it.available.signum() > 0 }
                 .map {
                     BalanceListItem(it, ownerName = it.company?.name ?: systemAssetLabel)
+                }
+                .filter {item ->
+                    filter?.let {
+                        SearchUtil.isMatchGeneralCondition(it, item.assetName, item.ownerName)
+                    } ?: true
                 }
 
         adapter.setData(items)
@@ -247,6 +288,9 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         return if (menu_fab.isOpened) {
             menu_fab.close(true)
             false
+        } else if (searchMenuItem?.isActionViewExpanded == true) {
+            searchMenuItem?.collapseActionView()
+            false
         } else {
             super.onBackPressed()
         }
@@ -254,6 +298,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+        val ID = "balances".hashCode().toLong()
 
         fun newInstance(bundle: Bundle): BalancesFragment {
             val fragment = BalancesFragment()

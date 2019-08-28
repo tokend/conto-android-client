@@ -29,6 +29,7 @@ import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
@@ -60,7 +61,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         private const val REPO_URL = "https://github.com/tokend/conto-android-client"
     }
 
-    protected open val defaultFragmentId = DashboardFragment.ID
+    protected open val defaultFragmentId = BalancesFragment.ID
 
     private var navigationDrawer: Drawer? = null
     private var landscapeNavigationDrawer: Drawer? = null
@@ -130,8 +131,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected open fun getNavigationItems() = listOf(
             PrimaryDrawerItem()
-                    .withName(R.string.dashboard_title)
-                    .withIdentifier(DashboardFragment.ID)
+                    .withName(R.string.balances_screen_title)
+                    .withIdentifier(BalancesFragment.ID)
                     .withIcon(R.drawable.ic_coins),
 
             PrimaryDrawerItem()
@@ -257,7 +258,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                                                   items: Map<Long, PrimaryDrawerItem>) {
         builder.apply {
             addDrawerItems(
-                    items[DashboardFragment.ID],
+                    items[BalancesFragment.ID],
                     items[AssetMovementsFragment.ID]
             )
 
@@ -335,6 +336,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             TradeAssetPairsFragment.ID -> factory.getTradeAssetPairsFragment()
             PollsFragment.ID -> factory.getPollsFragment()
             AssetMovementsFragment.ID -> factory.getAssetMovementsFragment()
+            BalancesFragment.ID -> factory.getBalancesFragment(withToolbar = true)
             else -> null
         }
     }
@@ -427,15 +429,15 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     override fun onPaymentRequestConfirmed(paymentRequest: PaymentRequest) {
-        navigateTo(DashboardFragment.ID)
+        navigateTo(defaultFragmentId)
     }
 
     override fun onWithdrawalRequestConfirmed(withdrawalRequest: WithdrawalRequest) {
-        navigateTo(DashboardFragment.ID)
+        navigateTo(defaultFragmentId)
     }
 
     override fun onAtomicSwapBuyConfirmed() {
-        navigateTo(DashboardFragment.ID)
+        navigateTo(defaultFragmentId)
     }
 
     override fun onRedemptionRequestAccepted() {}

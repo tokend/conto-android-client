@@ -116,8 +116,10 @@ class FragmentFactory {
         )
     }
 
-    fun getBalancesFragment(): Fragment {
-        return BalancesFragment()
+    fun getBalancesFragment(withToolbar: Boolean): Fragment {
+        return BalancesFragment.newInstance(
+                BalancesFragment.getBundle(withToolbar)
+        )
     }
 
     fun getPollsFragment(ownerAccountId: String? = null): Fragment {
