@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 
 class ShareRedemptionQrFragment : ShareQrFragment() {
     override val title: String
-        get() = session.getCompany()?.name ?: ""
+        get() = ""
 
     override val shareDialogText: String
         get() = getString(R.string.share_redemption_request)

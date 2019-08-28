@@ -16,7 +16,7 @@ import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
 
 class AllAtomicSwapAsksRepository(
-        private val companyId: String?,
+        private val ownerAccountId: String?,
         private val apiProvider: ApiProvider,
         private val urlConfigProvider: UrlConfigProvider,
         private val objectMapper: ObjectMapper,
@@ -28,7 +28,7 @@ class AllAtomicSwapAsksRepository(
 
         return signedApi.v3.atomicSwaps.getAtomicSwapAsks(
                 AtomicSwapAsksPageParams(
-                        owner = companyId,
+                        owner = ownerAccountId,
                         include = listOf(
                                 AtomicSwapAskParams.Includes.BASE_BALANCE,
                                 AtomicSwapAskParams.Includes.QUOTE_ASSETS,

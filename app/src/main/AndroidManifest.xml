@@ -190,9 +190,6 @@
             android:name=".features.companies.view.CompaniesActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
-            android:name=".features.companies.view.CompanyLoadingActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
-        <activity
             android:name=".features.redeem.create.view.CreateRedemptionActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />

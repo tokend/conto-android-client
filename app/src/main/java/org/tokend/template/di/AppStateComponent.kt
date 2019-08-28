@@ -22,7 +22,6 @@ import javax.inject.Singleton
     UtilModule::class,
     AppModule::class,
     SessionModule::class,
-    CompanyInfoProviderModule::class,
     LocaleManagerModule::class,
     EnvironmentManagerModule::class
 ])

@@ -28,7 +28,7 @@ class AllAtomicSwapAsksFragment: BaseFragment() {
     )
 
     private val asksRepository: AllAtomicSwapAsksRepository
-        get() = repositoryProvider.allAtomicSwapAsks()
+        get() = repositoryProvider.allAtomicSwapAsks("")
 
     private lateinit var adapter: SinglePriceAtomicSwapAsksAdapter
     private lateinit var layoutManager: GridLayoutManager

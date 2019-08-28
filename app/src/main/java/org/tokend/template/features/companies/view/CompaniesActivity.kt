@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.ClientCompaniesRepository
 import org.tokend.template.features.companies.view.adapter.CompanyItemsAdapter
 import org.tokend.template.features.companies.view.adapter.CompanyListItem
@@ -124,9 +123,6 @@ class CompaniesActivity : BaseActivity() {
         companiesAdapter.registerAdapterDataObserver(
                 ScrollOnTopItemUpdateAdapterObserver(companies_recycler_view)
         )
-        companiesAdapter.onItemClick { _, item ->
-            item.source?.also(this::onCompanySelected)
-        }
     }
 
     private fun subscribeToCompanies() {
@@ -162,20 +158,6 @@ class CompaniesActivity : BaseActivity() {
     }
 
     private fun onCompaniesLoaded() {
-        if (clientCompaniesRepository.itemsList.size == 1) {
-            val company = clientCompaniesRepository.itemsList.first()
-            onCompanySelected(company)
-            return
-        }
-
-        clientCompaniesRepository
-                .itemsList
-                .find { it.id == session.lastCompanyId }
-                ?.let { company ->
-                    onCompanySelected(company)
-                    return
-                }
-
         displayCompanies()
     }
 
@@ -204,11 +186,6 @@ class CompaniesActivity : BaseActivity() {
         } else {
             clientCompaniesRepository.update()
         }
-    }
-
-    private fun onCompanySelected(company: CompanyRecord) {
-        session.setCompany(company)
-        Navigator.from(this).toCompanyLoading()
     }
 
     private fun addCompany() {

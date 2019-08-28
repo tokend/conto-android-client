@@ -11,9 +11,9 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
 
     override fun onInitAllowed() {
         val askId = arguments?.getString(ASK_ID_EXTRA)
+        TODO("Serialize ask instead of searching it")
         this.ask = listOf(
-                repositoryProvider.atomicSwapAsks(requestedAsset!!).itemsList,
-                repositoryProvider.allAtomicSwapAsks().itemsList
+                repositoryProvider.atomicSwapAsks(requestedAsset!!).itemsList
         )
                 .flatten()
                 .find { it.id == askId }

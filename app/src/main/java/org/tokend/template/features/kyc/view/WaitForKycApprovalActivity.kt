@@ -69,7 +69,7 @@ class WaitForKycApprovalActivity : BaseActivity() {
 
     private fun onKycApproved() {
         toastManager.short(R.string.account_setup_completed)
-        Navigator.from(this).toCompaniesActivity()
+        Navigator.from(this).toMainActivity(true)
     }
 
     private fun onCheckError(error: Throwable) {

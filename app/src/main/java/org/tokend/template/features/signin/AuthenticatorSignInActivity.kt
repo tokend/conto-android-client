@@ -227,7 +227,8 @@ class AuthenticatorSignInActivity : BaseActivity() {
                 .subscribeBy(
                         onComplete = {
                             setResult(Activity.RESULT_OK)
-                            Navigator.from(this).toCompaniesActivity()
+                            Navigator.from(this)
+                                    .performPostSignInRouting(repositoryProvider.kycState().item)
                         },
                         onError = {
                             errorHandlerFactory.getDefault().handle(it)

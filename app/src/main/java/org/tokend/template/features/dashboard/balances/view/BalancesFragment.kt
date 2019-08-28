@@ -126,7 +126,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     protected open fun getFabActions(): Collection<FloatingActionMenuAction> {
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val balances = balancesRepository.itemsList
         val navigator = Navigator.from(this)
 
@@ -198,15 +197,10 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     // region Display
     protected open fun displayBalances() {
-        val companyId = companyInfoProvider.getCompany()?.id
-
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
-                .filter {
-                    it.asset.ownerAccountId == companyId
-                            && it.available.signum() > 0
-                }
+                .filter { it.available.signum() > 0 }
                 .map(::BalanceListItem)
 
         adapter.setData(items)
@@ -214,7 +208,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     protected open fun displayTotal() {
         val conversionAssetCode = balancesRepository.conversionAsset
-        val companyId = companyInfoProvider.getCompany()?.id
 
         if (conversionAssetCode == null) {
             total_text_view.visibility = View.GONE
@@ -223,7 +216,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
         val total = balancesRepository
                 .itemsList
-                .filter { it.asset.ownerAccountId == companyId }
                 .fold(BigDecimal.ZERO) { sum, balance ->
                     sum.add(balance.convertedAmount ?: BigDecimal.ZERO)
                 }

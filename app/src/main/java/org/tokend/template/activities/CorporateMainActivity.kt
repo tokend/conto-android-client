@@ -83,8 +83,6 @@ class CorporateMainActivity : MainActivity() {
                 }
     }
 
-    override fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> = emptyList()
-
     override fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_client)
 
     override fun switchAccountType() {

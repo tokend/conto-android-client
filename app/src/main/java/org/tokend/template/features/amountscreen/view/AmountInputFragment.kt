@@ -292,15 +292,12 @@ open class AmountInputFragment : BaseFragment() {
      * @return [BalancePickerBottomDialog] with required filter
      */
     protected open fun getBalancePicker(): BalancePickerBottomDialog {
-        val companyId = companyInfoProvider.getCompany()?.id
-                ?: walletInfoProvider.getWalletInfo()?.accountId
-
         return BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { it.asset.ownerAccountId == companyId }
+        )
     }
 
     /**

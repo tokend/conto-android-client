@@ -88,15 +88,11 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initBalanceSelection() {
-        val companyId = companyInfoProvider.getCompany()?.id
-                ?: walletInfoProvider.getWalletInfo()?.accountId
-
         balancePicker = object : BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
                 balanceComparator,
-                balancesRepository,
-                balancesFilter = { it.asset.ownerAccountId == companyId }
+                balancesRepository
         ) {
             // Available amounts are useless on this screen.
             override fun getAvailableAmount(assetCode: String,

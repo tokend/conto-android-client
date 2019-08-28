@@ -34,8 +34,6 @@ import org.tokend.template.features.clients.details.view.CompanyClientDetailsAct
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.companies.add.view.AddCompanyActivity
 import org.tokend.template.features.companies.add.view.AddCompanyConfirmationActivity
-import org.tokend.template.features.companies.view.CompaniesActivity
-import org.tokend.template.features.companies.view.CompanyLoadingActivity
 import org.tokend.template.features.companies.view.ExploreCompaniesActivity
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
@@ -436,27 +434,6 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun toCompaniesActivity() {
-        context?.intentFor<CompaniesActivity>()
-                ?.also { performIntent(it) }
-        activity?.let { fadeOut(it) }
-    }
-
-    fun toCompanyLoading(finishAffinity: Boolean = false) {
-        context?.intentFor<CompanyLoadingActivity>()
-                ?.singleTop()
-                ?.clearTop()
-                ?.also { performIntent(it) }
-        activity?.let {
-            if (finishAffinity) {
-                it.setResult(Activity.RESULT_CANCELED, null)
-                ActivityCompat.finishAffinity(it)
-            } else {
-                it.finish()
-            }
-        }
-    }
-
     fun openRedemptionCreation(assetCode: String? = null) {
         context?.intentFor<CreateRedemptionActivity>()
                 ?.putExtras(CreateRedemptionActivity.getBundle(assetCode))
@@ -561,7 +538,7 @@ class Navigator private constructor() {
             if (kycState is KycState.Submitted.Pending<*>) {
                 toWaitingForKycApproval()
             } else {
-                toCompaniesActivity()
+                toMainActivity()
             }
         } else {
             toClientKyc()

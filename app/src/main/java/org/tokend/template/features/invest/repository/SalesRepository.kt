@@ -18,7 +18,6 @@ import org.tokend.template.extensions.mapSuccessful
 import org.tokend.template.features.invest.model.SaleRecord
 
 class SalesRepository(
-        private val ownerId: String?,
         private val walletInfoProvider: WalletInfoProvider,
         private val apiProvider: ApiProvider,
         private val urlConfigProvider: UrlConfigProvider,
@@ -36,7 +35,6 @@ class SalesRepository(
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
 
         val requestParams = SalesPageParamsV3(
-                owner = ownerId,
                 pagingParams = PagingParamsV2(
                         page = nextCursor,
                         order = PagingOrder.DESC,

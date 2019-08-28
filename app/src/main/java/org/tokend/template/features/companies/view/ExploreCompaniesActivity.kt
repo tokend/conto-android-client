@@ -91,15 +91,6 @@ class ExploreCompaniesActivity : BaseActivity() {
                     || clientCompaniesRepository.isNeverUpdated
         }
 
-        companiesAdapter.onItemClick { view, item ->
-            if (!item.exist) {
-                addCompanyWithConfirmation(item)
-                return@onItemClick
-            }
-            session.setCompany(item.source)
-            Navigator.from(this).toCompanyLoading(true)
-        }
-
         companiesAdapter.registerAdapterDataObserver(
                 ScrollOnTopItemUpdateAdapterObserver(recycler_view)
         )

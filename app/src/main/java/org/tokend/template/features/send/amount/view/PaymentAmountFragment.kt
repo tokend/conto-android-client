@@ -93,19 +93,12 @@ class PaymentAmountFragment : AmountInputFragment() {
     }
 
     override fun getBalancePicker(): BalancePickerBottomDialog {
-        val companyId = companyInfoProvider.getCompany()?.id
-                ?: walletInfoProvider.getWalletInfo()?.accountId
-
         return BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { balance ->
-            balance.asset.isTransferable
-                    && balance.asset.ownerAccountId == companyId
-                    && balance.available.signum() > 0
-        }
+        ) { it.asset.isTransferable && it.available.signum() > 0 }
     }
 
     override fun getExtraView(parent: ViewGroup): View? {

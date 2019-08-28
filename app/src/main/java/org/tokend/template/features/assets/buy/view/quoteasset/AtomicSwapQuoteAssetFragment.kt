@@ -32,9 +32,9 @@ class AtomicSwapQuoteAssetFragment : BaseFragment() {
         val assetCode = arguments?.getString(ASSET_CODE_EXTRA)
                 ?: throw IllegalArgumentException("No $ASSET_CODE_EXTRA specified")
         val askId = arguments?.getString(ASK_ID_EXTRA)
+        TODO("Serialize ask instead of searching it")
         this.ask = listOf(
-                repositoryProvider.atomicSwapAsks(assetCode).itemsList,
-                repositoryProvider.allAtomicSwapAsks().itemsList
+                repositoryProvider.atomicSwapAsks(assetCode).itemsList
         )
                 .flatten()
                 .find { it.id == askId }

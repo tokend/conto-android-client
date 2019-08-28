@@ -42,8 +42,6 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     @Inject
     lateinit var amountFormatter: AmountFormatter
     @Inject
-    lateinit var companyInfoProvider: CompanyInfoProvider
-    @Inject
     lateinit var session: Session
 
     override fun onBackPressed() = true

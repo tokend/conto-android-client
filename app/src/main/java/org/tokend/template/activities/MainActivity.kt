@@ -1,15 +1,8 @@
 package org.tokend.template.activities
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -18,7 +11,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
-import com.mikepenz.fastadapter.IIdentifyable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -30,15 +22,12 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_drawer_header.view.*
 import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
-import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.ClientCompaniesRepository
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
@@ -61,15 +50,12 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
 import org.tokend.template.view.util.PicassoDrawerImageLoader
-import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.util.concurrent.TimeUnit
 
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
-        private val CONTACT_ITEM_ID = "contact".hashCode().toLong()
         val CONTRIBUTE_ITEM_ID = "contribute".hashCode().toLong()
-        private val ADD_COMPANY_ITEM_ID = "add_company".hashCode().toLong()
 
         private const val REPO_URL = "https://github.com/tokend/conto-android-client"
     }
@@ -94,23 +80,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected val kycStateRepository: KycStateRepository
         get() = repositoryProvider.kycState()
 
-    private val clientCompaniesRepository: ClientCompaniesRepository
-        get() = repositoryProvider.clientCompanies()
-
-    private val companyPlaceholderDrawable: Drawable? by lazy {
-        ContextCompat.getDrawable(this, R.drawable.company_logo_placeholder)
-    }
-    private val companyPlaceholderBitmap: Bitmap? by lazy {
-        val drawable = companyPlaceholderDrawable?.mutate()
-                ?: return@lazy null
-        val size = resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon)
-        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        bitmap
-    }
-
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
         window.setBackgroundDrawable(null)
@@ -118,7 +87,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         initNavigation()
 
         subscribeToKycChanges()
-        subscribeToCompanies()
 
         navigationDrawer?.setSelection(defaultFragmentId)
     }
@@ -132,11 +100,12 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         val placeholderValue = email.toUpperCase()
         val placeholderSize =
                 resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon_width)
+        val placeholderBackground =
+                ContextCompat.getColor(this, R.color.avatar_placeholder_background)
         val placeholderDrawable =
                 ProfileUtil.getAvatarPlaceholder(placeholderValue, this, placeholderSize)
         DrawerImageLoader.init(
-                PicassoDrawerImageLoader(this, placeholderDrawable, Color.WHITE,
-                        companyPlaceholderDrawable)
+                PicassoDrawerImageLoader(this, placeholderDrawable, placeholderBackground)
         )
 
         val items = getNavigationItems()
@@ -196,12 +165,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withIcon(R.drawable.ic_settings),
 
             PrimaryDrawerItem()
-                    .withName(R.string.contact_company)
-                    .withIdentifier(CONTACT_ITEM_ID)
-                    .withIcon(R.drawable.ic_email_letter)
-                    .withSelectable(false),
-
-            PrimaryDrawerItem()
                     .withName(R.string.github)
                     .withIdentifier(CONTRIBUTE_ITEM_ID)
                     .withIcon(R.drawable.ic_github_circle)
@@ -214,8 +177,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     )
 
     protected open fun getHeaderInstance(email: String): AccountHeader {
-        var header: AccountHeader? = null
-
         return AccountHeaderBuilder()
                 .withActivity(this)
                 .withAccountHeader(R.layout.navigation_drawer_header)
@@ -226,34 +187,16 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                 .withSelectionListEnabledForSingleProfile(false)
                 .withProfileImagesVisible(true)
                 .withDividerBelowHeader(true)
-                .addProfiles(
-                        getProfileHeaderItem(email),
-                        *getCompaniesProfileItems().toTypedArray()
-                )
+                .addProfiles(getProfileHeaderItem(email))
                 .withThreeSmallProfileImages(true)
                 .withOnlyMainProfileImageVisible(true)
                 .withCurrentProfileHiddenInList(true)
-                .withOnAccountHeaderListener { view, _, isCurrent ->
-                    if (isCurrent) {
-                        openAccountIdShare()
-                    } else {
-                        (view.tag as? CompanyRecord)?.also(this::switchToAnotherCompany)
-                        (view.tag as? Long)
-                                ?.takeIf { it == ADD_COMPANY_ITEM_ID }
-                                ?.also { openCompanyAdd() }
-                    }
-                    false
-                }
-                .withOnAccountHeaderSelectionViewClickListener { _, _ ->
-                    val selectionWasHidden = header?.isSelectionListShown == false
-                    if (selectionWasHidden) {
-                        clientCompaniesRepository.update()
-                    }
-                    false
+                .withOnAccountHeaderListener { _, _, _ ->
+                    openAccountIdShare()
+                    true
                 }
                 .build()
                 .also(this::initAccountTypeSwitch)
-                .also { header = it }
     }
 
     protected open fun initAccountTypeSwitch(accountHeader: AccountHeader) {
@@ -290,53 +233,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         return ProfileDrawerItem()
                 .withIdentifier(1)
                 .withName(name)
-                .withEmail(session.getCompany()?.name ?: "")
+                .withEmail(email)
                 .apply {
                     avatarUrl?.also { withIcon(it) }
-                }
-    }
-
-    protected open fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> {
-        return clientCompaniesRepository
-                .itemsList
-                .map { company ->
-                    ProfileDrawerItem()
-                            .withEmail(company.name)
-                            .withIdentifier(company.hashCode().toLong())
-                            .withSelectable(false)
-                            .withTypeface(
-                                    if (session.getCompany() == company)
-                                        Typeface.DEFAULT_BOLD
-                                    else
-                                        Typeface.DEFAULT
-                            )
-                            .withPostOnBindViewListener { _, view ->
-                                view.tag = company
-                            }
-                            .apply {
-                                if (company.logoUrl != null) {
-                                    withIcon(company.logoUrl)
-                                } else {
-                                    withIcon(companyPlaceholderBitmap)
-                                }
-                            }
-                }
-                .toMutableList()
-                .apply {
-                    add(
-                            ProfileDrawerItem()
-                                    .withEmail(getString(R.string.add_company))
-                                    .withIdentifier(ADD_COMPANY_ITEM_ID)
-                                    .withSelectable(false)
-                                    .withPostOnBindViewListener { _, view ->
-                                        view.tag = ADD_COMPANY_ITEM_ID
-                                    }
-                                    .withTypeface(Typeface.DEFAULT)
-                                    .withIcon(ContextCompat.getDrawable(
-                                            this@MainActivity,
-                                            R.drawable.company_add
-                                    ))
-                    )
                 }
     }
 
@@ -383,7 +282,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             }
 
             addDrawerItems(
-                    items[CONTACT_ITEM_ID],
                     items[SettingsFragment.ID],
                     DividerDrawerItem(),
                     items[CONTRIBUTE_ITEM_ID]
@@ -399,18 +297,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                 .subscribe(profileUpdatesSubject)
     }
 
-    private fun subscribeToCompanies() {
-        clientCompaniesRepository
-                .itemsSubject
-                .map { true }
-                .subscribe(profileUpdatesSubject)
-    }
-
     // region Navigation
     private fun onNavigationItemSelected(item: IDrawerItem<Any, RecyclerView.ViewHolder>)
             : Boolean {
         when (item.identifier) {
-            CONTACT_ITEM_ID -> contactCompany()
             CONTRIBUTE_ITEM_ID -> contribute()
             else -> navigateTo(item.identifier)
 
@@ -454,64 +344,14 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         val email = walletInfoProvider.getWalletInfo()?.email
                 ?: throw IllegalStateException("No email found")
 
-        val mainProfile = getProfileHeaderItem(email)
-        val companyProfiles = getCompaniesProfileItems()
-
-        accountHeader?.also { updateProfiles(it, mainProfile, companyProfiles) }
-        landscapeAccountHeader?.also { updateProfiles(it, mainProfile, companyProfiles) }
-    }
-
-    private fun updateProfiles(header: AccountHeader,
-                               mainProfile: ProfileDrawerItem,
-                               companyProfiles: Collection<ProfileDrawerItem>) {
-        header.updateProfile(mainProfile)
-
-        header.profiles
-                ?.filter { it.identifier != mainProfile.identifier }
-                ?.map(IIdentifyable<Any>::getIdentifier)
-                ?.forEach(header::removeProfileByIdentifier)
-
-        header.addProfiles(*companyProfiles.toTypedArray())
+        val h = getProfileHeaderItem(email)
+        accountHeader?.updateProfile(h)
+        landscapeAccountHeader?.updateProfile(h)
     }
 
     protected open fun openAccountIdShare() {
         val walletInfo = walletInfoProvider.getWalletInfo() ?: return
         Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
-    }
-
-    private fun contactCompany() {
-        val currentCompanyAccount = session.getCompany()?.id
-                ?: return
-
-        var disposable: Disposable? = null
-
-        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
-            disposable?.dispose()
-        }
-
-        disposable = repositoryProvider
-                .accountDetails()
-                .getEmailByAccountId(currentCompanyAccount)
-                .compose(ObservableTransformers.defaultSchedulersSingle())
-                .doOnSubscribe { progress.show() }
-                .doOnEvent { _, _ -> progress.dismiss() }
-                .subscribeBy(
-                        onSuccess = this::openEmailCreation,
-                        onError = { errorHandlerFactory.getDefault().handle(it) }
-                )
-                .addTo(compositeDisposable)
-    }
-
-    private fun openEmailCreation(recipient: String) {
-        val emailIntent = Intent(Intent.ACTION_SENDTO,
-                Uri.fromParts("mailto", recipient, null))
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
-        startActivity(Intent.createChooser(emailIntent,
-                getString(
-                        R.string.template_contact_email,
-                        recipient
-                )
-        ))
     }
 
     private fun contribute() {
@@ -559,20 +399,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             toolbar?.setNavigationIcon(R.drawable.ic_menu)
             side_shadow_view.visibility = View.GONE
         }
-    }
-
-    private fun switchToAnotherCompany(company: CompanyRecord) {
-        if (session.getCompany() == company) {
-            return
-        }
-
-        session.setCompany(company)
-        Navigator.from(this).toCompanyLoading()
-    }
-
-    private fun openCompanyAdd() {
-        navigationDrawer?.closeDrawer()
-        Navigator.from(this).openExploreCompanies()
     }
 
     override fun onBackPressed() {
