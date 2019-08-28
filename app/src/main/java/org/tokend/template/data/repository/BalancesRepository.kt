@@ -33,6 +33,7 @@ class BalancesRepository(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         private val conversionAssetCode: String?,
+        private val companiesRepository: ClientCompaniesRepository,
         itemsCache: RepositoryCache<BalanceRecord>
 ) : SimpleMultipleItemsRepository<BalanceRecord>(itemsCache) {
 
@@ -63,8 +64,7 @@ class BalancesRepository(
                                     urlConfigProvider,
                                     mapper
                             )
-                        }
-                        else
+                        } else
                             Single.error(it)
                     }
         else
@@ -94,13 +94,20 @@ class BalancesRepository(
                         )
                 )
                 .toSingle()
-                .map { convertedBalances ->
+                .flatMap { convertedBalances ->
+                    companiesRepository
+                            .ensureCompanies(
+                                    convertedBalances.states.map { it.balance.asset.owner.id }
+                            )
+                            .map { convertedBalances to it }
+                }
+                .map { (convertedBalances, companiesMap) ->
                     conversionAsset = SimpleAsset(convertedBalances.asset)
                     convertedBalances
                             .states
                             .mapSuccessful {
                                 BalanceRecord(it, urlConfigProvider.getConfig(),
-                                        mapper, conversionAsset)
+                                        mapper, conversionAsset, companiesMap)
                             }
                 }
     }
@@ -112,10 +119,16 @@ class BalancesRepository(
         return signedAccountsApi
                 .getBalances(accountId)
                 .toSingle()
-                .map { sourceList ->
+                .flatMap { sourceList ->
+                    companiesRepository
+                            .ensureCompanies(sourceList.map { it.asset.owner.id })
+                            .map { sourceList to it }
+                }
+                .map { (sourceList, companiesMap) ->
                     sourceList
                             .mapSuccessful {
-                                BalanceRecord(it, urlConfigProvider.getConfig(), mapper)
+                                BalanceRecord(it, urlConfigProvider.getConfig(),
+                                        mapper, companiesMap)
                             }
                 }
     }

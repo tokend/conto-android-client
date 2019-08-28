@@ -54,9 +54,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/standard_padding"
             android:layout_marginEnd="@dimen/standard_margin"
-            android:gravity="end"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible">
@@ -66,14 +66,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/accent"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:text="500" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/quarter_standard_margin"
-                android:text="@string/asset_available_lowercase" />
 
         </LinearLayout>
     </RelativeLayout>

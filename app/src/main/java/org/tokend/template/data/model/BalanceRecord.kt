@@ -11,20 +11,24 @@ class BalanceRecord(
         val asset: AssetRecord,
         var available: BigDecimal,
         val conversionAsset: Asset?,
-        val convertedAmount: BigDecimal?
+        val convertedAmount: BigDecimal?,
+        val company: CompanyRecord?
 ) : Serializable {
-    constructor(source: BalanceResource, urlConfig: UrlConfig?, mapper: ObjectMapper) : this(
+    constructor(source: BalanceResource, urlConfig: UrlConfig?, mapper: ObjectMapper,
+                companiesMap: Map<String, CompanyRecord>) : this(
             id = source.id,
             available = source.state.available,
             asset = AssetRecord.fromResource(source.asset, urlConfig, mapper),
             conversionAsset = null,
-            convertedAmount = null
+            convertedAmount = null,
+            company = companiesMap[source.asset.owner.id]
     )
 
     constructor(source: ConvertedBalanceStateResource,
                 urlConfig: UrlConfig?,
                 mapper: ObjectMapper,
-                conversionAsset: Asset?) : this(
+                conversionAsset: Asset?,
+                companiesMap: Map<String, CompanyRecord>) : this(
             id = source.balance.id,
             available = source.initialAmounts.available,
             asset = AssetRecord.fromResource(source.balance.asset, urlConfig, mapper),
@@ -33,7 +37,8 @@ class BalanceRecord(
             if (source.isConverted)
                 source.convertedAmounts.available
             else
-                null
+                null,
+            company = companiesMap[source.balance.asset.owner.id]
     )
 
     val assetCode: String

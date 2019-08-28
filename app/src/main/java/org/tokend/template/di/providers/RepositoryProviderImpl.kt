@@ -52,6 +52,7 @@ class RepositoryProviderImpl(
                 urlConfigProvider,
                 mapper,
                 conversionAssetCode,
+                clientCompanies(),
                 MemoryOnlyRepositoryCache()
         )
     }

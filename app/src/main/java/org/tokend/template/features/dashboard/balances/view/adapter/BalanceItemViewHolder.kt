@@ -17,8 +17,8 @@ class BalanceItemViewHolder(
 
         nameTextView.text = item.displayedName
 
-        if (item.companyName != null) {
-            bottomTextView.text = item.companyName
+        if (item.ownerName != null) {
+            bottomTextView.text = item.ownerName
             altAmountLayout.visibility = View.VISIBLE
             altAmountTextView.text =
                     amountFormatter.formatAssetAmount(

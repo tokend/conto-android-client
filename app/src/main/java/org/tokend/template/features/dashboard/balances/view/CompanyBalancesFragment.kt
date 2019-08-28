@@ -62,7 +62,9 @@ class CompanyBalancesFragment : BalancesFragment() {
                 .itemsList
                 .sortedWith(balanceComparator)
                 .filter { it.asset.ownerAccountId == companyId }
-                .map(::BalanceListItem)
+                .map {
+                    BalanceListItem(it, ownerName = null)
+                }
 
         adapter.setData(items)
     }

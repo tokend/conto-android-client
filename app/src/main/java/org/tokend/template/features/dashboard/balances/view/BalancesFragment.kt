@@ -197,11 +197,15 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     // region Display
     protected open fun displayBalances() {
+        val systemAssetLabel = getString(R.string.system_asset)
+
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
                 .filter { it.available.signum() > 0 }
-                .map(::BalanceListItem)
+                .map {
+                    BalanceListItem(it, ownerName = it.company?.name ?: systemAssetLabel)
+                }
 
         adapter.setData(items)
     }
