@@ -88,11 +88,19 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initBalanceSelection() {
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+        val filter: ((BalanceRecord) -> Boolean)? =
+                if (!repositoryProvider.kycState().isActualOrForcedGeneral)
+                    { it: BalanceRecord -> it.asset.ownerAccountId == accountId }
+                else
+                    null
+
         balancePicker = object : BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
                 balanceComparator,
-                balancesRepository
+                balancesRepository,
+                balancesFilter = filter
         ) {
             // Available amounts are useless on this screen.
             override fun getAvailableAmount(assetCode: String,
