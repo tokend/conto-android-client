@@ -1,5 +1,6 @@
 package org.tokend.template.data.model.history.details
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import org.tokend.sdk.api.generated.resources.*
 import org.tokend.sdk.factory.GsonFactory
@@ -154,46 +155,75 @@ sealed class BalanceChangeCause : Serializable {
             var destName: String?,
             val reference: String
     ) : BalanceChangeCause() {
+        open class PaymentSubjectMeta(
+                @SerializedName(SUBJECT_KEY)
+                val actualSubject: String?
+        ) {
+            companion object {
+                const val SUBJECT_KEY = "subject"
+            }
+        }
+
         /**
          * Payment metadata which helps to perform payment
          * to not existing recipient.
          */
         class PaymentToNotExistingRecipientMeta(
-                @SerializedName("sender")
+                @SerializedName(SENDER_KEY)
                 val senderAccount: String,
                 @SerializedName("email")
                 val recipientEmail: String,
-                @SerializedName("subject")
-                val actualSubject: String?
-        )
+                actualSubject: String?
+        ) : PaymentSubjectMeta(actualSubject) {
+            companion object {
+                const val SENDER_KEY = "sender"
+            }
+        }
 
         companion object {
             fun fromPaymentOp(op: OpPaymentDetailsResource): Payment {
                 val rawSubject = op.subject.takeIf { it.isNotEmpty() }
 
-                val meta = try {
-                    GsonFactory().getBaseGson().fromJson(
-                            rawSubject,
-                            PaymentToNotExistingRecipientMeta::class.java
-                    ).also { assert(it.senderAccount.isNotEmpty()) }
+                val gson = GsonFactory().getBaseGson()
+                val meta: PaymentSubjectMeta? = try {
+                    val metaJson = gson.fromJson(rawSubject, JsonObject::class.java)!!
+
+                    if (metaJson.has(PaymentToNotExistingRecipientMeta.SENDER_KEY))
+                        gson.fromJson(metaJson, PaymentToNotExistingRecipientMeta::class.java)
+                    else if (metaJson.has(PaymentSubjectMeta.SUBJECT_KEY))
+                        gson.fromJson(metaJson, PaymentSubjectMeta::class.java)
+                    else
+                        null
                 } catch (_: Exception) {
                     null
                 }
 
                 val actualSubject =
                         if (meta != null)
-                            meta.actualSubject
+                            meta.actualSubject?.takeIf(String::isNotEmpty)
                         else
                             rawSubject
 
+                val sourceAccountId =
+                        if (meta is PaymentToNotExistingRecipientMeta)
+                            meta.senderAccount
+                        else
+                            op.accountFrom.id
+
+                val destName =
+                        if (meta is PaymentToNotExistingRecipientMeta)
+                            meta.recipientEmail
+                        else
+                            null
+
                 return Payment(
-                        sourceAccountId = meta?.senderAccount ?: op.accountFrom.id,
+                        sourceAccountId = sourceAccountId,
                         destAccountId = op.accountTo.id,
                         destFee = SimpleFeeRecord(op.destinationFee),
                         sourceFee = SimpleFeeRecord(op.sourceFee),
                         isDestFeePaidBySource = op.sourcePayForDestination(),
                         subject = actualSubject,
-                        destName = meta?.recipientEmail,
+                        destName = destName,
                         sourceName = null,
                         reference = op.reference
                 )
