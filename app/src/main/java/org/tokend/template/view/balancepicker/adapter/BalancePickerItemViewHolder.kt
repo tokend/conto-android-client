@@ -22,7 +22,7 @@ class BalancePickerItemViewHolder(
         nameTextView.text = item.displayedName
 
         if (item.available != null) {
-            amountTextView.text = view.context.getString(
+            bottomTextView.text = view.context.getString(
                     R.string.template_available,
                     amountFormatter.formatAssetAmount(
                             item.available,
@@ -30,21 +30,21 @@ class BalancePickerItemViewHolder(
                             withAssetCode = false
                     )
             )
-            amountTextView.visibility = View.VISIBLE
+            bottomTextView.visibility = View.VISIBLE
         } else {
-            amountTextView.visibility = View.GONE
+            bottomTextView.visibility = View.GONE
         }
 
         if (item.isEnough) {
-            amountTextView.setTextColor(colorDefaultText)
+            bottomTextView.setTextColor(colorDefaultText)
             nameTextView.setTextColor(colorDefaultText)
             logoImageView.alpha = 1f
-            amountTextView.alpha = 1f
+            bottomTextView.alpha = 1f
         } else {
-            amountTextView.setTextColor(colorError)
+            bottomTextView.setTextColor(colorError)
             nameTextView.setTextColor(colorSecondaryText)
             logoImageView.alpha = DISABLED_ALPHA
-            amountTextView.alpha = DISABLED_ALPHA
+            bottomTextView.alpha = DISABLED_ALPHA
         }
     }
 
