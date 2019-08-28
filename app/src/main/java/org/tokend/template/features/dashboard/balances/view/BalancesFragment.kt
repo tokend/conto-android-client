@@ -17,7 +17,6 @@ import kotlinx.android.synthetic.main.fragment_balances.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceItemsAdapter
@@ -157,47 +156,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         menu_fab.setClosedOnTouchOutside(true)
     }
 
-    protected open fun getFabActions(): Collection<FloatingActionMenuAction> {
-        val balances = balancesRepository.itemsList
-        val navigator = Navigator.from(this)
-
-        val actions = mutableListOf<FloatingActionMenuAction>()
-
-        // Redeem.
-        actions.add(FloatingActionMenuAction(
-                requireContext(),
-                R.string.redeem,
-                R.drawable.ic_redeem,
-                {
-                    navigator.openRedemptionCreation()
-                }
-        ))
-
-        // Send, Receive.
-        if (BuildConfig.IS_SEND_ALLOWED) {
-            actions.add(FloatingActionMenuAction(
-                    requireContext(),
-                    R.string.send_title,
-                    R.drawable.ic_send_fab,
-                    {
-                        navigator.openSend()
-                    },
-                    isEnabled = balances.any { it.asset.isTransferable }
-            ))
-            actions.add(FloatingActionMenuAction(
-                    requireContext(),
-                    R.string.receive_title,
-                    R.drawable.ic_receive_fab,
-                    {
-                        val walletInfo = walletInfoProvider.getWalletInfo()
-                                ?: return@FloatingActionMenuAction
-                        navigator.openAccountQrShare(walletInfo)
-                    }
-            ))
-        }
-
-        return actions
-    }
+    protected open fun getFabActions(): Collection<FloatingActionMenuAction> = emptyList()
     // endregion
 
     private fun update(force: Boolean = false) {
