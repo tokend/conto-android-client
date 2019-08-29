@@ -1,4 +1,4 @@
-package org.tokend.template.features.assets.buy
+package org.tokend.template.features.assets.buy.view
 
 import android.app.Activity
 import android.content.Intent
@@ -20,8 +20,6 @@ import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetForFiatUseCase
 import org.tokend.template.features.assets.buy.model.FiatInvoice
-import org.tokend.template.features.assets.buy.view.AtomicSwapAmountFragment
-import org.tokend.template.features.assets.buy.view.quoteasset.AtomicSwapQuoteAssetFragment
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -96,7 +94,6 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 .resultObservable
                 .compose(ObservableTransformers.defaultSchedulers())
                 .map { it as AmountInputResult }
-                .map(AmountInputResult::amount)
                 .subscribeBy(
                         onNext = this::onAmountEntered,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
@@ -105,30 +102,10 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
         displayFragment(fragment, "amount", null)
     }
 
-    private fun onAmountEntered(amount: BigDecimal) {
-        this.amount = amount
-        if (ask.quoteAssets.size > 1) {
-            toQuoteAssetScreen()
-        } else {
-            onQuoteAssetSelected(ask.quoteAssets.first())
-        }
-    }
+    private fun onAmountEntered(amountData: AmountInputResult) {
+        this.amount = amountData.amount
+        this.asset = amountData.asset
 
-    private fun toQuoteAssetScreen() {
-        val fragment = AtomicSwapQuoteAssetFragment.newInstance(ask.asset.code, ask.id, amount)
-        fragment
-                .resultObservable
-                .compose(ObservableTransformers.defaultSchedulers())
-                .subscribeBy(
-                        onNext = this::onQuoteAssetSelected,
-                        onError = { errorHandlerFactory.getDefault().handle(it) }
-                )
-                .addTo(compositeDisposable)
-        displayFragment(fragment, "quote-asset", true)
-    }
-
-    private fun onQuoteAssetSelected(asset: Asset) {
-        this.asset = asset
         submitBid()
     }
 

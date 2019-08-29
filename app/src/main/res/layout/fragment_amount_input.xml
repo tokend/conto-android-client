@@ -22,6 +22,14 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Enter amount to send" />
 
+        <FrameLayout
+            android:id="@+id/extra_top_view_frame"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/balance_text_view" />
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/amount_edit_text_container"
             style="@style/LimitedMatchParentWidthConstraint"

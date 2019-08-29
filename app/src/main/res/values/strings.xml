@@ -514,6 +514,7 @@
     <string name="system_asset">System asset</string>
     <string name="my_companies_tab">My</string>
     <string name="all_companies_tab">All</string>
+    <string name="quantity">Quantity</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

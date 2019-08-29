@@ -526,4 +526,5 @@
     <string name="system_asset">Системний актив</string>
     <string name="my_companies_tab">Мої</string>
     <string name="all_companies_tab">Усі</string>
+    <string name="quantity">Кількість</string>
 </resources>
