@@ -6,18 +6,20 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.model.DataPage
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
+import org.tokend.sdk.api.generated.resources.AtomicSwapQuoteAssetResource
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAskParams
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAsksPageParams
 import org.tokend.template.data.model.AtomicSwapAskRecord
+import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
-import org.tokend.template.extensions.mapSuccessful
 
 class AllAtomicSwapAsksRepository(
         private val companyId: String?,
         private val apiProvider: ApiProvider,
+        private val assetsRepository: AssetsRepository,
         private val urlConfigProvider: UrlConfigProvider,
         private val objectMapper: ObjectMapper,
         itemsCache: RepositoryCache<AtomicSwapAskRecord>
@@ -42,15 +44,20 @@ class AllAtomicSwapAsksRepository(
                 )
         )
                 .toSingle()
-                .map { page ->
-                    DataPage(
-                            nextCursor = page.nextCursor,
-                            isLast = page.isLast,
-                            items = page.items.mapSuccessful {
-                                AtomicSwapAskRecord(it, emptyMap(),
-                                        urlConfigProvider.getConfig(), objectMapper)
-                            }
-                    )
+                .flatMap { page ->
+                    val quoteAssetCodes = page.items
+                            .map { it.quoteAssets.map(AtomicSwapQuoteAssetResource::getQuoteAsset) }
+                            .flatten()
+
+                    assetsRepository
+                            .ensureAssets(quoteAssetCodes)
+                            .map { page to it }
+                }
+                .map { (page, assetsMap) ->
+                    page.mapItems {
+                        AtomicSwapAskRecord(it, assetsMap,
+                                urlConfigProvider.getConfig(), objectMapper)
+                    }
                 }
     }
 

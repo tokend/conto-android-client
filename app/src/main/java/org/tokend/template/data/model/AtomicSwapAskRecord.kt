@@ -26,7 +26,7 @@ class AtomicSwapAskRecord(
                         code = it.quoteAsset,
                         trailingDigits = 6,
                         price = it.price,
-                        name = assetsMap[it.id]?.name
+                        name = assetsMap[it.quoteAsset]?.name
                 )
             }
     )

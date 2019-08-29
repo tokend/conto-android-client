@@ -183,7 +183,7 @@
             android:name=".features.wallet.view.BalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
-            android:name=".features.assets.buy.BuyWithAtomicSwapActivity"
+            android:name=".features.assets.buy.view.BuyWithAtomicSwapActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity

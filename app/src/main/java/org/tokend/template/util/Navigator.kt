@@ -25,7 +25,7 @@ import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
-import org.tokend.template.features.assets.buy.BuyWithAtomicSwapActivity
+import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity

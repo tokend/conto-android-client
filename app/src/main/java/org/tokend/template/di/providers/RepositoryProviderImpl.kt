@@ -343,6 +343,7 @@ class RepositoryProviderImpl(
             AllAtomicSwapAsksRepository(
                     companyId,
                     apiProvider,
+                    assets(),
                     urlConfigProvider,
                     mapper,
                     MemoryOnlyRepositoryCache()

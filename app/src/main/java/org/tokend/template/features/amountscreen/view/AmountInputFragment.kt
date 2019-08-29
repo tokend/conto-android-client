@@ -180,10 +180,13 @@ open class AmountInputFragment : BaseFragment() {
 
     protected open fun initExtraView() {
         extra_view_frame.removeAllViews()
-        getExtraView(extra_view_frame)?.also { extra_view_frame.addView(it) }
+        getExtraView(extra_view_frame)?.also(extra_view_frame::addView)
 
         extra_amount_view_frame.removeAllViews()
-        getExtraAmountView(extra_amount_view_frame)?.also { extra_amount_view_frame.addView(it) }
+        getExtraAmountView(extra_amount_view_frame)?.also(extra_amount_view_frame::addView)
+
+        extra_top_view_frame.removeAllViews()
+        getExtraTopView(extra_top_view_frame)?.also(extra_top_view_frame::addView)
     }
     // endregion
 
@@ -332,6 +335,15 @@ open class AmountInputFragment : BaseFragment() {
      * @return view displayed below the amount input
      */
     protected open fun getExtraAmountView(parent: ViewGroup): View? {
+        return null
+    }
+
+    /**
+     * @param parent use for inflation but avoid automatic adding
+     *
+     * @return view displayed above the balance hint
+     */
+    protected open fun getExtraTopView(parent: ViewGroup): View? {
         return null
     }
 
