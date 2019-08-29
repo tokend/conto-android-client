@@ -21,14 +21,16 @@ class AtomicSwapAskRecord(
             asset = AssetRecord.fromResource(source.baseAsset, urlConfig, mapper),
             amount = source.availableAmount,
             isCanceled = source.isCanceled,
-            quoteAssets = source.quoteAssets.map {
-                QuoteAsset(
-                        code = it.quoteAsset,
-                        trailingDigits = 6,
-                        price = it.price,
-                        name = assetsMap[it.quoteAsset]?.name
-                )
-            }
+            quoteAssets = source.quoteAssets
+                    .map {
+                        QuoteAsset(
+                                code = it.quoteAsset,
+                                trailingDigits = 6,
+                                price = it.price,
+                                name = assetsMap[it.quoteAsset]?.name
+                        )
+                    }
+                    .sortedByDescending { it.code == DEFAULT_QUOTE_ASSET }
     )
 
     override fun equals(other: Any?): Boolean {
@@ -45,4 +47,8 @@ class AtomicSwapAskRecord(
             val price: BigDecimal,
             override val name: String?
     ) : Asset
+
+    companion object {
+        private const val DEFAULT_QUOTE_ASSET = "UAH"
+    }
 }
