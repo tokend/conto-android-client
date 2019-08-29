@@ -54,11 +54,11 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity?.application as? App)?.stateComponent?.inject(this)
+        compositeDisposable = CompositeDisposable()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        compositeDisposable = CompositeDisposable()
         if (savedInstanceState == null) {
             onInitAllowed()
         }

@@ -132,8 +132,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         toolbar.inflateMenu(R.menu.explore)
         val menu = toolbar.menu
 
-        searchMenuItem = menu?.findItem(R.id.search) ?: return
         val searchItem = menu.findItem(R.id.search) ?: return
+        this.searchMenuItem = searchItem
 
         try {
             val searchManager = MenuSearchViewManager(searchItem, toolbar, compositeDisposable)

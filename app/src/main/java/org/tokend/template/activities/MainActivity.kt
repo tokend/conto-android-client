@@ -29,6 +29,7 @@ import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
@@ -134,6 +135,11 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withName(R.string.balances_screen_title)
                     .withIdentifier(BalancesFragment.ID)
                     .withIcon(R.drawable.ic_coins),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.companies_title)
+                    .withIdentifier(CompaniesFragment.ID)
+                    .withIcon(R.drawable.ic_company),
 
             PrimaryDrawerItem()
                     .withName(R.string.deposit_title)
@@ -259,6 +265,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         builder.apply {
             addDrawerItems(
                     items[BalancesFragment.ID],
+                    items[CompaniesFragment.ID],
                     items[AssetMovementsFragment.ID]
             )
 
@@ -337,6 +344,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             PollsFragment.ID -> factory.getPollsFragment()
             AssetMovementsFragment.ID -> factory.getAssetMovementsFragment()
             BalancesFragment.ID -> factory.getBalancesFragment(withToolbar = true)
+            CompaniesFragment.ID -> factory.getCompaniesFragment()
             else -> null
         }
     }

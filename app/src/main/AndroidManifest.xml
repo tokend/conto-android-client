@@ -187,9 +187,6 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
-            android:name=".features.companies.view.CompaniesActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
-        <activity
             android:name=".features.redeem.create.view.CreateRedemptionActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
@@ -231,9 +228,6 @@
             android:name=".features.clients.details.movements.view.CompanyClientMovementsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-        <activity
-            android:name=".features.companies.view.ExploreCompaniesActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
             android:name=".features.settings.phonenumber.view.PhoneNumberSettingsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"

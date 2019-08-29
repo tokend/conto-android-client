@@ -524,4 +524,6 @@
     <string name="template_telegram_otp_dialog_message_bot_url"><![CDATA[Отримайте код у <a href=\"%1$s\">нашого Telegram бота</a>]]></string>
     <string name="web_invoice_screen_title">Оплата</string>
     <string name="system_asset">Системний актив</string>
+    <string name="my_companies_tab">Мої</string>
+    <string name="all_companies_tab">Усі</string>
 </resources>

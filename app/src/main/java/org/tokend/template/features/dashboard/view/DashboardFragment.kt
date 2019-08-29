@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.appbar_with_tabs.*
-import kotlinx.android.synthetic.main.fragment_dashboard.*
+import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.OnBackPressedListener
@@ -26,7 +26,7 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_dashboard, container, false)
+        return inflater.inflate(R.layout.fragment_pager, container, false)
     }
 
     override fun onInitAllowed() {
