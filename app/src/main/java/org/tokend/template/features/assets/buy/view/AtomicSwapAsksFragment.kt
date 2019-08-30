@@ -18,6 +18,7 @@ import org.tokend.template.R
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.repository.AtomicSwapAsksRepository
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAskListItem
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAsksAdapter
 import org.tokend.template.fragments.BaseFragment
@@ -167,11 +168,8 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
         private const val ASSET_CODE_EXTRA = "asset_code"
         private val BUY_REQUEST = "buy".hashCode() and 0xffff
 
-        fun newInstance(bundle: Bundle): AtomicSwapAsksFragment {
-            val fragment = AtomicSwapAsksFragment()
-            fragment.arguments = bundle
-            return fragment
-        }
+        fun newInstance(bundle: Bundle): AtomicSwapAsksFragment =
+                AtomicSwapAsksFragment().withArguments(bundle)
 
         fun getBundle(assetCode: String) = Bundle().apply {
             putString(ASSET_CODE_EXTRA, assetCode)

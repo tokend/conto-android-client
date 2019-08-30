@@ -37,7 +37,7 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         }
 
     override fun onInitAllowed() {
-        ask = arguments?.getSerializable(ASK_EXTRA) as? AtomicSwapAskRecord
+        this.ask = arguments?.getSerializable(ASK_EXTRA) as? AtomicSwapAskRecord
                 ?: throw IllegalArgumentException("No $ASK_EXTRA specified")
 
         super.onInitAllowed()

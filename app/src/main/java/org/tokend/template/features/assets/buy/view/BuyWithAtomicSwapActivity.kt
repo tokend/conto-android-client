@@ -64,6 +64,14 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = getString(R.string.template_buy_asset, ask.asset.name ?: ask.asset.code)
+        toolbar.subtitle = getString(
+                R.string.template_price,
+                amountFormatter.formatAssetAmount(
+                        ask.quoteAssets.first().price,
+                        ask.quoteAssets.first(),
+                        withAssetCode = true
+                )
+        )
     }
 
     private fun initSwipeRefresh() {
@@ -76,6 +84,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
         val fragment = AtomicSwapAmountFragment.newInstance(
                 AtomicSwapAmountFragment.getBundle(ask)
         )
+
         fragment
                 .resultObservable
                 .compose(ObservableTransformers.defaultSchedulers())

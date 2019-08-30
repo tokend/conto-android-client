@@ -88,12 +88,5 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         const val ID = 1110L
-
-        fun newInstance(): DashboardFragment {
-            val fragment = DashboardFragment()
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
     }
 }
