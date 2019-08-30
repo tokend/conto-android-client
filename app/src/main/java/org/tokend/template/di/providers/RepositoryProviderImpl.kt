@@ -337,8 +337,8 @@ class RepositoryProviderImpl(
         return blobs
     }
 
-    override fun allAtomicSwapAsks(ownerAccountId: String): AllAtomicSwapAsksRepository {
-        return allAtomicSwapAsksRepositories.getOrPut(ownerAccountId) {
+    override fun allAtomicSwapAsks(ownerAccountId: String?): AllAtomicSwapAsksRepository {
+        return allAtomicSwapAsksRepositories.getOrPut(ownerAccountId.toString()) {
             AllAtomicSwapAsksRepository(
                     ownerAccountId,
                     apiProvider,

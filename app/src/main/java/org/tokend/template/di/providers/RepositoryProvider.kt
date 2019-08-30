@@ -45,5 +45,5 @@ interface RepositoryProvider {
     fun companyClientBalanceChanges(clientAccountId: String, assetCode: String): BalanceChangesRepository
     fun keyValueEntries(): KeyValueEntriesRepository
     fun blobs(): BlobsRepository
-    fun allAtomicSwapAsks(ownerAccountId: String): AllAtomicSwapAsksRepository
+    fun allAtomicSwapAsks(ownerAccountId: String?): AllAtomicSwapAsksRepository
 }

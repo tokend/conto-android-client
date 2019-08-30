@@ -19,6 +19,7 @@ import org.tokend.template.data.repository.base.MultipleItemsRepository
 import org.tokend.template.features.companies.view.adapter.CompanyItemsAdapter
 import org.tokend.template.features.companies.view.adapter.CompanyListItem
 import org.tokend.template.fragments.BaseFragment
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.SearchUtil
 import org.tokend.template.view.util.ColumnCalculator
@@ -77,6 +78,10 @@ abstract class CompaniesListFragment : BaseFragment() {
         adapter.registerAdapterDataObserver(
                 ScrollOnTopItemUpdateAdapterObserver(companies_recycler_view)
         )
+
+        adapter.onItemClick { _, item ->
+            item.source?.also(this::openCompanyDetails)
+        }
     }
 
     private fun initSwipeRefresh() {
@@ -143,6 +148,10 @@ abstract class CompaniesListFragment : BaseFragment() {
                 }
 
         adapter.setData(items)
+    }
+
+    private fun openCompanyDetails(company: CompanyRecord) {
+        Navigator.from(this).openCompanyDetails(company)
     }
 
     private fun updateListColumnsCount() {

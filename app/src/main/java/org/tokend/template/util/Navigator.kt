@@ -25,8 +25,8 @@ import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
-import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
+import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
@@ -34,6 +34,7 @@ import org.tokend.template.features.clients.details.view.CompanyClientDetailsAct
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.companies.add.view.AddCompanyActivity
 import org.tokend.template.features.companies.add.view.AddCompanyConfirmationActivity
+import org.tokend.template.features.companies.details.view.CompanyDetailsActivity
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
@@ -569,5 +570,11 @@ class Navigator private constructor() {
         context?.intentFor<WebInvoiceActivity>()
                 ?.putExtras(WebInvoiceActivity.getBundle(invoiceUrl))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openCompanyDetails(company: CompanyRecord) {
+        context?.intentFor<CompanyDetailsActivity>()
+                ?.putExtras(CompanyDetailsActivity.getBundle(company))
+                ?.also { performIntent(it) }
     }
 }

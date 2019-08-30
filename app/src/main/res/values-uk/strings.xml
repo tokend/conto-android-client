@@ -527,4 +527,5 @@
     <string name="my_companies_tab">Мої</string>
     <string name="all_companies_tab">Усі</string>
     <string name="quantity">Кількість</string>
+    <string name="my_balances">Мої баланси</string>
 </resources>

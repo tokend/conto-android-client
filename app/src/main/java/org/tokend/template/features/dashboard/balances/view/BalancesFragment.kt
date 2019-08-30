@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceItemsAdapter
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
 import org.tokend.template.fragments.BaseFragment
@@ -56,6 +57,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, false) ?: false
     }
 
+    protected open var companyId: String? = null
+
     private var searchMenuItem: MenuItem? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,6 +71,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onInitAllowed() {
+        companyId = arguments?.getString(COMPANY_ID_EXTRA)
+
         initList()
         initSwipeRefresh()
         initToolbar()
@@ -197,11 +202,19 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
-                .filter { it.available.signum() > 0 }
-                .map {
-                    BalanceListItem(it, ownerName = it.company?.name ?: systemAssetLabel)
+                .filter {
+                    it.available.signum() > 0 &&
+                            (companyId == null || it.asset.ownerAccountId == companyId)
                 }
-                .filter {item ->
+                .map {
+                    val ownerName =
+                            if (companyId != null)
+                                null
+                            else
+                                it.company?.name ?: systemAssetLabel
+                    BalanceListItem(it, ownerName)
+                }
+                .filter { item ->
                     filter?.let {
                         SearchUtil.isMatchGeneralCondition(it, item.assetName, item.ownerName)
                     } ?: true
@@ -257,16 +270,15 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+        private const val COMPANY_ID_EXTRA = "company_id"
         val ID = "balances".hashCode().toLong()
 
-        fun newInstance(bundle: Bundle): BalancesFragment {
-            val fragment = BalancesFragment()
-            fragment.arguments = bundle
-            return fragment
-        }
+        fun newInstance(bundle: Bundle): BalancesFragment = BalancesFragment().withArguments(bundle)
 
-        fun getBundle(allowToolbar: Boolean) = Bundle().apply {
+        fun getBundle(allowToolbar: Boolean,
+                      companyId: String?) = Bundle().apply {
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
+            putString(COMPANY_ID_EXTRA, companyId)
         }
     }
 }

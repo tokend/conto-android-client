@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.fragment_all_atomic_swap_asks.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import org.tokend.template.R
 import org.tokend.template.data.model.AtomicSwapAskRecord
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.dashboard.shop.repository.AllAtomicSwapAsksRepository
 import org.tokend.template.features.dashboard.shop.view.adapter.SinglePriceAtomicSwapAskListItem
 import org.tokend.template.features.dashboard.shop.view.adapter.SinglePriceAtomicSwapAsksAdapter
@@ -21,14 +22,16 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.LoadingIndicatorManager
 
-class AllAtomicSwapAsksFragment: BaseFragment() {
+class AllAtomicSwapAsksFragment : BaseFragment() {
     private val loadingIndicator = LoadingIndicatorManager(
             showLoading = { swipe_refresh.isRefreshing = true },
             hideLoading = { swipe_refresh.isRefreshing = false }
     )
 
+    private var companyId: String? = null
+
     private val asksRepository: AllAtomicSwapAsksRepository
-        get() = repositoryProvider.allAtomicSwapAsks("")
+        get() = repositoryProvider.allAtomicSwapAsks(companyId)
 
     private lateinit var adapter: SinglePriceAtomicSwapAsksAdapter
     private lateinit var layoutManager: GridLayoutManager
@@ -38,6 +41,8 @@ class AllAtomicSwapAsksFragment: BaseFragment() {
     }
 
     override fun onInitAllowed() {
+        companyId = arguments?.getString(COMPANY_ID_EXTRA)
+
         initList()
         initSwipeRefresh()
 
@@ -141,5 +146,16 @@ class AllAtomicSwapAsksFragment: BaseFragment() {
 
     private fun updateListColumnsCount() {
         layoutManager.spanCount = ColumnCalculator.getColumnCount(requireActivity())
+    }
+
+    companion object {
+        private const val COMPANY_ID_EXTRA = "company_id"
+
+        fun getBundle(companyId: String?) = Bundle().apply {
+            putString(COMPANY_ID_EXTRA, companyId)
+        }
+
+        fun newInstance(bundle: Bundle): AllAtomicSwapAsksFragment =
+                AllAtomicSwapAsksFragment().withArguments(bundle)
     }
 }

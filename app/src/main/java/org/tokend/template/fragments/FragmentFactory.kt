@@ -117,9 +117,10 @@ class FragmentFactory {
         )
     }
 
-    fun getBalancesFragment(withToolbar: Boolean): Fragment {
+    fun getBalancesFragment(withToolbar: Boolean,
+                            companyId: String? = null): Fragment {
         return BalancesFragment.newInstance(
-                BalancesFragment.getBundle(withToolbar)
+                BalancesFragment.getBundle(withToolbar, companyId)
         )
     }
 
@@ -140,8 +141,10 @@ class FragmentFactory {
         return CompanyBalancesFragment.newInstance()
     }
 
-    fun getAllAtomicSwapAsksFragment(): Fragment {
-        return AllAtomicSwapAsksFragment()
+    fun getAllAtomicSwapAsksFragment(companyId: String? = null): Fragment {
+        return AllAtomicSwapAsksFragment.newInstance(
+                AllAtomicSwapAsksFragment.getBundle(companyId)
+        )
     }
 
     fun getAssetMovementsFragment(): Fragment {

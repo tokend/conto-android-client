@@ -4,15 +4,16 @@ import android.view.View
 import kotlinx.android.synthetic.main.fragment_balances.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
-import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.util.Navigator
-import org.tokend.template.util.SearchUtil
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 
 class CompanyBalancesFragment : BalancesFragment() {
+    override var companyId: String?
+        get() = walletInfoProvider.getWalletInfo()?.accountId
+        set(_) {}
 
     override fun getFabActions(): Collection<FloatingActionMenuAction> {
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val balances = balancesRepository.itemsList
         val navigator = Navigator.from(this)
 
@@ -26,7 +27,7 @@ class CompanyBalancesFragment : BalancesFragment() {
                 {
                     navigator.openScanRedemption()
                 },
-                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+                isEnabled = balances.any { it.asset.ownerAccountId == companyId }
         ))
 
         // Send.
@@ -50,29 +51,10 @@ class CompanyBalancesFragment : BalancesFragment() {
                 {
                     navigator.openMassIssuance()
                 },
-                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+                isEnabled = balances.any { it.asset.ownerAccountId == companyId }
         ))
 
         return actions
-    }
-
-    override fun displayBalances() {
-        val companyId = walletInfoProvider.getWalletInfo()?.accountId
-
-        val items = balancesRepository
-                .itemsList
-                .sortedWith(balanceComparator)
-                .filter { it.asset.ownerAccountId == companyId }
-                .map {
-                    BalanceListItem(it, ownerName = null)
-                }
-                .filter {item ->
-                    filter?.let {
-                        SearchUtil.isMatchGeneralCondition(it, item.assetName, item.ownerName)
-                    } ?: true
-                }
-
-        adapter.setData(items)
     }
 
     override fun displayTotal() {
@@ -82,10 +64,7 @@ class CompanyBalancesFragment : BalancesFragment() {
     companion object {
         val ID = "company_balances".hashCode().toLong()
 
-        fun newInstance(): CompanyBalancesFragment {
-            val fragment = CompanyBalancesFragment()
-            fragment.arguments = getBundle(true)
-            return fragment
-        }
+        fun newInstance(): CompanyBalancesFragment =
+                CompanyBalancesFragment().withArguments(getBundle(true, null))
     }
 }
