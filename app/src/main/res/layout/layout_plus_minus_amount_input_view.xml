@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.mikepenz.materialdrawer.view.BezelImageView
+        android:id="@+id/dec_amount_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:elevation="2dp"
+        android:src="@drawable/minus_round_button" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/amount_edit_text"
+        style="@style/EditText.OneLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/double_margin"
+        android:layout_marginEnd="@dimen/double_margin"
+        android:gravity="end"
+        android:hint="0"
+        android:inputType="numberDecimal"
+        android:textSize="@dimen/text_size_amount_input"
+        app:met_floatingLabel="none"
+        app:met_hideUnderline="true"
+        app:met_textColor="@color/primary_text"
+        app:met_textColorHint="@color/primary_text" />
+
+    <com.mikepenz.materialdrawer.view.BezelImageView
+        android:id="@+id/inc_amount_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:elevation="2dp"
+        android:src="@drawable/plus_round_button" />
+</merge>
