@@ -147,11 +147,7 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun openBuy(ask: AtomicSwapAskRecord) {
-        Navigator.from(this).openAtomicSwapBuy(
-                ask.asset.code,
-                ask.id,
-                BUY_REQUEST
-        )
+        Navigator.from(this).openAtomicSwapBuy(ask, BUY_REQUEST)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

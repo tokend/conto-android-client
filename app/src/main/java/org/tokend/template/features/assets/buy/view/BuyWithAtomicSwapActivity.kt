@@ -43,27 +43,11 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
 
-        val errorHandler = errorHandlerFactory.getDefault()
-
-        val assetCode = intent.getStringExtra(ASSET_CODE_EXTRA)
-        if (assetCode == null) {
-            errorHandler.handle(
-                    IllegalArgumentException("No $ASSET_CODE_EXTRA specified")
-            )
-            finish()
-            return
-        }
-        val askId = intent.getStringExtra(ASK_ID_EXTRA)
-        TODO("Serialize ask instead of searching it")
-        val ask = listOf(
-                repositoryProvider.atomicSwapAsks(assetCode).itemsList
-        )
-                .flatten()
-                .find { it.id == askId }
+        val ask = intent.getSerializableExtra(ASK_EXTRA) as? AtomicSwapAskRecord
         if (ask == null) {
-            errorHandler.handle(
-                    IllegalArgumentException("No ask found for ID $askId from $ASK_ID_EXTRA")
-            )
+            errorHandlerFactory.getDefault().handle(IllegalArgumentException(
+                    "No $ASK_EXTRA specified"
+            ))
             finish()
             return
         }
@@ -89,7 +73,9 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     // endregion
 
     private fun toAmountScreen() {
-        val fragment = AtomicSwapAmountFragment.newInstance(ask.asset.code, ask.id)
+        val fragment = AtomicSwapAmountFragment.newInstance(
+                AtomicSwapAmountFragment.getBundle(ask)
+        )
         fragment
                 .resultObservable
                 .compose(ObservableTransformers.defaultSchedulers())
@@ -202,14 +188,11 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     }
 
     companion object {
-        private const val ASSET_CODE_EXTRA = "asset_code"
-        private const val ASK_ID_EXTRA = "ask_id"
+        private const val ASK_EXTRA = "ask"
         private val WEB_INVOICE_REQUEST = "web_invoice".hashCode() and 0xffff
 
-        fun getBundle(assetCode: String,
-                      askId: String) = Bundle().apply {
-            putString(ASSET_CODE_EXTRA, assetCode)
-            putString(ASK_ID_EXTRA, askId)
+        fun getBundle(ask: AtomicSwapAskRecord) = Bundle().apply {
+            putSerializable(ASK_EXTRA, ask)
         }
     }
 }

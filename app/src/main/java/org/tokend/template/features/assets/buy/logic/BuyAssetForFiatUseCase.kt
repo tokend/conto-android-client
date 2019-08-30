@@ -98,8 +98,7 @@ class BuyAssetForFiatUseCase(
     }
 
     private fun updateRepositories() {
-        TODO("Update aswap asks by company ID")
-        //repositoryProvider.allAtomicSwapAsks().updateIfEverUpdated()
+        repositoryProvider.allAtomicSwapAsks(ask.asset.ownerAccountId).updateIfEverUpdated()
         repositoryProvider.atomicSwapAsks(ask.asset.code).updateIfEverUpdated()
     }
 }

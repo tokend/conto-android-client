@@ -17,10 +17,7 @@ import org.tokend.template.R
 import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.activities.MainActivity
 import org.tokend.template.activities.SingleFragmentActivity
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetPairRecord
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.data.model.*
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.assets.AssetDetailsActivity
@@ -417,11 +414,10 @@ class Navigator private constructor() {
         )
     }
 
-    fun openAtomicSwapBuy(assetCode: String,
-                          askId: String,
+    fun openAtomicSwapBuy(ask: AtomicSwapAskRecord,
                           requestCode: Int = 0) {
         context?.intentFor<BuyWithAtomicSwapActivity>()
-                ?.putExtras(BuyWithAtomicSwapActivity.getBundle(assetCode, askId))
+                ?.putExtras(BuyWithAtomicSwapActivity.getBundle(ask))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 

@@ -133,10 +133,7 @@ class AllAtomicSwapAsksFragment : BaseFragment() {
     }
 
     private fun openBuy(ask: AtomicSwapAskRecord) {
-        Navigator.from(this).openAtomicSwapBuy(
-                ask.asset.code,
-                ask.id
-        )
+        Navigator.from(this).openAtomicSwapBuy(ask)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
