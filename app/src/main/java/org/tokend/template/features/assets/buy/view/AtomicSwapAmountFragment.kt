@@ -14,6 +14,7 @@ import org.tokend.template.R
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.amountscreen.view.AmountInputFragment
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
@@ -36,14 +37,8 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         }
 
     override fun onInitAllowed() {
-        val askId = arguments?.getString(ASK_ID_EXTRA)
-        this.ask = listOf(
-                repositoryProvider.atomicSwapAsks(requestedAsset!!).itemsList,
-                repositoryProvider.allAtomicSwapAsks().itemsList
-        )
-                .flatten()
-                .find { it.id == askId }
-                ?: throw IllegalArgumentException("No ask found for ID $askId from $ASK_ID_EXTRA")
+        this.ask = arguments?.getSerializable(ASK_EXTRA) as? AtomicSwapAskRecord
+                ?: throw IllegalArgumentException("No $ASK_EXTRA specified")
 
         super.onInitAllowed()
         onAssetChanged()
@@ -160,16 +155,13 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
 
     companion object {
         private const val PRE_FILLED_AMOUNT = "1"
-        private const val ASK_ID_EXTRA = "ask_id"
+        private const val ASK_EXTRA = "ask"
 
-        fun newInstance(assetCode: String,
-                        askId: String): AtomicSwapAmountFragment {
-            val fragment = AtomicSwapAmountFragment()
-            fragment.arguments = Bundle().apply {
-                putString(ASK_ID_EXTRA, askId)
-                putString(ASSET_EXTRA, assetCode)
-            }
-            return fragment
+        fun getBundle(ask: AtomicSwapAskRecord) = Bundle().apply {
+            putSerializable(ASK_EXTRA, ask)
         }
+
+        fun newInstance(bundle: Bundle): AtomicSwapAmountFragment =
+                AtomicSwapAmountFragment().withArguments(bundle)
     }
 }
