@@ -75,6 +75,7 @@ import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
 import org.tokend.template.features.wallet.view.BalanceDetailsActivity
+import org.tokend.template.features.wallet.view.SimpleBalanceDetailsActivity
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.WithdrawalConfirmationActivity
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
@@ -242,13 +243,15 @@ class Navigator private constructor() {
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
-    fun openSend(asset: String? = null) {
+    fun openSend(asset: String? = null,
+                 amount: BigDecimal? = null,
+                 requestCode: Int = 0) {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         SendFragment.ID,
-                        SendFragment.getBundle(asset, true)
+                        SendFragment.getBundle(asset, amount, true)
                 ))
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 
     fun openAssetDetails(requestCode: Int,
@@ -402,6 +405,12 @@ class Navigator private constructor() {
     fun openBalanceDetails(balanceId: String) {
         context?.intentFor<BalanceDetailsActivity>()
                 ?.putExtras(BalanceDetailsActivity.getBundle(balanceId))
+                ?.also { performIntent(it) }
+    }
+
+    fun openSimpleBalanceDetails(balanceId: String) {
+        context?.intentFor<SimpleBalanceDetailsActivity>()
+                ?.putExtras(SimpleBalanceDetailsActivity.getBundle(balanceId))
                 ?.also { performIntent(it) }
     }
 

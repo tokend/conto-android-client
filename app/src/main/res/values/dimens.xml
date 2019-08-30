@@ -68,4 +68,7 @@
     <dimen name="company_client_status_icon_padding">4dp</dimen>
 
     <dimen name="elevated_round_button_stroke_width">1dp</dimen>
+
+    <dimen name="rounded_primary_button_height">48dp</dimen>
+    <dimen name="rounded_primary_button_corner_radius">24dp</dimen>
 </resources>

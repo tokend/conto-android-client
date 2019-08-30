@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.tokend.template.features.wallet.view.SimpleBalanceDetailsActivity">
+
+    <include layout="@layout/appbar" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        style="@style/LimitedMatchParentWidthConstraint"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintTop_toTopOf="@null">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/standard_padding" />
+
+            <LinearLayout
+                android:id="@+id/payment_amount_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp">
+
+                <com.mikepenz.materialdrawer.view.BezelImageView
+                    android:id="@+id/dec_amount_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:elevation="2dp"
+                    android:src="@drawable/minus_round_button" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/amount_edit_text"
+                    style="@style/EditText.OneLine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/double_margin"
+                    android:layout_marginEnd="@dimen/double_margin"
+                    android:hint="0"
+                    android:inputType="numberDecimal"
+                    android:textSize="@dimen/text_size_amount_input"
+                    app:met_floatingLabel="none"
+                    app:met_hideUnderline="true"
+                    app:met_textColor="@color/primary_text"
+                    app:met_textColorHint="@color/primary_text" />
+
+                <com.mikepenz.materialdrawer.view.BezelImageView
+                    android:id="@+id/inc_amount_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:elevation="2dp"
+                    android:src="@drawable/plus_round_button" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/available_text_view"
+                style="@style/SecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/quarter_standard_margin"
+                tools:text="123.45 available" />
+
+            <Button
+                android:id="@+id/send_button"
+                style="@style/PrimaryButton.Rounded"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="@dimen/triple_margin"
+                android:text="@string/send_action" />
+
+        </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -516,6 +516,7 @@
     <string name="all_companies_tab">All</string>
     <string name="quantity">Quantity</string>
     <string name="my_balances">My balances</string>
+    <string name="send_action">Send</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

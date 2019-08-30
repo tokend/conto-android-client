@@ -242,8 +242,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
     // endregion
 
-    private fun openWallet(balanceId: String) {
-        Navigator.from(this).openBalanceDetails(balanceId)
+    protected open fun openWallet(balanceId: String) {
+        Navigator.from(this).openSimpleBalanceDetails(balanceId)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

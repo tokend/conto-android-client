@@ -61,6 +61,10 @@ class CompanyBalancesFragment : BalancesFragment() {
         total_text_view.visibility = View.GONE
     }
 
+    override fun openWallet(balanceId: String) {
+        Navigator.from(this).openBalanceDetails(balanceId)
+    }
+
     companion object {
         val ID = "company_balances".hashCode().toLong()
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/white" />
+            <stroke
+                android:width="@dimen/elevated_round_button_stroke_width"
+                android:color="@color/material_drawer_divider" />
+        </shape>
+    </item>
+    <item
+        android:bottom="6dp"
+        android:drawable="@drawable/ic_plus"
+        android:left="6dp"
+        android:right="6dp"
+        android:top="6dp" />
+</layer-list>

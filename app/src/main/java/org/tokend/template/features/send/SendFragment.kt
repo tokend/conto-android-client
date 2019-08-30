@@ -20,10 +20,12 @@ import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.send.amount.model.PaymentAmountData
@@ -55,6 +57,9 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
     private val requiredAsset: String?
         get() = arguments?.getString(ASSET_EXTRA)
+
+    private val requiredAmount: BigDecimal?
+        get() = arguments?.getString(AMOUNT_EXTRA)?.let { BigDecimalUtil.valueOf(it) }
 
     private val allowToolbar: Boolean
         get() = arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA) ?: true
@@ -167,7 +172,21 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
     private fun onRecipientSelected(recipient: PaymentRecipient) {
         this.recipient = recipient
-        toAmountScreen()
+
+        val requiredAmount = this.requiredAmount
+        val requiredAsset = balancesRepository
+                .itemsList
+                .find {
+                    it.assetCode == requiredAsset
+                }
+                ?.asset
+
+        if (requiredAmount != null && requiredAsset != null) {
+            onAmountEntered(PaymentAmountData(requiredAmount, requiredAsset,
+                    null, PaymentFee(SimpleFeeRecord.ZERO, SimpleFeeRecord.ZERO)))
+        } else {
+            toAmountScreen()
+        }
     }
 
     private fun toAmountScreen() {
@@ -308,15 +327,18 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     companion object {
         private const val ASSET_EXTRA = "asset"
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+        private const val AMOUNT_EXTRA = "amount"
         const val ID = 1118L
         val PAYMENT_CONFIRMATION_REQUEST = "confirm_payment".hashCode() and 0xffff
 
         fun newInstance(bundle: Bundle): SendFragment = SendFragment().withArguments(bundle)
 
         fun getBundle(assetCode: String?,
+                      amount: BigDecimal?,
                       allowToolbar: Boolean) = Bundle().apply {
             putString(ASSET_EXTRA, assetCode)
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
+            putString(AMOUNT_EXTRA, amount?.let(BigDecimalUtil::toPlainString))
         }
     }
 }

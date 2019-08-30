@@ -528,4 +528,5 @@
     <string name="all_companies_tab">Все</string>
     <string name="quantity">Количество</string>
     <string name="my_balances">Мои балансы</string>
+    <string name="send_action">Отправить</string>
 </resources>
