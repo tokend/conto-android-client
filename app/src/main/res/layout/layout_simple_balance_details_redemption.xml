@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/redemption_bottom_sheet_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="0dp"
+    android:orientation="vertical"
+    android:paddingTop="0dp"
+    app:behavior_peekHeight="68dp"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/bottom_sheet_header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- 9patch for vector done right. -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/left_corner"
+                    android:layout_width="6dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="-2dp"
+                    app:srcCompat="@drawable/bottom_sheet_rounded_header_elevation_corner" />
+
+                <ImageView
+                    android:id="@+id/right_corner"
+                    android:layout_width="6dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="-2dp"
+                    android:scaleX="-1"
+                    app:srcCompat="@drawable/bottom_sheet_rounded_header_elevation_corner" />
+
+                <ImageView
+                    android:id="@+id/long_part"
+                    android:layout_width="wrap_content"
+                    android:layout_height="8dp"
+                    android:layout_toStartOf="@id/right_corner"
+                    android:layout_toEndOf="@id/left_corner"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/above_shadow" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bottom_sheet_rounded_elevated_header" />
+
+            <View
+                android:id="@+id/bottom_sheet_peek_view"
+                android:layout_width="24dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/bottom_sheet_peek" />
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/bottom_sheet_header_fade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/bottom_sheet_header_layout"
+            android:layout_alignParentTop="true"
+            android:alpha="0.0"
+            android:background="@color/background" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/half_standard_margin"
+            android:gravity="center"
+            android:text="@string/redemption_qr_code"
+            android:textSize="@dimen/text_size_heading" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_padding"
+            android:src="@mipmap/product_logo" />
+    </LinearLayout>
+</LinearLayout>

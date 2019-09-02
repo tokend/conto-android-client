@@ -3,9 +3,12 @@ package org.tokend.template.features.wallet.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
+import android.view.View
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.activity_simple_balance_details.*
+import kotlinx.android.synthetic.main.layout_simple_balance_details_content.*
+import kotlinx.android.synthetic.main.layout_simple_balance_details_redemption.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.textColor
 import org.tokend.template.R
@@ -59,6 +62,7 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         initSwipeRefresh()
         initFields()
         initButtons()
+        initBottomSheet()
 
         subscribeToBalances()
     }
@@ -88,6 +92,20 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
 
     private fun initButtons() {
         send_button.setOnClickListener { tryToSend() }
+    }
+
+    private fun initBottomSheet() {
+        val behavior = BottomSheetBehavior.from(redemption_bottom_sheet_layout)
+        behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(p0: View, offset: Float) {
+                bottom_sheet_header_fade.alpha = offset
+            }
+
+            override fun onStateChanged(p0: View, p1: Int) {
+
+            }
+        })
+
     }
 
     private fun subscribeToBalances() {

@@ -517,6 +517,7 @@
     <string name="quantity">Quantity</string>
     <string name="my_balances">My balances</string>
     <string name="send_action">Send</string>
+    <string name="redemption_qr_code">Redemption QR code</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
