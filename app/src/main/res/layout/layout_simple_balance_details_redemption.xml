@@ -30,7 +30,7 @@
                     android:layout_width="6dp"
                     android:layout_height="16dp"
                     android:layout_alignParentStart="true"
-                    android:layout_marginStart="-2dp"
+                    android:layout_marginStart="-1dp"
                     app:srcCompat="@drawable/bottom_sheet_rounded_header_elevation_corner" />
 
                 <ImageView
@@ -38,7 +38,7 @@
                     android:layout_width="6dp"
                     android:layout_height="16dp"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="-2dp"
+                    android:layout_marginEnd="-1dp"
                     android:scaleX="-1"
                     app:srcCompat="@drawable/bottom_sheet_rounded_header_elevation_corner" />
 
@@ -55,9 +55,9 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="12dp"
+                android:layout_height="14dp"
                 android:layout_marginTop="6dp"
-                android:background="@drawable/bottom_sheet_rounded_elevated_header" />
+                android:background="@drawable/bottom_sheet_rounded_header" />
 
             <View
                 android:id="@+id/bottom_sheet_peek_view"
@@ -88,7 +88,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/half_standard_margin"
+            android:layout_marginTop="6dp"
             android:gravity="center"
             android:text="@string/redemption_qr_code"
             android:textSize="@dimen/text_size_heading" />

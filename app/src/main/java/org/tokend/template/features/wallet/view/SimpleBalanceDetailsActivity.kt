@@ -47,6 +47,8 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
             send_button.isEnabled = value
         }
 
+    private lateinit var bottomSheet: BottomSheetBehavior<View>
+
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_simple_balance_details)
 
@@ -96,10 +98,10 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     }
 
     private fun initBottomSheet() {
-        val behavior = BottomSheetBehavior.from(redemption_bottom_sheet_layout)
+        bottomSheet = BottomSheetBehavior.from(redemption_bottom_sheet_layout)
 
         // Fade header.
-        behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(p0: View, p1: Int) {}
 
             override fun onSlide(p0: View, offset: Float) {
@@ -217,6 +219,14 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         }
     }
     // endregion
+
+    override fun onBackPressed() {
+        if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            super.onBackPressed()
+        }
+    }
 
     companion object {
         private val PRE_FILLED_AMOUNT = BigDecimal.ONE
