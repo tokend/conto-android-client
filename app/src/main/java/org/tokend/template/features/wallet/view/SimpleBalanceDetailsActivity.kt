@@ -16,6 +16,7 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.onEditorAction
+import org.tokend.template.features.redeem.create.view.SimpleRedemptionFragment
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -96,16 +97,22 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
 
     private fun initBottomSheet() {
         val behavior = BottomSheetBehavior.from(redemption_bottom_sheet_layout)
+
+        // Fade header.
         behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(p0: View, p1: Int) {}
+
             override fun onSlide(p0: View, offset: Float) {
                 bottom_sheet_header_fade.alpha = offset
             }
-
-            override fun onStateChanged(p0: View, p1: Int) {
-
-            }
         })
 
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container_layout, SimpleRedemptionFragment.newInstance(
+                        SimpleRedemptionFragment.getBundle(balanceId)
+                ))
+                .commit()
     }
 
     private fun subscribeToBalances() {

@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="@null">
 
         <LinearLayout
+            android:id="@+id/root_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -45,7 +46,8 @@
                     android:id="@+id/qr_code_image_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/show_qr_label" />
+                    android:contentDescription="@string/show_qr_label"
+                    android:minHeight="@dimen/hepta_margin" />
 
             </FrameLayout>
 

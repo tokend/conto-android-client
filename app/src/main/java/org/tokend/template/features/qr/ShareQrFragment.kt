@@ -9,7 +9,7 @@ import android.os.Bundle
 import android.support.v4.content.FileProvider
 import android.support.v7.widget.Toolbar
 import android.view.*
-import android.widget.Toast
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
@@ -86,7 +86,7 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
         ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
     }
 
-    private fun shareData() {
+    protected open fun shareData() {
         val sharingIntent = Intent(Intent.ACTION_SEND)
                 .apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -110,7 +110,7 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
         return Math.min(height, scroll_view.measuredWidth)
     }
 
-    private fun displayData() {
+    protected open fun displayData() {
         scroll_view.post {
             displayQrCode(data)
         }
@@ -134,11 +134,14 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
         }
     }
 
+    private var displayDisposable: Disposable? = null
     private fun displayQrCode(text: String) {
-        QrGenerator().bitmap(text, getMaxQrSize())
+        displayDisposable?.dispose()
+        displayDisposable = QrGenerator().bitmap(text, getMaxQrSize())
                 .delay(300, TimeUnit.MILLISECONDS)
                 .compose(ObservableTransformers.defaultSchedulers())
                 .doOnSubscribe {
+                    qr_code_image_view.clearAnimation()
                     qr_code_image_view.visibility = View.INVISIBLE
                 }
                 .subscribeBy(
@@ -148,9 +151,7 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
                             saveQrCode(it)
                         },
                         onError = {
-                            Toast.makeText(requireContext(),
-                                    R.string.error_try_again, Toast.LENGTH_SHORT)
-                                    .show()
+                            errorHandlerFactory.getDefault().handle(it)
                         }
                 )
                 .addTo(compositeDisposable)

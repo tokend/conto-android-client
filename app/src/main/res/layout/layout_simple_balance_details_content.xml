@@ -15,10 +15,6 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="@dimen/standard_padding" />
-
             <org.tokend.template.features.wallet.view.PlusMinusAmountInputView
                 android:id="@+id/payment_amount_view"
                 android:layout_width="wrap_content"

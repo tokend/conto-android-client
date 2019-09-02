@@ -13,44 +13,37 @@ import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.ObservableTransformers
 import java.util.concurrent.TimeUnit
 
-class ShareRedemptionQrFragment : ShareQrFragment() {
+open class ShareRedemptionQrFragment : ShareQrFragment() {
     override val title: String
         get() = ""
 
     override val shareDialogText: String
         get() = getString(R.string.share_redemption_request)
 
-    private val referenceToPoll: String?
+    protected open val referenceToPoll: String?
         get() = arguments?.getString(REFERENCE_EXTRA)
 
-    private val balanceId: String?
+    protected open val balanceId: String?
         get() = arguments?.getString(BALANCE_ID_EXTRA)
 
-    private var needPolling = false
     private var pollingDisposable: Disposable? = null
+    protected var isAccepted = false
 
-    override fun onInitAllowed() {
-        super.onInitAllowed()
-
-        if (referenceToPoll != null) {
-            needPolling = true
-        }
-    }
-
-    private fun startPollingIfNeeded() {
-        if (!needPolling) {
+    protected open fun startPollingIfNeeded() {
+        if (isAccepted) {
             return
         }
 
         val reference = referenceToPoll ?: return
 
+        pollingDisposable?.dispose()
         pollingDisposable = IntervalPoller<Any>(
                 POLLING_INTERVAL_S,
                 TimeUnit.SECONDS,
                 Single.defer {
                     repositoryProvider
                             .balanceChanges(balanceId)
-                            .getPage(null, BALANCE_CHANGES_TO_CHECK)
+                            .getPage(null, BALANCE_CHANGES_TO_CHECK, false)
                             .map { page ->
                                 page.items.find {
                                     it.cause is BalanceChangeCause.Payment
@@ -82,7 +75,9 @@ class ShareRedemptionQrFragment : ShareQrFragment() {
         stopPolling()
     }
 
-    private fun onRedemptionAccepted() {
+    protected open fun onRedemptionAccepted() {
+        isAccepted = true
+
         toastManager.long(R.string.successfully_accepted_redemption)
 
         repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()

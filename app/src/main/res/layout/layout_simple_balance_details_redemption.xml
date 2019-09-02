@@ -93,10 +93,9 @@
             android:text="@string/redemption_qr_code"
             android:textSize="@dimen/text_size_heading" />
 
-        <android.support.v7.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/standard_padding"
-            android:src="@mipmap/product_logo" />
+        <FrameLayout
+            android:id="@+id/fragment_container_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 </LinearLayout>
