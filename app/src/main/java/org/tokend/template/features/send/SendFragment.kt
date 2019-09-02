@@ -34,6 +34,7 @@ import org.tokend.template.features.send.logic.CreatePaymentRequestUseCase
 import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.features.send.recipient.model.PaymentRecipientAndDescription
 import org.tokend.template.features.send.recipient.view.PaymentRecipientFragment
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
@@ -55,15 +56,22 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
-    private val requiredAsset: String?
+    private val requiredAssetCode: String?
         get() = arguments?.getString(ASSET_EXTRA)
+
+    private val requiredAsset: Asset?
+        get() = balancesRepository
+                .itemsList
+                .find {
+                    it.assetCode == requiredAssetCode
+                }
+                ?.asset
 
     private val requiredAmount: BigDecimal?
         get() = arguments?.getString(AMOUNT_EXTRA)?.let { BigDecimalUtil.valueOf(it) }
 
     private val allowToolbar: Boolean
         get() = arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA) ?: true
-
 
     private var recipient: PaymentRecipient? = null
     private var amount: BigDecimal = BigDecimal.ZERO
@@ -73,17 +81,13 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
     private var isWaitingForTransferableAssets: Boolean = true
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_user_flow, container, false)
     }
 
     override fun onInitAllowed() {
-        toolbarSubject.onNext(toolbar)
-        toolbar.title = getString(R.string.send_title)
-        if (!allowToolbar) appbar.visibility = View.GONE
-
+        initToolbar()
         initSwipeRefresh()
         initErrorEmptyView()
 
@@ -93,6 +97,26 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     }
 
     // region Init
+    private fun initToolbar() {
+        toolbarSubject.onNext(toolbar)
+        toolbar.title = getString(R.string.send_title)
+
+        val requiredAmount = this.requiredAmount
+        val requiredAsset = this.requiredAsset
+
+        if (requiredAmount != null && requiredAsset != null) {
+            toolbar.subtitle = amountFormatter.formatAssetAmount(
+                    requiredAmount,
+                    requiredAsset,
+                    withAssetName = true
+            )
+        }
+
+        if (!allowToolbar) {
+            appbar.visibility = View.GONE
+        }
+    }
+
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { balancesRepository.update() }
@@ -156,7 +180,11 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun toRecipientScreen() {
-        val fragment = PaymentRecipientFragment()
+        val requestDescription = requiredAmount != null
+
+        val fragment = PaymentRecipientFragment.newInstance(
+                PaymentRecipientFragment.getBundle(requestDescription)
+        )
 
         fragment
                 .resultObservable
@@ -170,20 +198,16 @@ class SendFragment : BaseFragment(), ToolbarProvider {
         displayFragment(fragment, "recipient", null)
     }
 
-    private fun onRecipientSelected(recipient: PaymentRecipient) {
-        this.recipient = recipient
+    private fun onRecipientSelected(recipientAndDescription: PaymentRecipientAndDescription) {
+        this.recipient = recipientAndDescription.recipient
+        this.description = recipientAndDescription.description
 
         val requiredAmount = this.requiredAmount
-        val requiredAsset = balancesRepository
-                .itemsList
-                .find {
-                    it.assetCode == requiredAsset
-                }
-                ?.asset
+        val requiredAsset = this.requiredAsset
 
         if (requiredAmount != null && requiredAsset != null) {
             onAmountEntered(PaymentAmountData(requiredAmount, requiredAsset,
-                    null, PaymentFee(SimpleFeeRecord.ZERO, SimpleFeeRecord.ZERO)))
+                    description, PaymentFee(SimpleFeeRecord.ZERO, SimpleFeeRecord.ZERO)))
         } else {
             toAmountScreen()
         }
@@ -196,7 +220,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
                 ?: return
 
         val fragment = PaymentAmountFragment.newInstance(
-                PaymentAmountFragment.getBundle(recipientNickname, recipientAccount, requiredAsset)
+                PaymentAmountFragment.getBundle(recipientNickname, recipientAccount, requiredAssetCode)
         )
 
         fragment

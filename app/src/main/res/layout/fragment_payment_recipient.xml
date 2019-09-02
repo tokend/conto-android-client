@@ -50,11 +50,24 @@
                 app:srcCompat="@drawable/ic_qr_code_scan" />
         </android.support.constraint.ConstraintLayout>
 
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/payment_description_edit_text"
+            style="@style/EditText.OneLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recipient_layout"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:visibility="visible"
+            android:layout_marginBottom="@dimen/half_standard_padding"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:hint="@string/payment_description_label"
+            android:maxLines="2" />
+
         <LinearLayout
             android:id="@+id/contacts_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/recipient_layout"
+            android:layout_below="@id/payment_description_edit_text"
             android:layout_marginTop="@dimen/standard_margin"
             android:orientation="vertical">
 
