@@ -1,10 +1,13 @@
 package org.tokend.template.features.redeem.create.view
 
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import io.reactivex.disposables.Disposable
@@ -26,6 +29,7 @@ import org.tokend.template.view.util.LoadingIndicatorManager
 import java.io.IOException
 import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     private val loadingIndicator = LoadingIndicatorManager(
@@ -61,6 +65,16 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     private val errorColor: Int by lazy {
         ContextCompat.getColor(requireContext(), R.color.error)
     }
+
+    override val shareText: String
+        get() = getString(
+                R.string.template_redemption_qr_explanation_amount,
+                amountFormatter.formatAssetAmount(
+                        amountView.amountWrapper.scaledAmount,
+                        balance.asset,
+                        withAssetName = true
+                )
+        )
 
     override fun onInitAllowed() {
         balanceId = arguments?.getString(BALANCE_ID_EXTRA)
@@ -129,15 +143,27 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun initShareButton() {
-        val shareButton = TextView(
-                ContextThemeWrapper(requireContext(), R.style.PrimaryActionTextView),
+        val shareButton = ImageButton(
+                ContextThemeWrapper(requireContext(), R.style.SecondaryButton),
                 null,
-                R.style.PrimaryActionTextView
+                R.style.SecondaryButton
         )
-        shareButton.text = getString(R.string.share)
+        shareButton.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+                .apply {
+                    topMargin = requireContext().resources
+                            .getDimensionPixelOffset(R.dimen.standard_margin)
+                    gravity = Gravity.CENTER
+                }
+        shareButton.background = null
+        shareButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_share))
         shareButton.setOnClickListener {
             shareData()
         }
+
+        root_layout.addView(shareButton)
     }
 
     private fun preFillAmount() {
@@ -243,6 +269,32 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
     override fun onRedemptionAccepted() {
         super.onRedemptionAccepted()
+        overlayQrCodeCheck()
+    }
+
+    private fun overlayQrCodeCheck() {
+        val source = (qr_code_image_view.drawable as? BitmapDrawable)
+                ?.bitmap
+                ?: return
+
+        val canvas = Canvas(source)
+
+        canvas.drawColor(ContextCompat.getColor(requireContext(), R.color.white_almost))
+
+        val checkDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circle_ok)!!
+        val sourceSize = min(source.width, source.height)
+        val sourceRadius = sourceSize / 2
+        val checkSize = min(source.width, source.height) / 3
+        val checkRadius = checkSize / 2
+        checkDrawable.setBounds(
+                sourceRadius - checkRadius,
+                sourceRadius - checkRadius,
+                sourceRadius + checkRadius,
+                sourceRadius + checkRadius
+        )
+        checkDrawable.draw(canvas)
+
+        qr_code_image_view.setImageBitmap(source)
     }
 
     companion object {

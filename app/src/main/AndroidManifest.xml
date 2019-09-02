@@ -257,7 +257,7 @@
         <activity
             android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
     </application>
 
 </manifest>

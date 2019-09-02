@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/bg_check"/>
-    <item android:drawable="@drawable/ic_check_white"
-        android:top="@dimen/standard_margin"
-        android:bottom="@dimen/standard_margin"
-        android:left="@dimen/standard_margin"
-        android:right="@dimen/standard_margin"/>
-</layer-list>

@@ -29,7 +29,7 @@ class CompanyClientItemViewHolder(
     private val noBalancesTextView: TextView = view.no_balances_text_view
     private val dividerView: View = view.divider_view
     private val bgSelected = ContextCompat.getDrawable(view.context, R.drawable.bg_selection)
-    private val checkIcon = ContextCompat.getDrawable(view.context, R.drawable.ic_check_colorized)
+    private val checkIcon = ContextCompat.getDrawable(view.context, R.drawable.ic_check_circle_accent)
     private lateinit var clientIcon: Drawable
 
 
