@@ -61,7 +61,7 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
                 .addTo(compositeDisposable)
     }
 
-    private fun stopPolling() {
+    protected fun stopPolling() {
         pollingDisposable?.dispose()
     }
 

@@ -233,6 +233,9 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
         redemptionCreationDisposable?.dispose()
 
+        referenceToPoll = null
+        stopPolling()
+
         val assetCode = balance.assetCode
 
         redemptionCreationDisposable = CreateRedemptionRequestUseCase(
@@ -251,6 +254,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                             errorHandlerFactory.getDefault().handle(it)
                         }
                 )
+                .addTo(compositeDisposable)
     }
 
     private fun onRedemptionRequestCreated(result: CreateRedemptionRequestUseCase.Result) {
