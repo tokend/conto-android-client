@@ -96,8 +96,7 @@ class CorporateMainActivity : MainActivity() {
     }
 
     override fun openAccountIdShare() {
-        val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-        Navigator.from(this).openAccountQrShare(walletInfo, true)
+        Navigator.from(this).openAccountQrShare(useAccountId = true)
     }
 
     override fun getFragment(screenIdentifier: Long): Fragment? {

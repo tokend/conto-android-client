@@ -20,6 +20,7 @@ import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.*
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
+import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
@@ -412,13 +413,13 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAccountQrShare(walletInfo: WalletInfo,
-                           useAccountId: Boolean = false) {
-        openQrShare(
-                data = if (useAccountId) walletInfo.accountId else walletInfo.email,
-                title = context!!.getString(R.string.account_title),
-                shareLabel = context!!.getString(R.string.share_account)
-        )
+    fun openAccountQrShare(useAccountId: Boolean = false) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        AccountDetailsFragment.ID,
+                        AccountDetailsFragment.getBundle(useAccountId)
+                ))
+                ?.also { performIntent(it) }
     }
 
     fun openAtomicSwapBuy(ask: AtomicSwapAskRecord,

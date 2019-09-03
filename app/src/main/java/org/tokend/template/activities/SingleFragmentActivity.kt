@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import io.reactivex.rxkotlin.addTo
 import org.tokend.template.R
+import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.deposit.DepositFragment
@@ -52,6 +53,7 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
             AtomicSwapAsksFragment.ID -> bundle?.let(AtomicSwapAsksFragment.Companion::newInstance)
             SettingsFragment.ID -> GeneralSettingsFragment()
             ShareRedemptionQrFragment.ID -> bundle?.let(ShareRedemptionQrFragment.Companion::newInstance)
+            AccountDetailsFragment.ID -> bundle?.let(AccountDetailsFragment.Companion::newInstance)
             else -> null
         }
     }

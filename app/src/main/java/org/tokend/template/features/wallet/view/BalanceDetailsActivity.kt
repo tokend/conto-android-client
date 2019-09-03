@@ -189,9 +189,7 @@ class BalanceDetailsActivity : BaseActivity() {
                     R.string.receive_title,
                     R.drawable.ic_receive_fab,
                     {
-                        val walletInfo = walletInfoProvider.getWalletInfo()
-                                ?: return@FloatingActionMenuAction
-                        navigator.openAccountQrShare(walletInfo)
+                        navigator.openAccountQrShare()
                     },
                     isEnabled = asset?.isTransferable == true
             ))

@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import io.reactivex.rxkotlin.addTo
+import kotlinx.android.synthetic.main.include_rounded_elevated_bottom_sheet_header.*
 import kotlinx.android.synthetic.main.layout_simple_balance_details_content.*
 import kotlinx.android.synthetic.main.layout_simple_balance_details_redemption.*
 import kotlinx.android.synthetic.main.toolbar.*

@@ -32,7 +32,7 @@ import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.LocalizedName
 import java.math.BigDecimal
 
-class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
+open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
 
     private val loadingIndicator = LoadingIndicatorManager(
@@ -43,7 +43,7 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
-    private var currentBalance: BalanceRecord? = null
+    protected var currentBalance: BalanceRecord? = null
         set(value) {
             field = value
             onBalanceChanged()
@@ -68,8 +68,8 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     }
 
     // region Init
-    private fun initToolbar() {
-        toolbar.title = getString(R.string.movements_screen_title)
+    protected open fun initToolbar() {
+        toolbar.title = getString(R.string.operations_history)
 
         val dropDownButton = ImageButton(requireContext()).apply {
             setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_arrow_drop_down))
@@ -87,7 +87,7 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
         toolbarSubject.onNext(toolbar)
     }
 
-    private fun initBalanceSelection() {
+    protected open fun initBalanceSelection() {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val filter: ((BalanceRecord) -> Boolean)? =
                 if (!repositoryProvider.kycState().isActualOrForcedGeneral)
@@ -122,7 +122,7 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
         swipe_refresh.setOnRefreshListener { update(force = true) }
     }
 
-    private fun initList() {
+    protected open fun initList() {
         adapter = BalanceChangesAdapter(amountFormatter, false)
         adapter.onItemClick { _, item ->
             item.source?.let { Navigator.from(this).openBalanceChangeDetails(it) }
@@ -206,13 +206,13 @@ class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
         })
     }
 
-    private fun openBalancePicker() {
+    protected fun openBalancePicker() {
         balancePicker.show {
             currentBalance = it.source
         }
     }
 
-    private fun onBalanceChanged() {
+    protected open fun onBalanceChanged() {
         toolbar.subtitle = currentBalance?.asset?.name ?: currentBalance?.assetCode
         history_list.resetBottomReachHandled()
         subscribeToHistory()

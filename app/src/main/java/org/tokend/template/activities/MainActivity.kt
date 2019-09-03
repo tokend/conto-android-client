@@ -179,11 +179,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withSelectable(false),
 
             PrimaryDrawerItem()
-                    .withName(R.string.movements_screen_title)
-                    .withIdentifier(AssetMovementsFragment.ID)
-                    .withIcon(R.drawable.ic_history),
-
-            PrimaryDrawerItem()
                     .withName(R.string.marketplace)
                     .withIdentifier(AllAtomicSwapAsksFragment.ID)
                     .withIcon(R.drawable.ic_shop_cart)
@@ -272,8 +267,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             addDrawerItems(
                     items[BalancesFragment.ID],
                     items[CompaniesFragment.ID],
-                    items[AllAtomicSwapAsksFragment.ID],
-                    items[AssetMovementsFragment.ID]
+                    items[AllAtomicSwapAsksFragment.ID]
             )
 
             if (BuildConfig.IS_DEPOSIT_ALLOWED) {
@@ -369,8 +363,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     protected open fun openAccountIdShare() {
-        val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-        Navigator.from(this@MainActivity).openAccountQrShare(walletInfo)
+        Navigator.from(this).openAccountQrShare()
     }
 
     private fun contribute() {

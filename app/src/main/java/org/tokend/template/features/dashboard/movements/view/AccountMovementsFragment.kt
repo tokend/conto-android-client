@@ -61,7 +61,7 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
     // region Init
     private fun initToolbar() {
         if (allowToolbar) {
-            toolbar.title = getString(R.string.movements_screen_title)
+            toolbar.title = getString(R.string.operations_history)
 
             ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
         } else {

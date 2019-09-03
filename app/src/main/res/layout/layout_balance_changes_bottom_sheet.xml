@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/redemption_bottom_sheet_layout"
+    android:id="@+id/balance_changes_bottom_sheet_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="0dp"
     android:orientation="vertical"
     android:paddingTop="0dp"
     app:behavior_peekHeight="68dp"
-    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+    app:layout_behavior="org.tokend.template.features.accountdetails.view.BottomSheetBehaviorWithNestedScrollChild">
 
     <include layout="@layout/include_rounded_elevated_bottom_sheet_header" />
 
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:gravity="center"
-            android:text="@string/redemption_qr_code"
+            android:text="@string/operations_history"
             android:textSize="@dimen/text_size_heading" />
 
         <FrameLayout

@@ -139,11 +139,11 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
         amountView.amountWrapper.onAmountChanged { _, _ -> onAmountChanged() }
-        root_layout.addView(amountView)
+        scrollable_root_layout.addView(amountView)
 
         preFillAmount()
 
-        root_layout.addView(availableTextView)
+        scrollable_root_layout.addView(availableTextView)
     }
 
     private fun initShareButton() {
@@ -167,7 +167,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
             shareData()
         }
 
-        root_layout.addView(shareButton)
+        scrollable_root_layout.addView(shareButton)
     }
 
     private fun preFillAmount() {
