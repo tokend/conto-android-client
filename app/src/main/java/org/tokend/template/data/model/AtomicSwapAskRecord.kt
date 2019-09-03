@@ -8,7 +8,7 @@ import java.math.BigDecimal
 class AtomicSwapAskRecord(
         val id: String,
         val asset: AssetRecord,
-        val amount: BigDecimal,
+        var amount: BigDecimal,
         val isCanceled: Boolean,
         val quoteAssets: List<QuoteAsset>,
         val company: CompanyRecord

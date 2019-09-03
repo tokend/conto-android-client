@@ -47,6 +47,8 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
     override lateinit var balanceId: String
 
+    override var amount: BigDecimal = BigDecimal.ZERO
+
     override var referenceToPoll: String? = null
 
     private val balance: BalanceRecord
@@ -264,6 +266,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                 .encodeBase64String()
 
         referenceToPoll = result.request.salt.toString()
+        amount = result.request.amount
 
         isAccepted = false
 

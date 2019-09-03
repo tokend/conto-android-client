@@ -125,7 +125,8 @@ class CreateRedemptionActivity : BaseActivity() {
                         serializedBase64,
                         shareText,
                         result.request.salt.toString(),
-                        balanceId
+                        balanceId,
+                        result.request.amount
                 )
 
         finish()

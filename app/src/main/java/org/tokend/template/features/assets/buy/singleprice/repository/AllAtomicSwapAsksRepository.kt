@@ -19,6 +19,7 @@ import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
+import java.math.BigDecimal
 
 class AllAtomicSwapAsksRepository(
         private val ownerAccountId: String?,
@@ -72,6 +73,17 @@ class AllAtomicSwapAsksRepository(
                         AtomicSwapAskRecord(it, assetsMap, companiesMap,
                                 urlConfigProvider.getConfig(), objectMapper)
                     }
+                }
+    }
+
+    fun updateAskAvailable(askId: String,
+                           delta: BigDecimal) {
+        itemsList
+                .find { it.id == askId }
+                ?.also { ask ->
+                    ask.amount += delta
+                    itemsCache.update(ask)
+                    broadcast()
                 }
     }
 

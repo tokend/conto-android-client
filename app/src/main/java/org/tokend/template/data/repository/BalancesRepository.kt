@@ -199,4 +199,15 @@ class BalancesRepository(
                     broadcast()
                 }
     }
+
+    fun updateBalance(balanceId: String,
+                      delta: BigDecimal) {
+        itemsList
+                .find { it.id == balanceId }
+                ?.also { balance ->
+                    balance.available += delta
+                    itemsCache.update(balance)
+                    broadcast()
+                }
+    }
 }
