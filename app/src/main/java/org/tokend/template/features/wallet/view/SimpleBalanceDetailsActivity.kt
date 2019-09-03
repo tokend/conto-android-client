@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.layout_simple_balance_details_content.*
@@ -226,6 +228,22 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.balance_details, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.asset_details -> openAssetDetails()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun openAssetDetails() {
+        Navigator.from(this).openAssetDetails(balance.asset)
     }
 
     companion object {

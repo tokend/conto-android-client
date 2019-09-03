@@ -407,7 +407,7 @@ class BalanceDetailsActivity : BaseActivity() {
     private fun openAssetDetails() {
         val asset = balance?.asset ?: return
         menu_fab.close(false)
-        Navigator.from(this).openAssetDetails(ASSET_DETAILS_REQUEST, asset)
+        Navigator.from(this).openAssetDetails(asset)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -425,8 +425,6 @@ class BalanceDetailsActivity : BaseActivity() {
 
     companion object {
         private const val BALANCE_ID_EXTRA = "balance_id"
-        private const val ASSET_DETAILS_REQUEST = 1132
-        private val BUY_MENU_ITEM_ID = "buy_fab".hashCode()
 
         fun getBundle(balanceId: String) = Bundle().apply {
             putString(BALANCE_ID_EXTRA, balanceId)

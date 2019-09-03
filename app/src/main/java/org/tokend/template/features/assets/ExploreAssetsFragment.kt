@@ -26,8 +26,8 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.features.assets.adapter.AssetListItem
 import org.tokend.template.features.assets.adapter.AssetsAdapter
 import org.tokend.template.features.assets.logic.CreateBalanceUseCase
@@ -234,8 +234,10 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun openAssetDetails(view: View?, item: AssetListItem) {
-        Navigator.from(this).openAssetDetails(CREATE_REQUEST, item.source,
-                cardView = view
+        Navigator.from(this).openAssetDetails(
+                item.source,
+                cardView = view,
+                requestCode = CREATE_REQUEST
         )
     }
 

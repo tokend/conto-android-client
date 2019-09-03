@@ -252,9 +252,9 @@ class Navigator private constructor() {
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
-    fun openAssetDetails(requestCode: Int,
-                         asset: AssetRecord,
-                         cardView: View? = null) {
+    fun openAssetDetails(asset: AssetRecord,
+                         cardView: View? = null,
+                         requestCode: Int = 0) {
         val transitionBundle = activity?.let {
             createTransitionBundle(it,
                     cardView to it.getString(R.string.transition_asset_card)
