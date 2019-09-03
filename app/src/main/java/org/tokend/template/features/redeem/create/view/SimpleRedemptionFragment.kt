@@ -134,6 +134,8 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         )
                 .apply {
+                    topMargin = requireContext().resources
+                            .getDimensionPixelOffset(R.dimen.standard_margin)
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
         amountView.amountWrapper.onAmountChanged { _, _ -> onAmountChanged() }

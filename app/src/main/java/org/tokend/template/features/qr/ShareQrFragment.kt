@@ -29,6 +29,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 open class ShareQrFragment : BaseFragment(), ToolbarProvider {
     companion object {
@@ -105,9 +106,8 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun getMaxQrSize(): Int {
-        val height = scroll_view.measuredHeight -
-                2 * resources.getDimensionPixelSize(R.dimen.standard_margin)
-        return Math.min(height, scroll_view.measuredWidth)
+        val minScreenSize = min(scroll_view.measuredHeight, scroll_view.measuredWidth)
+        return minScreenSize - 2 * resources.getDimensionPixelSize(R.dimen.double_margin)
     }
 
     protected open fun displayData() {
