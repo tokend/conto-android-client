@@ -29,8 +29,6 @@ import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
-import org.tokend.template.features.companies.add.view.AddCompanyActivity
-import org.tokend.template.features.companies.add.view.AddCompanyConfirmationActivity
 import org.tokend.template.features.companies.details.view.CompanyDetailsActivity
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
@@ -472,18 +470,6 @@ class Navigator private constructor() {
                          requestCode: Int = 0) {
         context?.intentFor<MassIssuanceActivity>()
                 ?.putExtras(MassIssuanceActivity.getBundle(emails, assetCode))
-                ?.also { performIntent(it, requestCode = requestCode) }
-    }
-
-    fun openCompanyAdd() {
-        context?.intentFor<AddCompanyActivity>()
-                ?.also { performIntent(it) }
-    }
-
-    fun openCompanyAddConfirmation(company: CompanyRecord,
-                                   requestCode: Int = 0) {
-        context?.intentFor<AddCompanyConfirmationActivity>()
-                ?.putExtras(AddCompanyConfirmationActivity.getBundle(company))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 

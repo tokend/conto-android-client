@@ -67,7 +67,7 @@ class AtomicSwapAsksRepository(
                 }
                 .map { (items, assetsMap) ->
                     items.mapSuccessful {
-                        AtomicSwapAskRecord(it, assetsMap,
+                        AtomicSwapAskRecord(it, assetsMap, emptyMap(),
                                 urlConfigProvider.getConfig(), objectMapper)
                     }
                 }

@@ -15,6 +15,20 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/company_name_text_view"
+            style="@style/HintText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/half_standard_padding"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginBottom="-4dp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textAllCaps="true"
+            tools:text="Oleg's business" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="18sp"
-                    tools:text="BTC" />
+                    tools:text="Mak" />
 
                 <TextView
                     android:id="@+id/price_text_view"

@@ -29,6 +29,7 @@ import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.assets.buy.singleprice.view.AllAtomicSwapAsksFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
@@ -180,7 +181,12 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             PrimaryDrawerItem()
                     .withName(R.string.movements_screen_title)
                     .withIdentifier(AssetMovementsFragment.ID)
-                    .withIcon(R.drawable.ic_history)
+                    .withIcon(R.drawable.ic_history),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.marketplace)
+                    .withIdentifier(AllAtomicSwapAsksFragment.ID)
+                    .withIcon(R.drawable.ic_shop_cart)
     )
 
     protected open fun getHeaderInstance(email: String): AccountHeader {
@@ -266,6 +272,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             addDrawerItems(
                     items[BalancesFragment.ID],
                     items[CompaniesFragment.ID],
+                    items[AllAtomicSwapAsksFragment.ID],
                     items[AssetMovementsFragment.ID]
             )
 
@@ -345,6 +352,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             AssetMovementsFragment.ID -> factory.getAssetMovementsFragment()
             BalancesFragment.ID -> factory.getBalancesFragment(withToolbar = true)
             CompaniesFragment.ID -> factory.getCompaniesFragment()
+            AllAtomicSwapAsksFragment.ID -> factory
+                    .getAllAtomicSwapAsksFragment(withToolbar = true, companyId = null)
             else -> null
         }
     }

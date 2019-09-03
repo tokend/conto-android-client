@@ -1,4 +1,4 @@
-package org.tokend.template.features.dashboard.shop.view.adapter
+package org.tokend.template.features.assets.buy.singleprice.view.adapter
 
 import android.view.View
 import android.widget.Button
@@ -18,6 +18,7 @@ class SinglePriceAtomicSwapAskItemViewHolder(
     private val assetNameTextView: TextView = view.findViewById(R.id.asset_name_text_view)
     private val priceTextView: TextView = view.findViewById(R.id.price_text_view)
     private val availableTextView: TextView = view.findViewById(R.id.available_text_view)
+    private val companyNameTextView: TextView = view.findViewById(R.id.company_name_text_view)
     private val buyButton: Button = view.findViewById(R.id.buy_btn)
 
     private val logoSize =
@@ -43,6 +44,12 @@ class SinglePriceAtomicSwapAskItemViewHolder(
                         abbreviation = true
                 )
         )
+        if (item.companyName != null) {
+            companyNameTextView.text = item.companyName
+            companyNameTextView.visibility = View.VISIBLE
+        } else {
+            companyNameTextView.visibility = View.GONE
+        }
     }
 
     override fun bind(item: SinglePriceAtomicSwapAskListItem,

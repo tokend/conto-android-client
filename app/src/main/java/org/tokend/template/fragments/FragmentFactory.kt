@@ -5,12 +5,12 @@ import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.AssetDetailsFragment
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.assets.buy.singleprice.view.AllAtomicSwapAsksFragment
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.balances.view.CompanyBalancesFragment
 import org.tokend.template.features.dashboard.movements.view.AccountMovementsFragment
-import org.tokend.template.features.dashboard.shop.view.AllAtomicSwapAsksFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
@@ -141,9 +141,10 @@ class FragmentFactory {
         return CompanyBalancesFragment.newInstance()
     }
 
-    fun getAllAtomicSwapAsksFragment(companyId: String? = null): Fragment {
+    fun getAllAtomicSwapAsksFragment(withToolbar: Boolean,
+                                     companyId: String?): Fragment {
         return AllAtomicSwapAsksFragment.newInstance(
-                AllAtomicSwapAsksFragment.getBundle(companyId)
+                AllAtomicSwapAsksFragment.getBundle(companyId, withToolbar)
         )
     }
 

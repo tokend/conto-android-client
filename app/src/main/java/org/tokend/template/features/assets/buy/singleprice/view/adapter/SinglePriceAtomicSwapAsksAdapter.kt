@@ -1,4 +1,4 @@
-package org.tokend.template.features.dashboard.shop.view.adapter
+package org.tokend.template.features.assets.buy.singleprice.view.adapter
 
 import android.view.View
 import android.view.ViewGroup
