@@ -3,12 +3,12 @@ package org.tokend.template.features.assets.buy.logic
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
-import org.tokend.template.features.assets.buy.model.FiatInvoice
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
@@ -17,7 +17,7 @@ import org.tokend.wallet.xdr.CreateAtomicSwapBidRequestOp
 import org.tokend.wallet.xdr.Operation
 import java.math.BigDecimal
 
-class BuyAssetForFiatUseCase(
+class BuyAssetOnMarketplaceUseCase(
         private val amount: BigDecimal,
         private val quoteAssetCode: String,
         private val ask: AtomicSwapAskRecord,
@@ -30,7 +30,7 @@ class BuyAssetForFiatUseCase(
     private lateinit var networkParams: NetworkParams
     private lateinit var transaction: Transaction
 
-    fun perform(): Single<FiatInvoice> {
+    fun perform(): Single<MarketplaceInvoiceData> {
         return getAccountId()
                 .doOnSuccess { accountId ->
                     this.accountId = accountId
@@ -88,13 +88,16 @@ class BuyAssetForFiatUseCase(
                 Operation.OperationBody.CreateAtomicSwapBidRequest(op))
     }
 
-    private fun getInvoice(): Single<FiatInvoice> {
+    private fun getInvoice(): Single<MarketplaceInvoiceData> {
         return apiProvider.getApi()
                 .integrations
+                // TODO: Replace with .marketplace
                 .fiat
                 .submitBidTransaction(transaction)
                 .toSingle()
-                .map(::FiatInvoice)
+                .map {
+                    MarketplaceInvoiceData.Redirect(it.paymentUrl)
+                }
     }
 
     private fun updateRepositories() {

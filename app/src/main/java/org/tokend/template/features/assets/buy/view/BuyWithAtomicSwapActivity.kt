@@ -12,14 +12,14 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
-import org.tokend.template.features.assets.buy.logic.BuyAssetForFiatUseCase
-import org.tokend.template.features.assets.buy.model.FiatInvoice
+import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -112,7 +112,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 cancelListener = { disposable?.dispose() }
         )
 
-        disposable = BuyAssetForFiatUseCase(
+        disposable = BuyAssetOnMarketplaceUseCase(
                 amount = amount,
                 quoteAssetCode = assetCode,
                 ask = ask,
@@ -132,9 +132,38 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
-    private fun onBidSubmitted(invoice: FiatInvoice) {
-        Navigator.from(this).openWebInvoice(invoice.paymentFormUrl, WEB_INVOICE_REQUEST)
+    private fun onBidSubmitted(invoice: MarketplaceInvoiceData) {
+        when (invoice) {
+            is MarketplaceInvoiceData.Redirect ->
+                Navigator.from(this).openWebInvoice(invoice.url, WEB_INVOICE_REQUEST)
+            is MarketplaceInvoiceData.Crypto ->
+                openCryptoInvoiceAndFinish(invoice)
+            else ->
+                errorHandlerFactory.getDefault().handle(
+                        NotImplementedError("There is no handler for $invoice")
+                )
+        }
         SoftInputUtil.hideSoftInput(this)
+    }
+
+    private fun openCryptoInvoiceAndFinish(invoice: MarketplaceInvoiceData.Crypto) {
+        val asset = this.asset ?: return
+        val sendAmountString = amountFormatter.formatAssetAmount(invoice.amount, asset)
+        val receiveAmountString = amountFormatter.formatAssetAmount(amount, ask.asset)
+
+        Navigator.from(this).openQrShare(
+                title = this.title.toString(),
+                shareLabel = getString(R.string.share_address_label),
+                data = invoice.address,
+                shareText = getString(
+                        R.string.template_atomic_swap_invoice_share_text,
+                        sendAmountString,
+                        receiveAmountString,
+                        invoice.address
+                ),
+                topText = getString(R.string.template_send_to_address, sendAmountString)
+        )
+        finish()
     }
 
     private fun displayFragment(
