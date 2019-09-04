@@ -19,10 +19,7 @@ class WebInvoiceActivity : BaseActivity() {
 
         val invoiceUrl = intent.getStringExtra(INVOICE_URL_EXTRA)
         if (invoiceUrl == null) {
-            errorHandlerFactory.getDefault().handle(
-                    IllegalArgumentException("No $INVOICE_URL_EXTRA specified")
-            )
-            finish()
+            finishWithMissingArgError(INVOICE_URL_EXTRA)
             return
         }
 

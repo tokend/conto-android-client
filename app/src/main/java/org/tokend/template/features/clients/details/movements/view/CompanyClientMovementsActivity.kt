@@ -37,18 +37,16 @@ class CompanyClientMovementsActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_company_client_movements)
 
-        val client = (intent.getSerializableExtra(CLIENT_EXTRA) as? CompanyClientRecord)
+        val client = intent.getSerializableExtra(CLIENT_EXTRA) as? CompanyClientRecord
         if (client == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException("Invalid $CLIENT_EXTRA"))
-            finish()
+            finishWithMissingArgError(CLIENT_EXTRA)
             return
         }
         this.client = client
 
         val assetCode = intent.getNullableStringExtra(ASSET_CODE_EXTRA)
         if (assetCode == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException("Invalid $ASSET_CODE_EXTRA"))
-            finish()
+            finishWithMissingArgError(ASSET_CODE_EXTRA)
             return
         }
         this.assetCode = assetCode

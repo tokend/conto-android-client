@@ -25,8 +25,7 @@ class CompanyClientDetailsActivity : BaseActivity() {
 
         val client = (intent.getSerializableExtra(CLIENT_EXTRA) as? CompanyClientRecord)
         if (client == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException("Invalid $CLIENT_EXTRA"))
-            finish()
+            finishWithMissingArgError(CLIENT_EXTRA)
             return
         }
         this.client = client

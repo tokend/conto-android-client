@@ -176,11 +176,7 @@ class BalancesRepository(
 
             val transaction =
                     TransactionBuilder(networkParams, PublicKeyFactory.fromAccountId(sourceAccountId))
-                            .apply {
-                                operations.forEach {
-                                    addOperation(Operation.OperationBody.ManageBalance(it))
-                                }
-                            }
+                            .addOperations(operations.map(Operation.OperationBody::ManageBalance))
                             .build()
 
             transaction.addSignature(signer)

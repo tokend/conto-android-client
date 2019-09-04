@@ -63,20 +63,14 @@ class ConfirmRedemptionActivity : BaseActivity() {
 
         val balanceId = intent.getStringExtra(EXTRA_BALANCE_ID)
         if (balanceId == null) {
-            errorHandler.handle(IllegalArgumentException(
-                    "No $EXTRA_BALANCE_ID specified"
-            ))
-            finish()
+            finishWithMissingArgError(EXTRA_BALANCE_ID)
             return
         }
         this.balanceId = balanceId
 
         val requestString = intent.getStringExtra(EXTRA_REDEMPTION)
         if (requestString == null) {
-            errorHandler.handle(IllegalArgumentException(
-                    "No $EXTRA_REDEMPTION specified"
-            ))
-            finish()
+            finishWithMissingArgError(EXTRA_REDEMPTION)
             return
         }
 
@@ -89,8 +83,7 @@ class ConfirmRedemptionActivity : BaseActivity() {
 
             request = RedemptionRequest.fromSerialized(networkParams, requestString.decodeBase64())
         } catch (e: Exception) {
-            errorHandler.handle(e)
-            finish()
+            finishWithError(e)
             return
         }
 

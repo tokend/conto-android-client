@@ -28,9 +28,7 @@ class CompanyDetailsActivity : BaseActivity() {
 
         val company = intent.getSerializableExtra(COMPANY_EXTRA) as? CompanyRecord
         if (company == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException(
-                    "No $COMPANY_EXTRA specified"))
-            finish()
+            finishWithMissingArgError(COMPANY_EXTRA)
             return
         }
         this.company = company

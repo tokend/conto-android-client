@@ -57,9 +57,7 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
 
         val balanceId = intent.getStringExtra(BALANCE_ID_EXTRA)
         if (balanceId == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException(
-                    "No $BALANCE_ID_EXTRA specified"))
-            finish()
+            finishWithMissingArgError(BALANCE_ID_EXTRA)
             return
         }
         this.balanceId = balanceId

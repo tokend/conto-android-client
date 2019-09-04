@@ -124,10 +124,7 @@ class MassIssuanceActivity : BaseActivity() {
                 .filter { it.ownerAccountId == accountId }
 
         if (ownedAssets.isEmpty()) {
-            errorHandlerFactory.getDefault().handle(IllegalStateException(
-                    "No owned assets found"
-            ))
-            finish()
+            finishWithError(IllegalStateException("No owned assets found"))
             return
         }
 

@@ -45,10 +45,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
 
         val ask = intent.getSerializableExtra(ASK_EXTRA) as? AtomicSwapAskRecord
         if (ask == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException(
-                    "No $ASK_EXTRA specified"
-            ))
-            finish()
+            finishWithMissingArgError(ASK_EXTRA)
             return
         }
         this.ask = ask

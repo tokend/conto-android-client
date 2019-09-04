@@ -19,10 +19,7 @@ class ForceAccountTypeActivity : BaseActivity() {
         val forcedAccountType = intent.getStringExtra(FORCED_ACCOUNT_TYPE_EXTRA)
                 ?.let { ForcedAccountType.valueOf(it) }
         if (forcedAccountType == null) {
-            errorHandlerFactory.getDefault().handle(IllegalArgumentException(
-                    "No $FORCED_ACCOUNT_TYPE_EXTRA specified"
-            ))
-            finish()
+            finishWithMissingArgError(FORCED_ACCOUNT_TYPE_EXTRA)
             return
         }
         this.forcedAccountType = forcedAccountType
