@@ -14,7 +14,7 @@ import org.tokend.template.data.repository.base.MemoryOnlyRepositoryCache
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.extensions.getOrPut
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
-import org.tokend.template.features.dashboard.shop.repository.AllAtomicSwapAsksRepository
+import org.tokend.template.features.assets.buy.singleprice.repository.AllAtomicSwapAsksRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -37,21 +37,25 @@ class RepositoryProviderImpl(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         private val context: Context? = null,
-        private val companyInfoProvider: CompanyInfoProvider? = null,
         private val kycStatePersistor: SubmittedKycStatePersistor? = null
 ) : RepositoryProvider {
-    private val conversionAssetCode
-        get() =
+    private val conversionAssetCode =
             if (BuildConfig.ENABLE_BALANCES_CONVERSION)
-                companyInfoProvider?.getCompany()?.conversionAssetCode
+                BuildConfig.BALANCES_CONVERSION_ASSET
             else
                 null
 
-    private val companyId: String?
-        get() = companyInfoProvider?.getCompany()?.id
-
-    private val balancesRepositories =
-            LruCache<String, BalancesRepository>(MAX_SAME_REPOSITORIES_COUNT)
+    private val balancesRepository: BalancesRepository by lazy {
+        BalancesRepository(
+                apiProvider,
+                walletInfoProvider,
+                urlConfigProvider,
+                mapper,
+                conversionAssetCode,
+                clientCompanies(),
+                MemoryOnlyRepositoryCache()
+        )
+    }
     private val accountDetails: AccountDetailsRepository by lazy {
         AccountDetailsRepository(apiProvider)
     }
@@ -74,10 +78,25 @@ class RepositoryProviderImpl(
     private val accountRepository: AccountRepository by lazy {
         AccountRepository(apiProvider, walletInfoProvider)
     }
-    private val salesRepositories =
-            LruCache<String, SalesRepository>(MAX_SAME_REPOSITORIES_COUNT)
-    private val filteredSalesRepositories =
-            LruCache<String, SalesRepository>(MAX_SAME_REPOSITORIES_COUNT)
+
+    private val salesRepository: SalesRepository by lazy {
+        SalesRepository(
+                walletInfoProvider,
+                apiProvider,
+                urlConfigProvider,
+                mapper,
+                MemoryOnlyRepositoryCache())
+    }
+
+    private val filteredSalesRepository: SalesRepository by lazy {
+        SalesRepository(
+                walletInfoProvider,
+                apiProvider,
+                urlConfigProvider,
+                mapper,
+                MemoryOnlyRepositoryCache())
+    }
+
     private val contactsRepository: ContactsRepository by lazy {
         context ?: throw IllegalStateException("This provider has no context " +
                 "required to provide contacts repository")
@@ -100,7 +119,7 @@ class RepositoryProviderImpl(
     private val clientBalanceChangesRepositories =
             LruCache<String, BalanceChangesRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
-    private val pollsRepositories =
+    private val pollsRepositoriesByOwnerAccountId =
             LruCache<String, PollsRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     private val balanceChangesRepositoriesByBalanceId =
@@ -139,17 +158,7 @@ class RepositoryProviderImpl(
     }
 
     override fun balances(): BalancesRepository {
-        val key = companyId.toString()
-        return balancesRepositories.getOrPut(key) {
-            BalancesRepository(
-                    apiProvider,
-                    walletInfoProvider,
-                    urlConfigProvider,
-                    mapper,
-                    conversionAssetCode,
-                    MemoryOnlyRepositoryCache()
-            )
-        }
+        return balancesRepository
     }
 
     override fun accountDetails(): AccountDetailsRepository {
@@ -200,19 +209,11 @@ class RepositoryProviderImpl(
     }
 
     override fun sales(): SalesRepository {
-        val key = companyId.toString()
-        return salesRepositories.getOrPut(key) {
-            SalesRepository(companyId, walletInfoProvider,
-                    apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
-        }
+        return salesRepository
     }
 
     override fun filteredSales(): SalesRepository {
-        val key = companyId.toString()
-        return filteredSalesRepositories.getOrPut(key) {
-            SalesRepository(companyId, walletInfoProvider,
-                    apiProvider, urlConfigProvider, mapper, MemoryOnlyRepositoryCache())
-        }
+        return filteredSalesRepository
     }
 
     override fun contacts(): ContactsRepository {
@@ -281,11 +282,10 @@ class RepositoryProviderImpl(
         }
     }
 
-    override fun polls(): PollsRepository {
-        val key = companyId.toString()
-        return pollsRepositories.getOrPut(key) {
-            PollsRepository(companyId, apiProvider, walletInfoProvider, keyValueEntries(),
-                    PollsCache())
+    override fun polls(ownerAccountId: String): PollsRepository {
+        return pollsRepositoriesByOwnerAccountId.getOrPut(ownerAccountId) {
+            PollsRepository(ownerAccountId, apiProvider, walletInfoProvider,
+                    keyValueEntries(), PollsCache())
         }
     }
 
@@ -337,13 +337,13 @@ class RepositoryProviderImpl(
         return blobs
     }
 
-    override fun allAtomicSwapAsks(): AllAtomicSwapAsksRepository {
-        val key = companyId.toString()
-        return allAtomicSwapAsksRepositories.getOrPut(key) {
+    override fun allAtomicSwapAsks(ownerAccountId: String?): AllAtomicSwapAsksRepository {
+        return allAtomicSwapAsksRepositories.getOrPut(ownerAccountId.toString()) {
             AllAtomicSwapAsksRepository(
-                    companyId,
+                    ownerAccountId,
                     apiProvider,
                     assets(),
+                    companies(),
                     urlConfigProvider,
                     mapper,
                     MemoryOnlyRepositoryCache()

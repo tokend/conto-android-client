@@ -60,6 +60,14 @@ class AmountEditTextWrapper(private val editText: EditText,
     val scaledAmount: BigDecimal
         get() = BigDecimalUtil.scaleAmount(rawAmount, maxPlacesAfterComa)
 
+    /**
+     * Sets given amount into field
+     */
+    fun setAmount(amount: BigDecimal) {
+        editText.setText(BigDecimalUtil.toPlainString(amount))
+        editText.setSelection(editText.text?.length ?: 0)
+    }
+
     init {
         editText.removeTextChangedListener(textWatcher)
         editText.addTextChangedListener(textWatcher)

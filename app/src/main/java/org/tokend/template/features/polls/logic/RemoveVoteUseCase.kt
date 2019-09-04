@@ -87,7 +87,7 @@ class RemoveVoteUseCase(
 
     private fun updateRepository() {
         repositoryProvider
-                .polls()
+                .polls(pollOwnerAccountId)
                 .updatePollChoiceLocally(pollId, null)
     }
 }

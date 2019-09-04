@@ -11,17 +11,19 @@ class BalanceListItem(
         val conversionAsset: Asset?,
         val assetName: String?,
         val logoUrl: String?,
+        val ownerName: String?,
         val source: BalanceRecord?
 ) {
     val displayedName: String = assetName ?: asset.code
 
-    constructor(source: BalanceRecord) : this(
+    constructor(source: BalanceRecord, ownerName: String? = source.company?.name) : this(
             asset = source.asset,
             available = source.available,
             logoUrl = source.asset.logoUrl,
             assetName = source.asset.name,
             converted = source.convertedAmount,
             conversionAsset = source.conversionAsset,
+            ownerName = ownerName,
             source = source
     )
 
@@ -36,6 +38,7 @@ class BalanceListItem(
         if (assetName != other.assetName) return false
         if (logoUrl != other.logoUrl) return false
         if (displayedName != other.displayedName) return false
+        if (ownerName != other.ownerName) return false
 
         return true
     }
@@ -48,6 +51,7 @@ class BalanceListItem(
         result = 31 * result + (assetName?.hashCode() ?: 0)
         result = 31 * result + (logoUrl?.hashCode() ?: 0)
         result = 31 * result + displayedName.hashCode()
+        result = 31 * result + (ownerName?.hashCode() ?: 0)
         return result
     }
 

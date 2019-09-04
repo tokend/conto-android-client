@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -15,6 +16,7 @@
         app:layout_constraintTop_toTopOf="@null">
 
         <LinearLayout
+            android:id="@+id/scrollable_root_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -45,7 +47,8 @@
                     android:id="@+id/qr_code_image_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/show_qr_label" />
+                    android:contentDescription="@string/show_qr_label"
+                    android:minHeight="@dimen/hepta_margin" />
 
             </FrameLayout>
 
@@ -54,7 +57,7 @@
                 style="@style/SecondaryText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/half_standard_margin"
+                android:layout_marginTop="@dimen/standard_margin"
                 android:gravity="center"
                 android:maxLines="2"
                 android:paddingBottom="@dimen/standard_margin"

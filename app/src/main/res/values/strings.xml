@@ -388,7 +388,7 @@
     <string name="template_amount_with_converted">%1$s ≈ %2$s</string>
     <string name="template_converted_amount">≈ %1$s</string>
     <string name="asset_distribution_other">Other</string>
-    <string name="movements_screen_title">Movements</string>
+    <string name="operations_history">Operations history</string>
     <string name="balances_screen_title">Balances</string>
     <string name="unlock_label">Unlock</string>
     <string name="use_password">Use password</string>
@@ -511,7 +511,14 @@
     <string name="lock_app_in_background">Lock app in background</string>
     <string name="open_email_app">Open mailbox</string>
     <string name="almost_done">Almost done</string>
+    <string name="system_asset">System asset</string>
+    <string name="my_companies_tab">My</string>
+    <string name="all_companies_tab">All</string>
     <string name="quantity">Quantity</string>
+    <string name="my_balances">My balances</string>
+    <string name="send_action">Send</string>
+    <string name="redemption_qr_code">Redemption QR code</string>
+    <string name="marketplace">Marketplace</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

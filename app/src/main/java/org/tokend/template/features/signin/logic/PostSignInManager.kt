@@ -3,7 +3,6 @@ package org.tokend.template.features.signin.logic
 import io.reactivex.Completable
 import org.tokend.sdk.utils.extentions.isUnauthorized
 import org.tokend.template.di.providers.RepositoryProvider
-import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.signin.model.ForcedAccountType
 import retrofit2.HttpException
 
@@ -20,18 +19,11 @@ class PostSignInManager(
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
                 repositoryProvider.account().updateDeferred(),
-                repositoryProvider.kycState().updateIfNotFreshDeferred().andThen(Completable.defer {
-                    repositoryProvider.kycState().forcedType = forcedAccountType
-
-                    // Update balances for corporate users, companies otherwise.
-                    if (forcedAccountType == ForcedAccountType.CORPORATE ||
-                            forcedAccountType == null
-                            && repositoryProvider.kycState().itemFormData is KycForm.Corporate) {
-                        repositoryProvider.balances().updateIfNotFreshDeferred()
-                    } else {
-                        repositoryProvider.clientCompanies().updateIfNotFreshDeferred()
-                    }
-                })
+                repositoryProvider.kycState().updateDeferred()
+                        .doOnComplete {
+                            repositoryProvider.kycState().forcedType = forcedAccountType
+                        },
+                repositoryProvider.balances().updateDeferred()
         )
         val syncActions = listOf<Completable>(
                 // Added actions will be performed on after another in

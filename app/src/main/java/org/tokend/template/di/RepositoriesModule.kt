@@ -16,12 +16,11 @@ class RepositoriesModule {
             apiProvider: ApiProvider,
             walletInfoProvider: WalletInfoProvider,
             urlConfigProvider: UrlConfigProvider,
-            companyInfoProvider: CompanyInfoProvider,
             mapper: ObjectMapper,
             context: Context,
             kycStatePersistor: SubmittedKycStatePersistor
     ): RepositoryProvider {
         return RepositoryProviderImpl(apiProvider, walletInfoProvider, urlConfigProvider,
-                mapper, context, companyInfoProvider, kycStatePersistor)
+                mapper, context, kycStatePersistor)
     }
 }

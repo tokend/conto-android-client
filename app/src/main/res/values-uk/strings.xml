@@ -385,7 +385,7 @@
     <string name="template_amount_with_converted">%1$s ≈ %2$s</string>
     <string name="template_converted_amount">≈ %1$s</string>
     <string name="asset_distribution_other">Інше</string>
-    <string name="movements_screen_title">Історія</string>
+    <string name="operations_history">Історія операцій</string>
     <string name="balances_screen_title">Баланси</string>
     <string name="unlock_label">Увійти</string>
     <string name="use_password">Ввести пароль</string>
@@ -523,5 +523,12 @@
     <string name="error_telegram_username_already_taken">Нікнейм вже зайнято</string>
     <string name="template_telegram_otp_dialog_message_bot_url"><![CDATA[Отримайте код у <a href=\"%1$s\">нашого Telegram бота</a>]]></string>
     <string name="web_invoice_screen_title">Оплата</string>
+    <string name="system_asset">Системний актив</string>
+    <string name="my_companies_tab">Мої</string>
+    <string name="all_companies_tab">Усі</string>
     <string name="quantity">Кількість</string>
+    <string name="my_balances">Мої баланси</string>
+    <string name="send_action">Відправити</string>
+    <string name="redemption_qr_code">QR код погашення</string>
+    <string name="marketplace">Магазин</string>
 </resources>

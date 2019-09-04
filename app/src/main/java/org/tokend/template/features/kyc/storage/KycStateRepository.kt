@@ -67,6 +67,9 @@ class KycStateRepository(
 
     var forcedType: ForcedAccountType? = null
 
+    val isActualOrForcedGeneral: Boolean
+        get() = itemFormData is KycForm.General || forcedType == ForcedAccountType.GENERAL
+
     fun set(newState: KycState) {
         onNewItem(newState)
     }

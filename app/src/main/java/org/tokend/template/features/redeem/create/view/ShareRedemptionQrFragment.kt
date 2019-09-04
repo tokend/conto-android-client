@@ -6,6 +6,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import org.tokend.template.R
+import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.logic.wallet.WalletEventsListener
@@ -13,44 +14,37 @@ import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.ObservableTransformers
 import java.util.concurrent.TimeUnit
 
-class ShareRedemptionQrFragment : ShareQrFragment() {
+open class ShareRedemptionQrFragment : ShareQrFragment() {
     override val title: String
-        get() = session.getCompany()?.name ?: ""
+        get() = ""
 
     override val shareDialogText: String
         get() = getString(R.string.share_redemption_request)
 
-    private val referenceToPoll: String?
+    protected open val referenceToPoll: String?
         get() = arguments?.getString(REFERENCE_EXTRA)
 
-    private val balanceId: String?
+    protected open val balanceId: String?
         get() = arguments?.getString(BALANCE_ID_EXTRA)
 
-    private var needPolling = false
     private var pollingDisposable: Disposable? = null
+    protected var isAccepted = false
 
-    override fun onInitAllowed() {
-        super.onInitAllowed()
-
-        if (referenceToPoll != null) {
-            needPolling = true
-        }
-    }
-
-    private fun startPollingIfNeeded() {
-        if (!needPolling) {
+    protected open fun startPollingIfNeeded() {
+        if (isAccepted) {
             return
         }
 
         val reference = referenceToPoll ?: return
 
-        pollingDisposable = IntervalPoller<Any>(
+        pollingDisposable?.dispose()
+        pollingDisposable = IntervalPoller<BalanceChange>(
                 POLLING_INTERVAL_S,
                 TimeUnit.SECONDS,
                 Single.defer {
                     repositoryProvider
                             .balanceChanges(balanceId)
-                            .getPage(null, BALANCE_CHANGES_TO_CHECK)
+                            .getPage(null, BALANCE_CHANGES_TO_CHECK, false)
                             .map { page ->
                                 page.items.find {
                                     it.cause is BalanceChangeCause.Payment
@@ -62,13 +56,13 @@ class ShareRedemptionQrFragment : ShareQrFragment() {
                 .asSingle()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .subscribeBy(
-                        onSuccess = { onRedemptionAccepted() },
+                        onSuccess = this::onRedemptionAccepted,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
     }
 
-    private fun stopPolling() {
+    protected fun stopPolling() {
         pollingDisposable?.dispose()
     }
 
@@ -82,11 +76,13 @@ class ShareRedemptionQrFragment : ShareQrFragment() {
         stopPolling()
     }
 
-    private fun onRedemptionAccepted() {
+    protected open fun onRedemptionAccepted(balanceChange: BalanceChange) {
+        isAccepted = true
+
         toastManager.long(R.string.successfully_accepted_redemption)
 
-        repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()
-        repositoryProvider.balances().updateIfEverUpdated()
+        repositoryProvider.balanceChanges(balanceId).addBalanceChange(balanceChange)
+        repositoryProvider.balances().updateBalance(balanceChange.balanceId, -balanceChange.amount)
 
         (activity as? WalletEventsListener)?.onRedemptionRequestAccepted()
     }

@@ -24,7 +24,7 @@ class ClientCompaniesRepository(
         private val walletInfoProvider: WalletInfoProvider,
         private val urlConfigProvider: UrlConfigProvider,
         itemsCache: RepositoryCache<CompanyRecord>
-) : SimpleMultipleItemsRepository<CompanyRecord>(itemsCache) {
+) : CompaniesRepository(apiProvider, urlConfigProvider, itemsCache) {
 
     override fun getItems(): Single<List<CompanyRecord>> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
@@ -58,22 +58,6 @@ class ClientCompaniesRepository(
                         Single.just(emptyList())
                     else
                         Single.error(error)
-                }
-    }
-
-    fun getCompanyById(companyAccountId: String): Maybe<CompanyRecord> {
-        return apiProvider
-                .getApi()
-                .integrations
-                .dns
-                .getBusiness(companyAccountId)
-                .toSingle()
-                .toMaybe()
-                .map {
-                    CompanyRecord(it, urlConfigProvider.getConfig())
-                }
-                .onErrorComplete { error ->
-                    error is HttpException && error.isNotFound()
                 }
     }
 

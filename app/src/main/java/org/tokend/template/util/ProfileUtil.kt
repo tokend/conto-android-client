@@ -88,15 +88,15 @@ object ProfileUtil {
     }
 
     /**
-     * @return person full name or company from KYC if it's available or [email] otherwise
+     * @return person full name or company from KYC if it's available
      */
-    fun getDisplayedName(kycState: KycState?, email: String): String {
+    fun getDisplayedName(kycState: KycState?, email: String): String? {
         val form = (kycState as? KycState.Submitted<*>)?.formData
 
         return when (form) {
             is KycForm.General -> form.firstName + " " + form.lastName
             is KycForm.Corporate -> form.company
-            else -> email
+            else -> null
         }
     }
 }

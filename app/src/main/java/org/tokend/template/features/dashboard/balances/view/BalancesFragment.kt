@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.rxkotlin.addTo
@@ -16,22 +17,20 @@ import kotlinx.android.synthetic.main.fragment_balances.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceItemsAdapter
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.ColumnCalculator
-import org.tokend.template.view.util.LoadingIndicatorManager
-import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
+import org.tokend.template.util.SearchUtil
+import org.tokend.template.view.util.*
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 import org.tokend.template.view.util.fab.addActions
 import java.math.BigDecimal
-
 
 open class BalancesFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
@@ -46,10 +45,21 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     protected lateinit var adapter: BalanceItemsAdapter
     private lateinit var layoutManager: GridLayoutManager
+    protected var filter: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                onFilterChanged()
+            }
+        }
 
     private val allowToolbar: Boolean by lazy {
         arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, false) ?: false
     }
+
+    protected open var companyId: String? = null
+
+    private var searchMenuItem: MenuItem? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_balances, container, false)
@@ -61,6 +71,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onInitAllowed() {
+        companyId = arguments?.getString(COMPANY_ID_EXTRA)
+
         initList()
         initSwipeRefresh()
         initToolbar()
@@ -98,26 +110,50 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         error_empty_view.observeAdapter(adapter, R.string.you_have_no_balances)
         error_empty_view.setEmptyViewDenial { balancesRepository.isNeverUpdated }
         error_empty_view.setEmptyDrawable(R.drawable.ic_coins)
+
+        ElevationUtil.initScrollElevation(balances_list, appbar_elevation_view)
     }
 
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
-//        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, app_bar)
     }
 
     private fun initToolbar() {
         if (allowToolbar) {
             toolbar.title = getString(R.string.balances_screen_title)
+            initMenu()
         } else {
             appbar.visibility = View.GONE
         }
 
         // Do not forget to add SwipeRefreshDependency when making visible.
         app_bar.visibility = View.GONE
-        appbar_elevation_view.visibility = View.GONE
 
         toolbarSubject.onNext(toolbar)
+    }
+
+    private fun initMenu() {
+        toolbar.inflateMenu(R.menu.explore)
+        val menu = toolbar.menu
+
+        val searchItem = menu.findItem(R.id.search) ?: return
+        this.searchMenuItem = searchItem
+
+        try {
+            val searchManager = MenuSearchViewManager(searchItem, toolbar, compositeDisposable)
+
+            searchManager.queryHint = getString(R.string.search)
+            searchManager
+                    .queryChanges
+                    .compose(ObservableTransformers.defaultSchedulers())
+                    .subscribe { newValue ->
+                        filter = newValue.takeIf { it.isNotEmpty() }
+                    }
+                    .addTo(compositeDisposable)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun initFab() {
@@ -125,48 +161,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         menu_fab.setClosedOnTouchOutside(true)
     }
 
-    protected open fun getFabActions(): Collection<FloatingActionMenuAction> {
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
-        val balances = balancesRepository.itemsList
-        val navigator = Navigator.from(this)
-
-        val actions = mutableListOf<FloatingActionMenuAction>()
-
-        // Redeem.
-        actions.add(FloatingActionMenuAction(
-                requireContext(),
-                R.string.redeem,
-                R.drawable.ic_redeem,
-                {
-                    navigator.openRedemptionCreation()
-                }
-        ))
-
-        // Send, Receive.
-        if (BuildConfig.IS_SEND_ALLOWED) {
-            actions.add(FloatingActionMenuAction(
-                    requireContext(),
-                    R.string.send_title,
-                    R.drawable.ic_send_fab,
-                    {
-                        navigator.openSend()
-                    },
-                    isEnabled = balances.any { it.asset.isTransferable }
-            ))
-            actions.add(FloatingActionMenuAction(
-                    requireContext(),
-                    R.string.receive_title,
-                    R.drawable.ic_receive_fab,
-                    {
-                        val walletInfo = walletInfoProvider.getWalletInfo()
-                                ?: return@FloatingActionMenuAction
-                        navigator.openAccountQrShare(walletInfo)
-                    }
-            ))
-        }
-
-        return actions
-    }
+    protected open fun getFabActions(): Collection<FloatingActionMenuAction> = emptyList()
     // endregion
 
     private fun update(force: Boolean = false) {
@@ -196,25 +191,40 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         displayTotal()
     }
 
+    private fun onFilterChanged() {
+        displayBalances()
+    }
+
     // region Display
     protected open fun displayBalances() {
-        val companyId = companyInfoProvider.getCompany()?.id
+        val systemAssetLabel = getString(R.string.system_asset)
 
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
                 .filter {
-                    it.asset.ownerAccountId == companyId
-                            && it.available.signum() > 0
+                    it.available.signum() > 0 &&
+                            (companyId == null || it.asset.ownerAccountId == companyId)
                 }
-                .map(::BalanceListItem)
+                .map {
+                    val ownerName =
+                            if (companyId != null)
+                                null
+                            else
+                                it.company?.name ?: systemAssetLabel
+                    BalanceListItem(it, ownerName)
+                }
+                .filter { item ->
+                    filter?.let {
+                        SearchUtil.isMatchGeneralCondition(it, item.assetName, item.ownerName)
+                    } ?: true
+                }
 
         adapter.setData(items)
     }
 
     protected open fun displayTotal() {
         val conversionAssetCode = balancesRepository.conversionAsset
-        val companyId = companyInfoProvider.getCompany()?.id
 
         if (conversionAssetCode == null) {
             total_text_view.visibility = View.GONE
@@ -223,7 +233,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
         val total = balancesRepository
                 .itemsList
-                .filter { it.asset.ownerAccountId == companyId }
                 .fold(BigDecimal.ZERO) { sum, balance ->
                     sum.add(balance.convertedAmount ?: BigDecimal.ZERO)
                 }
@@ -233,8 +242,8 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
     // endregion
 
-    private fun openWallet(balanceId: String) {
-        Navigator.from(this).openBalanceDetails(balanceId)
+    protected open fun openWallet(balanceId: String) {
+        Navigator.from(this).openSimpleBalanceDetails(balanceId)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -251,6 +260,9 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         return if (menu_fab.isOpened) {
             menu_fab.close(true)
             false
+        } else if (searchMenuItem?.isActionViewExpanded == true) {
+            searchMenuItem?.collapseActionView()
+            false
         } else {
             super.onBackPressed()
         }
@@ -258,15 +270,15 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+        private const val COMPANY_ID_EXTRA = "company_id"
+        val ID = "balances".hashCode().toLong()
 
-        fun newInstance(bundle: Bundle): BalancesFragment {
-            val fragment = BalancesFragment()
-            fragment.arguments = bundle
-            return fragment
-        }
+        fun newInstance(bundle: Bundle): BalancesFragment = BalancesFragment().withArguments(bundle)
 
-        fun getBundle(allowToolbar: Boolean) = Bundle().apply {
+        fun getBundle(allowToolbar: Boolean,
+                      companyId: String?) = Bundle().apply {
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
+            putString(COMPANY_ID_EXTRA, companyId)
         }
     }
 }

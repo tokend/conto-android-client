@@ -4,6 +4,7 @@ import android.support.transition.Fade
 import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup

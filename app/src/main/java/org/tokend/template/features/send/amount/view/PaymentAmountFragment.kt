@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.layout_payment_description.view.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.layoutInflater
 import org.tokend.template.R
+import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.amountscreen.view.AmountInputFragment
@@ -94,19 +95,19 @@ class PaymentAmountFragment : AmountInputFragment() {
     }
 
     override fun getBalancePicker(): BalancePickerBottomDialog {
-        val companyId = companyInfoProvider.getCompany()?.id
-                ?: walletInfoProvider.getWalletInfo()?.accountId
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+        val ownerFilter: ((BalanceRecord) -> Boolean) =
+                if (!repositoryProvider.kycState().isActualOrForcedGeneral)
+                    { it: BalanceRecord -> it.asset.ownerAccountId == accountId }
+                else
+                    { _: BalanceRecord -> true }
 
         return BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { balance ->
-            balance.asset.isTransferable
-                    && balance.asset.ownerAccountId == companyId
-                    && balance.available.signum() > 0
-        }
+        ) { it.asset.isTransferable && it.available.signum() > 0 && ownerFilter(it) }
     }
 
     override fun getExtraView(parent: ViewGroup): View? {

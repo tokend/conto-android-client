@@ -15,11 +15,15 @@ import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
 import retrofit2.HttpException
 
-class CompaniesRepository(
+open class CompaniesRepository(
         private val apiProvider: ApiProvider,
         private val urlConfigProvider: UrlConfigProvider,
         itemsCache: RepositoryCache<CompanyRecord>
 ) : SimpleMultipleItemsRepository<CompanyRecord>(itemsCache) {
+    private val mItemsMap = mutableMapOf<String, CompanyRecord>()
+    val itemsMap: Map<String, CompanyRecord> = mItemsMap
+
+    private val nonCompanyAccounts = mutableSetOf<String>()
 
     override fun getItems(): Single<List<CompanyRecord>> {
 
@@ -49,5 +53,32 @@ class CompaniesRepository(
                     else
                         throw error
                 }
+    }
+
+    override fun broadcast() {
+        mItemsMap.clear()
+        itemsCache.items.associateByTo(mItemsMap, CompanyRecord::id)
+        super.broadcast()
+    }
+
+    override fun invalidate() = synchronized(this) {
+        isFresh = false
+        nonCompanyAccounts.clear()
+    }
+
+    /**
+     * Ensures that given companies are loaded
+     */
+    fun ensureCompanies(accounts: Collection<String>): Single<Map<String, CompanyRecord>> {
+        val toRequest = accounts.filterNot(nonCompanyAccounts::contains)
+
+        return if (itemsMap.keys.containsAll(toRequest))
+            Single.just(itemsMap)
+        else
+            updateDeferred()
+                    .doOnComplete {
+                        nonCompanyAccounts.addAll(accounts.filterNot(itemsMap::containsKey))
+                    }
+                    .toSingle { itemsMap }
     }
 }

@@ -47,7 +47,8 @@ class BalanceChangesRepository(
     override fun getPage(nextCursor: String?) = getPage(nextCursor, LIMIT)
 
     fun getPage(nextCursor: String?,
-                limit: Int): Single<DataPage<BalanceChange>> {
+                limit: Int,
+                loadEmails: Boolean = true): Single<DataPage<BalanceChange>> {
         val signedApi = apiProvider.getSignedApi()
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
 
@@ -91,7 +92,12 @@ class BalanceChangesRepository(
                     )
                 }
                 .toSingle()
-                .flatMap(this::loadAndSetEmails)
+                .flatMap {
+                    if (loadEmails)
+                        loadAndSetEmails(it)
+                    else
+                        Single.just(it)
+                }
     }
 
     private fun loadAndSetEmails(changesPage: DataPage<BalanceChange>): Single<DataPage<BalanceChange>> {
@@ -141,8 +147,7 @@ class BalanceChangesRepository(
                 cause = BalanceChangeCause.Payment(request)
         )
 
-        itemsCache.add(balanceChange)
-        broadcast()
+        addBalanceChange(balanceChange)
     }
 
     fun addAcceptedIncomingRedemption(request: RedemptionRequest,
@@ -171,6 +176,10 @@ class BalanceChangesRepository(
                 )
         )
 
+        addBalanceChange(balanceChange)
+    }
+
+    fun addBalanceChange(balanceChange: BalanceChange) {
         itemsCache.add(balanceChange)
         broadcast()
     }

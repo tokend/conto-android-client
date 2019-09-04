@@ -172,7 +172,7 @@
         <activity
             android:name=".features.signin.unlock.UnlockAppActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible"/>
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
             android:name=".features.qr.CaptureActivityPortrait"
             android:screenOrientation="portrait"
@@ -186,12 +186,6 @@
             android:name=".features.assets.buy.view.BuyWithAtomicSwapActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-        <activity
-            android:name=".features.companies.view.CompaniesActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
-        <activity
-            android:name=".features.companies.view.CompanyLoadingActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
             android:name=".features.redeem.create.view.CreateRedemptionActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
@@ -219,14 +213,6 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
-            android:name=".features.companies.add.view.AddCompanyActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-        <activity
-            android:name=".features.companies.add.view.AddCompanyConfirmationActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-        <activity
             android:name=".features.signin.ForceAccountTypeActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
@@ -234,9 +220,6 @@
             android:name=".features.clients.details.movements.view.CompanyClientMovementsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-        <activity
-            android:name=".features.companies.view.ExploreCompaniesActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
             android:name=".features.settings.phonenumber.view.PhoneNumberSettingsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
@@ -259,6 +242,14 @@
             android:name=".features.assets.buy.view.WebInvoiceActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
+            android:name=".features.companies.details.view.CompanyDetailsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
+            android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
     </application>
 
 </manifest>

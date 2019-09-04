@@ -7,17 +7,12 @@ import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 
 class WithdrawAmountFragment : AmountInputFragment() {
     override fun getBalancePicker(): BalancePickerBottomDialog {
-        val companyId = companyInfoProvider.getCompany()?.id
-
         return BalancePickerBottomDialog(
                 requireContext(),
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { balance ->
-            balance.asset.isWithdrawable
-                    && balance.asset.ownerAccountId == companyId
-        }
+        ) { it.asset.isWithdrawable && it.available.signum() > 0  }
     }
 
     override fun getTitleText(): String? {

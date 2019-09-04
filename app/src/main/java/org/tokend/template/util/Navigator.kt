@@ -17,26 +17,20 @@ import org.tokend.template.R
 import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.activities.MainActivity
 import org.tokend.template.activities.SingleFragmentActivity
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetPairRecord
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.data.model.*
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
+import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
-import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
+import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
-import org.tokend.template.features.companies.add.view.AddCompanyActivity
-import org.tokend.template.features.companies.add.view.AddCompanyConfirmationActivity
-import org.tokend.template.features.companies.view.CompaniesActivity
-import org.tokend.template.features.companies.view.CompanyLoadingActivity
-import org.tokend.template.features.companies.view.ExploreCompaniesActivity
+import org.tokend.template.features.companies.details.view.CompanyDetailsActivity
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
@@ -80,6 +74,7 @@ import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
 import org.tokend.template.features.wallet.view.BalanceDetailsActivity
+import org.tokend.template.features.wallet.view.SimpleBalanceDetailsActivity
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.WithdrawalConfirmationActivity
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
@@ -247,18 +242,20 @@ class Navigator private constructor() {
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
-    fun openSend(asset: String? = null) {
+    fun openSend(asset: String? = null,
+                 amount: BigDecimal? = null,
+                 requestCode: Int = 0) {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         SendFragment.ID,
-                        SendFragment.getBundle(asset, true)
+                        SendFragment.getBundle(asset, amount, true)
                 ))
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 
-    fun openAssetDetails(requestCode: Int,
-                         asset: AssetRecord,
-                         cardView: View? = null) {
+    fun openAssetDetails(asset: AssetRecord,
+                         cardView: View? = null,
+                         requestCode: Int = 0) {
         val transitionBundle = activity?.let {
             createTransitionBundle(it,
                     cardView to it.getString(R.string.transition_asset_card)
@@ -410,20 +407,25 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAccountQrShare(walletInfo: WalletInfo,
-                           useAccountId: Boolean = false) {
-        openQrShare(
-                data = if (useAccountId) walletInfo.accountId else walletInfo.email,
-                title = context!!.getString(R.string.account_title),
-                shareLabel = context!!.getString(R.string.share_account)
-        )
+    fun openSimpleBalanceDetails(balanceId: String) {
+        context?.intentFor<SimpleBalanceDetailsActivity>()
+                ?.putExtras(SimpleBalanceDetailsActivity.getBundle(balanceId))
+                ?.also { performIntent(it) }
     }
 
-    fun openAtomicSwapBuy(assetCode: String,
-                          askId: String,
+    fun openAccountQrShare(useAccountId: Boolean = false) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        AccountDetailsFragment.ID,
+                        AccountDetailsFragment.getBundle(useAccountId)
+                ))
+                ?.also { performIntent(it) }
+    }
+
+    fun openAtomicSwapBuy(ask: AtomicSwapAskRecord,
                           requestCode: Int = 0) {
         context?.intentFor<BuyWithAtomicSwapActivity>()
-                ?.putExtras(BuyWithAtomicSwapActivity.getBundle(assetCode, askId))
+                ?.putExtras(BuyWithAtomicSwapActivity.getBundle(ask))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
@@ -434,27 +436,6 @@ class Navigator private constructor() {
                         AtomicSwapAsksFragment.getBundle(assetCode)
                 ))
                 ?.also { performIntent(it) }
-    }
-
-    fun toCompaniesActivity() {
-        context?.intentFor<CompaniesActivity>()
-                ?.also { performIntent(it) }
-        activity?.let { fadeOut(it) }
-    }
-
-    fun toCompanyLoading(finishAffinity: Boolean = false) {
-        context?.intentFor<CompanyLoadingActivity>()
-                ?.singleTop()
-                ?.clearTop()
-                ?.also { performIntent(it) }
-        activity?.let {
-            if (finishAffinity) {
-                it.setResult(Activity.RESULT_CANCELED, null)
-                ActivityCompat.finishAffinity(it)
-            } else {
-                it.finish()
-            }
-        }
     }
 
     fun openRedemptionCreation(assetCode: String? = null) {
@@ -493,18 +474,6 @@ class Navigator private constructor() {
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
-    fun openCompanyAdd() {
-        context?.intentFor<AddCompanyActivity>()
-                ?.also { performIntent(it) }
-    }
-
-    fun openCompanyAddConfirmation(company: CompanyRecord,
-                                   requestCode: Int = 0) {
-        context?.intentFor<AddCompanyConfirmationActivity>()
-                ?.putExtras(AddCompanyConfirmationActivity.getBundle(company))
-                ?.also { performIntent(it, requestCode = requestCode) }
-    }
-
     fun toForcingAccountType(accountType: ForcedAccountType) {
         context?.intentFor<ForceAccountTypeActivity>()
                 ?.putExtras(ForceAccountTypeActivity.getBundle(accountType))
@@ -516,11 +485,6 @@ class Navigator private constructor() {
                                    assetCode: String) {
         context?.intentFor<CompanyClientMovementsActivity>()
                 ?.putExtras(CompanyClientMovementsActivity.getBundle(client, assetCode))
-                ?.also { performIntent(it) }
-    }
-
-    fun openExploreCompanies() {
-        context?.intentFor<ExploreCompaniesActivity>()
                 ?.also { performIntent(it) }
     }
 
@@ -561,7 +525,7 @@ class Navigator private constructor() {
             if (kycState is KycState.Submitted.Pending<*>) {
                 toWaitingForKycApproval()
             } else {
-                toCompaniesActivity()
+                toMainActivity()
             }
         } else {
             toClientKyc()
@@ -598,5 +562,11 @@ class Navigator private constructor() {
         context?.intentFor<WebInvoiceActivity>()
                 ?.putExtras(WebInvoiceActivity.getBundle(invoiceUrl))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openCompanyDetails(company: CompanyRecord) {
+        context?.intentFor<CompanyDetailsActivity>()
+                ?.putExtras(CompanyDetailsActivity.getBundle(company))
+                ?.also { performIntent(it) }
     }
 }

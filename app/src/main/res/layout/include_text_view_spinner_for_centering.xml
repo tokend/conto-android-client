@@ -1,0 +1,19 @@
+<LinearLayout android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Space
+        android:layout_width="@dimen/standard_padding"
+        android:layout_height="0dp" />
+
+    <TextView
+        android:id="@+id/spinner_text_view"
+        style="@style/Base.Widget.AppCompat.Spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2sp"
+        android:textSize="16sp"
+        tools:text="Bitcoin" />
+</LinearLayout>

@@ -23,7 +23,6 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
-import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
 import org.tokend.template.util.Navigator
@@ -144,7 +143,7 @@ class BalanceDetailsActivity : BaseActivity() {
         val actions = mutableListOf<FloatingActionMenuAction>()
 
         if (asset?.ownerAccountId == accountId
-                && repositoryProvider.kycState().forcedType != ForcedAccountType.GENERAL) {
+                && !repositoryProvider.kycState().isActualOrForcedGeneral) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,
@@ -190,9 +189,7 @@ class BalanceDetailsActivity : BaseActivity() {
                     R.string.receive_title,
                     R.drawable.ic_receive_fab,
                     {
-                        val walletInfo = walletInfoProvider.getWalletInfo()
-                                ?: return@FloatingActionMenuAction
-                        navigator.openAccountQrShare(walletInfo)
+                        navigator.openAccountQrShare()
                     },
                     isEnabled = asset?.isTransferable == true
             ))
@@ -408,7 +405,7 @@ class BalanceDetailsActivity : BaseActivity() {
     private fun openAssetDetails() {
         val asset = balance?.asset ?: return
         menu_fab.close(false)
-        Navigator.from(this).openAssetDetails(ASSET_DETAILS_REQUEST, asset)
+        Navigator.from(this).openAssetDetails(asset)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -426,8 +423,6 @@ class BalanceDetailsActivity : BaseActivity() {
 
     companion object {
         private const val BALANCE_ID_EXTRA = "balance_id"
-        private const val ASSET_DETAILS_REQUEST = 1132
-        private val BUY_MENU_ITEM_ID = "buy_fab".hashCode()
 
         fun getBundle(balanceId: String) = Bundle().apply {
             putString(BALANCE_ID_EXTRA, balanceId)

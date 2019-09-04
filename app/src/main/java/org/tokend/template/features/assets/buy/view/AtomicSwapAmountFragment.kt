@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_amount_input.*
-import kotlinx.android.synthetic.main.layout_atomic_swap_quote_asset_selection.view.*
+import kotlinx.android.synthetic.main.include_text_view_spinner_for_centering.view.*
 import org.jetbrains.anko.layoutInflater
 import org.tokend.template.R
 import org.tokend.template.data.model.Asset
@@ -103,7 +103,7 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         val view = requireContext().layoutInflater.inflate(
                 R.layout.layout_atomic_swap_quote_asset_selection, parent, false)
 
-        quoteAssetTextView = view.quote_asset_code_text_view
+        quoteAssetTextView = view.spinner_text_view
         quoteAssetTextView.setOnClickListener {
             openQuoteAssetPicker()
         }

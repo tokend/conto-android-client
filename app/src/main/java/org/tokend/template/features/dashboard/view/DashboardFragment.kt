@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.appbar_with_tabs.*
-import kotlinx.android.synthetic.main.fragment_dashboard.*
+import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.OnBackPressedListener
@@ -26,16 +26,15 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_dashboard, container, false)
+        return inflater.inflate(R.layout.fragment_pager, container, false)
     }
 
     override fun onInitAllowed() {
         toolbarSubject.onNext(toolbar)
 
-        toolbar.title = companyInfoProvider.getCompany()?.name
+        toolbar.title = "TODO"
 
         initViewPager()
-        switchToShopIfNeeded()
     }
 
     // region Init
@@ -77,21 +76,6 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
         onPageSelected(0)
     }
     // endregion
-
-    private fun switchToShopIfNeeded() {
-        val companyId = companyInfoProvider.getCompany()?.id
-
-        val hasNonZeroBalance = repositoryProvider
-                .balances()
-                .itemsList
-                .any {
-                    it.asset.ownerAccountId == companyId && it.available.signum() > 0
-                }
-
-        if (!hasNonZeroBalance) {
-            pager.currentItem = adapter.getIndexOf(DashboardPagerAdapter.SHOP_PAGE)
-        }
-    }
 
     override fun onBackPressed(): Boolean {
         val currentPage = adapter.getItem(pager.currentItem)

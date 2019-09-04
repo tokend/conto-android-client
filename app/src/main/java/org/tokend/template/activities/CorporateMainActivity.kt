@@ -83,8 +83,6 @@ class CorporateMainActivity : MainActivity() {
                 }
     }
 
-    override fun getCompaniesProfileItems(): Collection<ProfileDrawerItem> = emptyList()
-
     override fun getAccountTypeSwitchHint(): String = getString(R.string.switch_to_client)
 
     override fun switchAccountType() {
@@ -98,8 +96,7 @@ class CorporateMainActivity : MainActivity() {
     }
 
     override fun openAccountIdShare() {
-        val walletInfo = walletInfoProvider.getWalletInfo() ?: return
-        Navigator.from(this).openAccountQrShare(walletInfo, true)
+        Navigator.from(this).openAccountQrShare(useAccountId = true)
     }
 
     override fun getFragment(screenIdentifier: Long): Fragment? {

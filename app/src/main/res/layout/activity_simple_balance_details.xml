@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="org.tokend.template.features.wallet.view.SimpleBalanceDetailsActivity">
+
+    <include layout="@layout/appbar" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/layout_simple_balance_details_content" />
+
+        <include layout="@layout/layout_simple_balance_details_redemption" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</LinearLayout>

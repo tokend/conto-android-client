@@ -93,7 +93,7 @@ class AddVoteUseCase(
 
     private fun updateRepository() {
         repositoryProvider
-                .polls()
+                .polls(pollOwnerAccountId)
                 .updatePollChoiceLocally(pollId, choiceIndex)
     }
 }

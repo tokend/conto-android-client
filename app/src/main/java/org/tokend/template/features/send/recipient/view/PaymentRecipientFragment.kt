@@ -23,10 +23,12 @@ import org.jetbrains.anko.enabled
 import org.tokend.template.R
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import org.tokend.template.features.send.recipient.model.Contact
 import org.tokend.template.features.send.recipient.model.ContactData
+import org.tokend.template.features.send.recipient.model.PaymentRecipientAndDescription
 import org.tokend.template.features.send.recipient.repository.ContactsRepository
 import org.tokend.template.features.send.recipient.view.adapter.ContactListItem
 import org.tokend.template.features.send.recipient.view.adapter.ContactsAdapter
@@ -69,8 +71,11 @@ open class PaymentRecipientFragment : BaseFragment() {
             continue_button.enabled = value
         }
 
-    private val resultSubject = PublishSubject.create<PaymentRecipient>()
-    val resultObservable: Observable<PaymentRecipient> = resultSubject
+    private val requestDescription: Boolean
+        get() = arguments?.getBoolean(REQUEST_DESCRIPTION_EXTRA) ?: false
+
+    private val resultSubject = PublishSubject.create<PaymentRecipientAndDescription>()
+    val resultObservable: Observable<PaymentRecipientAndDescription> = resultSubject
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_payment_recipient, container, false)
@@ -98,6 +103,12 @@ open class PaymentRecipientFragment : BaseFragment() {
         })
         recipient_edit_text.onEditorAction {
             tryToLoadRecipient()
+        }
+
+        if (requestDescription) {
+            payment_description_edit_text.visibility = View.VISIBLE
+        } else {
+            payment_description_edit_text.visibility = View.GONE
         }
     }
 
@@ -250,14 +261,18 @@ open class PaymentRecipientFragment : BaseFragment() {
 
     private fun onRecipientLoaded(recipient: PaymentRecipient) {
         val currentAccountId = walletInfoProvider.getWalletInfo()?.accountId
+        val description = payment_description_edit_text.text
+                .toString()
+                .trim()
+                .takeIf { it.isNotEmpty() }
 
         if (currentAccountId == recipient.accountId) {
             recipient_edit_text.error = getString(R.string.error_cannot_send_to_yourself)
             updateContinueAvailability()
         } else if (recipient is PaymentRecipient.NotExisting) {
-            showNotExistingRecipientWarning(recipient)
+            showNotExistingRecipientWarning(recipient, description)
         } else {
-            resultSubject.onNext(recipient)
+            resultSubject.onNext(PaymentRecipientAndDescription(recipient, description))
         }
     }
 
@@ -272,7 +287,8 @@ open class PaymentRecipientFragment : BaseFragment() {
     }
 
     @Suppress("DEPRECATION")
-    private fun showNotExistingRecipientWarning(recipient: PaymentRecipient.NotExisting) {
+    private fun showNotExistingRecipientWarning(recipient: PaymentRecipient.NotExisting,
+                                                description: String?) {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.not_existing_payment_recipient_warning_title)
                 .setMessage(Html.fromHtml(resources.getString(
@@ -280,7 +296,7 @@ open class PaymentRecipientFragment : BaseFragment() {
                         recipient.actualEmail
                 )))
                 .setPositiveButton(R.string.continue_action) { _, _ ->
-                    resultSubject.onNext(recipient)
+                    resultSubject.onNext(PaymentRecipientAndDescription(recipient, description))
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
@@ -302,5 +318,16 @@ open class PaymentRecipientFragment : BaseFragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         cameraPermission.handlePermissionResult(requestCode, permissions, grantResults)
         contactsPermission.handlePermissionResult(requestCode, permissions, grantResults)
+    }
+
+    companion object {
+        private const val REQUEST_DESCRIPTION_EXTRA = "request_description"
+
+        fun getBundle(requestDescription: Boolean) = Bundle().apply {
+            putBoolean(REQUEST_DESCRIPTION_EXTRA, requestDescription)
+        }
+
+        fun newInstance(bundle: Bundle): PaymentRecipientFragment = PaymentRecipientFragment()
+                .withArguments(bundle)
     }
 }
