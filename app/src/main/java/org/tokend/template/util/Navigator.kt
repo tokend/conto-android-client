@@ -543,8 +543,7 @@ class Navigator private constructor() {
     fun openRedemptionQrShare(serializedRequest: String,
                               shareText: String,
                               referenceToPoll: String,
-                              relatedBalanceId: String?,
-                              amount: BigDecimal) {
+                              relatedBalanceId: String?) {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         ShareRedemptionQrFragment.ID,
@@ -552,8 +551,7 @@ class Navigator private constructor() {
                                 serializedRequest,
                                 shareText,
                                 referenceToPoll,
-                                relatedBalanceId,
-                                amount
+                                relatedBalanceId
                         )
                 ))
                 ?.also { performIntent(it) }

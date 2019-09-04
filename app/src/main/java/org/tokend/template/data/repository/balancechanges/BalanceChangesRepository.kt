@@ -147,8 +147,7 @@ class BalanceChangesRepository(
                 cause = BalanceChangeCause.Payment(request)
         )
 
-        itemsCache.add(balanceChange)
-        broadcast()
+        addBalanceChange(balanceChange)
     }
 
     fun addAcceptedIncomingRedemption(request: RedemptionRequest,
@@ -177,6 +176,10 @@ class BalanceChangesRepository(
                 )
         )
 
+        addBalanceChange(balanceChange)
+    }
+
+    fun addBalanceChange(balanceChange: BalanceChange) {
         itemsCache.add(balanceChange)
         broadcast()
     }

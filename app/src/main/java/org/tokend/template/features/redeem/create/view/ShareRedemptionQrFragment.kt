@@ -5,14 +5,13 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
+import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.logic.wallet.WalletEventsListener
 import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.ObservableTransformers
-import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 
 open class ShareRedemptionQrFragment : ShareQrFragment() {
@@ -28,10 +27,6 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
     protected open val balanceId: String?
         get() = arguments?.getString(BALANCE_ID_EXTRA)
 
-    protected open val amount: BigDecimal by lazy {
-        BigDecimalUtil.valueOf(arguments?.getString(AMOUNT_EXTRA))
-    }
-
     private var pollingDisposable: Disposable? = null
     protected var isAccepted = false
 
@@ -43,7 +38,7 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
         val reference = referenceToPoll ?: return
 
         pollingDisposable?.dispose()
-        pollingDisposable = IntervalPoller<Any>(
+        pollingDisposable = IntervalPoller<BalanceChange>(
                 POLLING_INTERVAL_S,
                 TimeUnit.SECONDS,
                 Single.defer {
@@ -61,7 +56,7 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
                 .asSingle()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .subscribeBy(
-                        onSuccess = { onRedemptionAccepted() },
+                        onSuccess = this::onRedemptionAccepted,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
@@ -81,20 +76,13 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
         stopPolling()
     }
 
-    protected open fun onRedemptionAccepted() {
+    protected open fun onRedemptionAccepted(balanceChange: BalanceChange) {
         isAccepted = true
 
         toastManager.long(R.string.successfully_accepted_redemption)
 
-        repositoryProvider.balanceChanges(balanceId).updateIfEverUpdated()
-        repositoryProvider.balances().also {
-            val balanceId = this.balanceId
-            if (balanceId != null) {
-                it.updateBalance(balanceId, -amount)
-            } else {
-                it.updateIfEverUpdated()
-            }
-        }
+        repositoryProvider.balanceChanges(balanceId).addBalanceChange(balanceChange)
+        repositoryProvider.balances().updateBalance(balanceChange.balanceId, -balanceChange.amount)
 
         (activity as? WalletEventsListener)?.onRedemptionRequestAccepted()
     }
@@ -103,15 +91,13 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
         val ID = "share_redemption_qr".hashCode().toLong()
         private const val REFERENCE_EXTRA = "reference"
         private const val BALANCE_ID_EXTRA = "balance_id"
-        private const val AMOUNT_EXTRA = "amount"
         private const val POLLING_INTERVAL_S = 2L
         private const val BALANCE_CHANGES_TO_CHECK = 5
 
         fun getBundle(serializedRequest: String,
                       shareText: String,
                       referenceToPoll: String,
-                      relatedBalanceId: String?,
-                      amount: BigDecimal) = getBundle(
+                      relatedBalanceId: String?) = getBundle(
                 data = serializedRequest,
                 shareText = shareText,
                 topText = shareText,
@@ -122,7 +108,6 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
                 .apply {
                     putString(REFERENCE_EXTRA, referenceToPoll)
                     putString(BALANCE_ID_EXTRA, relatedBalanceId)
-                    putString(AMOUNT_EXTRA, BigDecimalUtil.toPlainString(amount))
                 }
 
         fun newInstance(bundle: Bundle): ShareRedemptionQrFragment {

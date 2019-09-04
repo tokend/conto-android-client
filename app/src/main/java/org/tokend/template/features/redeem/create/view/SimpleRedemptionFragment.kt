@@ -20,6 +20,7 @@ import org.jetbrains.anko.textColor
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
 import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.redeem.create.logic.CreateRedemptionRequestUseCase
@@ -46,8 +47,6 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
         get() = repositoryProvider.balances()
 
     override lateinit var balanceId: String
-
-    override var amount: BigDecimal = BigDecimal.ZERO
 
     override var referenceToPoll: String? = null
 
@@ -268,7 +267,6 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                 .encodeBase64String()
 
         referenceToPoll = result.request.salt.toString()
-        amount = result.request.amount
 
         isAccepted = false
 
@@ -276,8 +274,8 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
         displayData()
     }
 
-    override fun onRedemptionAccepted() {
-        super.onRedemptionAccepted()
+    override fun onRedemptionAccepted(balanceChange: BalanceChange) {
+        super.onRedemptionAccepted(balanceChange)
         overlayQrCodeCheck()
     }
 
