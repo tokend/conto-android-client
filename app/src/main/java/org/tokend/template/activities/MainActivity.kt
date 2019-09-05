@@ -181,7 +181,12 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             PrimaryDrawerItem()
                     .withName(R.string.marketplace)
                     .withIdentifier(AllAtomicSwapAsksFragment.ID)
-                    .withIcon(R.drawable.ic_shop_cart)
+                    .withIcon(R.drawable.ic_shop_cart),
+
+            PrimaryDrawerItem()
+                    .withName(R.string.operations_history_short)
+                    .withIdentifier(AssetMovementsFragment.ID)
+                    .withIcon(R.drawable.ic_history)
     )
 
     protected open fun getHeaderInstance(email: String): AccountHeader {
@@ -267,7 +272,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             addDrawerItems(
                     items[BalancesFragment.ID],
                     items[CompaniesFragment.ID],
-                    items[AllAtomicSwapAsksFragment.ID]
+                    items[AllAtomicSwapAsksFragment.ID],
+                    items[AssetMovementsFragment.ID]
             )
 
             if (BuildConfig.IS_DEPOSIT_ALLOWED) {
