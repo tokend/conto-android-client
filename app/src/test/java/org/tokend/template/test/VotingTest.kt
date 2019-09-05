@@ -42,7 +42,7 @@ class VotingTest {
 
         createPoll(repositoryProvider, apiProvider, session)
 
-        val repo = repositoryProvider.polls()
+        val repo = repositoryProvider.polls(session.getWalletInfo()!!.accountId)
 
         repo.updateDeferred().blockingAwait()
 
@@ -93,7 +93,7 @@ class VotingTest {
 
         createPoll(repositoryProvider, apiProvider, session)
 
-        val repo = repositoryProvider.polls()
+        val repo = repositoryProvider.polls(session.getWalletInfo()!!.accountId)
 
         repo.updateDeferred().blockingAwait()
 
