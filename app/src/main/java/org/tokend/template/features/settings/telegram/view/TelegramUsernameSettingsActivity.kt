@@ -17,7 +17,6 @@ import org.tokend.template.data.repository.AccountDetailsRepository
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
-import org.tokend.template.features.settings.phonenumber.logic.SetPhoneNumberUseCase
 import org.tokend.template.features.settings.telegram.logic.SetTelegramUsernameUseCase
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -184,7 +183,7 @@ class TelegramUsernameSettingsActivity : BaseActivity() {
     }
 
     private fun onUsernameSettingError(error: Throwable) {
-        if (error is SetPhoneNumberUseCase.PhoneNumberAlreadyTakenException) {
+        if (error is SetTelegramUsernameUseCase.UsernameAlreadyTakenException) {
             username_edit_text.setErrorAndFocus(R.string.error_telegram_username_already_taken)
         } else {
             errorHandlerFactory.getDefault().handle(error)
