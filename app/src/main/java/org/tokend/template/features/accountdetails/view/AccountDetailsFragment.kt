@@ -1,6 +1,8 @@
 package org.tokend.template.features.accountdetails.view
 
 import android.os.Bundle
+import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.ImageView
@@ -35,34 +37,29 @@ class AccountDetailsFragment : ShareQrFragment() {
     }
 
     private fun initExtraActions() {
-        layoutInflater.inflate(R.layout.preference_layout,
-                scrollable_root_layout, false).apply {
-            findViewById<ImageView>(android.R.id.icon).setImageDrawable(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_settings))
-            findViewById<TextView>(android.R.id.title).setText(R.string.settings_title)
-            findViewById<TextView>(android.R.id.summary).visibility = View.GONE
-            setPadding(0, 0, 0, 0)
-
-            setOnClickListener {
-                Navigator.from(this@AccountDetailsFragment).openSettings()
-            }
-
-            scrollable_root_layout.addView(this)
+        addPreferenceItem(R.drawable.ic_settings, R.string.settings_title) {
+            Navigator.from(this@AccountDetailsFragment).openSettings()
         }
 
+        addPreferenceItem(R.drawable.ic_sign_out, R.string.sign_out) {
+            SignOutDialogFactory.getDialog(requireContext()) {
+                (activity?.application as? App)?.signOut(activity)
+            }.show()
+        }
+    }
+
+    private fun addPreferenceItem(@DrawableRes iconRes: Int,
+                                  @StringRes titleRes: Int,
+                                  action: () -> Unit) {
         layoutInflater.inflate(R.layout.preference_layout,
                 scrollable_root_layout, false).apply {
             findViewById<ImageView>(android.R.id.icon).setImageDrawable(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_sign_out))
-            findViewById<TextView>(android.R.id.title).setText(R.string.sign_out)
+                    ContextCompat.getDrawable(requireContext(), iconRes))
+            findViewById<TextView>(android.R.id.title).setText(titleRes)
             findViewById<TextView>(android.R.id.summary).visibility = View.GONE
             setPadding(0, 0, 0, 0)
 
-            setOnClickListener {
-                SignOutDialogFactory.getDialog(requireContext()) {
-                    (activity?.application as? App)?.signOut(activity)
-                }.show()
-            }
+            setOnClickListener { action() }
 
             scrollable_root_layout.addView(this)
         }
