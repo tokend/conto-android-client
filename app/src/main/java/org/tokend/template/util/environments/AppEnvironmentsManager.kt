@@ -42,6 +42,15 @@ class AppEnvironmentsManager(
                             storage = "https://s3.eu-north-1.amazonaws.com/contodemo-identity-storage-stoic-haslett",
                             client = "https://demo.conto.me"
                     )
+            ),
+            AppEnvironment(
+                    name = "UNIT.City",
+                    id = "unit",
+                    config = UrlConfig(
+                            api = "https://api.unitcity.conto.me",
+                            storage = "https://s3.eu-north-1.amazonaws.com/contodemo-identity-storage-stoic-haslett",
+                            client = "https://unitcity.conto.me"
+                    )
             )
     ).apply { extraEnv?.also { add(it) } }.associateBy(AppEnvironment::id)
 

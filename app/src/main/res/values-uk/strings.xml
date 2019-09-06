@@ -1,6 +1,5 @@
 <resources>
     <string name="language_code">uk</string>
-    <string name="app_name">Conto</string>
     <string name="authenticator_app_name">TokenD Authenticator</string>
 
     <string name="sign_up">Реєстрація</string>
