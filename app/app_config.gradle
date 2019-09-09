@@ -100,7 +100,7 @@ ext {
     // Auto logout timer in milliseconds.
     // App will logout after being in background during this time.
     // 0 means option is disabled
-    auto_logout = 0
+    auto_logout = 29000
 
     // ----------------------
 
