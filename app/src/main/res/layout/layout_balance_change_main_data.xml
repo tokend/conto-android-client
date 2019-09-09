@@ -11,6 +11,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingBottom="@dimen/half_standard_padding"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:textSize="16sp"
         tools:text="United States Dollar" />
 
