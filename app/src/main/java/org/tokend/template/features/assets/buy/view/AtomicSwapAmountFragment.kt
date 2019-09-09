@@ -84,8 +84,8 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
             R.string.template_asset_name_dash_price,
             ask.asset.name ?: ask.asset.code,
             amountFormatter.formatAssetAmount(
-                    ask.quoteAssets.first().price,
-                    ask.quoteAssets.first(),
+                    ask.price,
+                    ask.priceAsset,
                     withAssetCode = true
             )
     )

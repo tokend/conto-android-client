@@ -30,8 +30,8 @@ class SinglePriceAtomicSwapAskItemViewHolder(
         priceTextView.text = view.context.getString(
                 R.string.template_price,
                 amountFormatter.formatAssetAmount(
-                        item.quoteAsset.price,
-                        item.quoteAsset,
+                        item.price,
+                        item.priceAsset,
                         withAssetCode = true
                 )
         )

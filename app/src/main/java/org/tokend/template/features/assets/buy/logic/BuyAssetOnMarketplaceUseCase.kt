@@ -91,13 +91,9 @@ class BuyAssetOnMarketplaceUseCase(
     private fun getInvoice(): Single<MarketplaceInvoiceData> {
         return apiProvider.getApi()
                 .integrations
-                // TODO: Replace with .marketplace
-                .fiat
+                .marketplace
                 .submitBidTransaction(transaction)
                 .toSingle()
-                .map {
-                    MarketplaceInvoiceData.Redirect(it.paymentUrl)
-                }
     }
 
     private fun updateRepositories() {

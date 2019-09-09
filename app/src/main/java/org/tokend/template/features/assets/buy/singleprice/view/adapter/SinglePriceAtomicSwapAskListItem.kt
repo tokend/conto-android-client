@@ -8,7 +8,8 @@ class SinglePriceAtomicSwapAskListItem(
         val available: BigDecimal,
         val asset: Asset,
         val logoUrl: String?,
-        val quoteAsset: AtomicSwapAskRecord.QuoteAsset,
+        val price: BigDecimal,
+        val priceAsset: Asset,
         val companyName: String?,
         val source: AtomicSwapAskRecord?
 ) {
@@ -17,10 +18,9 @@ class SinglePriceAtomicSwapAskListItem(
             available = source.amount,
             asset = source.asset,
             logoUrl = source.asset.logoUrl,
-            quoteAsset = source.quoteAssets.first(),
+            price = source.price,
+            priceAsset = source.priceAsset,
             companyName = if (withCompany) source.company.name else null,
             source = source
     )
-
-    constructor(source: AtomicSwapAskRecord) : this(source, withCompany = true)
 }
