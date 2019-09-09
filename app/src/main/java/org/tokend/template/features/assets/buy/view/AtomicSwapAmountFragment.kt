@@ -80,7 +80,15 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         }
     }
 
-    override fun getTitleText(): String? = null
+    override fun getTitleText(): String? = getString(
+            R.string.template_asset_name_dash_price,
+            ask.asset.name ?: ask.asset.code,
+            amountFormatter.formatAssetAmount(
+                    ask.quoteAssets.first().price,
+                    ask.quoteAssets.first(),
+                    withAssetCode = true
+            )
+    )
 
     override fun displayBalance() {}
 

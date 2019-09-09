@@ -60,15 +60,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        title = getString(R.string.template_buy_asset, ask.asset.name ?: ask.asset.code)
-        toolbar.subtitle = getString(
-                R.string.template_price,
-                amountFormatter.formatAssetAmount(
-                        ask.quoteAssets.first().price,
-                        ask.quoteAssets.first(),
-                        withAssetCode = true
-                )
-        )
+        title = getString(R.string.buy)
     }
 
     private fun initSwipeRefresh() {
