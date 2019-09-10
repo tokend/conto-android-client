@@ -14,7 +14,7 @@ class AssetRecord(
         val policy: Int,
         override val name: String?,
         val description: String?,
-        val logoUrl: String?,
+        override val logoUrl: String?,
         val terms: RemoteFile?,
         val externalSystemType: Int?,
         val issued: BigDecimal?,

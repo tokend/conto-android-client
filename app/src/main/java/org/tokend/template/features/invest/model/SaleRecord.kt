@@ -68,6 +68,7 @@ class SaleRecord(
             val softCap: BigDecimal
     ) : Asset {
         override val name: String? = null
+        override val logoUrl: String? = null
 
         constructor(source: SaleQuoteAssetResource) : this(
                 code = source.asset.id,

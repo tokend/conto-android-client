@@ -17,7 +17,7 @@ class BalancePickerItemViewHolder(
     private val colorError = ContextCompat.getColor(view.context, R.color.error)
 
     override fun bind(item: BalancePickerListItem) {
-        displayLogo(item.logoUrl, item.asset.code)
+        displayLogo(item.asset.logoUrl, item.asset.code)
 
         nameTextView.text = item.displayedName
 
