@@ -47,7 +47,7 @@ class AppEnvironmentsManager(
                     name = "ForkLog",
                     id = "forklog",
                     config = UrlConfig(
-                            api = "https://api.conto.conto.me",
+                            api = "https://api.conto.me",
                             storage = "https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver",
                             client = "https://forklog.conto.me"
                     )

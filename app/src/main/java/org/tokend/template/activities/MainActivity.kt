@@ -271,7 +271,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         builder.apply {
             addDrawerItems(
                     items[BalancesFragment.ID],
-                    items[CompaniesFragment.ID],
                     items[AllAtomicSwapAsksFragment.ID],
                     items[AssetMovementsFragment.ID]
             )

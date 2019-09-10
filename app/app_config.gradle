@@ -30,7 +30,7 @@ ext {
     logs_enabled = true
 
     available_envs = ['config', 'staging', 'production', 'demo', 'forklog']
-    default_env_id = 'staging'
+    default_env_id = 'forklog'
 
     // --------------------------
 

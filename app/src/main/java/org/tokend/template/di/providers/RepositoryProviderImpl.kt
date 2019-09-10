@@ -13,8 +13,8 @@ import org.tokend.template.data.repository.balancechanges.BalanceChangesReposito
 import org.tokend.template.data.repository.base.MemoryOnlyRepositoryCache
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.extensions.getOrPut
-import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.assets.buy.singleprice.repository.AllAtomicSwapAsksRepository
+import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -338,6 +338,7 @@ class RepositoryProviderImpl(
     }
 
     override fun allAtomicSwapAsks(ownerAccountId: String?): AllAtomicSwapAsksRepository {
+        val ownerAccountId = CompaniesRepository.FORCED_COMPANY
         return allAtomicSwapAsksRepositories.getOrPut(ownerAccountId.toString()) {
             AllAtomicSwapAsksRepository(
                     ownerAccountId,

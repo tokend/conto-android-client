@@ -2,18 +2,11 @@ package org.tokend.template.data.repository
 
 import io.reactivex.Single
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.base.params.PagingParamsV2
-import org.tokend.sdk.api.v3.base.PageQueryParams
-import org.tokend.sdk.utils.SimplePagedResourceLoader
-import org.tokend.sdk.utils.extentions.isBadRequest
-import org.tokend.sdk.utils.extentions.isNotFound
 import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
-import org.tokend.template.extensions.mapSuccessful
-import retrofit2.HttpException
 
 open class CompaniesRepository(
         private val apiProvider: ApiProvider,
@@ -26,33 +19,12 @@ open class CompaniesRepository(
     private val nonCompanyAccounts = mutableSetOf<String>()
 
     override fun getItems(): Single<List<CompanyRecord>> {
-
-        val loader = SimplePagedResourceLoader({ nextCursor ->
-            apiProvider.getApi()
-                    .integrations
-                    .dns
-                    .getBusinesses(
-                            PageQueryParams(
-                                    PagingParamsV2(page = nextCursor),
-                                    null
-                            )
-                    )
-        })
-
-        return loader
-                .loadAll()
+        return apiProvider.getApi()
+                .integrations
+                .dns
+                .getBusiness(FORCED_COMPANY)
                 .toSingle()
-                .map { companiesResources ->
-                    companiesResources.mapSuccessful {
-                        CompanyRecord(it, urlConfigProvider.getConfig())
-                    }
-                }
-                .onErrorReturn { error ->
-                    if (error is HttpException && (error.isBadRequest() || error.isNotFound()))
-                        emptyList()
-                    else
-                        throw error
-                }
+                .map { listOf(CompanyRecord(it, urlConfigProvider.getConfig())) }
     }
 
     override fun broadcast() {
@@ -80,5 +52,9 @@ open class CompaniesRepository(
                         nonCompanyAccounts.addAll(accounts.filterNot(itemsMap::containsKey))
                     }
                     .toSingle { itemsMap }
+    }
+
+    companion object {
+        const val FORCED_COMPANY = "GB6RXMSM77D4PAJKAD3LWLZ2YTDB47P72VVU27QCDZ6O4FSHBECQYVCV"
     }
 }

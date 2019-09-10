@@ -119,6 +119,9 @@ class BalancesRepository(
         return signedAccountsApi
                 .getBalances(accountId)
                 .toSingle()
+                .map { sourceList ->
+                    sourceList.filter { it.asset.owner.id == CompaniesRepository.FORCED_COMPANY }
+                }
                 .flatMap { sourceList ->
                     companiesRepository
                             .ensureCompanies(sourceList.map { it.asset.owner.id })
