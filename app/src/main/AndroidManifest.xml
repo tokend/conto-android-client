@@ -172,7 +172,7 @@
         <activity
             android:name=".features.signin.unlock.UnlockAppActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".features.qr.CaptureActivityPortrait"
             android:screenOrientation="portrait"
@@ -245,7 +245,7 @@
         <activity
             android:name=".features.companies.details.view.CompanyDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"

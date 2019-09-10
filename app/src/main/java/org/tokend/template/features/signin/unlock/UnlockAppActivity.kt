@@ -26,8 +26,8 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
 import org.tokend.template.view.FingerprintIndicatorManager
-import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.dialog.SignOutDialogFactory
+import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 
@@ -240,7 +240,6 @@ class UnlockAppActivity : BaseActivity() {
         updatePasswordUnlockAvailability()
 
         if (canUnlockWithPassword) {
-            SoftInputUtil.hideSoftInput(this)
             unlock(email, password_edit_text.text.getChars())
         }
     }
@@ -259,6 +258,8 @@ class UnlockAppActivity : BaseActivity() {
             lastEnteredPassword?.erase()
         }
         lastEnteredPassword = password
+
+        SoftInputUtil.hideSoftInput(this)
 
         SignInUseCase(
                 email,
