@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_amount_input.*
 import kotlinx.android.synthetic.main.include_text_view_spinner_for_centering.view.*
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.layoutInflater
 import org.tokend.template.R
 import org.tokend.template.data.model.Asset
@@ -159,6 +160,36 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
                 ?: throw IllegalStateException("Quote asset must be selected at this moment")
 
         resultSubject.onNext(AmountInputResult(amount, asset))
+    }
+
+    override fun getMinLayoutHeight(): Int {
+        return if (needQuoteAssetSelection)
+            requireContext().dip(240)
+        else
+            super.getMinLayoutHeight()
+    }
+
+    override fun getSmallSizingHeightThreshold(): Int {
+        return requireContext().dip(290)
+    }
+
+    override fun updateSizing(useSmallSize: Boolean) {
+        super.updateSizing(useSmallSize)
+
+        if (needQuoteAssetSelection) {
+            val resources = requireContext().resources
+
+            val dividerVerticalSpacing = if (useSmallSize)
+                resources.getDimensionPixelSize(R.dimen.half_standard_padding)
+            else
+                resources.getDimensionPixelSize(R.dimen.standard_padding)
+
+            root_layout.findViewById<View>(R.id.divider_view).run {
+                layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    setMargins(leftMargin, dividerVerticalSpacing, rightMargin, dividerVerticalSpacing)
+                }
+            }
+        }
     }
 
     companion object {

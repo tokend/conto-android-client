@@ -19,6 +19,7 @@
     <include layout="@layout/include_text_view_spinner_for_centering" />
 
     <View
+        android:id="@+id/divider_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="@dimen/standard_padding"
