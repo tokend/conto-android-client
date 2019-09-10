@@ -2,12 +2,12 @@ ext {
     // ----- Android params -----
 
     // Application ID - unique identifier of the app in Google Play and on user's device
-    application_id = 'org.tokend.conto'
+    application_id = 'me.conto.forklog'
     // Version Name - human-readable app version
-    version_name = '1.1.0-rc.0'
+    version_name = '1.0.0'
     // Version Code - code number for version,
     // must be incremented after each release
-    version_code = 13
+    version_code = 1
 
     // --------------------------
 
@@ -29,7 +29,7 @@ ext {
     //Allow to log request and response information.
     logs_enabled = true
 
-    available_envs = ['config', 'staging', 'production', 'demo']
+    available_envs = ['config', 'staging', 'production', 'demo', 'forklog']
     default_env_id = 'staging'
 
     // --------------------------
@@ -38,10 +38,10 @@ ext {
 
     // Primary color of the brand,
     // can be used as a color of app toolbar
-    color_primary = '#c2185b'
+    color_primary = '#F79046'
     // Primary dark color - darker version of primary color,
     // can be used as a color of app status bar
-    color_primary_dark = '#8c0032'
+    color_primary_dark = '#CC763B'
 
     // Background color - used as a background color for screens
     color_background = '#ffffff'
@@ -50,10 +50,10 @@ ext {
     color_cards_container_background = '#ffffff'
 
     // Accent color - color of the most valuable labels and controls
-    color_accent = '#d81b60'
+    color_accent = '#F79046'
     // Accent highlight color - light, semi-white version of accent color
     // used for highlights
-    color_accent_highlight = '#FFEFF5'
+    color_accent_highlight = '#fff3e0'
 
     // Primary text - color of all text labels and fields
     color_primary_text = '#212121'
@@ -62,10 +62,10 @@ ext {
 
     // Primary action - custom color for action controls,
     // same as Accent by default
-    color_primary_action = '#d81b60'
+    color_primary_action = '#F68031'
     // Primary action disabled - color of disabled action control,
     // usually it's just a Primary action color with some transparency
-    color_primary_action_disabled = '#EEC6D2'
+    color_primary_action_disabled = '#e5cfbe'
 
     // Icons - color of all icons in app except menus
     color_icons = '#757575'
@@ -86,7 +86,7 @@ ext {
 
     // Avatar background - background color of the avatar placeholder
     // (a circle with the first email letter inside)
-    color_avatar_placeholder_background = '#f8bbd0'
+    color_avatar_placeholder_background = '#E8A534'
 
     // ----------------------
 

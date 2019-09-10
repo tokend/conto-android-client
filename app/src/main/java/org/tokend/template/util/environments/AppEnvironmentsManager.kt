@@ -42,6 +42,15 @@ class AppEnvironmentsManager(
                             storage = "https://s3.eu-north-1.amazonaws.com/contodemo-identity-storage-stoic-haslett",
                             client = "https://demo.conto.me"
                     )
+            ),
+            AppEnvironment(
+                    name = "ForkLog",
+                    id = "forklog",
+                    config = UrlConfig(
+                            api = "https://api.conto.conto.me",
+                            storage = "https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver",
+                            client = "https://forklog.conto.me"
+                    )
             )
     ).apply { extraEnv?.also { add(it) } }.associateBy(AppEnvironment::id)
 
