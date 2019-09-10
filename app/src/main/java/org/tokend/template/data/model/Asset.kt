@@ -6,4 +6,5 @@ interface Asset : Serializable {
     val code: String
     val trailingDigits: Int
     val name: String?
+    val logoUrl: String?
 }

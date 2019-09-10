@@ -128,7 +128,6 @@ open class BalancePickerBottomDialog(
                                 asset = requiredAsset,
                                 available = getAvailableAmount(requiredAsset.code, null),
                                 isEnough = true,
-                                logoUrl = null,
                                 source = null
                         )
                 } ?: filteredBalances.map {

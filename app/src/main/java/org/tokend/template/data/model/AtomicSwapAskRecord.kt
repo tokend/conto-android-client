@@ -33,7 +33,8 @@ class AtomicSwapAskRecord(
                                 code = it.quoteAsset,
                                 trailingDigits = 6,
                                 price = it.price,
-                                name = assetsMap[it.quoteAsset]?.name
+                                name = assetsMap[it.quoteAsset]?.name,
+                                logoUrl = assetsMap[it.quoteAsset]?.logoUrl
                         )
                     },
             price = source.quoteAssets.first().price,
@@ -52,6 +53,7 @@ class AtomicSwapAskRecord(
             override val code: String,
             override val trailingDigits: Int,
             val price: BigDecimal,
-            override val name: String?
+            override val name: String?,
+            override val logoUrl: String?
     ) : Asset
 }
