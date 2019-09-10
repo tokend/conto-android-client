@@ -15,7 +15,6 @@ import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
-import com.mikepenz.materialdrawer.model.DividerDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
@@ -63,7 +62,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         private const val REPO_URL = "https://github.com/tokend/conto-android-client"
     }
 
-    protected open val defaultFragmentId = BalancesFragment.ID
+    protected open val defaultFragmentId = AllAtomicSwapAsksFragment.ID
 
     private var navigationDrawer: Drawer? = null
     private var landscapeNavigationDrawer: Drawer? = null
@@ -270,8 +269,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                                                   items: Map<Long, PrimaryDrawerItem>) {
         builder.apply {
             addDrawerItems(
-                    items[BalancesFragment.ID],
                     items[AllAtomicSwapAsksFragment.ID],
+                    items[BalancesFragment.ID],
                     items[AssetMovementsFragment.ID]
             )
 
