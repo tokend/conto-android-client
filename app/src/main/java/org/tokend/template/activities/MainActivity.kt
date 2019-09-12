@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import com.github.tbouron.shakedetector.library.ShakeDetector
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -59,7 +60,7 @@ import java.util.concurrent.TimeUnit
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
         val CONTRIBUTE_ITEM_ID = "contribute".hashCode().toLong()
-
+        private const val SHAKES_TO_PAY_COUNT = 4
         private const val REPO_URL = "https://github.com/tokend/conto-android-client"
     }
 
@@ -88,6 +89,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         window.setBackgroundDrawable(null)
 
         initNavigation()
+        initShakeDetection()
 
         subscribeToKycChanges()
 
@@ -303,6 +305,11 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             )
         }
     }
+
+    private fun initShakeDetection() {
+        ShakeDetector.create(this, this::onShakingDetected)
+        ShakeDetector.updateConfiguration(2F, SHAKES_TO_PAY_COUNT)
+    }
     // endregion
 
     private fun subscribeToKycChanges() {
@@ -439,6 +446,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         }
     }
 
+    private fun onShakingDetected() {
+        Navigator.from(this).openShakeToPay()
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateDrawerVisibility()
@@ -457,4 +468,19 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     override fun onRedemptionRequestAccepted() {}
+
+    override fun onResume() {
+        super.onResume()
+        ShakeDetector.start();
+    }
+
+    override fun onStop() {
+        super.onStop()
+        ShakeDetector.stop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ShakeDetector.destroy()
+    }
 }

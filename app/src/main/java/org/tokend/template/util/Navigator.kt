@@ -12,7 +12,6 @@ import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.singleTop
-import org.tokend.sdk.keyserver.models.WalletInfo
 import org.tokend.template.R
 import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.activities.MainActivity
@@ -65,6 +64,7 @@ import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.settings.telegram.view.TelegramUsernameSettingsActivity
+import org.tokend.template.features.shaketopay.view.ShakeToPayActivity
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
@@ -567,6 +567,11 @@ class Navigator private constructor() {
     fun openCompanyDetails(company: CompanyRecord) {
         context?.intentFor<CompanyDetailsActivity>()
                 ?.putExtras(CompanyDetailsActivity.getBundle(company))
+                ?.also { performIntent(it) }
+    }
+
+    fun openShakeToPay() {
+        context?.intentFor<ShakeToPayActivity>()
                 ?.also { performIntent(it) }
     }
 }
