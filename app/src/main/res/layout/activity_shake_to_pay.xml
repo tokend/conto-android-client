@@ -8,4 +8,23 @@
 
     <include layout="@layout/appbar" />
 
+    <TextView
+        android:id="@+id/location_av_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin" />
+
+    <TextView
+        android:id="@+id/location_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:text="@string/loading_data" />
+
+    <TextView
+        android:id="@+id/near_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:text="@string/loading_data" />
 </LinearLayout>

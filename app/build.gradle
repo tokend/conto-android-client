@@ -101,6 +101,7 @@ dependencies {
     implementation "com.android.support:preference-v14:${support_lib_version}"
     implementation 'com.google.android.gms:play-services-base:16.1.0'
     implementation 'com.google.android.gms:play-services-auth:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation "com.android.support:support-v4:${support_lib_version}"
     implementation 'com.android.support:multidex:1.0.3'
     implementation "com.android.support:design:$support_lib_version"
@@ -118,7 +119,7 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.13'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    implementation "org.tokend:sdk:2.8.3-x.0"
+    implementation "org.tokend:sdk:2.8.3-x.3"
     implementation "org.tokend:rx-sdk:2.1.0"
 
     implementation 'io.reactivex.rxjava2:rxkotlin:2.0.0'
