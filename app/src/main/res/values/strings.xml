@@ -521,6 +521,8 @@
     <string name="redemption_qr_code">Redemption QR code</string>
     <string name="marketplace">Marketplace</string>
     <string name="template_asset_name_dash_price" translatable="false">%1$s – %2$s</string>
+    <string name="looking_for_people_nearby">Looking for people nearby…</string>
+    <string name="obtaining_location_progress">Obtaining your location…</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

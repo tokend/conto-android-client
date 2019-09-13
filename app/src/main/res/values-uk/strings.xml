@@ -532,4 +532,6 @@
     <string name="send_action">Відправити</string>
     <string name="redemption_qr_code">QR код погашення</string>
     <string name="marketplace">Магазин</string>
+    <string name="looking_for_people_nearby">Пошук людей поблизу…</string>
+    <string name="obtaining_location_progress">Визначення місцезнаходження…</string>
 </resources>

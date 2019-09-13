@@ -2,16 +2,23 @@ package org.tokend.template.features.shaketopay.view
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.graphics.drawable.Animatable
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
 import android.os.Looper
+import android.support.v4.content.ContextCompat
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.OvershootInterpolator
+import android.view.animation.RotateAnimation
 import com.google.android.gms.location.*
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_shake_to_pay.*
+import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.integrations.locator.model.MinimalUserData
@@ -36,12 +43,16 @@ class ShakeToPayActivity : BaseActivity() {
 
         initToolbar()
         initLocationClient()
+        initAnimations()
+
         tryToObserveLocation()
     }
 
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         title = ""
+        toolbar.background = null
+        appbar.background = ContextCompat.getDrawable(this, R.drawable.gradient_background_to_transparent_from_top)
         toolbar.setNavigationIcon(R.drawable.ic_close)
     }
 
@@ -49,10 +60,58 @@ class ShakeToPayActivity : BaseActivity() {
         locationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
-    private fun tryToObserveLocation() {
-        locationPermission.check(this) {
-            observeLocation()
+    private fun initAnimations() {
+        val phonePivotX = 1.15f
+        val phonePivotY = 1.3f
+        val phoneRotationDegree = -6f
+
+        val shakeLastBounceAnimation = RotateAnimation(phoneRotationDegree, 0f,
+                Animation.RELATIVE_TO_SELF, phonePivotX,
+                Animation.RELATIVE_TO_SELF, phonePivotY
+        ).apply {
+            interpolator = OvershootInterpolator(2.5f)
+            duration = 240
         }
+
+        val shakeWithLastBounceAnimation = RotateAnimation(0f, phoneRotationDegree,
+                Animation.RELATIVE_TO_SELF, phonePivotX,
+                Animation.RELATIVE_TO_SELF, phonePivotY
+        ).apply {
+            interpolator = AccelerateInterpolator()
+            repeatMode = Animation.REVERSE
+            repeatCount = 4
+            duration = 120
+            setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {}
+
+                override fun onAnimationStart(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    phone_image_view.startAnimation(shakeLastBounceAnimation)
+                }
+            })
+        }
+
+        Observable.interval(1500, 5000, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    phone_image_view.startAnimation(shakeWithLastBounceAnimation)
+                }
+                .addTo(compositeDisposable)
+
+        Observable.interval(2200, 2500, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    (circles_image_view.drawable as? Animatable)?.start()
+                }
+                .addTo(compositeDisposable)
+    }
+
+    private fun tryToObserveLocation() {
+        locationPermission.check(this,
+                action = { observeLocation() },
+                deniedAction = { finish() }
+        )
     }
 
     private val locationCallback = object : LocationCallback() {
@@ -91,14 +150,12 @@ class ShakeToPayActivity : BaseActivity() {
     }
 
     private fun onLocationAvailable() {
-        location_av_text_view.text = "Location is available"
-
+        title_text_view.setText(R.string.looking_for_people_nearby)
         startLocationBroadcast()
     }
 
     private fun onLocationNotAvailable() {
-        location_av_text_view.text = "Location not available"
-
+        title_text_view.setText(R.string.obtaining_location_progress)
         stopLocationBroadcast()
     }
 
@@ -106,17 +163,12 @@ class ShakeToPayActivity : BaseActivity() {
     private fun startLocationBroadcast() {
         stopLocationBroadcast()
 
-        val h = Handler(Looper.getMainLooper())
-
         locationBroadcastDisposable = IntervalPoller(
                 minInterval = 3,
                 timeUnit = TimeUnit.SECONDS,
                 deferredDataSource = Single.defer<List<NearbyUser>> {
                     val lastLocation = this.lastLocation
                             ?: return@defer Single.error(IllegalStateException("No location yet"))
-                    h.post {
-                        location_text_view.text = "Broadcasted: ${lastLocation.latitude}, ${lastLocation.longitude}"
-                    }
 
                     val email = walletInfoProvider.getWalletInfo()!!.email
                     val accountId = walletInfoProvider.getWalletInfo()!!.accountId
@@ -143,12 +195,7 @@ class ShakeToPayActivity : BaseActivity() {
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribeBy(
                         onNext = {
-                            if (it.isEmpty()) {
-                                near_text_view.text = "No one's near :("
-                            } else {
-                                near_text_view.text = "Near members: " +
-                                        it.map { n -> n.userData.name }.joinToString()
-                            }
+
                         },
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
