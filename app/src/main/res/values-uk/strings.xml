@@ -534,4 +534,6 @@
     <string name="marketplace">Магазин</string>
     <string name="looking_for_people_nearby">Пошук людей поблизу…</string>
     <string name="obtaining_location_progress">Визначення місцезнаходження…</string>
+    <string name="no_nearby_users_found">Ніхто не знайшовся</string>
+    <string name="people_nearby_enumeration">Люди поблизу:</string>
 </resources>

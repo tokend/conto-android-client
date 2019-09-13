@@ -19,7 +19,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="1.4:1"
+            app:layout_constraintDimensionRatio="1.1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -67,4 +67,27 @@
         android:textSize="@dimen/text_size_heading"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/half_standard_margin">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/nearby_users_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/half_standard_margin"
+            android:layout_marginEnd="@dimen/half_standard_margin"
+            android:clipToPadding="false"
+            android:fadingEdge="vertical"
+            android:overScrollMode="never"
+            android:paddingTop="@dimen/standard_margin"
+            android:requiresFadingEdge="vertical" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/standard_margin"
+            android:background="@drawable/gradient_background_to_transparent_from_top" />
+
+    </FrameLayout>
 </LinearLayout>

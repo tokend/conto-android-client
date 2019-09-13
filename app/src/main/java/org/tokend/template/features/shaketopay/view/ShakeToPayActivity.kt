@@ -1,12 +1,15 @@
 package org.tokend.template.features.shaketopay.view
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.graphics.drawable.Animatable
 import android.location.Location
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
-import android.util.Log
+import android.support.v7.widget.GridLayoutManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
@@ -22,14 +25,16 @@ import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.integrations.locator.model.MinimalUserData
-import org.tokend.sdk.api.integrations.locator.model.NearbyUser
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.shaketopay.logic.LocationUpdatesProvider
-import org.tokend.template.util.IntervalPoller
-import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.util.PermissionManager
-import org.tokend.template.util.ProfileUtil
+import org.tokend.template.features.shaketopay.model.NearbyUserRecord
+import org.tokend.template.features.shaketopay.view.adapter.NearbyUserListItem
+import org.tokend.template.features.shaketopay.view.adapter.NearbyUsersAdapter
+import org.tokend.template.util.*
+import org.tokend.template.view.util.ColumnCalculator
+import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ShakeToPayActivity : BaseActivity() {
@@ -38,26 +43,70 @@ class ShakeToPayActivity : BaseActivity() {
 
     private lateinit var locationUpdatesProvider: LocationUpdatesProvider
     private var lastLocation: Location? = null
+
+    private val adapter = NearbyUsersAdapter()
+    private lateinit var layoutManager: GridLayoutManager
+    private var isListExpanded = false
+
+    private val nearbyUsers = LinkedHashSet<NearbyUserRecord>()
+
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_shake_to_pay)
 
         initToolbar()
+        initNearbyUsersList()
         initLocationUpdatesProvider()
         initAnimations()
 
         tryToSubscribeToLocationUpdates()
+
+        val mock = listOf(
+                NearbyUserRecord("1", "", "Andrew Stepko", "https://avatars2.githubusercontent.com/u/15330929?s=96&v=4"),
+                NearbyUserRecord("2", "", "Pavlo Ponomarev", "https://avatars1.githubusercontent.com/u/251607?s=96&v=4"),
+                NearbyUserRecord("3", "", "Dmytro Haidashenko", "https://avatars1.githubusercontent.com/u/34754799?s=96&v=4"),
+                NearbyUserRecord("4", "", "Roman Malyshev", "https://avatars2.githubusercontent.com/u/18058020?s=96&v=4"),
+                NearbyUserRecord("5", "", "Maksym Shopynskyi", "https://avatars1.githubusercontent.com/u/17788043?s=96&v=4"),
+                NearbyUserRecord("6", "", "Terry from Bangladesh", "https://lh5.googleusercontent.com/-s0RiLjDDTsU/AAAAAAAAAAI/AAAAAAAAAGI/t5nhiF4Xg_U/photo.jpg?sz=128"),
+                NearbyUserRecord("7", "", "Максимка \uD83E\uDD8A", "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5c7e77a7625bb11abd843998/715241c7-3490-4084-9aae-bb92dc67e390/128?size=72&s=72"),
+                NearbyUserRecord("404", "nobody@mail.com", "Mr. Nobody", null)
+        ).shuffled()
+
+        Observable.intervalRange(0, mock.size.toLong(), 3000, 1800, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { i ->
+                     onNewUsersNearby(listOf(mock[i.toInt()]))
+                }
+                .addTo(compositeDisposable)
     }
 
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         title = ""
         toolbar.background = null
-        appbar.background = ContextCompat.getDrawable(this, R.drawable.gradient_background_to_transparent_from_top)
+        appbar.background = ContextCompat.getDrawable(this,
+                R.drawable.gradient_background_to_transparent_from_top)
         toolbar.setNavigationIcon(R.drawable.ic_close)
     }
 
     private fun initLocationUpdatesProvider() {
         locationUpdatesProvider = LocationUpdatesProvider(this)
+    }
+
+    private fun initNearbyUsersList() {
+        layoutManager = GridLayoutManager(this, 1)
+        updateListColumnsCount()
+
+        nearby_users_recycler_view.layoutManager = layoutManager
+
+        nearby_users_recycler_view.adapter = adapter
+
+        adapter.onItemClick { _, item ->
+            item.source?.also(this::openPayment)
+        }
+
+        adapter.registerAdapterDataObserver(
+                ScrollOnTopItemUpdateAdapterObserver(nearby_users_recycler_view)
+        )
     }
 
     private var animationsDisposable = CompositeDisposable()
@@ -162,13 +211,17 @@ class ShakeToPayActivity : BaseActivity() {
 
     private fun onNewLocation(location: Location) {
         lastLocation = location
-        Log.i("Oleg", "New location $location")
     }
 
     private fun onLocationUpdatesCompleted() {
         stopLocationBroadcast()
         stopAnimations()
-        Log.i("Oleg", "Updates completed")
+
+        if (nearbyUsers.isEmpty()) {
+            title_text_view.setText(R.string.no_nearby_users_found)
+        } else {
+            title_text_view.setText(R.string.people_nearby_enumeration)
+        }
     }
 
     private var locationBroadcastDisposable: Disposable? = null
@@ -189,7 +242,7 @@ class ShakeToPayActivity : BaseActivity() {
         locationBroadcastDisposable = IntervalPoller(
                 minInterval = LOCATION_SEND_INTERVAL_MS,
                 timeUnit = TimeUnit.MILLISECONDS,
-                deferredDataSource = Single.defer<List<NearbyUser>> {
+                deferredDataSource = Single.defer<List<NearbyUserRecord>> {
                     val lastLocation = this.lastLocation
                             ?: return@defer Single.error(IllegalStateException("No location yet"))
 
@@ -205,14 +258,15 @@ class ShakeToPayActivity : BaseActivity() {
                                     userData
                             )
                             .toSingle()
+                            .map { items ->
+                                items.map(::NearbyUserRecord)
+                            }
                 }
         )
                 .asObservable()
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribeBy(
-                        onNext = {
-                            // TODO
-                        },
+                        onNext = this::onNewUsersNearby,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
@@ -220,6 +274,53 @@ class ShakeToPayActivity : BaseActivity() {
 
     private fun stopLocationBroadcast() {
         locationBroadcastDisposable?.dispose()
+    }
+
+    private fun onNewUsersNearby(users: Collection<NearbyUserRecord>) {
+        nearbyUsers.addAll(users)
+        displayNearbyUsers()
+    }
+
+    private fun displayNearbyUsers() {
+        val items = nearbyUsers.map(::NearbyUserListItem)
+
+        if (items.isNotEmpty() && !isListExpanded) {
+            expandList()
+        }
+
+        adapter.setData(items)
+    }
+
+    private fun expandList() {
+        isListExpanded = true
+
+        val targetLayoutParams = circles_image_view.layoutParams as ConstraintLayout.LayoutParams
+
+        val animator = ValueAnimator.ofFloat(1.1f, 1.6f).apply {
+            interpolator = AccelerateInterpolator()
+            duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+            addUpdateListener {
+                val value = animatedValue as Float
+                targetLayoutParams.dimensionRatio = "$value:1"
+                circles_image_view.layoutParams = targetLayoutParams
+            }
+        }
+
+        animator.start()
+    }
+
+    private fun openPayment(user: NearbyUserRecord) {
+        Navigator.from(this).openSend()
+    }
+
+    private fun updateListColumnsCount() {
+        val maxWidth = resources.getDimensionPixelSize(R.dimen.nearby_user_avatar_size) * 3
+        layoutManager.spanCount = ColumnCalculator.getColumnCount(this, maxWidth)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        updateListColumnsCount()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
