@@ -62,7 +62,7 @@ class ShakeToPayActivity : BaseActivity() {
 
         val mock = listOf(
                 NearbyUserRecord("1", "", "Andrew Stepko", "https://avatars2.githubusercontent.com/u/15330929?s=96&v=4"),
-                NearbyUserRecord("2", "", "Pavlo Ponomarev", "https://avatars1.githubusercontent.com/u/251607?s=96&v=4"),
+                NearbyUserRecord("GDMQX74XSXHCDNXS6ADADSTPV4FRIKS5RM2HXEV27KQWLKANJVJIEOHE", "pp@distributedlab.com", "Pavlo Ponomarev", "https://avatars1.githubusercontent.com/u/251607?s=96&v=4"),
                 NearbyUserRecord("3", "", "Dmytro Haidashenko", "https://avatars1.githubusercontent.com/u/34754799?s=96&v=4"),
                 NearbyUserRecord("4", "", "Roman Malyshev", "https://avatars2.githubusercontent.com/u/18058020?s=96&v=4"),
                 NearbyUserRecord("5", "", "Maksym Shopynskyi", "https://avatars1.githubusercontent.com/u/17788043?s=96&v=4"),
@@ -310,7 +310,10 @@ class ShakeToPayActivity : BaseActivity() {
     }
 
     private fun openPayment(user: NearbyUserRecord) {
-        Navigator.from(this).openSend()
+        Navigator.from(this).openSend(
+                recipientAccount = user.accountId,
+                recipientNickname = user.email
+        )
     }
 
     private fun updateListColumnsCount() {

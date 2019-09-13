@@ -244,11 +244,14 @@ class Navigator private constructor() {
 
     fun openSend(asset: String? = null,
                  amount: BigDecimal? = null,
+                 recipientAccount: String? = null,
+                 recipientNickname: String? = null,
                  requestCode: Int = 0) {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         SendFragment.ID,
-                        SendFragment.getBundle(asset, amount, true)
+                        SendFragment.getBundle(asset, amount,
+                                recipientAccount, recipientNickname, true)
                 ))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }

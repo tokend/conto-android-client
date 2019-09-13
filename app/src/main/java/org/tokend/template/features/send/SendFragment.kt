@@ -70,6 +70,12 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     private val requiredAmount: BigDecimal?
         get() = arguments?.getString(AMOUNT_EXTRA)?.let { BigDecimalUtil.valueOf(it) }
 
+    private val requiredRecipient: String?
+        get() = arguments?.getString(RECIPIENT_ACCOUNT_EXTRA)
+
+    private val requiredRecipientNickname: String?
+        get() = arguments?.getString(RECIPIENT_NICKNAME_EXTRA)
+
     private val allowToolbar: Boolean
         get() = arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA) ?: true
 
@@ -171,11 +177,27 @@ class SendFragment : BaseFragment(), ToolbarProvider {
                 isWaitingForTransferableAssets = false
 
                 hideErrorOrEmptyView()
-                toRecipientScreen()
+                startFlow()
             }
         } else {
             isWaitingForTransferableAssets = true
             toEmptyView()
+        }
+    }
+
+    private fun startFlow() {
+        val requiredRecipient = this.requiredRecipient
+
+        if (requiredRecipient == null) {
+            toRecipientScreen()
+        } else {
+            onRecipientSelected(PaymentRecipientAndDescription(
+                    recipient = PaymentRecipient(
+                            accountId = requiredRecipient,
+                            nickname = this.requiredRecipientNickname
+                    ),
+                    description = null
+            ))
         }
     }
 
@@ -352,6 +374,8 @@ class SendFragment : BaseFragment(), ToolbarProvider {
         private const val ASSET_EXTRA = "asset"
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
         private const val AMOUNT_EXTRA = "amount"
+        private const val RECIPIENT_ACCOUNT_EXTRA = "recipient_account"
+        private const val RECIPIENT_NICKNAME_EXTRA = "recipient_nickname"
         const val ID = 1118L
         val PAYMENT_CONFIRMATION_REQUEST = "confirm_payment".hashCode() and 0xffff
 
@@ -359,10 +383,14 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
         fun getBundle(assetCode: String?,
                       amount: BigDecimal?,
+                      recipientAccount: String?,
+                      recipientNickname: String?,
                       allowToolbar: Boolean) = Bundle().apply {
             putString(ASSET_EXTRA, assetCode)
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
             putString(AMOUNT_EXTRA, amount?.let(BigDecimalUtil::toPlainString))
+            putString(RECIPIENT_ACCOUNT_EXTRA, recipientAccount)
+            putString(RECIPIENT_NICKNAME_EXTRA, recipientNickname)
         }
     }
 }
