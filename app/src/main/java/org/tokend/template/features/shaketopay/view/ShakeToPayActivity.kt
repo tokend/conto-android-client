@@ -5,15 +5,15 @@ import android.annotation.SuppressLint
 import android.graphics.drawable.Animatable
 import android.location.Location
 import android.os.Bundle
-import android.os.Looper
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.view.animation.RotateAnimation
-import com.google.android.gms.location.*
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -25,6 +25,7 @@ import org.tokend.sdk.api.integrations.locator.model.MinimalUserData
 import org.tokend.sdk.api.integrations.locator.model.NearbyUser
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.shaketopay.logic.LocationUpdatesProvider
 import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
@@ -35,17 +36,16 @@ class ShakeToPayActivity : BaseActivity() {
     private val locationPermission =
             PermissionManager(Manifest.permission.ACCESS_FINE_LOCATION, 404)
 
-    private lateinit var locationClient: FusedLocationProviderClient
+    private lateinit var locationUpdatesProvider: LocationUpdatesProvider
     private var lastLocation: Location? = null
-
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_shake_to_pay)
 
         initToolbar()
-        initLocationClient()
+        initLocationUpdatesProvider()
         initAnimations()
 
-        tryToObserveLocation()
+        tryToSubscribeToLocationUpdates()
     }
 
     private fun initToolbar() {
@@ -56,10 +56,11 @@ class ShakeToPayActivity : BaseActivity() {
         toolbar.setNavigationIcon(R.drawable.ic_close)
     }
 
-    private fun initLocationClient() {
-        locationClient = LocationServices.getFusedLocationProviderClient(this)
+    private fun initLocationUpdatesProvider() {
+        locationUpdatesProvider = LocationUpdatesProvider(this)
     }
 
+    private var animationsDisposable = CompositeDisposable()
     private fun initAnimations() {
         val phonePivotX = 1.15f
         val phonePivotY = 1.3f
@@ -97,56 +98,56 @@ class ShakeToPayActivity : BaseActivity() {
                 .subscribe {
                     phone_image_view.startAnimation(shakeWithLastBounceAnimation)
                 }
-                .addTo(compositeDisposable)
+                .addTo(animationsDisposable)
 
         Observable.interval(2200, 2500, TimeUnit.MILLISECONDS)
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe {
                     (circles_image_view.drawable as? Animatable)?.start()
                 }
-                .addTo(compositeDisposable)
+                .addTo(animationsDisposable)
+
+        animationsDisposable.addTo(compositeDisposable)
     }
 
-    private fun tryToObserveLocation() {
+    private fun stopAnimations() {
+        animationsDisposable.dispose()
+    }
+
+    private fun tryToSubscribeToLocationUpdates() {
         locationPermission.check(this,
-                action = { observeLocation() },
+                action = { subscribeToLocationUpdates() },
                 deniedAction = { finish() }
         )
     }
 
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            lastLocation = result.lastLocation
-        }
-
-        override fun onLocationAvailability(availability: LocationAvailability) {
-            if (availability.isLocationAvailable) {
-                onLocationAvailable()
-            } else {
-                onLocationNotAvailable()
-            }
-        }
-    }
-
     @SuppressLint("MissingPermission")
-    private fun observeLocation() {
-        locationClient
-                .requestLocationUpdates(
-                        LocationRequest.create().apply {
-                            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                            interval = 5000
-                            fastestInterval = 7000
-                            numUpdates = 10
-                        }
-                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
-                        locationCallback,
-                        Looper.getMainLooper()
-                )
-    }
+    private fun subscribeToLocationUpdates() {
+        locationUpdatesProvider
+                .locationAvailability
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { isAvailable ->
+                    if (isAvailable) {
+                        onLocationAvailable()
+                    } else {
+                        onLocationNotAvailable()
+                    }
+                }
+                .addTo(compositeDisposable)
 
-    override fun onDestroy() {
-        super.onDestroy()
-        locationClient.removeLocationUpdates(locationCallback)
+        locationUpdatesProvider
+                .getLocationUpdates(
+                        updateIntervalMs = LOCATION_UPDATE_INTERVAL_MS,
+                        updatesCount = LOCATION_UPDATES_COUNT,
+                        includeLastKnownLocation = true
+                )
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribeBy(
+                        onNext = this::onNewLocation,
+                        onError = { errorHandlerFactory.getDefault().handle(it) },
+                        onComplete = this::onLocationUpdatesCompleted
+                )
+                .addTo(compositeDisposable)
     }
 
     private fun onLocationAvailable() {
@@ -159,23 +160,38 @@ class ShakeToPayActivity : BaseActivity() {
         stopLocationBroadcast()
     }
 
+    private fun onNewLocation(location: Location) {
+        lastLocation = location
+        Log.i("Oleg", "New location $location")
+    }
+
+    private fun onLocationUpdatesCompleted() {
+        stopLocationBroadcast()
+        stopAnimations()
+        Log.i("Oleg", "Updates completed")
+    }
+
     private var locationBroadcastDisposable: Disposable? = null
     private fun startLocationBroadcast() {
         stopLocationBroadcast()
 
+        val email = walletInfoProvider.getWalletInfo()?.email
+                ?: return
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+                ?: return
+        val kycState = repositoryProvider.kycState().item
+                ?: return
+        val avatar = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
+        val name = ProfileUtil.getDisplayedName(kycState, email) ?: email
+
+        val userData = MinimalUserData(avatar, name, email)
+
         locationBroadcastDisposable = IntervalPoller(
-                minInterval = 3,
-                timeUnit = TimeUnit.SECONDS,
+                minInterval = LOCATION_SEND_INTERVAL_MS,
+                timeUnit = TimeUnit.MILLISECONDS,
                 deferredDataSource = Single.defer<List<NearbyUser>> {
                     val lastLocation = this.lastLocation
                             ?: return@defer Single.error(IllegalStateException("No location yet"))
-
-                    val email = walletInfoProvider.getWalletInfo()!!.email
-                    val accountId = walletInfoProvider.getWalletInfo()!!.accountId
-                    val avatar = ProfileUtil.getAvatarUrl(repositoryProvider.kycState().item,
-                            urlConfigProvider, email)
-                    val name = ProfileUtil.getDisplayedName(repositoryProvider.kycState().item, email)
-                            ?: email
 
                     apiProvider
                             .getApi()
@@ -184,9 +200,9 @@ class ShakeToPayActivity : BaseActivity() {
                             .getUsersNearby(
                                     lastLocation.latitude,
                                     lastLocation.longitude,
-                                    0.05,
+                                    SEARCH_RADIUS_KM,
                                     accountId,
-                                    MinimalUserData(avatar, name, email)
+                                    userData
                             )
                             .toSingle()
                 }
@@ -195,7 +211,7 @@ class ShakeToPayActivity : BaseActivity() {
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribeBy(
                         onNext = {
-
+                            // TODO
                         },
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
@@ -209,5 +225,12 @@ class ShakeToPayActivity : BaseActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermission.handlePermissionResult(requestCode, permissions, grantResults)
+    }
+
+    private companion object {
+        private const val LOCATION_UPDATE_INTERVAL_MS = 5000L
+        private const val LOCATION_UPDATES_COUNT = 10
+        private const val LOCATION_SEND_INTERVAL_MS = 3000L
+        private const val SEARCH_RADIUS_KM = 0.05
     }
 }
