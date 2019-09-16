@@ -59,24 +59,6 @@ class ShakeToPayActivity : BaseActivity() {
         initAnimations()
 
         tryToSubscribeToLocationUpdates()
-
-        val mock = listOf(
-                NearbyUserRecord("1", "", "Andrew Stepko", "https://avatars2.githubusercontent.com/u/15330929?s=96&v=4"),
-                NearbyUserRecord("GDMQX74XSXHCDNXS6ADADSTPV4FRIKS5RM2HXEV27KQWLKANJVJIEOHE", "pp@distributedlab.com", "Pavlo Ponomarev", "https://avatars1.githubusercontent.com/u/251607?s=96&v=4"),
-                NearbyUserRecord("3", "", "Dmytro Haidashenko", "https://avatars1.githubusercontent.com/u/34754799?s=96&v=4"),
-                NearbyUserRecord("4", "", "Roman Malyshev", "https://avatars2.githubusercontent.com/u/18058020?s=96&v=4"),
-                NearbyUserRecord("5", "", "Maksym Shopynskyi", "https://avatars1.githubusercontent.com/u/17788043?s=96&v=4"),
-                NearbyUserRecord("6", "", "Terry from Bangladesh", "https://lh5.googleusercontent.com/-s0RiLjDDTsU/AAAAAAAAAAI/AAAAAAAAAGI/t5nhiF4Xg_U/photo.jpg?sz=128"),
-                NearbyUserRecord("7", "", "Максимка \uD83E\uDD8A", "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5c7e77a7625bb11abd843998/715241c7-3490-4084-9aae-bb92dc67e390/128?size=72&s=72"),
-                NearbyUserRecord("404", "nobody@mail.com", "Mr. Nobody", null)
-        ).shuffled()
-
-        Observable.intervalRange(0, mock.size.toLong(), 3000, 1800, TimeUnit.MILLISECONDS)
-                .compose(ObservableTransformers.defaultSchedulers())
-                .subscribe { i ->
-                     onNewUsersNearby(listOf(mock[i.toInt()]))
-                }
-                .addTo(compositeDisposable)
     }
 
     private fun initToolbar() {
