@@ -91,7 +91,7 @@ open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val filter: ((BalanceRecord) -> Boolean)? =
                 if (!repositoryProvider.kycState().isActualOrForcedGeneral)
-                    { it: BalanceRecord -> it.asset.ownerAccountId == accountId }
+                    { it: BalanceRecord -> it.asset.isOwnedBy(accountId) }
                 else
                     null
 

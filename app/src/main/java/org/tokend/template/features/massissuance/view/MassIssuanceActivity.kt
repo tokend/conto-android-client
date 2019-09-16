@@ -121,7 +121,7 @@ class MassIssuanceActivity : BaseActivity() {
                 .itemsList
                 .sortedWith(balanceComparator)
                 .map(BalanceRecord::asset)
-                .filter { it.ownerAccountId == accountId }
+                .filter { it.isOwnedBy(accountId) }
 
         if (ownedAssets.isEmpty()) {
             finishWithError(IllegalStateException("No owned assets found"))

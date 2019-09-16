@@ -38,6 +38,10 @@ class AssetRecord(
     val isBase: Boolean
         get() = checkPolicy(policy, org.tokend.wallet.xdr.AssetPolicy.BASE_ASSET.value)
 
+    fun isOwnedBy(accountId: String?): Boolean {
+        return ownerAccountId == accountId
+    }
+
     override fun equals(other: Any?): Boolean {
         return other is AssetRecord
                 && other.code == this.code

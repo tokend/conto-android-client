@@ -12,7 +12,7 @@ class WithdrawAmountFragment : AmountInputFragment() {
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { it.asset.isWithdrawable && it.available.signum() > 0  }
+        ) { it.asset.isWithdrawable && it.hasAvailableAmount  }
     }
 
     override fun getTitleText(): String? {

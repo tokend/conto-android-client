@@ -203,8 +203,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                 .itemsList
                 .sortedWith(balanceComparator)
                 .filter {
-                    it.available.signum() > 0 &&
-                            (companyId == null || it.asset.ownerAccountId == companyId)
+                    it.hasAvailableAmount && (companyId == null || it.asset.isOwnedBy(companyId))
                 }
                 .map {
                     val ownerName =
