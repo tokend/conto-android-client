@@ -116,7 +116,7 @@ class PollsFragment : BaseFragment(), ToolbarProvider {
         if (requiredOwnerAccountId != null) {
             assets
                     .find {
-                        it.ownerAccountId == requiredOwnerAccountId
+                        it.isOwnedBy(requiredOwnerAccountId)
                     }
                     ?.also {
                         currentAsset = it

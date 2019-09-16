@@ -59,7 +59,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     private val balances: List<BalanceRecord>
         get() = balancesRepository
                 .itemsList
-                .filter { it.available.signum() > 0 }
+                .filter(BalanceRecord::hasAvailableAmount)
 
     private val requiredAssetCode: String?
         get() = arguments?.getString(ASSET_EXTRA)

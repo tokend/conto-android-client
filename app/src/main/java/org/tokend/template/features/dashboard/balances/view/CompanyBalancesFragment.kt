@@ -27,7 +27,7 @@ class CompanyBalancesFragment : BalancesFragment() {
                 {
                     navigator.openScanRedemption()
                 },
-                isEnabled = balances.any { it.asset.ownerAccountId == companyId }
+                isEnabled = balances.any { it.asset.isOwnedBy(companyId) }
         ))
 
         // Send.
@@ -51,7 +51,7 @@ class CompanyBalancesFragment : BalancesFragment() {
                 {
                     navigator.openMassIssuance()
                 },
-                isEnabled = balances.any { it.asset.ownerAccountId == companyId }
+                isEnabled = balances.any { it.asset.isOwnedBy(companyId) }
         ))
 
         return actions

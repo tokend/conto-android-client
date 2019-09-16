@@ -43,4 +43,7 @@ class BalanceRecord(
 
     val assetCode: String
         get() = asset.code
+
+    val hasAvailableAmount: Boolean
+        get() = available.signum() > 0
 }

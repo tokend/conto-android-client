@@ -105,7 +105,7 @@ class CompanyDetailsActivity : BaseActivity() {
                 .balances()
                 .itemsList
                 .any {
-                    it.asset.ownerAccountId == companyId && it.available.signum() > 0
+                    it.asset.isOwnedBy(companyId) && it.hasAvailableAmount
                 }
 
         if (!hasNonZeroBalance) {

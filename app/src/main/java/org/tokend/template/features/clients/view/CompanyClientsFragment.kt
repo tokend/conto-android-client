@@ -8,7 +8,9 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.fragment_company_clients.*
@@ -154,7 +156,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                 {
                     navigator.openScanRedemption()
                 },
-                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+                isEnabled = balances.any { it.asset.isOwnedBy(accountId) }
         ))
 
         // Invite.
@@ -175,7 +177,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                 {
                     navigator.openMassIssuance(requestCode = MASS_ISSUANCE_REQUEST)
                 },
-                isEnabled = balances.any { it.asset.ownerAccountId == accountId }
+                isEnabled = balances.any { it.asset.isOwnedBy(accountId) }
         ))
 
         return actions

@@ -142,14 +142,14 @@ class BalanceDetailsActivity : BaseActivity() {
 
         val actions = mutableListOf<FloatingActionMenuAction>()
 
-        if (asset?.ownerAccountId == accountId
+        if (asset?.isOwnedBy(accountId) == true
                 && !repositoryProvider.kycState().isActualOrForcedGeneral) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,
                     R.drawable.ic_issuance_white,
                     {
-                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        val assetCode = asset.code
                         navigator.openMassIssuance(assetCode = assetCode)
                     }
             ))

@@ -98,7 +98,7 @@ class PaymentAmountFragment : AmountInputFragment() {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val ownerFilter: ((BalanceRecord) -> Boolean) =
                 if (!repositoryProvider.kycState().isActualOrForcedGeneral)
-                    { it: BalanceRecord -> it.asset.ownerAccountId == accountId }
+                    { it: BalanceRecord -> it.asset.isOwnedBy(accountId) }
                 else
                     { _: BalanceRecord -> true }
 
@@ -107,7 +107,7 @@ class PaymentAmountFragment : AmountInputFragment() {
                 amountFormatter,
                 balanceComparator,
                 balancesRepository
-        ) { it.asset.isTransferable && it.available.signum() > 0 && ownerFilter(it) }
+        ) { it.asset.isTransferable && it.hasAvailableAmount && ownerFilter(it) }
     }
 
     override fun getExtraView(parent: ViewGroup): View? {
