@@ -21,6 +21,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
+import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.PublishSubject
@@ -446,8 +447,19 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         }
     }
 
+    private var shakeDetectionPostponed = false
     private fun onShakingDetected() {
+        if (shakeDetectionPostponed) {
+            return
+        }
+
         Navigator.from(this).openShakeToPay()
+        
+        shakeDetectionPostponed = true
+        Completable.complete()
+                .delay(1, TimeUnit.SECONDS)
+                .subscribe { shakeDetectionPostponed = false }
+                .addTo(compositeDisposable)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
