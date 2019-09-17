@@ -63,10 +63,6 @@ class UnlockAppActivity : BaseActivity() {
     private lateinit var email: String
     private var lastEnteredPassword: CharArray? = null
 
-    private val animationDuration: Long by lazy {
-        this.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-    }
-
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_unlock_app)
 

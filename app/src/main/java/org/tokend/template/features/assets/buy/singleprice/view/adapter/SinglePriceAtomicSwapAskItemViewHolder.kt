@@ -7,7 +7,7 @@ import android.widget.TextView
 import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
-import org.tokend.template.view.util.LogoUtil
+import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
 class SinglePriceAtomicSwapAskItemViewHolder(
@@ -21,11 +21,8 @@ class SinglePriceAtomicSwapAskItemViewHolder(
     private val companyNameTextView: TextView = view.findViewById(R.id.company_name_text_view)
     private val buyButton: Button = view.findViewById(R.id.buy_btn)
 
-    private val logoSize =
-            view.context.resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
-
     override fun bind(item: SinglePriceAtomicSwapAskListItem) {
-        LogoUtil.setLogo(logoImageView, item.asset.code, item.logoUrl, logoSize)
+        CircleLogoUtil.setLogo(logoImageView, item.asset.code, item.logoUrl)
         assetNameTextView.text = item.asset.name ?: item.asset.code
         priceTextView.text = view.context.getString(
                 R.string.template_price,
