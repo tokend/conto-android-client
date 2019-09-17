@@ -24,7 +24,6 @@ import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAsksAdapte
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.wallet.WalletEventsListener
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 
@@ -148,7 +147,7 @@ class AtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun openBuy(ask: AtomicSwapAskRecord) {
-        Navigator.from(this).openAtomicSwapBuy(ask, BUY_REQUEST)
+        TODO("Buy with atomic swap is no more supported")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
