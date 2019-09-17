@@ -41,12 +41,13 @@ class LogoFactory(private val context: Context) {
                               @ColorInt
                               fontColor: Int = ContextCompat.getColor(context, R.color.white)
     ): Bitmap {
-        val string = mainValue + values.filterNotNull().joinToString("")
+        val main = mainValue.toUpperCase()
+        val string = main + values.filterNotNull().joinToString("")
         val code = string.toCharArray().fold(0) { result, char ->
             (31 * result + char.toInt()) % colors.size
         }
         val background = colors[code]
-        return getForValue(mainValue, size, background, fontColor)
+        return getForValue(main, size, background, fontColor)
     }
 
     /**
@@ -60,7 +61,10 @@ class LogoFactory(private val context: Context) {
                     @ColorInt
                     fontColor: Int
     ): Bitmap {
-        val letter = value.firstOrNull()?.toString()
+        val letter = value
+                .firstOrNull(Char::isLetter)
+                ?.toString()
+                ?: "O"
         val key = "${value}_$size"
         val cached = cache.get(key)
         return cached

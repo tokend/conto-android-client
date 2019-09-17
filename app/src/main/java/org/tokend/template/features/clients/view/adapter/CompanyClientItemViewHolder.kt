@@ -60,7 +60,7 @@ class CompanyClientItemViewHolder(
         clientIcon = BitmapDrawable(
                 itemView.context.resources,
                 logoFactory.getWithAutoBackground(item.name
-                        ?: item.email.toUpperCase(), logoSize, item.id)
+                        ?: item.email.toUpperCase(), logoSize, item.email)
         )
 
         initState(item.isChecked)

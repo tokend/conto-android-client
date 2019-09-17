@@ -358,10 +358,9 @@ class BalanceDetailsActivity : BaseActivity() {
 
         asset_name_text_view.text = balance.asset.name ?: balance.assetCode
 
-        CircleLogoUtil.setLogo(
+        CircleLogoUtil.setAssetLogo(
                 asset_logo_image_view,
-                balance.assetCode,
-                balance.asset.logoUrl
+                balance.asset
         )
 
         if (balance.convertedAmount != null

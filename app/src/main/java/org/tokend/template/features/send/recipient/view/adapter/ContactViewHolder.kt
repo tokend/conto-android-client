@@ -2,7 +2,6 @@ package org.tokend.template.features.send.recipient.view.adapter
 
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
-import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import kotlinx.android.synthetic.main.item_contact.view.*
 import org.jetbrains.anko.onClick
@@ -10,7 +9,7 @@ import org.tokend.template.R
 import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
-import org.tokend.template.view.util.ImageViewUtil
+import org.tokend.template.view.util.CircleLogoUtil
 
 class ContactViewHolder(itemView: View) : BaseViewHolder<Any>(itemView) {
     private val photoSize =
@@ -36,12 +35,7 @@ class ContactViewHolder(itemView: View) : BaseViewHolder<Any>(itemView) {
     override fun bind(item: Any) {
         item as ContactListItem
 
-        val placeholder = BitmapDrawable(
-                itemView.context.resources,
-                logoFactory.getWithAutoBackground(item.name, photoSize, item.id)
-        )
-
-        ImageViewUtil.loadImageCircle(image, item.photoUri, placeholder)
+        CircleLogoUtil.setPersonLogo(image, item.photoUri, item.id, item.name)
 
         name.text = item.name
 

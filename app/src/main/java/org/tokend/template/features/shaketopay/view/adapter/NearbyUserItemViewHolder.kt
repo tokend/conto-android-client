@@ -12,7 +12,7 @@ class NearbyUserItemViewHolder(view: View) : BaseViewHolder<NearbyUserListItem>(
     private val nameTextView: TextView = view.findViewById(R.id.name_text_view)
 
     override fun bind(item: NearbyUserListItem) {
-        CircleLogoUtil.setLogo(avatarImageView, item.name, item.avatarUrl)
+        CircleLogoUtil.setPersonLogo(avatarImageView, item.avatarUrl, item.id, item.name)
         nameTextView.text = item.name
     }
 }

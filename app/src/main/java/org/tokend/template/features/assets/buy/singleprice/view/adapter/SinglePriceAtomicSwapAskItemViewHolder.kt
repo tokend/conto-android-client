@@ -22,7 +22,7 @@ class SinglePriceAtomicSwapAskItemViewHolder(
     private val buyButton: Button = view.findViewById(R.id.buy_btn)
 
     override fun bind(item: SinglePriceAtomicSwapAskListItem) {
-        CircleLogoUtil.setLogo(logoImageView, item.asset.code, item.logoUrl)
+        CircleLogoUtil.setAssetLogo(logoImageView, item.asset)
         assetNameTextView.text = item.asset.name ?: item.asset.code
         priceTextView.text = view.context.getString(
                 R.string.template_price,

@@ -5,6 +5,7 @@ import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.balances.BalanceItemView
 import org.tokend.template.view.balances.BalanceItemViewImpl
+import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
 class BalanceItemViewHolder(
@@ -13,7 +14,7 @@ class BalanceItemViewHolder(
 ) : BaseViewHolder<BalanceListItem>(view), BalanceItemView by BalanceItemViewImpl(view) {
 
     override fun bind(item: BalanceListItem) {
-        displayLogo(item.logoUrl, item.asset.code)
+        CircleLogoUtil.setAssetLogo(logoImageView, item.asset)
 
         nameTextView.text = item.displayedName
 
