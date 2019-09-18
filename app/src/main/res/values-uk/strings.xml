@@ -536,4 +536,9 @@
     <string name="obtaining_location_progress">Визначення місцезнаходження…</string>
     <string name="no_nearby_users_found">Ніхто не знайшовся</string>
     <string name="people_nearby_enumeration">Люди поблизу:</string>
+    <string name="swap_state_needs_your_confirmation">Необхідне ваше підтвердження</string>
+    <string name="swap_state_needs_counterparty_confirmation">Необхідне підтвердження контрагента</string>
+    <string name="swap_state_claim_available">Можна отримати кошти</string>
+    <string name="swap_state_completed">Завершено</string>
+    <string name="swaps_screen_title">Обміни</string>
 </resources>

@@ -7,6 +7,7 @@ import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.fees.adapter.FeeListItem
 import org.tokend.template.features.kyc.model.KycForm
+import org.tokend.template.features.swap.model.SwapState
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.view.assetchart.AssetChartScale
 import org.tokend.wallet.xdr.FeeType
@@ -157,6 +158,21 @@ class LocalizedName(private val context: Context) {
                 context.getString(R.string.company_client_active)
             CompanyClientRecord.Status.BLOCKED ->
                 context.getString(R.string.company_client_blocked)
+        }
+    }
+
+    fun forSwapState(state: SwapState,
+                     isIncoming: Boolean): String {
+        return when (state) {
+            SwapState.CREATED ->
+                if (isIncoming)
+                    context.getString(R.string.swap_state_needs_your_confirmation)
+                else
+                    context.getString(R.string.swap_state_needs_counterparty_confirmation)
+            SwapState.ABILITY_TO_RECEIVE ->
+                context.getString(R.string.swap_state_claim_available)
+            SwapState.COMPLETED ->
+                context.getString(R.string.swap_state_completed)
         }
     }
 }

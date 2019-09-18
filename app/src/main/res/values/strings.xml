@@ -525,6 +525,11 @@
     <string name="obtaining_location_progress">Obtaining your location…</string>
     <string name="no_nearby_users_found">No one found</string>
     <string name="people_nearby_enumeration">People nearby:</string>
+    <string name="swap_state_needs_your_confirmation">Needs your confirmation</string>
+    <string name="swap_state_needs_counterparty_confirmation">Needs counterparty confirmation</string>
+    <string name="swap_state_claim_available">Can be received</string>
+    <string name="swap_state_completed">Completed</string>
+    <string name="swaps_screen_title">Swaps</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
