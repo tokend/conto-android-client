@@ -6,8 +6,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.v3.accounts.AccountsApiV3
-import org.tokend.sdk.api.v3.balances.BalancesApi
 import org.tokend.sdk.api.v3.balances.params.ConvertedBalancesParams
 import org.tokend.sdk.utils.extentions.isNotFound
 import org.tokend.template.data.model.Asset
@@ -40,14 +38,11 @@ class BalancesRepository(
     var conversionAsset: Asset? = null
 
     override fun getItems(): Single<List<BalanceRecord>> {
-        val signedApi = apiProvider.getSignedApi()
-                ?: return Single.error(IllegalStateException("No signed API instance found"))
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Single.error(IllegalStateException("No wallet info found"))
 
         return if (conversionAssetCode != null)
             getConvertedBalances(
-                    signedApi.v3.balances,
                     accountId,
                     urlConfigProvider,
                     mapper,
@@ -59,7 +54,6 @@ class BalancesRepository(
                             Log.e("BalancesRepo",
                                     "This env is unable to convert balances into $conversionAssetCode")
                             getBalances(
-                                    signedApi.v3.accounts,
                                     accountId,
                                     urlConfigProvider,
                                     mapper
@@ -69,18 +63,44 @@ class BalancesRepository(
                     }
         else
             getBalances(
-                    signedApi.v3.accounts,
                     accountId,
                     urlConfigProvider,
                     mapper
             )
     }
 
-    private fun getConvertedBalances(signedBalancesApi: BalancesApi,
-                                     accountId: String,
+    private fun getConvertedBalances(accountId: String,
                                      urlConfigProvider: UrlConfigProvider,
                                      mapper: ObjectMapper,
                                      conversionAssetCode: String): Single<List<BalanceRecord>> {
+        val systemsCount = urlConfigProvider.getConfigsCount()
+        return Single.merge(
+                (0 until systemsCount)
+                        .map { index ->
+                            getSystemConvertedBalances(
+                                    index, accountId,
+                                    urlConfigProvider,
+                                    mapper,
+                                    conversionAssetCode
+                            )
+                        }
+        )
+                .collect(
+                        { mutableListOf<List<BalanceRecord>>() },
+                        { a, b -> a.add(b) }
+                )
+                .map { it.flatten() }
+    }
+
+    private fun getSystemConvertedBalances(index: Int,
+                                           accountId: String,
+                                           urlConfigProvider: UrlConfigProvider,
+                                           mapper: ObjectMapper,
+                                           conversionAssetCode: String): Single<List<BalanceRecord>> {
+        val signedBalancesApi = apiProvider.getSignedApi(index)?.v3?.balances
+                ?: return Single.error(IllegalStateException("No signed API found for system $index"))
+        val urlConfig = urlConfigProvider.getConfig(index)
+
         return signedBalancesApi
                 .getConvertedBalances(
                         accountId = accountId,
@@ -106,16 +126,35 @@ class BalancesRepository(
                     convertedBalances
                             .states
                             .mapSuccessful {
-                                BalanceRecord(it, urlConfigProvider.getConfig(),
-                                        mapper, conversionAsset, companiesMap)
+                                BalanceRecord(it, urlConfig, mapper, conversionAsset, companiesMap)
                             }
                 }
     }
 
-    private fun getBalances(signedAccountsApi: AccountsApiV3,
-                            accountId: String,
+    private fun getBalances(accountId: String,
                             urlConfigProvider: UrlConfigProvider,
                             mapper: ObjectMapper): Single<List<BalanceRecord>> {
+        val systemsCount = urlConfigProvider.getConfigsCount()
+        return Single.merge(
+                (0 until systemsCount)
+                        .map { index ->
+                            getSystemBalances(index, accountId, urlConfigProvider, mapper)
+                        }
+        ).collect(
+                { mutableListOf<List<BalanceRecord>>() },
+                { a, b -> a.add(b) }
+        )
+                .map { it.flatten() }
+    }
+
+    private fun getSystemBalances(index: Int,
+                                  accountId: String,
+                                  urlConfigProvider: UrlConfigProvider,
+                                  mapper: ObjectMapper): Single<List<BalanceRecord>> {
+        val signedAccountsApi = apiProvider.getSignedApi(index)?.v3?.accounts
+                ?: return Single.error(IllegalStateException("No signed API found for system $index"))
+        val urlConfig = urlConfigProvider.getConfig(index)
+
         return signedAccountsApi
                 .getBalances(accountId)
                 .toSingle()
@@ -127,9 +166,14 @@ class BalancesRepository(
                 .map { (sourceList, companiesMap) ->
                     sourceList
                             .mapSuccessful {
-                                BalanceRecord(it, urlConfigProvider.getConfig(),
-                                        mapper, companiesMap)
+                                BalanceRecord(it, urlConfig, mapper, companiesMap)
                             }
+                }
+                .onErrorResumeNext { error ->
+                    if (error is HttpException && error.isNotFound())
+                        Single.just(emptyList())
+                    else
+                        Single.error(error)
                 }
     }
 

@@ -2,6 +2,5 @@
 // for "staging" builds.
 ext {
     enable_analytics = false
-    available_envs = ['staging','production', 'demo']
-    default_env_id = 'staging'
+    available_envs = ['multi_system']
 }

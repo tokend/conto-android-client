@@ -40,6 +40,22 @@ class AppEnvironmentsManager(
                             storage = "https://s3.eu-north-1.amazonaws.com/contodemo-identity-storage-stoic-haslett",
                             client = "https://demo.conto.me"
                     )
+            ),
+            AppEnvironment(
+                    name = "Multiple systems",
+                    id = "multi_system",
+                    configs = listOf(
+                            UrlConfig(
+                                    api = "https://api.staging.conto.me",
+                                    storage = "https://s3.eu-north-1.amazonaws.com/contostaging-identity-storage-festive-cannon-2",
+                                    client = "https://staging.conto.me"
+                            ),
+                            UrlConfig(
+                                    api = "https://api.conto.me",
+                                    storage = "https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver",
+                                    client = "https://conto.me"
+                            )
+                    )
             )
     ).apply { extraEnv?.also { add(it) } }.associateBy(AppEnvironment::id)
 
