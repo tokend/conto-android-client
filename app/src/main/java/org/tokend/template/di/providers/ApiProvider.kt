@@ -4,8 +4,8 @@ import org.tokend.sdk.api.TokenDApi
 import org.tokend.sdk.keyserver.KeyServer
 
 interface ApiProvider {
-    fun getApi(): TokenDApi
-    fun getSignedApi(): TokenDApi?
-    fun getKeyServer(): KeyServer
-    fun getSignedKeyServer(): KeyServer?
+    fun getApi(index: Int = 0): TokenDApi
+    fun getSignedApi(index: Int = 0): TokenDApi?
+    fun getKeyServer(index: Int = 0): KeyServer
+    fun getSignedKeyServer(index: Int = 0): KeyServer?
 }

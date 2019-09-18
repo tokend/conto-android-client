@@ -14,9 +14,6 @@ class ApiProviderImpl(
         private val accountProvider: AccountProvider,
         private val tfaCallback: TfaCallback?,
         cookieJar: CookieJar?) : ApiProvider {
-    private val url: String
-        get() = urlConfigProvider.getConfig().api
-
     private var cookieJarProvider = cookieJar?.let {
         object : CookieJarProvider {
             override fun getCookieJar(): CookieJar {
@@ -31,7 +28,12 @@ class ApiProviderImpl(
     private var apiByHash: Pair<Int, TokenDApi>? = null
     private var signedApiByHash: Pair<Int, TokenDApi>? = null
 
-    override fun getApi(): TokenDApi = synchronized(this) {
+    private fun getUrl(index: Int): String {
+        return urlConfigProvider.getConfig(index).api
+    }
+
+    override fun getApi(index: Int): TokenDApi = synchronized(this) {
+        val url = getUrl(index)
         val hash = url.hashCode()
 
         val api = apiByHash
@@ -52,12 +54,13 @@ class ApiProviderImpl(
         return api
     }
 
-    override fun getKeyServer(): KeyServer {
+    override fun getKeyServer(index: Int): KeyServer {
         return KeyServer(getApi().wallets)
     }
 
-    override fun getSignedApi(): TokenDApi? = synchronized(this) {
+    override fun getSignedApi(index: Int): TokenDApi? = synchronized(this) {
         val account = accountProvider.getAccount() ?: return null
+        val url = getUrl(index)
         val hash = HashCodes.ofMany(account.accountId, url)
 
         val signedApi =
@@ -79,7 +82,7 @@ class ApiProviderImpl(
         return signedApi
     }
 
-    override fun getSignedKeyServer(): KeyServer? {
+    override fun getSignedKeyServer(index: Int): KeyServer? {
         return getSignedApi()?.let { KeyServer(it.wallets) }
     }
 }

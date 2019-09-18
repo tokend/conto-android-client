@@ -203,13 +203,11 @@ class App : MultiDexApplication() {
         cookiePersistor = SharedPrefsCookiePersistor(this)
         cookieCache = SetCookieCache()
 
-        val urlConfigProvider = UrlConfigProviderFactory().createUrlConfigProvider()
         val defaultUrlConfig = UrlConfig(BuildConfig.API_URL, BuildConfig.STORAGE_URL,
                 BuildConfig.CLIENT_URL)
         val appEnvironmentsManager = AppEnvironmentsManager(
                 availableEnvIds = BuildConfig.AVAILABLE_ENV_IDS,
                 defaultEnvId = BuildConfig.DEFAULT_ENV_ID,
-                urlConfigProvider = urlConfigProvider,
                 preferences = getAppPreferences(),
                 extraEnv = AppEnvironment(
                         id = "config",
@@ -217,7 +215,8 @@ class App : MultiDexApplication() {
                         config = defaultUrlConfig
                 )
         )
-        appEnvironmentsManager.initEnvironment()
+        val urlConfigProvider = UrlConfigProviderFactory()
+                .createUrlConfigProvider(appEnvironmentsManager)
 
         stateComponent = DaggerAppStateComponent.builder()
                 .appModule(AppModule(this))

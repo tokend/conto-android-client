@@ -1,6 +1,5 @@
 package org.tokend.template.logic
 
-import org.tokend.sdk.factory.GsonFactory
 import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.logic.persistance.UrlConfigPersistor
@@ -18,18 +17,7 @@ class UrlConfigManager(
      * Sets given config to the provider and saves it to the persist
      */
     fun setFromJson(jsonConfig: String): Boolean {
-        return try {
-            val config = GsonFactory().getBaseGson().fromJson(jsonConfig, UrlConfig::class.java)
-
-            urlConfigProvider.setConfig(config)
-            urlConfigPersistor.saveConfig(config)
-
-            listener?.invoke()
-
-            true
-        } catch (e: Exception) {
-            false
-        }
+        TODO("User-defined URL configs are not allowed in Conto")
     }
 
     /**

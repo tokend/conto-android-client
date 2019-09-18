@@ -5,8 +5,11 @@ import org.tokend.template.data.model.UrlConfig
 class AppEnvironment(
         val id: String,
         val name: String,
-        val config: UrlConfig
+        val configs: List<UrlConfig>
 ) {
+    constructor(id: String, name: String, config: UrlConfig)
+            : this(id, name, listOf(config))
+
     override fun equals(other: Any?): Boolean {
         return other is AppEnvironment && other.id == this.id
     }

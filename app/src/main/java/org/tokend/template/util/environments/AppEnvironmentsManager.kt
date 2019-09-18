@@ -4,12 +4,10 @@ import android.content.SharedPreferences
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.tokend.template.data.model.UrlConfig
-import org.tokend.template.di.providers.UrlConfigProvider
 
 class AppEnvironmentsManager(
         availableEnvIds: Array<String>,
         private val defaultEnvId: String,
-        private val urlConfigProvider: UrlConfigProvider,
         private val preferences: SharedPreferences,
         private val extraEnv: AppEnvironment? = null
 ) {
@@ -49,15 +47,11 @@ class AppEnvironmentsManager(
 
     val environmentChanges: Observable<AppEnvironment> = environmentChangesSubject
 
-    val defaultEnvironment = availableEnvironments
+    private val defaultEnvironment = availableEnvironments
             .find { it.id == defaultEnvId }
             ?: throw IllegalArgumentException("No environment available with ID $defaultEnvId")
 
     fun getEnvironment(): AppEnvironment = loadEnvironment() ?: defaultEnvironment
-
-    fun initEnvironment() {
-        applyEnvironment(getEnvironment())
-    }
 
     fun setEnvironment(environment: AppEnvironment) {
         if (environment == getEnvironment()) {
@@ -65,12 +59,7 @@ class AppEnvironmentsManager(
         }
 
         saveEnvironment(environment)
-        applyEnvironment(environment)
         environmentChangesSubject.onNext(environment)
-    }
-
-    private fun applyEnvironment(environment: AppEnvironment) {
-        urlConfigProvider.setConfig(environment.config)
     }
 
     // region Persistence
