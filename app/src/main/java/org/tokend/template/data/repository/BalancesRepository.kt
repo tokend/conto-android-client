@@ -126,7 +126,8 @@ class BalancesRepository(
                     convertedBalances
                             .states
                             .mapSuccessful {
-                                BalanceRecord(it, urlConfig, mapper, conversionAsset, companiesMap)
+                                BalanceRecord(it, urlConfig, mapper,
+                                        conversionAsset, companiesMap, index)
                             }
                 }
     }
@@ -166,7 +167,7 @@ class BalancesRepository(
                 .map { (sourceList, companiesMap) ->
                     sourceList
                             .mapSuccessful {
-                                BalanceRecord(it, urlConfig, mapper, companiesMap)
+                                BalanceRecord(it, urlConfig, mapper, companiesMap, index)
                             }
                 }
                 .onErrorResumeNext { error ->

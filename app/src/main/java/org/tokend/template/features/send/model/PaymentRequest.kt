@@ -15,5 +15,6 @@ data class PaymentRequest(
         val fee: PaymentFee,
         val paymentSubject: String?,
         val actualPaymentSubject: String?,
+        val systemIndex: Int,
         val reference: String = SecureRandom.getSeed(16).encodeBase64String()
 ) : Serializable

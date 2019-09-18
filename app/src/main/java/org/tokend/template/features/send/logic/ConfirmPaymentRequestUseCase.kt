@@ -4,6 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.tokend.template.di.providers.AccountProvider
+import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.logic.transactions.TxManager
@@ -22,8 +23,9 @@ class ConfirmPaymentRequestUseCase(
         private val request: PaymentRequest,
         private val accountProvider: AccountProvider,
         private val repositoryProvider: RepositoryProvider,
-        private val txManager: TxManager
+        apiProvider: ApiProvider
 ) {
+    private val txManager = TxManager(apiProvider.getApi(request.systemIndex).v3.transactions)
     private lateinit var networkParams: NetworkParams
 
     fun perform(): Completable {
@@ -78,7 +80,7 @@ class ConfirmPaymentRequestUseCase(
     private fun getNetworkParams(): Single<NetworkParams> {
         return repositoryProvider
                 .systemInfo()
-                .getNetworkParams()
+                .getNetworkParams(request.systemIndex)
     }
 
     private fun updateRepositories() {

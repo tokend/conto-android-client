@@ -169,7 +169,7 @@ class PaymentConfirmationActivity : BaseActivity() {
                 request,
                 accountProvider,
                 repositoryProvider,
-                TxManager(apiProvider)
+                apiProvider
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())

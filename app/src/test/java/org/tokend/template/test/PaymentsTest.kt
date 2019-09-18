@@ -137,7 +137,7 @@ class PaymentsTest {
                 request,
                 session,
                 repositoryProvider,
-                txManager
+                apiProvider
         ).perform().blockingAwait()
 
         Thread.sleep(500)
@@ -239,7 +239,7 @@ class PaymentsTest {
                 request,
                 session,
                 repositoryProvider,
-                txManager
+                apiProvider
         ).perform().blockingAwait()
 
         Thread.sleep(500)

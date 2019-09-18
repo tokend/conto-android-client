@@ -5,6 +5,7 @@ import io.reactivex.rxkotlin.toMaybe
 import org.tokend.sdk.factory.GsonFactory
 import org.tokend.sdk.keyserver.models.WalletInfo
 import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.di.providers.WalletInfoProvider
@@ -30,7 +31,7 @@ class CreatePaymentRequestUseCase(
     class SendToYourselfException : Exception()
 
     private lateinit var senderAccount: String
-    private lateinit var senderBalance: String
+    private lateinit var senderBalance: BalanceRecord
     private var subjectContent = subject
 
     fun perform(): Single<PaymentRequest> {
@@ -66,7 +67,7 @@ class CreatePaymentRequestUseCase(
                 .switchIfEmpty(Single.error(IllegalStateException("Missing wallet info")))
     }
 
-    private fun getSenderBalance(): Single<String> {
+    private fun getSenderBalance(): Single<BalanceRecord> {
         return balancesRepository
                 .updateIfNotFreshDeferred()
                 .toSingleDefault(true)
@@ -74,7 +75,6 @@ class CreatePaymentRequestUseCase(
                     balancesRepository
                             .itemsList
                             .find { it.assetCode == asset.code }
-                            ?.id
                             .toMaybe()
                 }
                 .switchIfEmpty(Single.error(
@@ -101,11 +101,12 @@ class CreatePaymentRequestUseCase(
                         amount = amount,
                         asset = asset,
                         senderAccountId = senderAccount,
-                        senderBalanceId = senderBalance,
+                        senderBalanceId = senderBalance.id,
                         recipient = recipient,
                         fee = fee,
                         paymentSubject = subjectContent,
-                        actualPaymentSubject = subject
+                        actualPaymentSubject = subject,
+                        systemIndex = senderBalance.systemIndex
                 )
         )
     }
