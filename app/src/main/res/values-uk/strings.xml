@@ -541,4 +541,8 @@
     <string name="swap_state_claim_available">Можна отримати кошти</string>
     <string name="swap_state_completed">Завершено</string>
     <string name="swaps_screen_title">Обміни</string>
+    <string name="swap_counterparty">Контрагент</string>
+    <string name="error_invalid_counterparty">Некоректний контрагент</string>
+    <string name="create_swap">Створити обмін</string>
+    <string name="swap_asset_to_receive">Актив до отримання</string>
 </resources>

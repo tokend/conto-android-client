@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical">
 
     <include layout="@layout/appbar" />
 
@@ -32,10 +32,17 @@
                     android:paddingStart="@dimen/quarter_standard_margin"
                     android:paddingTop="@dimen/half_standard_margin"
                     android:paddingEnd="@dimen/quarter_standard_margin"
-                    android:paddingBottom="@dimen/standard_margin" />
+                    android:paddingBottom="@dimen/quadra_margin" />
             </LinearLayout>
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <include layout="@layout/include_appbar_elevation" />
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/add_fab"
+            style="@style/FloatingButton"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/standard_margin" />
     </FrameLayout>
 </LinearLayout>

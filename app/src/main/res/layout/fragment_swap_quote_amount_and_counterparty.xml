@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/standard_margin">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/asset_edit_text"
+            style="@style/EditText.OneLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="none"
+            app:met_floatingLabelAlwaysShown="true"
+            app:met_floatingLabelText="@string/swap_asset_to_receive"
+            tools:text="BTC" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/amount_edit_text"
+            style="@style/EditText.OneLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_padding"
+            android:gravity="start"
+            android:hint="@string/amount_label"
+            android:inputType="numberDecimal" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/recipient_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_margin">
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/counterparty_edit_text"
+                style="@style/EditText.OneLine"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_padding"
+                android:hint="@string/swap_counterparty"
+                android:inputType="text|textEmailAddress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/scan_qr_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/half_standard_padding"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/half_standard_margin"
+                android:scaleType="center"
+                app:layout_constraintEnd_toEndOf="@+id/counterparty_edit_text"
+                app:layout_constraintTop_toTopOf="@+id/counterparty_edit_text"
+                app:srcCompat="@drawable/ic_qr_code_scan" />
+        </android.support.constraint.ConstraintLayout>
+
+        <include layout="@layout/layout_progress" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_margin">
+
+            <Button
+                android:id="@+id/confirm_button"
+                style="@style/PrimaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:text="@string/go_to_confirmation_btn_label" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

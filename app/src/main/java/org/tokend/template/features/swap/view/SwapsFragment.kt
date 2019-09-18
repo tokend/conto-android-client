@@ -2,6 +2,7 @@ package org.tokend.template.features.swap.view
 
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,7 @@ import org.tokend.template.features.swap.view.adapter.SwapListItem
 import org.tokend.template.features.swap.view.adapter.SwapsAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
+import org.tokend.template.util.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import java.math.BigDecimal
 
@@ -34,6 +36,7 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
     override fun onInitAllowed() {
         initToolbar()
         initList()
+        initFab()
 
         displaySwaps()
     }
@@ -44,10 +47,22 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
         ElevationUtil.initScrollElevation(swaps_recycler_view, appbar_elevation_view)
     }
 
+    private val hideFabScrollListener =
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dy > 2) {
+                        add_fab.hideMenuButton(true)
+                    } else if (dy < -2 && add_fab.isEnabled) {
+                        add_fab.showMenuButton(true)
+                    }
+                }
+            }
+
     private fun initList() {
         adapter = SwapsAdapter(amountFormatter)
         swaps_recycler_view.layoutManager = LinearLayoutManager(requireContext())
         swaps_recycler_view.adapter = adapter
+        swaps_recycler_view.addOnScrollListener(hideFabScrollListener)
 
         adapter.onItemClick { _, item ->
             item.source?.also(this::openSwapDetails)
@@ -57,6 +72,12 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
             setEmptyDrawable(R.drawable.ic_shop_cart)
             observeAdapter(adapter, R.string.no_offers)
 //            setEmptyViewDenial { asksRepository.isNeverUpdated }
+        }
+    }
+
+    private fun initFab() {
+        add_fab.setOnMenuButtonClickListener {
+            Navigator.from(this).openSwapCreation()
         }
     }
 

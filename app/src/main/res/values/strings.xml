@@ -530,6 +530,10 @@
     <string name="swap_state_claim_available">Can be received</string>
     <string name="swap_state_completed">Completed</string>
     <string name="swaps_screen_title">Swaps</string>
+    <string name="swap_counterparty">Counterparty</string>
+    <string name="error_invalid_counterparty">Invalid counterparty</string>
+    <string name="create_swap">Create swap</string>
+    <string name="swap_asset_to_receive">Asset to receive</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

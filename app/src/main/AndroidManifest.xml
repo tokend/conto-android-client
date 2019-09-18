@@ -254,7 +254,11 @@
         <activity
             android:name=".features.shaketopay.view.ShakeToPayActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".features.swap.create.view.CreateSwapActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
     </application>
 
 </manifest>
