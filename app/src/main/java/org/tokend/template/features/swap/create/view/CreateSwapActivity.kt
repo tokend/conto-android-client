@@ -13,9 +13,13 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.send.model.PaymentRecipient
+import org.tokend.template.features.swap.create.logic.CreateSwapRequestUseCase
 import org.tokend.template.features.swap.create.model.SwapQuoteAmountAndCounterparty
+import org.tokend.template.features.swap.create.model.SwapRequest
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
 
 class CreateSwapActivity : BaseActivity() {
@@ -110,7 +114,31 @@ class CreateSwapActivity : BaseActivity() {
         this.quoteAsset = result.asset
         this.counterparty = result.counterparty
 
+        createRequestAndGoToConfirmation()
+    }
 
+    private fun createRequestAndGoToConfirmation() {
+        SoftInputUtil.hideSoftInput(this)
+
+        CreateSwapRequestUseCase(
+                baseAmount,
+                baseAsset,
+                quoteAmount,
+                quoteAsset,
+                counterparty,
+                repositoryProvider.balances(),
+                walletInfoProvider
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .subscribeBy(
+                        onSuccess = this::onSwapRequestCreated,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+    }
+
+    private fun onSwapRequestCreated(request: SwapRequest) {
+        Navigator.from(this).openSwapConfirmation(request, SWAP_CONFIRMATION_REQUEST)
     }
 
     private fun displayFragment(
@@ -137,5 +165,9 @@ class CreateSwapActivity : BaseActivity() {
         } else {
             supportFragmentManager.popBackStackImmediate()
         }
+    }
+
+    companion object {
+        private val SWAP_CONFIRMATION_REQUEST = "swap_confirmation".hashCode() and 0xffff
     }
 }

@@ -1,5 +1,7 @@
 package org.tokend.template.features.swap.create.view
 
+import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
@@ -26,6 +28,8 @@ import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import org.tokend.template.features.swap.create.model.SwapQuoteAmountAndCounterparty
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.PermissionManager
+import org.tokend.template.util.QrScannerUtil
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.AmountEditTextWrapper
@@ -35,6 +39,8 @@ import java.math.BigDecimal
 class SwapQuoteAmountAndCounterpartyFragment : BaseFragment() {
     private val resultSubject = PublishSubject.create<SwapQuoteAmountAndCounterparty>()
     val resultObservable: Observable<SwapQuoteAmountAndCounterparty> = resultSubject
+
+    private val cameraPermission = PermissionManager(Manifest.permission.CAMERA, 404)
 
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
@@ -97,6 +103,10 @@ class SwapQuoteAmountAndCounterpartyFragment : BaseFragment() {
     }
 
     private fun initButtons() {
+        scan_qr_button.setOnClickListener {
+            tryOpenQrScanner()
+        }
+
         confirm_button.setOnClickListener {
             tryToContinue()
         }
@@ -186,6 +196,26 @@ class SwapQuoteAmountAndCounterpartyFragment : BaseFragment() {
                 counterparty_edit_text.setErrorAndFocus(R.string.error_invalid_counterparty)
             else ->
                 errorHandlerFactory.getDefault().handle(error)
+        }
+    }
+
+    private fun tryOpenQrScanner() {
+        cameraPermission.check(this) {
+            QrScannerUtil.openScanner(this)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        cameraPermission.handlePermissionResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
+            counterparty_edit_text.setText(it)
+            counterparty_edit_text.setSelection(counterparty_edit_text.text?.length ?: 0)
+            tryToContinue()
         }
     }
 

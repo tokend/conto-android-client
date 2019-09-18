@@ -75,7 +75,9 @@ import org.tokend.template.features.signin.SignInActivity
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.signin.unlock.UnlockAppActivity
 import org.tokend.template.features.signup.SignUpActivity
+import org.tokend.template.features.swap.create.model.SwapRequest
 import org.tokend.template.features.swap.create.view.CreateSwapActivity
+import org.tokend.template.features.swap.create.view.SwapConfirmationActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
 import org.tokend.template.features.wallet.view.BalanceDetailsActivity
@@ -586,5 +588,12 @@ class Navigator private constructor() {
     fun openSwapCreation() {
         context?.intentFor<CreateSwapActivity>()
                 ?.also { performIntent(it) }
+    }
+
+    fun openSwapConfirmation(request: SwapRequest,
+                             requestCode: Int = 0) {
+        context?.intentFor<SwapConfirmationActivity>()
+                ?.putExtras(SwapConfirmationActivity.getBundle(request))
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 }

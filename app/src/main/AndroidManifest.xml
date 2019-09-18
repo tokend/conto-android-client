@@ -259,6 +259,9 @@
             android:name=".features.swap.create.view.CreateSwapActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
+            android:name=".features.swap.create.view.SwapConfirmationActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
     </application>
 
 </manifest>

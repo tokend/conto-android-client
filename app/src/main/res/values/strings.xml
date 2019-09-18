@@ -534,6 +534,7 @@
     <string name="error_invalid_counterparty">Invalid counterparty</string>
     <string name="create_swap">Create swap</string>
     <string name="swap_asset_to_receive">Asset to receive</string>
+    <string name="balance_change_cause_swap">Swap</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
