@@ -260,7 +260,8 @@ class UnlockAppActivity : BaseActivity() {
         SignInUseCase(
                 email,
                 password,
-                apiProvider.getKeyServer(),
+                apiProvider,
+                urlConfigProvider,
                 session,
                 credentialsPersistor,
                 PostSignInManager(repositoryProvider)

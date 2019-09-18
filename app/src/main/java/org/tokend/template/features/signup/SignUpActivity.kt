@@ -19,7 +19,6 @@ import org.jetbrains.anko.onCheckedChange
 import org.jetbrains.anko.onClick
 import org.tokend.crypto.ecdsa.erase
 import org.tokend.sdk.api.wallets.model.EmailAlreadyTakenException
-import org.tokend.sdk.keyserver.KeyServer
 import org.tokend.sdk.keyserver.models.WalletCreateResult
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
@@ -313,7 +312,8 @@ class SignUpActivity : BaseActivity() {
         SignInUseCase(
                 email,
                 password,
-                KeyServer(apiProvider.getApi().wallets),
+                apiProvider,
+                urlConfigProvider,
                 session,
                 credentialsPersistor,
                 PostSignInManager(repositoryProvider)
