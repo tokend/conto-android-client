@@ -47,6 +47,7 @@ class ClientCompaniesRepository(
                                    accountId: String): Single<List<CompanyRecord>> {
         val signedApi = apiProvider.getSignedApi(index)
                 ?: return Single.error(IllegalStateException("No signed API found for system $index"))
+        val urlConfig = urlConfigProvider.getConfig(index)
 
         val loader = SimplePagedResourceLoader({ nextCursor ->
             signedApi
@@ -66,7 +67,7 @@ class ClientCompaniesRepository(
                 .toSingle()
                 .map { companiesResources ->
                     companiesResources.mapSuccessful {
-                        CompanyRecord(it, urlConfigProvider.getConfig())
+                        CompanyRecord(it, urlConfig)
                     }
                 }
                 .onErrorResumeNext { error ->
