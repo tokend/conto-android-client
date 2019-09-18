@@ -16,14 +16,18 @@ import org.tokend.template.R
 import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.activities.MainActivity
 import org.tokend.template.activities.SingleFragmentActivity
-import org.tokend.template.data.model.*
+import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.AssetPairRecord
+import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
-import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
+import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
@@ -425,10 +429,10 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAtomicSwapBuy(ask: AtomicSwapAskRecord,
-                          requestCode: Int = 0) {
-        context?.intentFor<BuyWithAtomicSwapActivity>()
-                ?.putExtras(BuyWithAtomicSwapActivity.getBundle(ask))
+    fun openMarketplaceBuy(offer: MarketplaceOfferRecord,
+                           requestCode: Int = 0) {
+        context?.intentFor<BuyAssetOnMarketplaceActivity>()
+                ?.putExtras(BuyAssetOnMarketplaceActivity.getBundle(offer))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 

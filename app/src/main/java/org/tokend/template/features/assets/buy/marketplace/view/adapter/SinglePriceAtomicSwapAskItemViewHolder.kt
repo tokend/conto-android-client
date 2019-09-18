@@ -1,4 +1,4 @@
-package org.tokend.template.features.assets.buy.singleprice.view.adapter
+package org.tokend.template.features.assets.buy.marketplace.view.adapter
 
 import android.view.View
 import android.widget.Button
@@ -13,7 +13,7 @@ import org.tokend.template.view.util.formatter.AmountFormatter
 class SinglePriceAtomicSwapAskItemViewHolder(
         view: View,
         private val amountFormatter: AmountFormatter
-) : BaseViewHolder<SinglePriceAtomicSwapAskListItem>(view) {
+) : BaseViewHolder<MarketplaceOfferListItem>(view) {
     private val logoImageView: ImageView = view.findViewById(R.id.asset_logo_image_view)
     private val assetNameTextView: TextView = view.findViewById(R.id.asset_name_text_view)
     private val priceTextView: TextView = view.findViewById(R.id.price_text_view)
@@ -21,7 +21,7 @@ class SinglePriceAtomicSwapAskItemViewHolder(
     private val companyNameTextView: TextView = view.findViewById(R.id.company_name_text_view)
     private val buyButton: Button = view.findViewById(R.id.buy_btn)
 
-    override fun bind(item: SinglePriceAtomicSwapAskListItem) {
+    override fun bind(item: MarketplaceOfferListItem) {
         CircleLogoUtil.setAssetLogo(logoImageView, item.asset)
         assetNameTextView.text = item.asset.name ?: item.asset.code
         priceTextView.text = view.context.getString(
@@ -49,8 +49,8 @@ class SinglePriceAtomicSwapAskItemViewHolder(
         }
     }
 
-    override fun bind(item: SinglePriceAtomicSwapAskListItem,
-                      clickListener: SimpleItemClickListener<SinglePriceAtomicSwapAskListItem>?) {
+    override fun bind(item: MarketplaceOfferListItem,
+                      clickListener: SimpleItemClickListener<MarketplaceOfferListItem>?) {
         super.bind(item, clickListener)
         buyButton.setOnClickListener { clickListener?.invoke(view, item) }
     }

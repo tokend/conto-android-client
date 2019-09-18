@@ -1,19 +1,19 @@
-package org.tokend.template.features.assets.buy.singleprice.view.adapter
+package org.tokend.template.features.assets.buy.marketplace.view.adapter
 
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AtomicSwapAskRecord
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import java.math.BigDecimal
 
-class SinglePriceAtomicSwapAskListItem(
+class MarketplaceOfferListItem(
         val available: BigDecimal,
         val asset: Asset,
         val logoUrl: String?,
         val price: BigDecimal,
         val priceAsset: Asset,
         val companyName: String?,
-        val source: AtomicSwapAskRecord?
+        val source: MarketplaceOfferRecord?
 ) {
-    constructor(source: AtomicSwapAskRecord,
+    constructor(source: MarketplaceOfferRecord,
                 withCompany: Boolean) : this(
             available = source.amount,
             asset = source.asset,

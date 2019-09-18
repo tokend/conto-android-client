@@ -5,7 +5,7 @@ import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.AssetDetailsFragment
 import org.tokend.template.features.assets.ExploreAssetsFragment
-import org.tokend.template.features.assets.buy.singleprice.view.AllAtomicSwapAsksFragment
+import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
@@ -141,10 +141,10 @@ class FragmentFactory {
         return CompanyBalancesFragment.newInstance()
     }
 
-    fun getAllAtomicSwapAsksFragment(withToolbar: Boolean,
-                                     companyId: String?): Fragment {
-        return AllAtomicSwapAsksFragment.newInstance(
-                AllAtomicSwapAsksFragment.getBundle(companyId, withToolbar)
+    fun getMarketplaceFragment(withToolbar: Boolean,
+                               companyId: String?): Fragment {
+        return MarketplaceFragment.newInstance(
+                MarketplaceFragment.getBundle(companyId, withToolbar)
         )
     }
 

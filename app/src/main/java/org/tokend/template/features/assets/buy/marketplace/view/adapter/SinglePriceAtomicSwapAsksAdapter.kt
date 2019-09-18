@@ -1,4 +1,4 @@
-package org.tokend.template.features.assets.buy.singleprice.view.adapter
+package org.tokend.template.features.assets.buy.marketplace.view.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -10,21 +10,21 @@ import org.tokend.template.view.util.formatter.AmountFormatter
 
 class SinglePriceAtomicSwapAsksAdapter(
         private val amountFormatter: AmountFormatter
-) : PaginationRecyclerAdapter<SinglePriceAtomicSwapAskListItem,
-        BaseViewHolder<SinglePriceAtomicSwapAskListItem>>() {
-    class FooterViewHolder(v: View) : BaseViewHolder<SinglePriceAtomicSwapAskListItem>(v) {
-        override fun bind(item: SinglePriceAtomicSwapAskListItem) {}
+) : PaginationRecyclerAdapter<MarketplaceOfferListItem,
+        BaseViewHolder<MarketplaceOfferListItem>>() {
+    class FooterViewHolder(v: View) : BaseViewHolder<MarketplaceOfferListItem>(v) {
+        override fun bind(item: MarketplaceOfferListItem) {}
     }
 
-    override fun createFooterViewHolder(parent: ViewGroup): BaseViewHolder<SinglePriceAtomicSwapAskListItem> {
+    override fun createFooterViewHolder(parent: ViewGroup): BaseViewHolder<MarketplaceOfferListItem> {
         val view = parent.context
                 .layoutInflater.inflate(R.layout.list_item_loading_footer, parent, false)
         return FooterViewHolder(view)
     }
 
-    override fun bindFooterViewHolder(holder: BaseViewHolder<SinglePriceAtomicSwapAskListItem>) {}
+    override fun bindFooterViewHolder(holder: BaseViewHolder<MarketplaceOfferListItem>) {}
 
-    override fun createItemViewHolder(parent: ViewGroup): BaseViewHolder<SinglePriceAtomicSwapAskListItem> {
+    override fun createItemViewHolder(parent: ViewGroup): BaseViewHolder<MarketplaceOfferListItem> {
         val view = parent.context.layoutInflater.inflate(R.layout.list_item_single_price_atomic_swap_ask,
                 parent, false)
         return SinglePriceAtomicSwapAskItemViewHolder(view, amountFormatter)
