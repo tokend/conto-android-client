@@ -9,6 +9,7 @@ import java.math.BigDecimal
 import java.util.*
 
 class SwapRecord(
+        val id: String,
         val sourceAccountId: String,
         val destAccountId: String,
         val baseAmount: BigDecimal,
@@ -20,18 +21,21 @@ class SwapRecord(
         val state: SwapState,
         val isIncoming: Boolean,
         val createdAt: Date,
-        var counterpartyEmail: String?
+        var counterpartyEmail: String?,
+        val sourceSystemIndex: Int
 ) {
     companion object {
         fun fromResource(source: SwapResource,
                          secret: ByteArray?,
                          state: SwapState,
                          isIncoming: Boolean,
-                         objectMapper: ObjectMapper): SwapRecord {
+                         objectMapper: ObjectMapper,
+                         sourceSystemIndex: Int): SwapRecord {
             val quoteAmountDetails =
                     objectMapper.treeToValue(source.details, SwapQuoteAmountDetails::class.java)
 
             return SwapRecord(
+                    id = source.id,
                     sourceAccountId = source.source.id,
                     destAccountId = source.destination.id,
                     baseAmount = source.amount,
@@ -44,19 +48,12 @@ class SwapRecord(
                     state = state,
                     secret = secret,
                     isIncoming = isIncoming,
-                    counterpartyEmail = null
+                    counterpartyEmail = null,
+                    sourceSystemIndex = sourceSystemIndex
             )
         }
     }
 
     val hashBytes: ByteArray
         get() = hash.decodeHex()
-
-    override fun hashCode(): Int {
-        return hash.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return other is SwapRecord && other.hash == this.hash
-    }
 }

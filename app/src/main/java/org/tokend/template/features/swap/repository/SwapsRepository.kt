@@ -149,6 +149,7 @@ class SwapsRepository(
     private fun getRecordFromSourceSwap(swapResource: SwapResource,
                                         connectedSwaps: List<SwapResource>): SwapRecord {
         val hash = swapResource.secretHash
+        val systemIndex = sourceSystemIndex!!
         val remoteState = org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapResource.state)
 
         val secret = secretsPersistor.loadSecret(hash)
@@ -173,12 +174,15 @@ class SwapsRepository(
             else -> throw IllegalStateException("Unable to define state of swap $hash")
         }
 
-        return SwapRecord.fromResource(swapResource, secret, state, true, objectMapper)
+        return SwapRecord.fromResource(swapResource, secret, state,
+                true, objectMapper, systemIndex)
     }
 
     private fun getRecordFromDestSwap(swapBySource: SwapResource,
                                       connectedSwaps: List<SwapResource>): SwapRecord {
         val hash = swapBySource.secretHash
+        val systemIndex = (0 until urlConfigProvider.getConfigsCount())
+                .first { it != sourceSystemIndex }
         val sourceSwapState = org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapBySource.state)
 
         var secret: ByteArray? = null
@@ -208,6 +212,7 @@ class SwapsRepository(
             else -> throw IllegalStateException("Unable to define state of swap $hash")
         }
 
-        return SwapRecord.fromResource(swapBySource, secret, state, true, objectMapper)
+        return SwapRecord.fromResource(swapBySource, secret, state,
+                true, objectMapper, systemIndex)
     }
 }

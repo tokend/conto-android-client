@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.swap.details.logic.CloseOutgoingSwapUseCase
 import org.tokend.template.features.swap.details.logic.ConfirmIncomingSwapUseCase
 import org.tokend.template.features.swap.model.SwapRecord
 import org.tokend.template.features.swap.model.SwapState
@@ -195,7 +196,25 @@ class SwapDetailsActivity : BaseActivity() {
         action_button.visibility = View.VISIBLE
         action_button.setText(R.string.receive_swap_funds)
         action_button.setOnClickListener {
+            val progress = ProgressDialogFactory.getDialog(this, R.string.processing_progress) {
+                actionDisposable?.dispose()
+            }
 
+            actionDisposable = CloseOutgoingSwapUseCase(
+                    swap,
+                    apiProvider,
+                    urlConfigProvider,
+                    repositoryProvider,
+                    accountProvider
+            )
+                    .perform()
+                    .compose(ObservableTransformers.defaultSchedulersCompletable())
+                    .doOnSubscribe { progress.show() }
+                    .doOnEvent { progress.dismiss() }
+                    .subscribeBy(
+                            onComplete = { progress.dismiss() },
+                            onError = { errorHandlerFactory.getDefault().handle(it) }
+                    )
         }
     }
 

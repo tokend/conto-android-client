@@ -75,7 +75,7 @@ class ConfirmIncomingSwapUseCase(
             )
 
             val transaction =
-                    TransactionBuilder(networkParams, incomingSwap.sourceAccountId)
+                    TransactionBuilder(networkParams, incomingSwap.destAccountId)
                             .addOperation(Operation.OperationBody.OpenSwap(operation))
                             .build()
 
