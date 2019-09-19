@@ -1,9 +1,7 @@
 package org.tokend.template.features.swap.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.toMaybe
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.generated.resources.SwapResource
@@ -20,6 +18,7 @@ import org.tokend.template.extensions.mapSuccessful
 import org.tokend.template.features.swap.model.SwapRecord
 import org.tokend.template.features.swap.model.SwapState
 import org.tokend.template.features.swap.persistence.SwapSecretsPersistor
+import java.util.*
 
 class SwapsRepository(
         private val apiProvider: ApiProvider,
@@ -30,130 +29,77 @@ class SwapsRepository(
         private val assetsRepository: AssetsRepository,
         itemsCache: RepositoryCache<SwapRecord>
 ) : SimpleMultipleItemsRepository<SwapRecord>(itemsCache) {
-    private var sourceSystemIndex: Int? = null
+    private data class SwapWithSystemIndex(
+            val swap: SwapResource,
+            val systemIndex: Int
+    ) {
+        val swapHash: String = swap.secretHash
+        val swapCreatedAt: Date = swap.createdAt
+    }
 
     override fun getItems(): Single<List<SwapRecord>> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Single.error(IllegalStateException("No wallet info found"))
 
-        return getSourceSystemIndex()
-                .flatMap { sourceSystemIndex ->
-                    getAllSwaps(sourceSystemIndex, accountId)
-                }
+        return getAllSwaps(accountId)
                 .map { allSwaps ->
-                    allSwaps.groupBy(SwapResource::getSecretHash)
-                            .mapValues { it.value.sortedBy(SwapResource::getCreatedAt) }
+                    allSwaps.groupBy(SwapWithSystemIndex::swapHash)
+                            .mapValues { it.value.sortedBy(SwapWithSystemIndex::swapCreatedAt) }
                 }
                 .map { swapsByHash ->
                     swapsByHash.entries.mapSuccessful { (_, connectedSwaps) ->
                         val initialSwap = connectedSwaps.first()
-                        if (initialSwap.source.id == accountId)
-                            getRecordFromSourceSwap(initialSwap, connectedSwaps)
+                        if (initialSwap.swap.source.id == accountId)
+                            getRecordFromSourceSwap(
+                                    initialSwap,
+                                    connectedSwaps.map(SwapWithSystemIndex::swap)
+                            )
                         else
-                            getRecordFromDestSwap(initialSwap, connectedSwaps)
+                            getRecordFromDestSwap(
+                                    initialSwap,
+                                    connectedSwaps.map(SwapWithSystemIndex::swap)
+                            )
                     }
                 }
                 .flatMap(this::loadAndSetAssets)
     }
 
-    private fun getSourceSystemIndex(): Single<Int> {
-        val email = walletInfoProvider.getWalletInfo()?.email
-                ?: return Single.error(IllegalStateException("No wallet info found"))
-
-        val obtainSystemIndex = Single.defer {
-            (0 until urlConfigProvider.getConfigsCount())
-                    .map { i ->
-                        apiProvider.getKeyServer(i)
-                                .getLoginParams(email)
-                                .toSingle()
-                                .toMaybe()
-                                .onErrorComplete()
-                                .map { i }
-                    }
-                    .let { Maybe.merge(it) }
-                    .firstOrError()
-                    .doOnSuccess { index ->
-                        sourceSystemIndex = index
-                    }
-        }
-
-        return sourceSystemIndex
-                .toMaybe()
-                .switchIfEmpty(obtainSystemIndex)
-    }
-
-    private fun getAllSwaps(sourceSystemIndex: Int,
-                            accountId: String): Single<List<SwapResource>> {
-        val sourceSwaps = getSourceSwaps(sourceSystemIndex, accountId)
-        val destSwaps = getDestSwaps(sourceSystemIndex, accountId)
-
-        return Single
-                .merge(sourceSwaps, destSwaps)
-                .collect<MutableList<List<SwapResource>>>(
+    private fun getAllSwaps(accountId: String): Single<List<SwapWithSystemIndex>> {
+        return (0 until urlConfigProvider.getConfigsCount())
+                .map { i ->
+                    SimplePagedResourceLoader({ nextCursor ->
+                        apiProvider.getApi(i).v3.swaps
+                                .get(SwapsPageParams(
+                                        pagingParams = PagingParamsV2(
+                                                page = nextCursor,
+                                                limit = 20
+                                        )
+                                ))
+                    })
+                            .loadAll()
+                            .toSingle()
+                            .map { list ->
+                                list
+                                        .filter { swapResource ->
+                                            swapResource.source.id == accountId
+                                                    || swapResource.destination.id == accountId
+                                        }
+                                        .map { SwapWithSystemIndex(it, i) }
+                            }
+                }
+                .let { Single.merge(it) }
+                .collect<MutableList<List<SwapWithSystemIndex>>>(
                         { mutableListOf() },
                         { a, b -> a.add(b) }
                 )
                 .map { it.flatten() }
     }
 
-    private fun getSourceSwaps(sourceSystemIndex: Int,
-                               accountId: String): Single<List<SwapResource>> {
-        val signedApi = apiProvider.getSignedApi(sourceSystemIndex)
-                ?: return Single.error(IllegalStateException("No signed API found for system $sourceSystemIndex"))
-
-        val loader = SimplePagedResourceLoader({ nextCursor ->
-            signedApi.v3.swaps
-                    .get(SwapsPageParams(
-                            source = accountId,
-                            pagingParams = PagingParamsV2(
-                                    page = nextCursor,
-                                    limit = 20
-                            )
-                    ))
-        })
-
-        return loader.loadAll().toSingle()
-    }
-
-    private fun getDestSwaps(sourceSystemIndex: Int,
-                             accountId: String): Single<List<SwapResource>> {
-        return (0 until urlConfigProvider.getConfigsCount())
-                .toMutableList()
-                .apply { remove(sourceSystemIndex) }
-                .takeIf { it.isNotEmpty() }
-                ?.map { getSystemDestSwaps(it, accountId) }
-                ?.let { Single.merge(it) }
-                ?.collect<MutableList<List<SwapResource>>>(
-                        { mutableListOf() },
-                        { a, b -> a.add(b) }
-                )
-                ?.map { it.flatten() }
-                ?: Single.just(emptyList())
-    }
-
-    private fun getSystemDestSwaps(index: Int,
-                                   accountId: String): Single<List<SwapResource>> {
-        val signedApi = apiProvider.getSignedApi(index)
-                ?: return Single.error(IllegalStateException("No signed API found for system $index"))
-
-        val loader = SimplePagedResourceLoader({ nextCursor ->
-            signedApi.v3.swaps
-                    .get(SwapsPageParams(
-                            destination = accountId,
-                            pagingParams = PagingParamsV2(
-                                    page = nextCursor,
-                                    limit = 20
-                            )
-                    ))
-        })
-
-        return loader.loadAll().toSingle()
-    }
-
-    private fun getRecordFromSourceSwap(swapResource: SwapResource,
+    private fun getRecordFromSourceSwap(swapWithSystemIndex: SwapWithSystemIndex,
                                         connectedSwaps: List<SwapResource>): SwapRecord {
+        val swapResource = swapWithSystemIndex.swap
+        val systemIndex = swapWithSystemIndex.systemIndex
         val hash = swapResource.secretHash
-        val systemIndex = sourceSystemIndex!!
         val remoteState =
                 org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapResource.state.value)
 
@@ -185,11 +131,11 @@ class SwapsRepository(
                 false, objectMapper, systemIndex, destId)
     }
 
-    private fun getRecordFromDestSwap(swapBySource: SwapResource,
+    private fun getRecordFromDestSwap(swapWithSystemIndex: SwapWithSystemIndex,
                                       connectedSwaps: List<SwapResource>): SwapRecord {
+        val swapBySource = swapWithSystemIndex.swap
+        val systemIndex = swapWithSystemIndex.systemIndex
         val hash = swapBySource.secretHash
-        val systemIndex = (0 until urlConfigProvider.getConfigsCount())
-                .first { it != sourceSystemIndex }
         val sourceSwapState =
                 org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapBySource.state.value)
 
