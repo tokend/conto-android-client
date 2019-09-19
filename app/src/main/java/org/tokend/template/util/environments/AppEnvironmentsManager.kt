@@ -46,14 +46,14 @@ class AppEnvironmentsManager(
                     id = "multi_system",
                     configs = listOf(
                             UrlConfig(
-                                    api = "https://api.staging.conto.me",
-                                    storage = "https://s3.eu-north-1.amazonaws.com/contostaging-identity-storage-festive-cannon-2",
-                                    client = "https://staging.conto.me"
+                                    api = "https://api.conto.gpki.tokend.io",
+                                    storage = "https://s3.us-east-2.amazonaws.com/gpkiconto-identity-storage-confident-goldstine",
+                                    client = "https://conto.gpki.tokend.io"
                             ),
                             UrlConfig(
-                                    api = "https://api.conto.me",
-                                    storage = "https://s3.eu-north-1.amazonaws.com/conto-identity-storage-ecstatic-beaver",
-                                    client = "https://conto.me"
+                                    api = "https://api.vanilla.gpki.tokend.io",
+                                    storage = "https://s3.us-east-2.amazonaws.com/gpkitokend-identity-storage-agitated-noether",
+                                    client = "https://vanilla.gpki.tokend.io"
                             )
                     )
             )
