@@ -5,6 +5,7 @@ import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.send.model.PaymentRecipient
@@ -22,7 +23,7 @@ class CreateSwapRequestUseCase(
         private val walletInfoProvider: WalletInfoProvider
 ) {
     private lateinit var sourceAccountId: String
-    private lateinit var baseBalanceId: String
+    private lateinit var baseBalance: BalanceRecord
     private lateinit var secret: ByteArray
 
     fun perform(): Single<SwapRequest> {
@@ -31,10 +32,10 @@ class CreateSwapRequestUseCase(
                     this.sourceAccountId = accountId
                 }
                 .flatMap {
-                    getBaseBalanceId()
+                    getBaseBalance()
                 }
-                .doOnSuccess { baseBalanceId ->
-                    this.baseBalanceId = baseBalanceId
+                .doOnSuccess { baseBalance ->
+                    this.baseBalance = baseBalance
                 }
                 .flatMap {
                     getSecret()
@@ -53,11 +54,10 @@ class CreateSwapRequestUseCase(
                 .switchIfEmpty(Single.error(IllegalStateException("Missing account ID")))
     }
 
-    private fun getBaseBalanceId(): Single<String> {
+    private fun getBaseBalance(): Single<BalanceRecord> {
         return {
             balancesRepository.itemsList
                     .find { it.assetCode == baseAsset.code }
-                    ?.id
                     ?: throw IllegalStateException("No balance ID found for $baseAsset")
         }.toSingle()
     }
@@ -72,8 +72,7 @@ class CreateSwapRequestUseCase(
         return {
             SwapRequest(
                     sourceAccountId = sourceAccountId,
-                    baseBalanceId = baseBalanceId,
-                    baseAsset = baseAsset,
+                    baseBalance = baseBalance,
                     baseAmount = baseAmount,
                     quoteAsset = quoteAsset,
                     quoteAmount = quoteAmount,
