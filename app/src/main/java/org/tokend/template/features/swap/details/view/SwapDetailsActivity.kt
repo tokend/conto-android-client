@@ -6,11 +6,15 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import android.widget.LinearLayout
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_change_details.*
+import kotlinx.android.synthetic.main.activity_balance_details.*
 import kotlinx.android.synthetic.main.activity_swap_details.*
+import kotlinx.android.synthetic.main.activity_swap_details.swipe_refresh
+import kotlinx.android.synthetic.main.layout_balance_change_main_data.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.R
@@ -26,7 +30,9 @@ import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.LocalizedName
 import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.template.view.util.SwipeRefreshDependencyUtil
 
 class SwapDetailsActivity : BaseActivity() {
     private val adapter = DetailsItemsAdapter()
@@ -73,12 +79,18 @@ class SwapDetailsActivity : BaseActivity() {
     }
 
     private fun initMainDataView() {
-        mainDataView.displayOperationName(getString(R.string.incoming_swap))
+        (top_info_text_view.layoutParams as? LinearLayout.LayoutParams)?.also {
+            it.topMargin = 0
+            top_info_text_view.layoutParams = it
+        }
+
+        mainDataView = BalanceChangeMainDataView(appbar, amountFormatter)
     }
 
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
+        SwipeRefreshDependencyUtil.addDependency(swipe_refresh, appbar)
     }
 
     private fun subscribeToSwaps() {
@@ -115,6 +127,8 @@ class SwapDetailsActivity : BaseActivity() {
     private fun displayDetails() {
         displayAmounts()
         displayCounterparty()
+        displayState()
+        displayOperationName()
 
         initAction()
     }
@@ -128,7 +142,7 @@ class SwapDetailsActivity : BaseActivity() {
         val asset = if (swap.isIncoming) swap.quoteAmount else swap.baseAmount
         val amount = if (swap.isIncoming) swap.quoteAsset else swap.baseAsset
 
-        mainDataView.displayAmount(asset, amount, true)
+        mainDataView.displayAmount(asset, amount, false)
     }
 
     private fun displayToPay() {
@@ -145,11 +159,33 @@ class SwapDetailsActivity : BaseActivity() {
         )
     }
 
+    private fun displayState() {
+        adapter.addOrUpdateItem(
+                DetailsItem(
+                        id = STATE_ITEM_ID,
+                        text = LocalizedName(this).forSwapState(swap.state, swap.isIncoming),
+                        isEnabled = false
+                )
+        )
+    }
+
+    private fun displayOperationName() {
+        mainDataView.displayOperationName(
+                if (swap.isIncoming)
+                    getString(R.string.incoming_swap)
+                else
+                    getString(R.string.balance_change_cause_swap)
+        )
+    }
+
     private fun displayCounterparty() {
+        val email = swap.counterpartyEmail
+                ?: return
+
         adapter.addOrUpdateItem(
                 DetailsItem(
                         id = COUNTERPARTY_ITEM_ID,
-                        text = swap.counterpartyEmail,
+                        text = email,
                         hint = getString(R.string.swap_counterparty),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_account)
                 )
@@ -248,7 +284,8 @@ class SwapDetailsActivity : BaseActivity() {
 
     companion object {
         private const val COUNTERPARTY_ITEM_ID = 1L
-        private val TO_PAY_ITEM_ID = 2L
+        private const val TO_PAY_ITEM_ID = 2L
+        private const val STATE_ITEM_ID = 3L
         private const val SWAP_HASH_EXTRA = "swap_hash"
 
         fun getBundle(swapHash: String) = Bundle().apply {

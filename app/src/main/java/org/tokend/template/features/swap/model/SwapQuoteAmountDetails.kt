@@ -6,8 +6,8 @@ import java.math.BigDecimal
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class SwapQuoteAmountDetails(
-        @JsonProperty("quote_amount")
+        @JsonProperty("quoteAmount")
         val quoteAmount: BigDecimal,
-        @JsonProperty("quote_asset_code")
+        @JsonProperty("quoteAssetCode")
         val quoteAssetCode: String
 )

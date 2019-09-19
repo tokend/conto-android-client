@@ -26,10 +26,20 @@ class AssetsRepository(
     val itemsMap: Map<String, AssetRecord> = mItemsMap
 
     override fun getItems(): Single<List<AssetRecord>> {
+        return (0 until urlConfigProvider.getConfigsCount())
+                .map(this::getSystemAssets)
+                .let { Single.merge(it) }
+                .collect<MutableList<List<AssetRecord>>>(
+                        { mutableListOf() },
+                        { a, b -> a.add(b) }
+                )
+                .map { it.flatten() }
+    }
 
+    private fun getSystemAssets(index: Int): Single<List<AssetRecord>> {
         val loader = SimplePagedResourceLoader(
                 { nextCursor ->
-                    apiProvider.getApi().v3.assets.get(
+                    apiProvider.getApi(index).v3.assets.get(
                             AssetsPageParams(
                                     owner = ownerId,
                                     pagingParams = PagingParamsV2(

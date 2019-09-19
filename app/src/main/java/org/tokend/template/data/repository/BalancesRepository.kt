@@ -8,6 +8,7 @@ import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.v3.balances.params.ConvertedBalancesParams
 import org.tokend.sdk.utils.extentions.isNotFound
+import org.tokend.sdk.utils.extentions.isUnauthorized
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.model.SimpleAsset
@@ -171,7 +172,7 @@ class BalancesRepository(
                             }
                 }
                 .onErrorResumeNext { error ->
-                    if (error is HttpException && error.isNotFound())
+                    if (error is HttpException && (error.isNotFound() || error.isUnauthorized()))
                         Single.just(emptyList())
                     else
                         Single.error(error)

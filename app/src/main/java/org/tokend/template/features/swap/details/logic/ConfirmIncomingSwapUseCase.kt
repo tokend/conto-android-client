@@ -63,7 +63,7 @@ class ConfirmIncomingSwapUseCase(
                     destination = OpenSwapOp.OpenSwapOpDestination.Account(
                             PublicKeyFactory.fromAccountId(incomingSwap.sourceAccountId)
                     ),
-                    lockTime = LOCK_TIME_SECONDS,
+                    lockTime = networkParams.nowTimestamp + LOCK_TIME_SECONDS,
                     secretHash = Hash(incomingSwap.hashBytes),
                     details = objectMapper.writeValueAsString(
                             SwapQuoteAmountDetails(

@@ -7,9 +7,12 @@ import io.reactivex.rxkotlin.toMaybe
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.generated.resources.SwapResource
+import org.tokend.sdk.api.v3.swaps.params.SwapParams
 import org.tokend.sdk.api.v3.swaps.params.SwapsPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.sdk.utils.extentions.decodeHex
+import org.tokend.template.data.repository.AccountDetailsRepository
+import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
@@ -26,6 +29,8 @@ class SwapsRepository(
         private val walletInfoProvider: WalletInfoProvider,
         private val objectMapper: ObjectMapper,
         private val secretsPersistor: SwapSecretsPersistor,
+        private val assetsRepository: AssetsRepository,
+        private val accountDetailsRepository: AccountDetailsRepository,
         itemsCache: RepositoryCache<SwapRecord>
 ) : SimpleMultipleItemsRepository<SwapRecord>(itemsCache) {
     private var sourceSystemIndex: Int? = null
@@ -50,17 +55,19 @@ class SwapsRepository(
                             getRecordFromDestSwap(initialSwap, connectedSwaps)
                     }
                 }
+//                .flatMap(this::loadAndSetEmails)
+                .flatMap(this::loadAndSetAssets)
     }
 
     private fun getSourceSystemIndex(): Single<Int> {
-        val walletId = walletInfoProvider.getWalletInfo()?.walletIdHex
+        val email = walletInfoProvider.getWalletInfo()?.email
                 ?: return Single.error(IllegalStateException("No wallet info found"))
 
         val obtainSystemIndex = Single.defer {
             (0 until urlConfigProvider.getConfigsCount())
                     .map { i ->
                         apiProvider.getKeyServer(i)
-                                .getWalletData(walletId)
+                                .getLoginParams(email)
                                 .toSingle()
                                 .toMaybe()
                                 .onErrorComplete()
@@ -101,6 +108,7 @@ class SwapsRepository(
             signedApi.v3.swaps
                     .get(SwapsPageParams(
                             source = accountId,
+                            include = listOf(SwapParams.Includes.ASSET),
                             pagingParams = PagingParamsV2(
                                     page = nextCursor,
                                     limit = 20
@@ -136,6 +144,7 @@ class SwapsRepository(
             signedApi.v3.swaps
                     .get(SwapsPageParams(
                             destination = accountId,
+                            include = listOf(SwapParams.Includes.ASSET),
                             pagingParams = PagingParamsV2(
                                     page = nextCursor,
                                     limit = 20
@@ -150,7 +159,8 @@ class SwapsRepository(
                                         connectedSwaps: List<SwapResource>): SwapRecord {
         val hash = swapResource.secretHash
         val systemIndex = sourceSystemIndex!!
-        val remoteState = org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapResource.state)
+        val remoteState =
+                org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapResource.state.value)
 
         val secret = secretsPersistor.loadSecret(hash)
 
@@ -162,7 +172,7 @@ class SwapsRepository(
             connectedSwaps.size == 2 -> {
                 val swapByDest = connectedSwaps.first { it.source.id == swapResource.destination.id }
 
-                when (org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapByDest.state)) {
+                when (org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapByDest.state.value)) {
                     org.tokend.sdk.api.v3.swaps.model.SwapState.OPEN ->
                         SwapState.WAITING_FOR_CLOSE_BY_SOURCE
                     org.tokend.sdk.api.v3.swaps.model.SwapState.CLOSED ->
@@ -175,7 +185,7 @@ class SwapsRepository(
         }
 
         return SwapRecord.fromResource(swapResource, secret, state,
-                true, objectMapper, systemIndex)
+                false, objectMapper, systemIndex)
     }
 
     private fun getRecordFromDestSwap(swapBySource: SwapResource,
@@ -183,7 +193,8 @@ class SwapsRepository(
         val hash = swapBySource.secretHash
         val systemIndex = (0 until urlConfigProvider.getConfigsCount())
                 .first { it != sourceSystemIndex }
-        val sourceSwapState = org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapBySource.state)
+        val sourceSwapState =
+                org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapBySource.state.value)
 
         var secret: ByteArray? = null
 
@@ -197,7 +208,7 @@ class SwapsRepository(
 
                 secret = ourSwap.secret?.decodeHex()
 
-                when (org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(ourSwap.state)) {
+                when (org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(ourSwap.state.value)) {
                     org.tokend.sdk.api.v3.swaps.model.SwapState.OPEN ->
                         SwapState.WAITING_FOR_CLOSE_BY_SOURCE
                     org.tokend.sdk.api.v3.swaps.model.SwapState.CLOSED -> {
@@ -214,5 +225,49 @@ class SwapsRepository(
 
         return SwapRecord.fromResource(swapBySource, secret, state,
                 true, objectMapper, systemIndex)
+    }
+
+    private fun loadAndSetEmails(items: List<SwapRecord>): Single<List<SwapRecord>> {
+        val accounts = items
+                .map { swap ->
+                    if (swap.isIncoming)
+                        swap.sourceAccountId
+                    else
+                        swap.destAccountId
+                }
+
+        return if (accounts.isNotEmpty()) {
+            accountDetailsRepository
+                    .getEmailsByAccountIds(accounts)
+                    .onErrorReturnItem(emptyMap())
+                    .map { emailsMap ->
+                        items.forEach { swap ->
+                            if (swap.isIncoming)
+                                swap.counterpartyEmail = emailsMap[swap.sourceAccountId]
+                            else
+                                swap.counterpartyEmail = emailsMap[swap.destAccountId]
+                        }
+                    }
+                    .map { items }
+        } else {
+            Single.just(items)
+        }
+    }
+
+    private fun loadAndSetAssets(items: List<SwapRecord>): Single<List<SwapRecord>> {
+        val codes = items
+                .map { listOf(it.quoteAsset.code, it.baseAsset.code) }
+                .flatten()
+                .distinct()
+
+        return assetsRepository.ensureAssets(codes)
+                .map { assetsMap ->
+                    items.apply {
+                        forEach { swap ->
+                            swap.quoteAsset = assetsMap.getValue(swap.quoteAsset.code)
+                            swap.baseAsset = assetsMap.getValue(swap.baseAsset.code)
+                        }
+                    }
+                }
     }
 }
