@@ -266,6 +266,7 @@ class SwapDetailsActivity : BaseActivity() {
                             onComplete = {
                                 progress.dismiss()
                                 toastManager.short(R.string.swap_funds_received)
+                                finish()
                             },
                             onError = { errorHandlerFactory.getDefault().handle(it) }
                     )
@@ -294,6 +295,7 @@ class SwapDetailsActivity : BaseActivity() {
                             onComplete = {
                                 progress.dismiss()
                                 toastManager.short(R.string.swap_funds_received)
+                                finish()
                             },
                             onError = { errorHandlerFactory.getDefault().handle(it) }
                     )

@@ -1,7 +1,9 @@
 package org.tokend.template.features.swap.view
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -23,6 +25,7 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 
@@ -38,6 +41,7 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
         get() = repositoryProvider.swaps()
 
     private lateinit var adapter: SwapsAdapter
+    private lateinit var layoutManager: GridLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_swaps, container, false)
@@ -73,7 +77,9 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
 
     private fun initList() {
         adapter = SwapsAdapter(amountFormatter)
-        swaps_recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        layoutManager = GridLayoutManager(requireContext(), 1)
+        updateListColumnsCount()
+        swaps_recycler_view.layoutManager = layoutManager
         swaps_recycler_view.adapter = adapter
         swaps_recycler_view.addOnScrollListener(hideFabScrollListener)
 
@@ -136,27 +142,18 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun displaySwaps() {
-//        val items = listOf(
-//                SwapListItem(
-//                        BigDecimal("100"), SimpleAsset("", 6, "Gas station bonuses", null),
-//                        BigDecimal("25"), SimpleAsset("", 6, "Pet shop points", null),
-//                        "alice@mail.com",
-//                        SwapState.CREATED,
-//                        false,
-//                        null
-//                ),
-//                SwapListItem(
-//                        BigDecimal("10"), SimpleAsset("", 6, "Silpo bonus points", null),
-//                        BigDecimal("10"), SimpleAsset("", 6, "ATB bonuses", null),
-//                        "alice@mail.com",
-//                        SwapState.CAN_BE_RECEIVED_BY_DEST,
-//                        true,
-//                        null
-//                )
-//        )
         val items = swapsRepository.itemsList.map(::SwapListItem)
 
         adapter.setData(items)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        updateListColumnsCount()
+    }
+
+    private fun updateListColumnsCount() {
+        layoutManager.spanCount = ColumnCalculator.getColumnCount(requireActivity())
     }
 
     private fun openSwapDetails(swap: SwapRecord) {
