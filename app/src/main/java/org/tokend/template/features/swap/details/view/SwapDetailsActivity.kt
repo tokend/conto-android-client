@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import android.widget.LinearLayout
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -14,7 +13,6 @@ import kotlinx.android.synthetic.main.activity_balance_change_details.*
 import kotlinx.android.synthetic.main.activity_balance_details.*
 import kotlinx.android.synthetic.main.activity_swap_details.*
 import kotlinx.android.synthetic.main.activity_swap_details.swipe_refresh
-import kotlinx.android.synthetic.main.layout_balance_change_main_data.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.R
@@ -33,6 +31,7 @@ import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.LocalizedName
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.SwipeRefreshDependencyUtil
+import java.math.BigDecimal
 
 class SwapDetailsActivity : BaseActivity() {
     private val adapter = DetailsItemsAdapter()
@@ -79,11 +78,6 @@ class SwapDetailsActivity : BaseActivity() {
     }
 
     private fun initMainDataView() {
-        (top_info_text_view.layoutParams as? LinearLayout.LayoutParams)?.also {
-            it.topMargin = 0
-            top_info_text_view.layoutParams = it
-        }
-
         mainDataView = BalanceChangeMainDataView(appbar, amountFormatter)
     }
 
@@ -129,23 +123,18 @@ class SwapDetailsActivity : BaseActivity() {
         displayCounterparty()
         displayState()
         displayOperationName()
+        displayDate()
 
         initAction()
     }
 
     private fun displayAmounts() {
+        mainDataView.displayNonZeroFee(BigDecimal.ZERO, swap.quoteAsset)
         displayToReceive()
         displayToPay()
     }
 
     private fun displayToReceive() {
-        val asset = if (swap.isIncoming) swap.quoteAmount else swap.baseAmount
-        val amount = if (swap.isIncoming) swap.quoteAsset else swap.baseAsset
-
-        mainDataView.displayAmount(asset, amount, false)
-    }
-
-    private fun displayToPay() {
         val asset = if (swap.isIncoming) swap.baseAsset else swap.quoteAsset
         val amount = if (swap.isIncoming) swap.baseAmount else swap.quoteAmount
 
@@ -153,10 +142,17 @@ class SwapDetailsActivity : BaseActivity() {
                 DetailsItem(
                         id = TO_PAY_ITEM_ID,
                         text = amountFormatter.formatAssetAmount(amount, asset, withAssetName = true),
-                        hint = getString(R.string.to_pay),
+                        hint = getString(R.string.to_receive),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_coins)
                 )
         )
+    }
+
+    private fun displayToPay() {
+        val asset = if (swap.isIncoming) swap.quoteAmount else swap.baseAmount
+        val amount = if (swap.isIncoming) swap.quoteAsset else swap.baseAsset
+
+        mainDataView.displayAmount(asset, amount, false)
     }
 
     private fun displayState() {
@@ -180,7 +176,6 @@ class SwapDetailsActivity : BaseActivity() {
 
     private fun displayCounterparty() {
         val email = swap.counterpartyEmail
-                ?: return
 
         adapter.addOrUpdateItem(
                 DetailsItem(
@@ -190,6 +185,10 @@ class SwapDetailsActivity : BaseActivity() {
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_account)
                 )
         )
+    }
+
+    private fun displayDate() {
+        mainDataView.displayDate(swap.createdAt)
     }
 
     private fun initAction() {

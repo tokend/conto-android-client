@@ -52,8 +52,13 @@ class CloseOutgoingSwapUseCase(
             val secret = outgoingSwap.secret
                     ?: return@defer Single.error<Transaction>(
                             IllegalStateException("Outgoing swap has no secret"))
+
+            val destId = outgoingSwap.destId
+                    ?: return@defer Single.error<Transaction>(
+                            IllegalStateException("Outgoing swap has no dest ID"))
+
             val operation = CloseSwapOp(
-                    swapID = outgoingSwap.id.toLong(),
+                    swapID = destId.toLong(),
                     secret = Hash(secret),
                     ext = EmptyExt.EmptyVersion()
             )

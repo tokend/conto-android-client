@@ -163,7 +163,7 @@ class RepositoryProviderImpl(
     private val swapsRepository: SwapsRepository by lazy {
         SwapsRepository(apiProvider, urlConfigProvider, walletInfoProvider, mapper,
                 SwapSecretsPersistor(context!!.getSharedPreferences("swaps", Context.MODE_PRIVATE)),
-                assets(), accountDetails(), SwapsCache())
+                assets(), SwapsCache())
     }
 
     override fun balances(): BalancesRepository {

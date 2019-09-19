@@ -11,7 +11,6 @@ import org.tokend.sdk.api.v3.swaps.params.SwapParams
 import org.tokend.sdk.api.v3.swaps.params.SwapsPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.sdk.utils.extentions.decodeHex
-import org.tokend.template.data.repository.AccountDetailsRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
@@ -30,7 +29,6 @@ class SwapsRepository(
         private val objectMapper: ObjectMapper,
         private val secretsPersistor: SwapSecretsPersistor,
         private val assetsRepository: AssetsRepository,
-        private val accountDetailsRepository: AccountDetailsRepository,
         itemsCache: RepositoryCache<SwapRecord>
 ) : SimpleMultipleItemsRepository<SwapRecord>(itemsCache) {
     private var sourceSystemIndex: Int? = null
@@ -45,6 +43,7 @@ class SwapsRepository(
                 }
                 .map { allSwaps ->
                     allSwaps.groupBy(SwapResource::getSecretHash)
+                            .mapValues { it.value.sortedBy(SwapResource::getCreatedAt) }
                 }
                 .map { swapsByHash ->
                     swapsByHash.entries.mapSuccessful { (_, connectedSwaps) ->
@@ -55,7 +54,6 @@ class SwapsRepository(
                             getRecordFromDestSwap(initialSwap, connectedSwaps)
                     }
                 }
-//                .flatMap(this::loadAndSetEmails)
                 .flatMap(this::loadAndSetAssets)
     }
 
@@ -163,6 +161,7 @@ class SwapsRepository(
                 org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapResource.state.value)
 
         val secret = secretsPersistor.loadSecret(hash)
+        var destId: String? = null
 
         val state = when {
             remoteState == org.tokend.sdk.api.v3.swaps.model.SwapState.CANCELED ->
@@ -171,6 +170,7 @@ class SwapsRepository(
                 SwapState.CREATED
             connectedSwaps.size == 2 -> {
                 val swapByDest = connectedSwaps.first { it.source.id == swapResource.destination.id }
+                destId = swapByDest.id
 
                 when (org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapByDest.state.value)) {
                     org.tokend.sdk.api.v3.swaps.model.SwapState.OPEN ->
@@ -185,7 +185,7 @@ class SwapsRepository(
         }
 
         return SwapRecord.fromResource(swapResource, secret, state,
-                false, objectMapper, systemIndex)
+                false, objectMapper, systemIndex, destId)
     }
 
     private fun getRecordFromDestSwap(swapBySource: SwapResource,
@@ -224,34 +224,7 @@ class SwapsRepository(
         }
 
         return SwapRecord.fromResource(swapBySource, secret, state,
-                true, objectMapper, systemIndex)
-    }
-
-    private fun loadAndSetEmails(items: List<SwapRecord>): Single<List<SwapRecord>> {
-        val accounts = items
-                .map { swap ->
-                    if (swap.isIncoming)
-                        swap.sourceAccountId
-                    else
-                        swap.destAccountId
-                }
-
-        return if (accounts.isNotEmpty()) {
-            accountDetailsRepository
-                    .getEmailsByAccountIds(accounts)
-                    .onErrorReturnItem(emptyMap())
-                    .map { emailsMap ->
-                        items.forEach { swap ->
-                            if (swap.isIncoming)
-                                swap.counterpartyEmail = emailsMap[swap.sourceAccountId]
-                            else
-                                swap.counterpartyEmail = emailsMap[swap.destAccountId]
-                        }
-                    }
-                    .map { items }
-        } else {
-            Single.just(items)
-        }
+                true, objectMapper, systemIndex, null)
     }
 
     private fun loadAndSetAssets(items: List<SwapRecord>): Single<List<SwapRecord>> {

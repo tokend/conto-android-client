@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.math.BigDecimal
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class SwapQuoteAmountDetails(
+class SwapDetails(
         @JsonProperty("quoteAmount")
         val quoteAmount: BigDecimal,
         @JsonProperty("quoteAssetCode")
-        val quoteAssetCode: String
+        val quoteAssetCode: String,
+        @JsonProperty("sourceEmail")
+        val sourceEmail: String,
+        @JsonProperty("destEmail")
+        val destEmail: String
 )

@@ -119,6 +119,7 @@ class SwapConfirmationActivity : BaseActivity() {
                 apiProvider,
                 repositoryProvider,
                 accountProvider,
+                walletInfoProvider,
                 JsonApiToolsProvider.getObjectMapper()
         )
                 .perform()

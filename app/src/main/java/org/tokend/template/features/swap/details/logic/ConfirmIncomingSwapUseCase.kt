@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.identity.params.IdentitiesPageParams
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
-import org.tokend.template.di.providers.WalletInfoProvider
-import org.tokend.template.features.swap.model.SwapQuoteAmountDetails
+import org.tokend.template.features.swap.model.SwapDetails
 import org.tokend.template.features.swap.model.SwapRecord
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
@@ -17,10 +18,11 @@ import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.*
+import java.util.concurrent.TimeUnit
 
 class ConfirmIncomingSwapUseCase(
         private val incomingSwap: SwapRecord,
-        apiProvider: ApiProvider,
+        private val apiProvider: ApiProvider,
         private val repositoryProvider: RepositoryProvider,
         private val accountProvider: AccountProvider,
         private val objectMapper: ObjectMapper
@@ -38,6 +40,9 @@ class ConfirmIncomingSwapUseCase(
                     this.networkParams = networkParams
                 }
                 .flatMap {
+                    ensureCounterpartyAccount()
+                }
+                .flatMap {
                     getTransaction()
                 }
                 .flatMap { transaction ->
@@ -47,6 +52,15 @@ class ConfirmIncomingSwapUseCase(
                     updateRepositories()
                 }
                 .ignoreElement()
+    }
+
+    private fun ensureCounterpartyAccount(): Single<Boolean> {
+        return apiProvider.getApi(quoteBalance.systemIndex)
+                .identities
+                .get(IdentitiesPageParams(incomingSwap.sourceEmail))
+                .toSingle()
+                .delay(5, TimeUnit.SECONDS)
+                .map { true }
     }
 
     private fun getTransaction(): Single<Transaction> {
@@ -66,9 +80,10 @@ class ConfirmIncomingSwapUseCase(
                     lockTime = networkParams.nowTimestamp + LOCK_TIME_SECONDS,
                     secretHash = Hash(incomingSwap.hashBytes),
                     details = objectMapper.writeValueAsString(
-                            SwapQuoteAmountDetails(
+                            SwapDetails(
                                     incomingSwap.baseAmount,
-                                    incomingSwap.baseAsset.code
+                                    incomingSwap.baseAsset.code,
+                                    "", ""
                             )
                     ),
                     ext = EmptyExt.EmptyVersion()

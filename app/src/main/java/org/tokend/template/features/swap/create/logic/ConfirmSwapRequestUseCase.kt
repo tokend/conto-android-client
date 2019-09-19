@@ -8,8 +8,9 @@ import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
+import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.swap.create.model.SwapRequest
-import org.tokend.template.features.swap.model.SwapQuoteAmountDetails
+import org.tokend.template.features.swap.model.SwapDetails
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.PublicKeyFactory
@@ -22,6 +23,7 @@ class ConfirmSwapRequestUseCase(
         apiProvider: ApiProvider,
         private val repositoryProvider: RepositoryProvider,
         private val accountProvider: AccountProvider,
+        private val walletInfoProvider: WalletInfoProvider,
         private val objectMapper: ObjectMapper
 ) {
     private val txManager = TxManager(apiProvider.getApi(request.baseBalance.systemIndex).v3.transactions)
@@ -48,6 +50,11 @@ class ConfirmSwapRequestUseCase(
         return Single.defer {
             val zeroFee = SimpleFeeRecord.ZERO.toXdrFee(networkParams)
 
+            val email = walletInfoProvider.getWalletInfo()?.email
+                    ?: return@defer Single.error<Transaction>(
+                            IllegalStateException("No wallet info found")
+                    )
+
             val operation = OpenSwapOp(
                     sourceBalance = PublicKeyFactory.fromBalanceId(
                             request.baseBalance.id
@@ -61,9 +68,11 @@ class ConfirmSwapRequestUseCase(
                     lockTime = networkParams.nowTimestamp + LOCK_TIME_SECONDS,
                     secretHash = Hash(request.hash),
                     details = objectMapper.writeValueAsString(
-                            SwapQuoteAmountDetails(
+                            SwapDetails(
                                     request.quoteAmount,
-                                    request.quoteAsset.code
+                                    request.quoteAsset.code,
+                                    email,
+                                    request.destEmail
                             )
                     ),
                     ext = EmptyExt.EmptyVersion()

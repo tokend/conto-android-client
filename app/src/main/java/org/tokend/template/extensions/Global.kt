@@ -6,6 +6,5 @@ package org.tokend.template.extensions
 inline fun <R: Any> tryOrNull(block: () -> R?) = try {
     block()
 } catch (e: Exception) {
-    e.printStackTrace()
     null
 }

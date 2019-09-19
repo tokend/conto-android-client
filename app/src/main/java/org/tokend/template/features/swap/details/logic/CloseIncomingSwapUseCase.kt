@@ -78,8 +78,8 @@ class CloseIncomingSwapUseCase(
 
     private fun updateRepositories() {
         repositoryProvider.balances().updateAssetBalance(
-                assetCode = incomingSwap.quoteAsset.code,
-                delta = incomingSwap.quoteAmount
+                assetCode = incomingSwap.baseAsset.code,
+                delta = incomingSwap.baseAmount
         )
         repositoryProvider.swaps().updateIfEverUpdated()
     }

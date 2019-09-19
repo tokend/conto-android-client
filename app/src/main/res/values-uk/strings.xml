@@ -540,7 +540,7 @@
     <string name="swap_state_needs_your_confirmation">Необхідне ваше підтвердження</string>
     <string name="swap_state_needs_counterparty_confirmation">Необхідне підтвердження контрагента</string>
     <string name="swap_state_can_be_received">Можна отримати кошти</string>
-    <string name="swap_state_waiting_for_counterparty_receive">Ожидание получения контрагентом</string>
+    <string name="swap_state_waiting_for_counterparty_receive">Очікується отримання контрагентом</string>
     <string name="swap_state_canceled">Скасовано</string>
     <string name="swap_state_canceled_by_counterparty">Скасовано контрагентом</string>
     <string name="swap_state_completed">Завершено</string>
@@ -551,7 +551,6 @@
     <string name="swap_asset_to_receive">Актив до отримання</string>
     <string name="balance_change_cause_swap">Обмін</string>
     <string name="no_swaps">Немає активних обмінів</string>
-    <string name="to_pay">Буде списано</string>
     <string name="incoming_swap">Запит на обмін</string>
     <string name="receive_swap_funds">Отримати кошти</string>
     <string name="swap_created">Обмін створено</string>

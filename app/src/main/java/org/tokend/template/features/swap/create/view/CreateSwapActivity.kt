@@ -166,7 +166,7 @@ class CreateSwapActivity : BaseActivity() {
 
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount <= 1) {
-            super.onBackPressed()
+            finish()
         } else {
             supportFragmentManager.popBackStackImmediate()
         }

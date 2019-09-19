@@ -34,6 +34,7 @@ class SwapItemViewHolder(
         bind(item)
         detailsButton.setOnClickListener { clickListener?.invoke(view, item) }
     }
+
     override fun bind(item: SwapListItem) {
         baseAmountTextView.text = amountFormatter.formatAssetAmount(
                 item.payAmount,
@@ -58,14 +59,14 @@ class SwapItemViewHolder(
 
         stateTextView.text = localizedName.forSwapState(item.state, item.isIncoming)
         stateTextView.textColor = when (item.state) {
-            SwapState.CREATED -> secondaryColor
             SwapState.CANCELED,
             SwapState.CANCELED_BY_COUNTERPARTY -> errorColor
             else -> {
-                if (item.isIncoming && item.state == SwapState.WAITING_FOR_CLOSE_BY_SOURCE)
-                    secondaryColor
-                else
+                if (item.isIncoming && item.state == SwapState.CAN_BE_RECEIVED_BY_DEST
+                        || !item.isIncoming && item.state == SwapState.WAITING_FOR_CLOSE_BY_SOURCE)
                     okColor
+                else
+                    secondaryColor
             }
         }
     }
