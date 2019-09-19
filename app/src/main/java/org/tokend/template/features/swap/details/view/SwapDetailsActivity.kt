@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.swap.details.logic.CloseIncomingSwapUseCase
 import org.tokend.template.features.swap.details.logic.CloseOutgoingSwapUseCase
 import org.tokend.template.features.swap.details.logic.ConfirmIncomingSwapUseCase
 import org.tokend.template.features.swap.model.SwapRecord
@@ -134,8 +135,9 @@ class SwapDetailsActivity : BaseActivity() {
         val asset = if (swap.isIncoming) swap.baseAsset else swap.quoteAsset
         val amount = if (swap.isIncoming) swap.baseAmount else swap.quoteAmount
 
-        adapter.addData(
+        adapter.addOrUpdateItem(
                 DetailsItem(
+                        id = TO_PAY_ITEM_ID,
                         text = amountFormatter.formatAssetAmount(amount, asset, withAssetName = true),
                         hint = getString(R.string.to_pay),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_coins)
@@ -144,8 +146,9 @@ class SwapDetailsActivity : BaseActivity() {
     }
 
     private fun displayCounterparty() {
-        adapter.addData(
+        adapter.addOrUpdateItem(
                 DetailsItem(
+                        id = COUNTERPARTY_ITEM_ID,
                         text = swap.counterpartyEmail,
                         hint = getString(R.string.swap_counterparty),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_account)
@@ -222,11 +225,30 @@ class SwapDetailsActivity : BaseActivity() {
         action_button.visibility = View.VISIBLE
         action_button.setText(R.string.receive_swap_funds)
         action_button.setOnClickListener {
+            val progress = ProgressDialogFactory.getDialog(this, R.string.processing_progress) {
+                actionDisposable?.dispose()
+            }
 
+            actionDisposable = CloseIncomingSwapUseCase(
+                    swap,
+                    apiProvider,
+                    repositoryProvider,
+                    accountProvider
+            )
+                    .perform()
+                    .compose(ObservableTransformers.defaultSchedulersCompletable())
+                    .doOnSubscribe { progress.show() }
+                    .doOnEvent { progress.dismiss() }
+                    .subscribeBy(
+                            onComplete = { progress.dismiss() },
+                            onError = { errorHandlerFactory.getDefault().handle(it) }
+                    )
         }
     }
 
     companion object {
+        private const val COUNTERPARTY_ITEM_ID = 1L
+        private val TO_PAY_ITEM_ID = 2L
         private const val SWAP_HASH_EXTRA = "swap_hash"
 
         fun getBundle(swapHash: String) = Bundle().apply {
