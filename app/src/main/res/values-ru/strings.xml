@@ -551,4 +551,7 @@
     <string name="swap_asset_to_receive">Актив к получению</string>
     <string name="balance_change_cause_swap">Обмен</string>
     <string name="no_swaps">Нет активных обменов</string>
+    <string name="to_pay">Будет списано</string>
+    <string name="incoming_swap">Запрос на обмен</string>
+    <string name="receive_swap_funds">Получить средства</string>
 </resources>

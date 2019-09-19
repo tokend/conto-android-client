@@ -78,6 +78,7 @@ import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.swap.create.model.SwapRequest
 import org.tokend.template.features.swap.create.view.CreateSwapActivity
 import org.tokend.template.features.swap.create.view.SwapConfirmationActivity
+import org.tokend.template.features.swap.details.view.SwapDetailsActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
 import org.tokend.template.features.wallet.view.BalanceDetailsActivity
@@ -595,5 +596,11 @@ class Navigator private constructor() {
         context?.intentFor<SwapConfirmationActivity>()
                 ?.putExtras(SwapConfirmationActivity.getBundle(request))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openSwapDetails(swapHash: String) {
+        context?.intentFor<SwapDetailsActivity>()
+                ?.putExtras(SwapDetailsActivity.getBundle(swapHash))
+                ?.also { performIntent(it) }
     }
 }

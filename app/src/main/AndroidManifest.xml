@@ -262,6 +262,9 @@
         <activity
             android:name=".features.swap.create.view.SwapConfirmationActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
+        <activity
+            android:name=".features.swap.details.view.SwapDetailsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
     </application>
 
 </manifest>

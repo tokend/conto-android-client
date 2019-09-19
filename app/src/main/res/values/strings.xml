@@ -540,6 +540,9 @@
     <string name="swap_asset_to_receive">Asset to receive</string>
     <string name="balance_change_cause_swap">Swap</string>
     <string name="no_swaps">No active swaps</string>
+    <string name="to_pay">To pay</string>
+    <string name="incoming_swap">Swap request</string>
+    <string name="receive_swap_funds">Receive funds</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

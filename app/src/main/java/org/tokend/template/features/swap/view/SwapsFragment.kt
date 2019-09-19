@@ -160,7 +160,7 @@ class SwapsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun openSwapDetails(swap: SwapRecord) {
-
+        Navigator.from(this).openSwapDetails(swap.hash)
     }
 
     companion object {
