@@ -8,11 +8,14 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_change_details.*
 import kotlinx.android.synthetic.main.activity_swap_details.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.swap.details.logic.ConfirmIncomingSwapUseCase
 import org.tokend.template.features.swap.model.SwapRecord
 import org.tokend.template.features.swap.model.SwapState
 import org.tokend.template.features.swap.repository.SwapsRepository
@@ -21,6 +24,7 @@ import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.ProgressDialogFactory
 
 class SwapDetailsActivity : BaseActivity() {
     private val adapter = DetailsItemsAdapter()
@@ -165,7 +169,25 @@ class SwapDetailsActivity : BaseActivity() {
         action_button.visibility = View.VISIBLE
         action_button.setText(R.string.confirm_action)
         action_button.setOnClickListener {
+            val progress = ProgressDialogFactory.getDialog(this, R.string.processing_progress) {
+                actionDisposable?.dispose()
+            }
 
+            actionDisposable = ConfirmIncomingSwapUseCase(
+                    swap,
+                    apiProvider,
+                    repositoryProvider,
+                    accountProvider,
+                    JsonApiToolsProvider.getObjectMapper()
+            )
+                    .perform()
+                    .compose(ObservableTransformers.defaultSchedulersCompletable())
+                    .doOnSubscribe { progress.show() }
+                    .doOnEvent { progress.dismiss() }
+                    .subscribeBy(
+                            onComplete = { progress.dismiss() },
+                            onError = { errorHandlerFactory.getDefault().handle(it) }
+                    )
         }
     }
 

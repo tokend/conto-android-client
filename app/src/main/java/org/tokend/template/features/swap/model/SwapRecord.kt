@@ -2,6 +2,7 @@ package org.tokend.template.features.swap.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.sdk.api.generated.resources.SwapResource
+import org.tokend.sdk.utils.extentions.decodeHex
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
 import java.math.BigDecimal
@@ -47,6 +48,9 @@ class SwapRecord(
             )
         }
     }
+
+    val hashBytes: ByteArray
+        get() = hash.decodeHex()
 
     override fun hashCode(): Int {
         return hash.hashCode()
