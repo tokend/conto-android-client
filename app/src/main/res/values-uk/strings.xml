@@ -297,6 +297,7 @@
     <string name="payout_fee">Виплата</string>
     <string name="atomic_swap_sale_fee">Пряма покупка</string>
     <string name="atomic_swap_purchase_fee">Прямий продаж</string>
+    <string name="swap_fee">Обмін</string>
     <string name="incoming_outgoing_fee"><![CDATA[Отримання та Відправка]]></string>
     <string name="outgoing_fee">Відправка</string>
     <string name="incoming_fee">Отримання</string>
@@ -538,7 +539,10 @@
     <string name="people_nearby_enumeration">Люди поблизу:</string>
     <string name="swap_state_needs_your_confirmation">Необхідне ваше підтвердження</string>
     <string name="swap_state_needs_counterparty_confirmation">Необхідне підтвердження контрагента</string>
-    <string name="swap_state_claim_available">Можна отримати кошти</string>
+    <string name="swap_state_can_be_received">Можна отримати кошти</string>
+    <string name="swap_state_waiting_for_counterparty_receive">Ожидание получения контрагентом</string>
+    <string name="swap_state_canceled">Скасовано</string>
+    <string name="swap_state_canceled_by_counterparty">Скасовано контрагентом</string>
     <string name="swap_state_completed">Завершено</string>
     <string name="swaps_screen_title">Обміни</string>
     <string name="swap_counterparty">Контрагент</string>
@@ -546,4 +550,5 @@
     <string name="create_swap">Створити обмін</string>
     <string name="swap_asset_to_receive">Актив до отримання</string>
     <string name="balance_change_cause_swap">Обмін</string>
+    <string name="no_swaps">Немає активних обмінів</string>
 </resources>

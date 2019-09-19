@@ -299,6 +299,7 @@
     <string name="payout_fee">Payout</string>
     <string name="atomic_swap_sale_fee">Sale atomic swap</string>
     <string name="atomic_swap_purchase_fee">Purchase atomic swap</string>
+    <string name="swap_fee">Swap</string>
     <string name="incoming_outgoing_fee"><![CDATA[Incoming & Outgoing]]></string>
     <string name="outgoing_fee">Outgoing</string>
     <string name="incoming_fee">Incoming</string>
@@ -527,14 +528,18 @@
     <string name="people_nearby_enumeration">People nearby:</string>
     <string name="swap_state_needs_your_confirmation">Needs your confirmation</string>
     <string name="swap_state_needs_counterparty_confirmation">Needs counterparty confirmation</string>
-    <string name="swap_state_claim_available">Can be received</string>
+    <string name="swap_state_can_be_received">Can be received</string>
+    <string name="swap_state_waiting_for_counterparty_receive">Waiting for counterparty to receive</string>
     <string name="swap_state_completed">Completed</string>
+    <string name="swap_state_canceled">Canceled</string>
+    <string name="swap_state_canceled_by_counterparty">Canceled by counterparty</string>
     <string name="swaps_screen_title">Swaps</string>
     <string name="swap_counterparty">Counterparty</string>
     <string name="error_invalid_counterparty">Invalid counterparty</string>
     <string name="create_swap">Create swap</string>
     <string name="swap_asset_to_receive">Asset to receive</string>
     <string name="balance_change_cause_swap">Swap</string>
+    <string name="no_swaps">No active swaps</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

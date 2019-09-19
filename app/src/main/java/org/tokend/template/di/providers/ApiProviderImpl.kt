@@ -55,7 +55,7 @@ class ApiProviderImpl(
     }
 
     override fun getKeyServer(index: Int): KeyServer {
-        return KeyServer(getApi().wallets)
+        return KeyServer(getApi(index).wallets)
     }
 
     override fun getSignedApi(index: Int): TokenDApi? = synchronized(this) {

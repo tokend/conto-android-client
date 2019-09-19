@@ -25,6 +25,8 @@ import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.features.polls.repository.PollsCache
 import org.tokend.template.features.polls.repository.PollsRepository
 import org.tokend.template.features.send.recipient.repository.ContactsRepository
+import org.tokend.template.features.swap.repository.SwapsCache
+import org.tokend.template.features.swap.repository.SwapsRepository
 import org.tokend.template.features.trade.orderbook.repository.OrderBookRepository
 
 /**
@@ -155,6 +157,10 @@ class RepositoryProviderImpl(
 
     private val companiesRepository: CompaniesRepository by lazy {
         CompaniesRepository(apiProvider, urlConfigProvider, MemoryOnlyRepositoryCache())
+    }
+
+    private val swapsRepository: SwapsRepository by lazy {
+        SwapsRepository(apiProvider, urlConfigProvider, walletInfoProvider, mapper, SwapsCache())
     }
 
     override fun balances(): BalancesRepository {
@@ -347,6 +353,10 @@ class RepositoryProviderImpl(
                     MemoryOnlyRepositoryCache()
             )
         }
+    }
+
+    override fun swaps(): SwapsRepository {
+        return swapsRepository
     }
 
     companion object {

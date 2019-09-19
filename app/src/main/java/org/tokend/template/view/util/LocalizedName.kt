@@ -31,6 +31,7 @@ class LocalizedName(private val context: Context) {
             FeeType.PAYOUT_FEE -> context.getString(R.string.payout_fee)
             FeeType.ATOMIC_SWAP_SALE_FEE -> context.getString(R.string.atomic_swap_sale_fee)
             FeeType.ATOMIC_SWAP_PURCHASE_FEE -> context.getString(R.string.atomic_swap_purchase_fee)
+            FeeType.SWAP_FEE -> context.getString(R.string.swap_fee)
         }
     }
 
@@ -169,10 +170,20 @@ class LocalizedName(private val context: Context) {
                     context.getString(R.string.swap_state_needs_your_confirmation)
                 else
                     context.getString(R.string.swap_state_needs_counterparty_confirmation)
-            SwapState.ABILITY_TO_RECEIVE ->
-                context.getString(R.string.swap_state_claim_available)
+            SwapState.WAITING_FOR_CLOSE_BY_SOURCE ->
+                if (isIncoming) {
+                    context.getString(R.string.swap_state_waiting_for_counterparty_receive)
+                } else {
+                    context.getString(R.string.swap_state_can_be_received)
+                }
+            SwapState.CAN_BE_RECEIVED_BY_DEST ->
+                context.getString(R.string.swap_state_can_be_received)
             SwapState.COMPLETED ->
                 context.getString(R.string.swap_state_completed)
+            SwapState.CANCELED ->
+                context.getString(R.string.swap_state_canceled)
+            SwapState.CANCELED_BY_COUNTERPARTY ->
+                context.getString(R.string.swap_state_canceled_by_counterparty)
         }
     }
 }

@@ -14,6 +14,7 @@ import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.features.polls.repository.PollsRepository
 import org.tokend.template.features.send.recipient.repository.ContactsRepository
+import org.tokend.template.features.swap.repository.SwapsRepository
 import org.tokend.template.features.trade.orderbook.repository.OrderBookRepository
 
 interface RepositoryProvider {
@@ -46,4 +47,5 @@ interface RepositoryProvider {
     fun keyValueEntries(): KeyValueEntriesRepository
     fun blobs(): BlobsRepository
     fun marketplaceOffers(ownerAccountId: String?): MarketplaceOffersRepository
+    fun swaps(): SwapsRepository
 }

@@ -25,28 +25,41 @@ class SwapItemViewHolder(
 
     private val secondaryColor = ContextCompat.getColor(view.context, R.color.secondary_text)
     private val okColor = ContextCompat.getColor(view.context, R.color.ok)
+    private val errorColor = ContextCompat.getColor(view.context, R.color.error)
 
     override fun bind(item: SwapListItem) {
         baseAmountTextView.text = amountFormatter.formatAssetAmount(
-                item.baseAmount,
-                item.baseAsset,
+                item.payAmount,
+                item.payAsset,
                 withAssetCode = false
         )
-        baseAssetTextView.text = item.baseAsset.name ?: item.baseAsset.code
+        baseAssetTextView.text = item.payAsset.name ?: item.payAsset.code
 
         quoteAmountTextView.text = amountFormatter.formatAssetAmount(
-                item.quoteAmount,
-                item.quoteAsset,
+                item.receiveAmount,
+                item.receiveAsset,
                 withAssetCode = false
         )
-        quoteAssetTextView.text = item.quoteAsset.name ?: item.quoteAsset.code
+        quoteAssetTextView.text = item.receiveAsset.name ?: item.receiveAsset.code
 
-        counterpartyTextView.text = item.counterparty
+        if (item.counterparty != null) {
+            counterpartyTextView.visibility = View.VISIBLE
+            counterpartyTextView.text = item.counterparty
+        } else {
+            counterpartyTextView.visibility = View.GONE
+        }
 
         stateTextView.text = localizedName.forSwapState(item.state, item.isIncoming)
         stateTextView.textColor = when (item.state) {
             SwapState.CREATED -> secondaryColor
-            else -> okColor
+            SwapState.CANCELED,
+            SwapState.CANCELED_BY_COUNTERPARTY -> errorColor
+            else -> {
+                if (item.isIncoming && item.state == SwapState.WAITING_FOR_CLOSE_BY_SOURCE)
+                    secondaryColor
+                else
+                    okColor
+            }
         }
     }
 }

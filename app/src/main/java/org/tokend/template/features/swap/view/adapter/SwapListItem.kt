@@ -6,20 +6,20 @@ import org.tokend.template.features.swap.model.SwapState
 import java.math.BigDecimal
 
 class SwapListItem(
-        val baseAmount: BigDecimal,
-        val baseAsset: Asset,
-        val quoteAmount: BigDecimal,
-        val quoteAsset: Asset,
-        val counterparty: String,
+        val payAmount: BigDecimal,
+        val payAsset: Asset,
+        val receiveAmount: BigDecimal,
+        val receiveAsset: Asset,
+        val counterparty: String?,
         val state: SwapState,
         val isIncoming: Boolean,
         val source: SwapRecord?
 ) {
     constructor(source: SwapRecord) : this(
-            baseAmount = source.baseAmount,
-            baseAsset = source.baseAsset,
-            quoteAmount = source.quoteAmount,
-            quoteAsset = source.quoteAsset,
+            payAmount = if (!source.isIncoming) source.baseAmount else source.quoteAmount,
+            payAsset = if (!source.isIncoming) source.baseAsset else source.quoteAsset,
+            receiveAmount = if (source.isIncoming) source.baseAmount else source.quoteAmount,
+            receiveAsset = if (source.isIncoming) source.baseAsset else source.quoteAsset,
             counterparty = source.counterpartyEmail,
             state = source.state,
             isIncoming = source.isIncoming,
