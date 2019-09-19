@@ -12,6 +12,7 @@ import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.swap.model.SwapDetails
 import org.tokend.template.features.swap.model.SwapRecord
+import org.tokend.template.features.swap.model.SwapState
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.PublicKeyFactory
@@ -116,7 +117,10 @@ class ConfirmIncomingSwapUseCase(
                 balanceId = quoteBalance.id,
                 delta = -incomingSwap.quoteAmount
         )
-        repositoryProvider.swaps().updateIfEverUpdated()
+        repositoryProvider.swaps().updateSwapState(
+                hash = incomingSwap.hash,
+                state = SwapState.WAITING_FOR_CLOSE_BY_SOURCE
+        )
     }
 
     private companion object {

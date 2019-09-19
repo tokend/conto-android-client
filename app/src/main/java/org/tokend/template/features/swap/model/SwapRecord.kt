@@ -19,7 +19,7 @@ class SwapRecord(
         var quoteAsset: Asset,
         val hash: String,
         val secret: ByteArray?,
-        val state: SwapState,
+        var state: SwapState,
         val isIncoming: Boolean,
         val createdAt: Date,
         val sourceEmail: String,
@@ -63,4 +63,12 @@ class SwapRecord(
 
     val hashBytes: ByteArray
         get() = hash.decodeHex()
+
+    override fun hashCode(): Int {
+        return hash.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is SwapRecord && other.hash == this.hash
+    }
 }

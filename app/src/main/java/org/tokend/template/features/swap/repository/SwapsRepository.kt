@@ -7,7 +7,6 @@ import io.reactivex.rxkotlin.toMaybe
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.generated.resources.SwapResource
-import org.tokend.sdk.api.v3.swaps.params.SwapParams
 import org.tokend.sdk.api.v3.swaps.params.SwapsPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.sdk.utils.extentions.decodeHex
@@ -106,7 +105,6 @@ class SwapsRepository(
             signedApi.v3.swaps
                     .get(SwapsPageParams(
                             source = accountId,
-                            include = listOf(SwapParams.Includes.ASSET),
                             pagingParams = PagingParamsV2(
                                     page = nextCursor,
                                     limit = 20
@@ -142,7 +140,6 @@ class SwapsRepository(
             signedApi.v3.swaps
                     .get(SwapsPageParams(
                             destination = accountId,
-                            include = listOf(SwapParams.Includes.ASSET),
                             pagingParams = PagingParamsV2(
                                     page = nextCursor,
                                     limit = 20
@@ -241,6 +238,17 @@ class SwapsRepository(
                             swap.baseAsset = assetsMap.getValue(swap.baseAsset.code)
                         }
                     }
+                }
+    }
+
+    fun updateSwapState(hash: String,
+                        state: SwapState) {
+        itemsList
+                .find { it.hash == hash }
+                ?.also { swap ->
+                    swap.state = state
+                    itemsCache.update(swap)
+                    broadcast()
                 }
     }
 }

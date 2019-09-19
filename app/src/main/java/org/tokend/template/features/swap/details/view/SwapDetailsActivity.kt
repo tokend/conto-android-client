@@ -38,8 +38,14 @@ class SwapDetailsActivity : BaseActivity() {
     private lateinit var mainDataView: BalanceChangeMainDataView
 
     private val loadingIndicator = LoadingIndicatorManager(
-            showLoading = { swipe_refresh.isRefreshing = true },
-            hideLoading = { swipe_refresh.isRefreshing = false }
+            showLoading = {
+                swipe_refresh.isRefreshing = true
+                action_button.isEnabled = false
+            },
+            hideLoading = {
+                swipe_refresh.isRefreshing = false
+                action_button.isEnabled = true
+            }
     )
 
     private lateinit var swapHash: String
@@ -142,7 +148,11 @@ class SwapDetailsActivity : BaseActivity() {
                 DetailsItem(
                         id = TO_PAY_ITEM_ID,
                         text = amountFormatter.formatAssetAmount(amount, asset, withAssetName = true),
-                        hint = getString(R.string.to_receive),
+                        hint =
+                        if (swap.state == SwapState.COMPLETED)
+                            getString(R.string.received)
+                        else
+                            getString(R.string.to_receive),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_coins)
                 )
         )
@@ -224,7 +234,10 @@ class SwapDetailsActivity : BaseActivity() {
                     .doOnSubscribe { progress.show() }
                     .doOnEvent { progress.dismiss() }
                     .subscribeBy(
-                            onComplete = { progress.dismiss() },
+                            onComplete = {
+                                progress.dismiss()
+                                toastManager.short(R.string.incoming_swap_confirmed)
+                            },
                             onError = { errorHandlerFactory.getDefault().handle(it) }
                     )
         }
@@ -250,7 +263,10 @@ class SwapDetailsActivity : BaseActivity() {
                     .doOnSubscribe { progress.show() }
                     .doOnEvent { progress.dismiss() }
                     .subscribeBy(
-                            onComplete = { progress.dismiss() },
+                            onComplete = {
+                                progress.dismiss()
+                                toastManager.short(R.string.swap_funds_received)
+                            },
                             onError = { errorHandlerFactory.getDefault().handle(it) }
                     )
         }
@@ -275,7 +291,10 @@ class SwapDetailsActivity : BaseActivity() {
                     .doOnSubscribe { progress.show() }
                     .doOnEvent { progress.dismiss() }
                     .subscribeBy(
-                            onComplete = { progress.dismiss() },
+                            onComplete = {
+                                progress.dismiss()
+                                toastManager.short(R.string.swap_funds_received)
+                            },
                             onError = { errorHandlerFactory.getDefault().handle(it) }
                     )
         }

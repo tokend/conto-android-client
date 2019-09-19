@@ -543,6 +543,8 @@
     <string name="incoming_swap">Swap request</string>
     <string name="receive_swap_funds">Receive funds</string>
     <string name="swap_created">Swap has been created</string>
+    <string name="incoming_swap_confirmed">Request has been confirmed</string>
+    <string name="swap_funds_received">Funds have been received</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

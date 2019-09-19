@@ -7,6 +7,7 @@ import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.swap.model.SwapRecord
+import org.tokend.template.features.swap.model.SwapState
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
@@ -81,6 +82,9 @@ class CloseIncomingSwapUseCase(
                 assetCode = incomingSwap.baseAsset.code,
                 delta = incomingSwap.baseAmount
         )
-        repositoryProvider.swaps().updateIfEverUpdated()
+        repositoryProvider.swaps().updateSwapState(
+                hash = incomingSwap.hash,
+                state = SwapState.COMPLETED
+        )
     }
 }

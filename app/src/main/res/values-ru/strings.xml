@@ -554,4 +554,6 @@
     <string name="incoming_swap">Запрос на обмен</string>
     <string name="receive_swap_funds">Получить средства</string>
     <string name="swap_created">Обмен создан</string>
+    <string name="incoming_swap_confirmed">Запрос подтвержден</string>
+    <string name="swap_funds_received">Средства получены</string>
 </resources>
