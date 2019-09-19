@@ -18,12 +18,14 @@ import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.extensions.mapSuccessful
 import org.tokend.template.features.swap.model.SwapRecord
 import org.tokend.template.features.swap.model.SwapState
+import org.tokend.template.features.swap.persistence.SwapSecretsPersistor
 
 class SwapsRepository(
         private val apiProvider: ApiProvider,
         private val urlConfigProvider: UrlConfigProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val objectMapper: ObjectMapper,
+        private val secretsPersistor: SwapSecretsPersistor,
         itemsCache: RepositoryCache<SwapRecord>
 ) : SimpleMultipleItemsRepository<SwapRecord>(itemsCache) {
     private var sourceSystemIndex: Int? = null
@@ -149,8 +151,7 @@ class SwapsRepository(
         val hash = swapResource.secretHash
         val remoteState = org.tokend.sdk.api.v3.swaps.model.SwapState.fromValue(swapResource.state)
 
-        // TODO: Secret persistence
-        val secret = byteArrayOf()
+        val secret = secretsPersistor.loadSecret(hash)
 
         val state = when {
             remoteState == org.tokend.sdk.api.v3.swaps.model.SwapState.CANCELED ->

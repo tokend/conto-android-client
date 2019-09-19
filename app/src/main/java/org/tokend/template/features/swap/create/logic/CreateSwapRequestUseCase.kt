@@ -10,6 +10,7 @@ import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.swap.create.model.SwapRequest
+import org.tokend.template.features.swap.persistence.SwapSecretsPersistor
 import java.math.BigDecimal
 import java.security.SecureRandom
 
@@ -20,7 +21,8 @@ class CreateSwapRequestUseCase(
         private val quoteAsset: Asset,
         private val counterparty: PaymentRecipient,
         private val balancesRepository: BalancesRepository,
-        private val walletInfoProvider: WalletInfoProvider
+        private val walletInfoProvider: WalletInfoProvider,
+        private val secretsPersistor: SwapSecretsPersistor
 ) {
     private lateinit var sourceAccountId: String
     private lateinit var baseBalance: BalanceRecord
@@ -44,6 +46,9 @@ class CreateSwapRequestUseCase(
                     this.secret = secret
                 }
                 .flatMap { getRequest() }
+                .doOnSuccess { request ->
+                    secretsPersistor.saveSecret(request.hashString, request.secret)
+                }
     }
 
     private fun getAccountId(): Single<String> {

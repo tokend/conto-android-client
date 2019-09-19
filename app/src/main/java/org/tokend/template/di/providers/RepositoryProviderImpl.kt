@@ -25,6 +25,7 @@ import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.features.polls.repository.PollsCache
 import org.tokend.template.features.polls.repository.PollsRepository
 import org.tokend.template.features.send.recipient.repository.ContactsRepository
+import org.tokend.template.features.swap.persistence.SwapSecretsPersistor
 import org.tokend.template.features.swap.repository.SwapsCache
 import org.tokend.template.features.swap.repository.SwapsRepository
 import org.tokend.template.features.trade.orderbook.repository.OrderBookRepository
@@ -160,7 +161,9 @@ class RepositoryProviderImpl(
     }
 
     private val swapsRepository: SwapsRepository by lazy {
-        SwapsRepository(apiProvider, urlConfigProvider, walletInfoProvider, mapper, SwapsCache())
+        SwapsRepository(apiProvider, urlConfigProvider, walletInfoProvider, mapper,
+                SwapSecretsPersistor(context!!.getSharedPreferences("swaps", Context.MODE_PRIVATE)
+                ), SwapsCache())
     }
 
     override fun balances(): BalancesRepository {

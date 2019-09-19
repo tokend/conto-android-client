@@ -1,5 +1,8 @@
 package org.tokend.template.features.swap.create.view
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
@@ -16,6 +19,7 @@ import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.swap.create.logic.CreateSwapRequestUseCase
 import org.tokend.template.features.swap.create.model.SwapQuoteAmountAndCounterparty
 import org.tokend.template.features.swap.create.model.SwapRequest
+import org.tokend.template.features.swap.persistence.SwapSecretsPersistor
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -127,7 +131,8 @@ class CreateSwapActivity : BaseActivity() {
                 quoteAsset,
                 counterparty,
                 repositoryProvider.balances(),
-                walletInfoProvider
+                walletInfoProvider,
+                SwapSecretsPersistor(getSharedPreferences("swaps", Context.MODE_PRIVATE))
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
@@ -164,6 +169,13 @@ class CreateSwapActivity : BaseActivity() {
             super.onBackPressed()
         } else {
             supportFragmentManager.popBackStackImmediate()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            finish()
         }
     }
 

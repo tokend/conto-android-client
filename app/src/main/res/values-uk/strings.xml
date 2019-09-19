@@ -554,4 +554,5 @@
     <string name="to_pay">Буде списано</string>
     <string name="incoming_swap">Запит на обмін</string>
     <string name="receive_swap_funds">Отримати кошти</string>
+    <string name="swap_created">Обмін створено</string>
 </resources>

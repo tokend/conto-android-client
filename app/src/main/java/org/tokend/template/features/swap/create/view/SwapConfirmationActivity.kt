@@ -7,18 +7,23 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.LinearLayout
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_change_confirmation.*
 import kotlinx.android.synthetic.main.appbar_with_balance_change_main_data.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_balance_change_main_data.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.swap.create.logic.ConfirmSwapRequestUseCase
 import org.tokend.template.features.swap.create.model.SwapRequest
+import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.util.ElevationUtil
+import org.tokend.template.view.util.ProgressDialogFactory
 import java.math.BigDecimal
 
 class SwapConfirmationActivity : BaseActivity() {
@@ -80,8 +85,8 @@ class SwapConfirmationActivity : BaseActivity() {
     }
 
     private fun displayAmounts() {
-        mainDataView.displayAmount(request.baseAmount, request.baseAsset, false)
-        mainDataView.displayNonZeroFee(BigDecimal.ZERO, request.baseAsset)
+        mainDataView.displayAmount(request.baseAmount, request.baseBalance.asset, false)
+        mainDataView.displayNonZeroFee(BigDecimal.ZERO, request.baseBalance.asset)
 
         adapter.addData(
                 DetailsItem(
@@ -107,7 +112,38 @@ class SwapConfirmationActivity : BaseActivity() {
     }
 
     private fun confirm() {
+        val progress = ProgressDialogFactory.getDialog(this)
+
+        ConfirmSwapRequestUseCase(
+                request,
+                apiProvider,
+                repositoryProvider,
+                accountProvider,
+                JsonApiToolsProvider.getObjectMapper()
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe {
+                    progress.show()
+                }
+                .doOnTerminate {
+                    progress.dismiss()
+                }
+                .subscribeBy(
+                        onComplete = {
+                            progress.dismiss()
+                            toastManager.long(R.string.swap_created)
+                            finishWithSuccess()
+                        },
+                        onError = {
+                            errorHandlerFactory.getDefault().handle(it)
+                        }
+                )
+    }
+
+    private fun finishWithSuccess() {
         setResult(Activity.RESULT_OK)
+        finish()
     }
 
     companion object {

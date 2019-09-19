@@ -59,7 +59,7 @@ class ConfirmSwapRequestUseCase(
                             PublicKeyFactory.fromAccountId(request.destAccountId)
                     ),
                     lockTime = LOCK_TIME_SECONDS,
-                    secretHash = Hash(request.secret),
+                    secretHash = Hash(request.hash),
                     details = objectMapper.writeValueAsString(
                             SwapQuoteAmountDetails(
                                     request.quoteAmount,
