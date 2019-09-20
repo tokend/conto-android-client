@@ -37,4 +37,7 @@ class AccountRecord(
         REJECTED,
         PERMANENTLY_REJECTED;
     }
+
+    val isKycRecoveryActive: Boolean
+        get() = kycRecoveryStatus != KycRecoveryStatus.NONE
 }

@@ -14,20 +14,20 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_network_field.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.jetbrains.anko.browse
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.enabled
 import org.jetbrains.anko.onClick
 import org.tokend.sdk.api.wallets.model.EmailNotVerifiedException
 import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
+import org.tokend.template.App
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
@@ -246,9 +246,12 @@ class SignInActivity : BaseActivity() {
 
     private fun onSignInComplete() {
         // KYC recovery check.
-        val kycRecoveryStatus = repositoryProvider.account().item?.kycRecoveryStatus
-        if (kycRecoveryStatus != null && kycRecoveryStatus != AccountRecord.KycRecoveryStatus.NONE) {
-            showKycRecoveryStatusDialog(kycRecoveryStatus)
+        val account = repositoryProvider.account().item
+        if (account != null && account.isKycRecoveryActive) {
+            KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
+                    .getStatusDialog(account, urlConfigProvider.getConfig().client)
+                    .show()
+            (application as? App)?.signOut(null)
         } else {
             canSignIn = false
 
@@ -267,29 +270,6 @@ class SignInActivity : BaseActivity() {
                 errorHandlerFactory.getDefault().handle(error)
         }
         updateSignInAvailability()
-    }
-
-    private fun showKycRecoveryStatusDialog(status: AccountRecord.KycRecoveryStatus) {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.kyc_recovery_status_dialog_title)
-                .setMessage(when (status) {
-                    AccountRecord.KycRecoveryStatus.PENDING ->
-                        R.string.kyc_recovery_pending_message
-                    AccountRecord.KycRecoveryStatus.REJECTED,
-                    AccountRecord.KycRecoveryStatus.PERMANENTLY_REJECTED ->
-                        R.string.kyc_recovery_rejected_message
-                    else ->
-                        R.string.kyc_recovery_initiated_message
-                })
-                .setPositiveButton(R.string.ok, null)
-                .apply {
-                    if (status == AccountRecord.KycRecoveryStatus.INITIATED) {
-                        setNeutralButton(R.string.open_action) { _, _ ->
-                            browse(urlConfigProvider.getConfig().client, true)
-                        }
-                    }
-                }
-                .show()
     }
 
     private fun updateAdditionalButtonsState(isEnabled: Boolean) {

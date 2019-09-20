@@ -65,10 +65,15 @@ class KycStateRepository(
     val itemFormData: KycForm?
         get() = (item as? KycState.Submitted<*>)?.formData
 
+    val isFormApproved: Boolean
+        get() = item is KycState.Submitted.Approved<*>
+
     var forcedType: ForcedAccountType? = null
 
     val isActualOrForcedGeneral: Boolean
-        get() = itemFormData is KycForm.General || forcedType == ForcedAccountType.GENERAL
+        get() = itemFormData is KycForm.General
+                || itemFormData is KycForm.Corporate && !isFormApproved
+                || forcedType == ForcedAccountType.GENERAL
 
     fun set(newState: KycState) {
         onNewItem(newState)

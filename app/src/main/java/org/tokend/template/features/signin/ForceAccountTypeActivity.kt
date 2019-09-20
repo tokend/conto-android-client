@@ -47,7 +47,7 @@ class ForceAccountTypeActivity : BaseActivity() {
         if (forcedAccountType == ForcedAccountType.CORPORATE) {
             Navigator.from(this).toCorporateMainActivity()
         } else {
-            Navigator.from(this).toMainActivity()
+            Navigator.from(this).toClientMainActivity()
         }
     }
 

@@ -38,6 +38,7 @@ import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
+import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
@@ -224,7 +225,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun initAccountTypeSwitch(accountHeader: AccountHeader) {
         val view = accountHeader.view.findViewById<View>(R.id.account_type_switch_layout)
                 ?: return
-        if (kycStateRepository.itemFormData is KycForm.Corporate) {
+        if (kycStateRepository.itemFormData is KycForm.Corporate
+                && kycStateRepository.isFormApproved) {
             view.visibility = View.VISIBLE
             view.account_type_switch_hint.text = getAccountTypeSwitchHint()
             view.account_type_switch_button.setOnClickListener {
@@ -462,7 +464,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         }
 
         Navigator.from(this).openShakeToPay()
-        
+
         shakeDetectionPostponed = true
         Completable.complete()
                 .delay(1, TimeUnit.SECONDS)

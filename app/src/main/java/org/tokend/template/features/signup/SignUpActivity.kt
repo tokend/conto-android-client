@@ -334,7 +334,7 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun onSuccessfulSignIn() {
-        Navigator.from(this).toMainActivity(finishAffinity = true)
+        Navigator.from(this).performPostSignInRouting(repositoryProvider.kycState().item)
     }
 
     private fun handleSignInError(error: Throwable) {

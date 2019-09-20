@@ -203,7 +203,7 @@ class Navigator private constructor() {
         activity?.finish()
     }
 
-    fun toMainActivity(finishAffinity: Boolean = false) {
+    fun toClientMainActivity(finishAffinity: Boolean = false) {
         context?.intentFor<MainActivity>()
                 ?.also { performIntent(it) }
         activity?.let {
@@ -531,12 +531,16 @@ class Navigator private constructor() {
         val kycForm = (kycState as? KycState.Submitted<*>)?.formData
 
         if (kycForm is KycForm.Corporate) {
-            toCorporateMainActivity()
+            if (kycState is KycState.Submitted.Approved<*>) {
+                toCorporateMainActivity()
+            } else {
+                toClientMainActivity()
+            }
         } else if (kycForm is KycForm.General) {
             if (kycState is KycState.Submitted.Pending<*>) {
                 toWaitingForKycApproval()
             } else {
-                toMainActivity()
+                toClientMainActivity()
             }
         } else {
             toClientKyc()
