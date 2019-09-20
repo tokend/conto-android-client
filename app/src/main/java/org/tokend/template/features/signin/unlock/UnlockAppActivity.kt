@@ -19,6 +19,7 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.persistance.FingerprintAuthManager
@@ -282,8 +283,20 @@ class UnlockAppActivity : BaseActivity() {
     }
 
     private fun onUnlockComplete() {
-        Navigator.from(this)
-                .performPostSignInRouting(repositoryProvider.kycState().item)
+        // KYC recovery check.
+        val account = repositoryProvider.account().item
+        if (account != null && account.isKycRecoveryActive) {
+            KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
+                    .getStatusDialog(account, urlConfigProvider.getConfig().client) {
+                        setOnDismissListener {
+                            (application as? App)?.signOut(this@UnlockAppActivity)
+                        }
+                    }
+                    .show()
+        } else {
+            Navigator.from(this)
+                    .performPostSignInRouting(repositoryProvider.kycState().item)
+        }
     }
 
     private fun onUnlockError(error: Throwable) {

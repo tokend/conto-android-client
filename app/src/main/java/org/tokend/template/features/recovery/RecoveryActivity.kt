@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.view.View
 import io.reactivex.rxkotlin.addTo
@@ -14,7 +13,6 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_network_field.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.jetbrains.anko.browse
 import org.jetbrains.anko.enabled
 import org.jetbrains.anko.onClick
 import org.tokend.sdk.api.wallets.model.EmailNotVerifiedException
@@ -22,8 +20,10 @@ import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.extensions.*
 import org.tokend.template.features.recovery.logic.RecoverPasswordUseCase
+import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.logic.UrlConfigManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -217,7 +217,7 @@ class RecoveryActivity : BaseActivity() {
                     password.fill('0')
                 }
                 .subscribeBy(
-                        onComplete = this::showNotVerifiedEmailDialogAndFinish,
+                        onComplete = this::showInitiatedRecoveryDialogAndFinish,
                         onError = {
                             handleRecoveryError(it)
                             updateRecoveryAvailability()
@@ -226,16 +226,15 @@ class RecoveryActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
-    private fun showNotVerifiedEmailDialogAndFinish() {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.almost_done)
-                .setMessage(R.string.kyc_recovery_initiated_message)
-                .setOnDismissListener {
-                    finishWithSuccess()
-                }
-                .setPositiveButton(R.string.ok, null)
-                .setNeutralButton(R.string.open_action) { _, _ ->
-                    browse(urlConfigProvider.getConfig().client, true)
+    private fun showInitiatedRecoveryDialogAndFinish() {
+        KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
+                .getStatusDialog(
+                        AccountRecord.KycRecoveryStatus.INITIATED,
+                        urlConfigProvider.getConfig().client
+                ) {
+                    setOnDismissListener {
+                        finishWithSuccess()
+                    }
                 }
                 .show()
     }
