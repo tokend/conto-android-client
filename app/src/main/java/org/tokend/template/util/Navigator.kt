@@ -527,7 +527,11 @@ class Navigator private constructor() {
         val kycForm = (kycState as? KycState.Submitted<*>)?.formData
 
         if (kycForm is KycForm.Corporate) {
-            toCorporateMainActivity()
+            if (kycState is KycState.Submitted.Approved<*>) {
+                toCorporateMainActivity()
+            } else {
+                toClientMainActivity()
+            }
         } else if (kycForm is KycForm.General) {
             if (kycState is KycState.Submitted.Pending<*>) {
                 toWaitingForKycApproval()
