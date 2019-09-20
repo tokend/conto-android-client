@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.view.View
 import io.reactivex.rxkotlin.addTo
@@ -13,6 +14,7 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_network_field.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.browse
 import org.jetbrains.anko.enabled
 import org.jetbrains.anko.onClick
 import org.tokend.sdk.api.wallets.model.EmailNotVerifiedException
@@ -215,16 +217,27 @@ class RecoveryActivity : BaseActivity() {
                     password.fill('0')
                 }
                 .subscribeBy(
-                        onComplete = {
-                            toastManager.long(R.string.kyc_recovery_initiated_message)
-                            finishWithSuccess()
-                        },
+                        onComplete = this::showNotVerifiedEmailDialogAndFinish,
                         onError = {
                             handleRecoveryError(it)
                             updateRecoveryAvailability()
                         }
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun showNotVerifiedEmailDialogAndFinish() {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(R.string.almost_done)
+                .setMessage(R.string.kyc_recovery_initiated_message)
+                .setOnDismissListener {
+                    finishWithSuccess()
+                }
+                .setPositiveButton(R.string.ok, null)
+                .setNeutralButton(R.string.open_action) { _, _ ->
+                    browse(urlConfigProvider.getConfig().client, true)
+                }
+                .show()
     }
 
     private fun finishWithSuccess() {

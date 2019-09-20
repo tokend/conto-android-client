@@ -199,7 +199,7 @@ class Navigator private constructor() {
         activity?.finish()
     }
 
-    fun toMainActivity(finishAffinity: Boolean = false) {
+    fun toClientMainActivity(finishAffinity: Boolean = false) {
         context?.intentFor<MainActivity>()
                 ?.also { performIntent(it) }
         activity?.let {
@@ -532,7 +532,7 @@ class Navigator private constructor() {
             if (kycState is KycState.Submitted.Pending<*>) {
                 toWaitingForKycApproval()
             } else {
-                toMainActivity()
+                toClientMainActivity()
             }
         } else {
             toClientKyc()
