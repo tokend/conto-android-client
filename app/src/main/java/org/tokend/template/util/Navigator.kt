@@ -121,23 +121,25 @@ class Navigator private constructor() {
             if (!IntentLock.checkIntent(intent, context)) return
             activity?.let {
                 if (requestCode != null) {
-                    it.startActivityForResult(intent, requestCode, bundle ?: Bundle.EMPTY)
+                    ActivityCompat.startActivityForResult(it, intent, requestCode, bundle)
                 } else {
-                    it.startActivity(intent, bundle ?: Bundle.EMPTY)
+                    ActivityCompat.startActivity(it, intent, bundle)
                 }
                 return
             }
 
             fragment?.let {
                 if (requestCode != null) {
-                    it.startActivityForResult(intent, requestCode, bundle ?: Bundle.EMPTY)
+                    it.startActivityForResult(intent, requestCode, bundle)
                 } else {
-                    it.startActivity(intent, bundle ?: Bundle.EMPTY)
+                    it.startActivity(intent, bundle)
                 }
                 return
             }
 
-            context?.startActivity(intent.newTask(), bundle ?: Bundle.EMPTY)
+            context?.let {
+                ActivityCompat.startActivity(it, intent.newTask(), bundle)
+            }
         }
     }
 
