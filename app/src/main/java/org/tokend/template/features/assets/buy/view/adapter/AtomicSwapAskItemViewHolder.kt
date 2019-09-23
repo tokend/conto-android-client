@@ -19,7 +19,7 @@ class AtomicSwapAskItemViewHolder(view: View,
     private val pricesHintTextView: TextView = view.findViewById(R.id.prices_hint_text_view)
     private val pricesLayout: ViewGroup = view.findViewById(R.id.prices_layout)
     private val buyButton: Button = view.findViewById(R.id.buy_btn)
-    private val priceThemedContext = ContextThemeWrapper(view.context, R.style.StrokedBadgeText)
+    private val priceThemedContext = ContextThemeWrapper(view.context, R.style.BadgeText)
 
     private val priceTextViewMargin =
             view.context.resources.getDimensionPixelSize(R.dimen.quarter_standard_margin)
@@ -42,7 +42,7 @@ class AtomicSwapAskItemViewHolder(view: View,
 
         pricesLayout.removeAllViews()
         item.quoteAssets.forEach { quoteAsset ->
-            val textView = TextView(priceThemedContext, null, R.style.StrokedBadgeText)
+            val textView = TextView(priceThemedContext, null, R.style.BadgeText)
             textView.text = amountFormatter.formatAssetAmount(
                     quoteAsset.price,
                     quoteAsset,

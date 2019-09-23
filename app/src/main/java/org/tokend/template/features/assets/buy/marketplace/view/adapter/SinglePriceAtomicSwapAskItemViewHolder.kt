@@ -19,19 +19,20 @@ class SinglePriceAtomicSwapAskItemViewHolder(
     private val priceTextView: TextView = view.findViewById(R.id.price_text_view)
     private val availableTextView: TextView = view.findViewById(R.id.available_text_view)
     private val companyNameTextView: TextView = view.findViewById(R.id.company_name_text_view)
+    private val assetDescriptionTextView: TextView = view.findViewById(R.id.asset_description_text_view)
     private val buyButton: Button = view.findViewById(R.id.buy_btn)
 
     override fun bind(item: MarketplaceOfferListItem) {
         CircleLogoUtil.setAssetLogo(logoImageView, item.asset)
         assetNameTextView.text = item.asset.name ?: item.asset.code
-        priceTextView.text = view.context.getString(
-                R.string.template_price,
+        priceTextView.text = //view.context.getString(
+//                R.string.template_price,
                 amountFormatter.formatAssetAmount(
                         item.price,
                         item.priceAsset,
                         withAssetCode = true
                 )
-        )
+//        )
         availableTextView.text = view.context.getString(
                 R.string.template_amount_available_for_buy,
                 amountFormatter.formatAssetAmount(
@@ -46,6 +47,13 @@ class SinglePriceAtomicSwapAskItemViewHolder(
             companyNameTextView.visibility = View.VISIBLE
         } else {
             companyNameTextView.visibility = View.GONE
+        }
+
+        if (item.assetDescription != null) {
+            assetDescriptionTextView.visibility = View.VISIBLE
+            assetDescriptionTextView.text = item.assetDescription
+        } else {
+            assetDescriptionTextView.visibility = View.GONE
         }
     }
 

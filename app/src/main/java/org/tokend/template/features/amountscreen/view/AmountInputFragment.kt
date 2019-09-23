@@ -194,7 +194,13 @@ open class AmountInputFragment : BaseFragment() {
     }
 
     protected open fun initTitle() {
-        title_text_view.text = getTitleText()
+        val title = getTitleText()
+        if (title != null) {
+            title_text_view.text = title
+            title_text_view.visibility = View.VISIBLE
+        } else {
+            title_text_view.visibility = View.GONE
+        }
     }
 
     protected open fun initExtraView() {
