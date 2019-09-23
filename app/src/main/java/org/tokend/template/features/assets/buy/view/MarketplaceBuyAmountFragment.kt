@@ -2,8 +2,6 @@ package org.tokend.template.features.assets.buy.view
 
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
-import android.support.v7.view.ContextThemeWrapper
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -26,8 +24,6 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
 
     private val needQuoteAssetSelection: Boolean
         get() = offer.paymentMethods.size > 1
-
-    private lateinit var availableTextView: TextView
 
     private lateinit var quoteAssetTextView: TextView
     private lateinit var quoteAssetPicker: BalancePickerBottomDialog
@@ -123,29 +119,6 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         }
 
         return view
-    }
-
-    override fun getExtraAmountView(parent: ViewGroup): View? {
-        val context = ContextThemeWrapper(requireContext(), R.style.HintText)
-        return TextView(context, null, R.style.HintText)
-                .apply {
-                    text = getString(
-                            R.string.template_amount_available_for_buy,
-                            amountFormatter.formatAssetAmount(offer.amount, offer.asset,
-                                    withAssetCode = false)
-                    )
-                    gravity = Gravity.CENTER
-                }
-                .also { availableTextView = it }
-    }
-
-    override fun setError(message: String?) {
-        super.setError(message)
-        availableTextView.visibility =
-                if (message == null)
-                    View.VISIBLE
-                else
-                    View.GONE
     }
 
     private fun openQuoteAssetPicker() {
