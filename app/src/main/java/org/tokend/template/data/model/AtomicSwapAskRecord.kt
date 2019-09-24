@@ -34,7 +34,7 @@ class AtomicSwapAskRecord(
                                 trailingDigits = 6,
                                 price = it.price,
                                 name = assetsMap[it.quoteAsset]?.name,
-                                logoUrl = assetsMap[it.quoteAsset]?.logoUrl
+                                logoUrl = (assetsMap[it.quoteAsset] as? RecordWithLogo)?.logoUrl
                         )
                     },
             price = source.quoteAssets.first().price,
@@ -55,5 +55,5 @@ class AtomicSwapAskRecord(
             val price: BigDecimal,
             override val name: String?,
             override val logoUrl: String?
-    ) : Asset
+    ) : Asset, RecordWithLogo
 }

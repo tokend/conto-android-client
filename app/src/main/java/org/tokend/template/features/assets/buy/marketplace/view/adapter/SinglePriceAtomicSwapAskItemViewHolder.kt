@@ -49,9 +49,9 @@ class SinglePriceAtomicSwapAskItemViewHolder(
             companyNameTextView.visibility = View.GONE
         }
 
-        if (item.assetDescription != null) {
+        if (item.description != null) {
             assetDescriptionTextView.visibility = View.VISIBLE
-            assetDescriptionTextView.text = item.assetDescription
+            assetDescriptionTextView.text = item.description
         } else {
             assetDescriptionTextView.visibility = View.GONE
         }

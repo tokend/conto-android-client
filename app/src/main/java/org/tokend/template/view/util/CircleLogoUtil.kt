@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
 import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.RecordWithLogo
 import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.util.imagetransform.CircleTransform
 
@@ -37,7 +38,7 @@ object CircleLogoUtil {
     fun setAssetLogo(view: ImageView,
                      asset: Asset,
                      sizePx: Int = (view.layoutParams as ViewGroup.LayoutParams).width) {
-        setLogo(view, asset.name ?: asset.code, asset.logoUrl,
+        setLogo(view, asset.name ?: asset.code, (asset as? RecordWithLogo)?.logoUrl,
                 sizePx, arrayOf(asset.code))
     }
 
