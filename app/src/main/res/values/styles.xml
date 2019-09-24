@@ -201,12 +201,17 @@
         </item>
     </style>
 
-    <style name="StrokedBadgeText">
+    <style name="BadgeText">
         <item name="android:background">@drawable/stroke_badge_text_background</item>
         <item name="android:layout_height">@dimen/badge_text_height</item>
         <item name="android:paddingStart">@dimen/standard_margin</item>
         <item name="android:paddingEnd">@dimen/standard_margin</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="BadgeText.Colored">
+        <item name="android:background">@drawable/colored_badge_text_background</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="ActionMode" parent="Widget.AppCompat.ActionMode">

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.content.ContextCompat
+import android.view.Menu
 import android.view.MenuItem
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -16,6 +17,7 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
@@ -189,12 +191,29 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.balance_details, menu)
+
+        menu?.findItem(R.id.asset_details)?.setOnMenuItemClickListener {
+            (offer.asset as? AssetRecord)?.also { asset ->
+                Navigator.from(this).openAssetDetails(asset)
+            }
+            true
+        }
+
+        return super.onCreateOptionsMenu(menu)
+    }
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
-            return true
+        when (item?.itemId) {
+            R.id.asset_details -> openAssetDetails()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openAssetDetails() {
+        (offer.asset as? AssetRecord)?.also { asset ->
+            Navigator.from(this).openAssetDetails(asset)
+        }
     }
 
     override fun onBackPressed() {

@@ -8,7 +8,7 @@ class SimpleAsset(
         override val trailingDigits: Int,
         override val name: String?,
         override val logoUrl: String?
-) : Asset {
+) : Asset, RecordWithLogo {
 
     constructor(source: AssetResource) : this(
             code = source.id,
@@ -21,7 +21,7 @@ class SimpleAsset(
             code = source.code,
             trailingDigits = source.trailingDigits,
             name = source.name,
-            logoUrl = source.logoUrl
+            logoUrl = (source as? RecordWithLogo)?.logoUrl
     )
 
     @Deprecated("Going to be removed. Right now used because of some issues")

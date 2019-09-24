@@ -43,7 +43,7 @@ class CompanyClientItemViewHolder(
     private val logoSize =
             view.context.resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
 
-    private val balanceThemedContext = ContextThemeWrapper(view.context, R.style.StrokedBadgeText)
+    private val balanceThemedContext = ContextThemeWrapper(view.context, R.style.BadgeText)
     private val balanceTextViewMargin =
             view.context.resources.getDimensionPixelSize(R.dimen.quarter_standard_margin)
 
@@ -126,7 +126,7 @@ class CompanyClientItemViewHolder(
     }
 
     private fun addBalanceBadge(text: String) {
-        val textView = TextView(balanceThemedContext, null, R.style.StrokedBadgeText)
+        val textView = TextView(balanceThemedContext, null, R.style.BadgeText)
         textView.text = text
         balancesLayout.addView(textView)
         textView.layoutParams = (textView.layoutParams as FlowLayout.LayoutParams).apply {

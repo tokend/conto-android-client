@@ -36,7 +36,8 @@ class AssetListItemViewHolder(view: View,
     }
 
     override fun bind(item: AssetListItem) {
-        CircleLogoUtil.setLogo(logoImageView, item.code, item.logoUrl)
+        CircleLogoUtil.setLogo(logoImageView, item.name ?: item.code,
+                item.logoUrl, extras = arrayOf(item.code))
 
         nameTextView.text = item.name ?: item.code
 
