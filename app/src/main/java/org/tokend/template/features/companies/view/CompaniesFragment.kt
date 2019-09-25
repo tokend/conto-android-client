@@ -1,6 +1,8 @@
 package org.tokend.template.features.companies.view
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
@@ -9,15 +11,26 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.ClientCompaniesRepository
+import org.tokend.template.data.repository.CompaniesRepository
+import org.tokend.template.features.companies.logic.CompanyLoader
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
+import org.tokend.template.util.Navigator
+import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.PermissionManager
+import org.tokend.template.util.QrScannerUtil
 import org.tokend.template.view.util.MenuSearchViewManager
+import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.wallet.Base32Check
 
 class CompaniesFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
@@ -25,10 +38,15 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
     private val clientCompaniesRepository: ClientCompaniesRepository
         get() = repositoryProvider.clientCompanies()
 
+    private val companiesRepository: CompaniesRepository
+        get() = repositoryProvider.companies()
+
     private lateinit var adapter: CompaniesPagerAdapter
 
     private var searchMenuItem: MenuItem? = null
     private var filterChangesSubject = BehaviorSubject.create<String>()
+
+    private val cameraPermission = PermissionManager(Manifest.permission.CAMERA, 404)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pager, container, false)
@@ -48,7 +66,7 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initMenu() {
-        toolbar.inflateMenu(R.menu.explore)
+        toolbar.inflateMenu(R.menu.explore_companies)
         val menu = toolbar.menu
 
         val searchItem = menu.findItem(R.id.search) ?: return
@@ -63,6 +81,11 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
                     .subscribe(filterChangesSubject)
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+
+        menu.findItem(R.id.scan)?.setOnMenuItemClickListener {
+            tryOpenQrScanner()
+            true
         }
     }
 
@@ -107,6 +130,69 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
             false
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun tryOpenQrScanner() {
+        cameraPermission.check(this) {
+            QrScannerUtil.openScanner(this, getString(R.string.scan_company_qr_code))
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        cameraPermission.handlePermissionResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
+                ?.takeIf { Base32Check.isValid(Base32Check.VersionByte.ACCOUNT_ID, it.toCharArray()) }
+                ?.also(this::onCompanyIdScanned)
+    }
+
+    private fun onCompanyIdScanned(companyId: String) {
+        loadAndDisplayCompany(companyId)
+    }
+
+    private fun loadAndDisplayCompany(companyId: String) {
+        val loadedCompany = companiesRepository
+                .itemsMap[companyId]
+                ?: clientCompaniesRepository
+                        .itemsMap[companyId]
+
+        if (loadedCompany != null) {
+            openCompanyDetails(loadedCompany)
+            return
+        }
+
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getDialog(requireContext(), R.string.loading_data) {
+            disposable?.dispose()
+        }
+
+        disposable = CompanyLoader(companiesRepository)
+                .load(companyId)
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::openCompanyDetails,
+                        onError = this::onCompanyLoadingError
+                )
+    }
+
+    private fun openCompanyDetails(company: CompanyRecord) {
+        Navigator.from(this).openCompanyDetails(company)
+    }
+
+    private fun onCompanyLoadingError(error: Throwable) {
+        when (error) {
+            is CompanyLoader.NoCompanyFoundException ->
+                toastManager.short(R.string.error_company_not_found)
+            else -> errorHandlerFactory.getDefault().handle(error)
         }
     }
 

@@ -484,7 +484,7 @@
     <string name="switch_to_client">К Клиенту</string>
     <string name="switch_to_company_confirmation">Перейти в интерфейс Компании?</string>
     <string name="switch_to_client_confirmation">Перейти в интерфейс Клиента?</string>
-    <string name="add_company_scanner_prompt">Отсканируйте QR код компании</string>
+    <string name="scan_company_qr_code">Отсканируйте QR код компании</string>
     <string name="error_redemption_request_no_more_valid">Погашение уже выполнено, запрос недействителен</string>
     <string name="template_asset_movements">Операции с %1$s</string>
     <string name="explore_companies_title">Поиск компаний</string>

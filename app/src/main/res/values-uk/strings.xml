@@ -484,7 +484,7 @@
     <string name="switch_to_client">До Клієнта</string>
     <string name="switch_to_company_confirmation">Перейти до інтерфейсу Компанії?</string>
     <string name="switch_to_client_confirmation">Перейти до інтерфейсу Клієнта?</string>
-    <string name="add_company_scanner_prompt">Відскануйте QR код компанії</string>
+    <string name="scan_company_qr_code">Відскануйте QR код компанії</string>
     <string name="error_redemption_request_no_more_valid">Погашення вже виконано, запит недійсний</string>
     <string name="template_asset_movements">Операції з %1$s</string>
     <string name="explore_companies_title">Пошук компаній</string>
