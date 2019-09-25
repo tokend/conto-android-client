@@ -6,25 +6,32 @@ import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.activity_company_details.*
 import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.data.repository.ClientCompaniesRepository
+import org.tokend.template.features.companies.details.logic.AddCompanyUseCase
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
 
 class CompanyDetailsActivity : BaseActivity() {
     private lateinit var company: CompanyRecord
 
+    private val clientCompaniesRepository: ClientCompaniesRepository
+        get() = repositoryProvider.clientCompanies()
+
     private lateinit var adapter: CompanyDetailsPagerAdapter
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
-        setContentView(R.layout.fragment_pager)
+        setContentView(R.layout.activity_company_details)
 
         val company = intent.getSerializableExtra(COMPANY_EXTRA) as? CompanyRecord
         if (company == null) {
@@ -35,6 +42,9 @@ class CompanyDetailsActivity : BaseActivity() {
 
         initToolbar()
         initPager()
+        initButton()
+
+        subscribeToClientCompanies()
     }
 
     private fun initToolbar() {
@@ -52,6 +62,20 @@ class CompanyDetailsActivity : BaseActivity() {
         appbar_tabs.tabMode = TabLayout.MODE_FIXED
 
         switchToShopIfNeeded()
+    }
+
+    private fun initButton() {
+        add_button.setOnClickListener {
+            addCompany()
+        }
+    }
+
+    private fun subscribeToClientCompanies() {
+        clientCompaniesRepository
+                .itemsSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { onClientCompaniesUpdated() }
+                .addTo(compositeDisposable)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -111,6 +135,39 @@ class CompanyDetailsActivity : BaseActivity() {
         if (!hasNonZeroBalance) {
             pager.currentItem = adapter.getIndexOf(CompanyDetailsPagerAdapter.SHOP_PAGE)
         }
+    }
+
+    private fun onClientCompaniesUpdated() {
+        updateAddButtonVisibility()
+    }
+
+    private fun updateAddButtonVisibility() {
+        if (clientCompaniesRepository.itemsList.contains(company)) {
+            add_button.visibility = View.GONE
+        } else {
+            add_button.visibility = View.VISIBLE
+        }
+    }
+
+    private fun addCompany() {
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getDialog(this, cancelListener = {
+            disposable?.dispose()
+        })
+
+        disposable = AddCompanyUseCase(
+                company, clientCompaniesRepository
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe { progress.show() }
+                .doOnTerminate { progress.dismiss() }
+                .subscribeBy(
+                        onComplete = { toastManager.short(R.string.company_added_successfully) },
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
     }
 
     companion object {
