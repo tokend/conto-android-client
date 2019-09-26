@@ -8,3 +8,4 @@ android/support/multidex/MultiDexExtractor$1.class
 android/support/multidex/MultiDexExtractor.class
 android/support/multidex/ZipUtil$CentralDirectory.class
 android/support/multidex/ZipUtil.class
+android/os/PowerManager$WakeLock.class
