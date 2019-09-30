@@ -1,5 +1,6 @@
 # Conto Android client
-This is an Android client for Conto based on TokenD Template app
+This is an Android client for Conto based on TokenD Template app.
+
 Read more about Conto at <a href="https://about.conto.me/" target="_blank">about.conto.me</a>.
 
 <a href='https://play.google.com/store/apps/details?id=org.tokend.conto&utm_source=github&utm_campaign=github&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='64px'/></a>
