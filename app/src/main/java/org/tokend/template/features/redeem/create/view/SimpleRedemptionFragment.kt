@@ -171,12 +171,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun preFillAmount() {
-        amountView.amountWrapper.setAmount(
-                if (PRE_FILLED_AMOUNT > balance.available)
-                    BigDecimal.ZERO
-                else
-                    PRE_FILLED_AMOUNT
-        )
+        amountView.amountWrapper.setAmount(PRE_FILLED_AMOUNT.min(balance.available))
     }
 
     private fun subscribeToBalances() {
