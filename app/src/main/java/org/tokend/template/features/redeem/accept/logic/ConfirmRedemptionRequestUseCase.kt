@@ -3,25 +3,19 @@ package org.tokend.template.features.redeem.accept.logic
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
+import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.general.model.SystemInfo
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
-import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.redeem.model.RedemptionRequest
-import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.template.logic.transactions.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.TransactionBuilder
-import org.tokend.wallet.xdr.Operation
-import org.tokend.wallet.xdr.PaymentFeeData
-import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
-import java.math.BigDecimal
 
 class ConfirmRedemptionRequestUseCase(
         private val request: RedemptionRequest,
@@ -117,34 +111,9 @@ class ConfirmRedemptionRequestUseCase(
     }
 
     private fun getTransaction(): Single<Transaction> {
-        val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
-        val fee = PaymentFee(zeroFee, zeroFee)
-
-        return Single.defer {
-            val operation = SimplePaymentOp(
-                    sourceBalanceId = senderBalanceId,
-                    destAccountId = accountId,
-                    amount = networkParams.amountToPrecised(request.amount),
-                    subject = "",
-                    reference = request.salt.toString(),
-                    feeData = PaymentFeeData(
-                            sourceFee = fee.senderFee.toXdrFee(networkParams),
-                            destinationFee = fee.recipientFee.toXdrFee(networkParams),
-                            sourcePaysForDest = false,
-                            ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
-                    )
-            )
-
-            val transaction = TransactionBuilder(networkParams, request.sourceAccountId)
-                    .addOperation(Operation.OperationBody.Payment(operation))
-                    .setSalt(request.salt)
-                    .setTimeBounds(request.timeBounds)
-                    .build()
-
-            transaction.addSignature(request.signature)
-
-            Single.just(transaction)
-        }.subscribeOn(Schedulers.newThread())
+        return {
+            request.toTransaction(senderBalanceId, accountId, networkParams)
+        }.toSingle().subscribeOn(Schedulers.newThread())
     }
 
     private fun submitTransaction(): Single<SubmitTransactionResponse> {
