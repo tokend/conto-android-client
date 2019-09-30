@@ -1,21 +1,8 @@
-# TokenD Android wallet
-This is a template wallet app that provides access to any TokenD-based system. Read more about TokenD platform on <a href="http://tokend.org/" target="_blank">tokend.org</a>.
+# Conto Android client
+This is an Android client for Conto based on TokenD Template app
+Read more about Conto at <a href="https://about.conto.me/" target="_blank">about.conto.me</a>.
 
-<a href='https://play.google.com/store/apps/details?id=org.tokend.template&utm_source=git&utm_campaign=git&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height=64px/></a>
-
-## Supported features
-
-* Account creation & recovery
-* Transfers
-* Deposit & withdrawal
-* Investments
-* Trades
-* Token explorer
-* Security preferences management
-* Limits view
-* Fees view
-* Polls
-* Direct asset buy
+<a href='https://play.google.com/store/apps/details?id=org.tokend.conto&utm_source=github&utm_campaign=github&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='64px'/></a>
 
 ## Customization
 The app configuration is placed in `app_config.gradle` file. There you can change application ID, version info, network params, colors, and features availability.
