@@ -89,6 +89,7 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         defaultAvailableLabelColor = available_text_view.currentTextColor
 
         payment_amount_view.amountWrapper.onAmountChanged { _, _ -> onAmountChanged() }
+        payment_amount_view.amountWrapper.maxPlacesAfterComa = balance.asset.trailingDigits
         payment_amount_view.editText.onEditorAction(this::tryToSend)
 
         preFillAmount()

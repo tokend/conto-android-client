@@ -138,6 +138,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
         amountView.amountWrapper.onAmountChanged { _, _ -> onAmountChanged() }
+        amountView.amountWrapper.maxPlacesAfterComa = balance.asset.trailingDigits
         scrollable_root_layout.addView(amountView)
 
         preFillAmount()
