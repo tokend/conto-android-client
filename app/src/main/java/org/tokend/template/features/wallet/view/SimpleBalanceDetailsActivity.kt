@@ -117,6 +117,12 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
                         SimpleRedemptionFragment.getBundle(balanceId)
                 ))
                 .commit()
+
+        redemption_bottom_sheet_text_view.setOnClickListener {
+            if (bottomSheet.state != BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
     }
 
     private fun subscribeToBalances() {
