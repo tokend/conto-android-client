@@ -18,7 +18,7 @@ class DashboardPagerAdapter(context: Context,
                     BALANCES_PAGE
             ),
             Page(
-                    fragmentFactory.getAllAtomicSwapAsksFragment(false, null),
+                    fragmentFactory.getMarketplaceFragment(false, null),
                     context.getString(R.string.shop_title),
                     SHOP_PAGE
             )

@@ -9,9 +9,9 @@ class CompanyRecord(
         val id: String,
         val name: String,
         val industry: String?,
-        val logoUrl: String?,
+        override val logoUrl: String?,
         val conversionAssetCode: String?
-) : Serializable {
+) : Serializable, RecordWithLogo {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
             name = source.name.takeIf(String::isNotEmpty) ?: "Unnamed company",

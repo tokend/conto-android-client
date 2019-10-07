@@ -2,31 +2,28 @@ package org.tokend.template.features.assets.buy.view
 
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
-import android.support.v7.view.ContextThemeWrapper
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_amount_input.*
 import kotlinx.android.synthetic.main.include_text_view_spinner_for_centering.view.*
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.layoutInflater
 import org.tokend.template.R
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.amountscreen.view.AmountInputFragment
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import java.math.BigDecimal
 
-class AtomicSwapAmountFragment : AmountInputFragment() {
-    private lateinit var ask: AtomicSwapAskRecord
+class MarketplaceBuyAmountFragment : AmountInputFragment() {
+    private lateinit var offer: MarketplaceOfferRecord
 
     private val needQuoteAssetSelection: Boolean
-        get() = ask.quoteAssets.size > 1
-
-    private lateinit var availableTextView: TextView
+        get() = offer.paymentMethods.size > 1
 
     private lateinit var quoteAssetTextView: TextView
     private lateinit var quoteAssetPicker: BalancePickerBottomDialog
@@ -37,8 +34,8 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         }
 
     override fun onInitAllowed() {
-        this.ask = arguments?.getSerializable(ASK_EXTRA) as? AtomicSwapAskRecord
-                ?: throw IllegalArgumentException("No $ASK_EXTRA specified")
+        this.offer = arguments?.getSerializable(OFFER_EXTRA) as? MarketplaceOfferRecord
+                ?: throw IllegalArgumentException("No $OFFER_EXTRA specified")
 
         super.onInitAllowed()
         onAssetChanged()
@@ -72,7 +69,7 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
                 amountFormatter,
                 balanceComparator,
                 repositoryProvider.balances(),
-                requiredAssets = ask.quoteAssets,
+                requiredAssets = offer.paymentMethods,
                 balancesFilter = { false }
         ) {
             override fun getAvailableAmount(assetCode: String,
@@ -80,18 +77,26 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         }
     }
 
-    override fun getTitleText(): String? = null
+    override fun getTitleText(): String? = getString(
+            R.string.template_asset_name_dash_price,
+            offer.asset.name ?: offer.asset.code,
+            amountFormatter.formatAssetAmount(
+                    offer.price,
+                    offer.priceAsset,
+                    withAssetCode = true
+            )
+    )
 
     override fun displayBalance() {}
 
     override fun checkAmount() {
-        val availableExceeded = amountWrapper.scaledAmount > ask.amount
+        val availableExceeded = amountWrapper.scaledAmount > offer.amount
 
         when {
             availableExceeded ->
                 setError(getString(
                         R.string.template_amount_available_for_buy,
-                        amountFormatter.formatAssetAmount(ask.amount, ask.asset,
+                        amountFormatter.formatAssetAmount(offer.amount, offer.asset,
                                 withAssetCode = false)
                 ))
             else ->
@@ -116,29 +121,6 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         return view
     }
 
-    override fun getExtraAmountView(parent: ViewGroup): View? {
-        val context = ContextThemeWrapper(requireContext(), R.style.HintText)
-        return TextView(context, null, R.style.HintText)
-                .apply {
-                    text = getString(
-                            R.string.template_amount_available_for_buy,
-                            amountFormatter.formatAssetAmount(ask.amount, ask.asset,
-                                    withAssetCode = false)
-                    )
-                    gravity = Gravity.CENTER
-                }
-                .also { availableTextView = it }
-    }
-
-    override fun setError(message: String?) {
-        super.setError(message)
-        availableTextView.visibility =
-                if (message == null)
-                    View.VISIBLE
-                else
-                    View.GONE
-    }
-
     private fun openQuoteAssetPicker() {
         quoteAssetPicker.show {
             quoteAsset = it.asset
@@ -153,15 +135,45 @@ class AtomicSwapAmountFragment : AmountInputFragment() {
         resultSubject.onNext(AmountInputResult(amount, asset))
     }
 
+    override fun getMinLayoutHeight(): Int {
+        return if (needQuoteAssetSelection)
+            requireContext().dip(240)
+        else
+            super.getMinLayoutHeight()
+    }
+
+    override fun getSmallSizingHeightThreshold(): Int {
+        return requireContext().dip(290)
+    }
+
+    override fun updateSizing(useSmallSize: Boolean) {
+        super.updateSizing(useSmallSize)
+
+        if (needQuoteAssetSelection) {
+            val resources = requireContext().resources
+
+            val dividerVerticalSpacing = if (useSmallSize)
+                resources.getDimensionPixelSize(R.dimen.half_standard_padding)
+            else
+                resources.getDimensionPixelSize(R.dimen.standard_padding)
+
+            root_layout.findViewById<View>(R.id.divider_view).run {
+                layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    setMargins(leftMargin, dividerVerticalSpacing, rightMargin, dividerVerticalSpacing)
+                }
+            }
+        }
+    }
+
     companion object {
         private const val PRE_FILLED_AMOUNT = "1"
-        private const val ASK_EXTRA = "ask"
+        private const val OFFER_EXTRA = "offer"
 
-        fun getBundle(ask: AtomicSwapAskRecord) = Bundle().apply {
-            putSerializable(ASK_EXTRA, ask)
+        fun getBundle(offer: MarketplaceOfferRecord) = Bundle().apply {
+            putSerializable(OFFER_EXTRA, offer)
         }
 
-        fun newInstance(bundle: Bundle): AtomicSwapAmountFragment =
-                AtomicSwapAmountFragment().withArguments(bundle)
+        fun newInstance(bundle: Bundle): MarketplaceBuyAmountFragment =
+                MarketplaceBuyAmountFragment().withArguments(bundle)
     }
 }

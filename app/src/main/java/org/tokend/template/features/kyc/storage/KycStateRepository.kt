@@ -1,5 +1,6 @@
 package org.tokend.template.features.kyc.storage
 
+import android.util.Log
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -9,7 +10,7 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.TokenDApi
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
-import org.tokend.sdk.api.generated.resources.ChangeRoleRequestDetailsResource
+import org.tokend.sdk.api.generated.resources.ChangeRoleRequestResource
 import org.tokend.sdk.api.generated.resources.ReviewableRequestResource
 import org.tokend.sdk.api.requests.model.base.RequestState
 import org.tokend.sdk.api.v3.requests.params.ChangeRoleRequestPageParams
@@ -65,10 +66,15 @@ class KycStateRepository(
     val itemFormData: KycForm?
         get() = (item as? KycState.Submitted<*>)?.formData
 
+    val isFormApproved: Boolean
+        get() = item is KycState.Submitted.Approved<*>
+
     var forcedType: ForcedAccountType? = null
 
     val isActualOrForcedGeneral: Boolean
-        get() = itemFormData is KycForm.General || forcedType == ForcedAccountType.GENERAL
+        get() = itemFormData is KycForm.General
+                || itemFormData is KycForm.Corporate && !isFormApproved
+                || forcedType == ForcedAccountType.GENERAL
 
     fun set(newState: KycState) {
         onNewItem(newState)
@@ -140,7 +146,7 @@ class KycStateRepository(
     private fun getKycRequestAttributes(request: ReviewableRequestResource): KycRequestAttributes? {
         return try {
             val state = RequestState.fromI(request.stateI)
-            val blobId = request.getTypedRequestDetails<ChangeRoleRequestDetailsResource>()
+            val blobId = request.getTypedRequestDetails<ChangeRoleRequestResource>()
                     .creatorDetails
                     .get("blob_id")
                     ?.asText()

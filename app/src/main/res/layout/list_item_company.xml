@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingTop="@dimen/standard_margin"
         android:paddingBottom="@dimen/standard_margin">
 
@@ -28,14 +28,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/company_name_text_view"
                 style="@style/HeadingText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:textSize="18sp"
                 tools:text="Awesome Company" />
 
@@ -46,19 +49,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/quarter_standard_margin"
                 android:visibility="gone"
-                tools:text="industry"/>
+                tools:text="industry" />
         </LinearLayout>
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/company_exists_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/standard_margin"
             android:layout_marginEnd="@dimen/standard_margin"
             android:contentDescription="@string/asset_balance_exists"
+            android:visibility="gone"
             app:srcCompat="@drawable/ic_check_circle"
             app:tint="@color/ok"
-            android:visibility="gone"/>
+            tools:visibility="visible" />
     </LinearLayout>
 
     <View

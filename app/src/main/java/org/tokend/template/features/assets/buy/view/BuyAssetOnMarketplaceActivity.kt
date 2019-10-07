@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.content.ContextCompat
+import android.view.Menu
 import android.view.MenuItem
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -16,10 +17,11 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AtomicSwapAskRecord
+import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -27,7 +29,7 @@ import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
 
-class BuyWithAtomicSwapActivity : BaseActivity() {
+class BuyAssetOnMarketplaceActivity : BaseActivity() {
     private val loadingIndicator = LoadingIndicatorManager(
             showLoading = { swipe_refresh.isRefreshing = true },
             hideLoading = { swipe_refresh.isRefreshing = false }
@@ -36,19 +38,19 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
-    private lateinit var ask: AtomicSwapAskRecord
+    private lateinit var offer: MarketplaceOfferRecord
     private var amount: BigDecimal = BigDecimal.ZERO
     private var asset: Asset? = null
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
 
-        val ask = intent.getSerializableExtra(ASK_EXTRA) as? AtomicSwapAskRecord
+        val ask = intent.getSerializableExtra(OFFER_EXTRA) as? MarketplaceOfferRecord
         if (ask == null) {
-            finishWithMissingArgError(ASK_EXTRA)
+            finishWithMissingArgError(OFFER_EXTRA)
             return
         }
-        this.ask = ask
+        this.offer = ask
 
         initToolbar()
         initSwipeRefresh()
@@ -60,15 +62,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        title = getString(R.string.template_buy_asset, ask.asset.name ?: ask.asset.code)
-        toolbar.subtitle = getString(
-                R.string.template_price,
-                amountFormatter.formatAssetAmount(
-                        ask.quoteAssets.first().price,
-                        ask.quoteAssets.first(),
-                        withAssetCode = true
-                )
-        )
+        title = getString(R.string.buy)
     }
 
     private fun initSwipeRefresh() {
@@ -78,8 +72,8 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     // endregion
 
     private fun toAmountScreen() {
-        val fragment = AtomicSwapAmountFragment.newInstance(
-                AtomicSwapAmountFragment.getBundle(ask)
+        val fragment = MarketplaceBuyAmountFragment.newInstance(
+                MarketplaceBuyAmountFragment.getBundle(offer)
         )
 
         fragment
@@ -115,10 +109,9 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
         disposable = BuyAssetOnMarketplaceUseCase(
                 amount = amount,
                 quoteAssetCode = assetCode,
-                ask = ask,
+                offer = offer,
                 repositoryProvider = repositoryProvider,
                 walletInfoProvider = walletInfoProvider,
-                accountProvider = accountProvider,
                 apiProvider = apiProvider
         )
                 .perform()
@@ -149,7 +142,7 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     private fun openCryptoInvoiceAndFinish(invoice: MarketplaceInvoiceData.Crypto) {
         val asset = this.asset ?: return
         val sendAmountString = amountFormatter.formatAssetAmount(invoice.amount, asset)
-        val receiveAmountString = amountFormatter.formatAssetAmount(amount, ask.asset)
+        val receiveAmountString = amountFormatter.formatAssetAmount(amount, offer.asset)
 
         Navigator.from(this).openQrShare(
                 title = this.title.toString(),
@@ -198,12 +191,29 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.balance_details, menu)
+
+        menu?.findItem(R.id.asset_details)?.setOnMenuItemClickListener {
+            (offer.asset as? AssetRecord)?.also { asset ->
+                Navigator.from(this).openAssetDetails(asset)
+            }
+            true
+        }
+
+        return super.onCreateOptionsMenu(menu)
+    }
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
-            return true
+        when (item?.itemId) {
+            R.id.asset_details -> openAssetDetails()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openAssetDetails() {
+        (offer.asset as? AssetRecord)?.also { asset ->
+            Navigator.from(this).openAssetDetails(asset)
+        }
     }
 
     override fun onBackPressed() {
@@ -223,11 +233,11 @@ class BuyWithAtomicSwapActivity : BaseActivity() {
     }
 
     companion object {
-        private const val ASK_EXTRA = "ask"
+        private const val OFFER_EXTRA = "offer"
         private val WEB_INVOICE_REQUEST = "web_invoice".hashCode() and 0xffff
 
-        fun getBundle(ask: AtomicSwapAskRecord) = Bundle().apply {
-            putSerializable(ASK_EXTRA, ask)
+        fun getBundle(offer: MarketplaceOfferRecord) = Bundle().apply {
+            putSerializable(OFFER_EXTRA, offer)
         }
     }
 }

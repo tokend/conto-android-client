@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import com.github.tbouron.shakedetector.library.ShakeDetector
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -20,6 +21,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
+import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.PublishSubject
@@ -29,13 +31,14 @@ import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.assets.ExploreAssetsFragment
-import org.tokend.template.features.assets.buy.singleprice.view.AllAtomicSwapAsksFragment
+import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
+import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
@@ -59,7 +62,7 @@ import java.util.concurrent.TimeUnit
 open class MainActivity : BaseActivity(), WalletEventsListener {
     companion object {
         val CONTRIBUTE_ITEM_ID = "contribute".hashCode().toLong()
-
+        private const val SHAKES_TO_PAY_COUNT = 4
         private const val REPO_URL = "https://github.com/tokend/conto-android-client"
     }
 
@@ -88,6 +91,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         window.setBackgroundDrawable(null)
 
         initNavigation()
+        initShakeDetection()
 
         subscribeToKycChanges()
 
@@ -180,7 +184,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
             PrimaryDrawerItem()
                     .withName(R.string.marketplace)
-                    .withIdentifier(AllAtomicSwapAsksFragment.ID)
+                    .withIdentifier(MarketplaceFragment.ID)
                     .withIcon(R.drawable.ic_shop_cart),
 
             PrimaryDrawerItem()
@@ -215,7 +219,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun initAccountTypeSwitch(accountHeader: AccountHeader) {
         val view = accountHeader.view.findViewById<View>(R.id.account_type_switch_layout)
                 ?: return
-        if (kycStateRepository.itemFormData is KycForm.Corporate) {
+        if (kycStateRepository.itemFormData is KycForm.Corporate
+                && kycStateRepository.isFormApproved) {
             view.visibility = View.VISIBLE
             view.account_type_switch_hint.text = getAccountTypeSwitchHint()
             view.account_type_switch_button.setOnClickListener {
@@ -272,7 +277,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             addDrawerItems(
                     items[BalancesFragment.ID],
                     items[CompaniesFragment.ID],
-                    items[AllAtomicSwapAsksFragment.ID],
+                    items[MarketplaceFragment.ID],
                     items[AssetMovementsFragment.ID]
             )
 
@@ -302,6 +307,11 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     items[CONTRIBUTE_ITEM_ID]
             )
         }
+    }
+
+    private fun initShakeDetection() {
+        ShakeDetector.create(this, this::onShakingDetected)
+        ShakeDetector.updateConfiguration(2F, SHAKES_TO_PAY_COUNT)
     }
     // endregion
 
@@ -352,8 +362,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             AssetMovementsFragment.ID -> factory.getAssetMovementsFragment()
             BalancesFragment.ID -> factory.getBalancesFragment(withToolbar = true)
             CompaniesFragment.ID -> factory.getCompaniesFragment()
-            AllAtomicSwapAsksFragment.ID -> factory
-                    .getAllAtomicSwapAsksFragment(withToolbar = true, companyId = null)
+            MarketplaceFragment.ID -> factory
+                    .getMarketplaceFragment(withToolbar = true, companyId = null)
             else -> null
         }
     }
@@ -439,6 +449,21 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         }
     }
 
+    private var shakeDetectionPostponed = false
+    private fun onShakingDetected() {
+        if (shakeDetectionPostponed) {
+            return
+        }
+
+        Navigator.from(this).openShakeToPay()
+
+        shakeDetectionPostponed = true
+        Completable.complete()
+                .delay(1, TimeUnit.SECONDS)
+                .subscribe { shakeDetectionPostponed = false }
+                .addTo(compositeDisposable)
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateDrawerVisibility()
@@ -457,4 +482,19 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     override fun onRedemptionRequestAccepted() {}
+
+    override fun onResume() {
+        super.onResume()
+        ShakeDetector.start();
+    }
+
+    override fun onStop() {
+        super.onStop()
+        ShakeDetector.stop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ShakeDetector.destroy()
+    }
 }

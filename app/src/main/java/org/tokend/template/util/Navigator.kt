@@ -12,19 +12,22 @@ import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.singleTop
-import org.tokend.sdk.keyserver.models.WalletInfo
 import org.tokend.template.R
 import org.tokend.template.activities.CorporateMainActivity
 import org.tokend.template.activities.MainActivity
 import org.tokend.template.activities.SingleFragmentActivity
-import org.tokend.template.data.model.*
+import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.AssetPairRecord
+import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.AssetDetailsActivity
 import org.tokend.template.features.assets.ExploreAssetsFragment
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
-import org.tokend.template.features.assets.buy.view.BuyWithAtomicSwapActivity
+import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
@@ -65,6 +68,7 @@ import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.settings.telegram.view.TelegramUsernameSettingsActivity
+import org.tokend.template.features.shaketopay.view.ShakeToPayActivity
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.SignInActivity
@@ -117,23 +121,25 @@ class Navigator private constructor() {
             if (!IntentLock.checkIntent(intent, context)) return
             activity?.let {
                 if (requestCode != null) {
-                    it.startActivityForResult(intent, requestCode, bundle ?: Bundle.EMPTY)
+                    ActivityCompat.startActivityForResult(it, intent, requestCode, bundle)
                 } else {
-                    it.startActivity(intent, bundle ?: Bundle.EMPTY)
+                    ActivityCompat.startActivity(it, intent, bundle)
                 }
                 return
             }
 
             fragment?.let {
                 if (requestCode != null) {
-                    it.startActivityForResult(intent, requestCode, bundle ?: Bundle.EMPTY)
+                    it.startActivityForResult(intent, requestCode, bundle)
                 } else {
-                    it.startActivity(intent, bundle ?: Bundle.EMPTY)
+                    it.startActivity(intent, bundle)
                 }
                 return
             }
 
-            context?.startActivity(intent.newTask(), bundle ?: Bundle.EMPTY)
+            context?.let {
+                ActivityCompat.startActivity(it, intent.newTask(), bundle)
+            }
         }
     }
 
@@ -195,7 +201,7 @@ class Navigator private constructor() {
         activity?.finish()
     }
 
-    fun toMainActivity(finishAffinity: Boolean = false) {
+    fun toClientMainActivity(finishAffinity: Boolean = false) {
         context?.intentFor<MainActivity>()
                 ?.also { performIntent(it) }
         activity?.let {
@@ -244,11 +250,14 @@ class Navigator private constructor() {
 
     fun openSend(asset: String? = null,
                  amount: BigDecimal? = null,
+                 recipientAccount: String? = null,
+                 recipientNickname: String? = null,
                  requestCode: Int = 0) {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         SendFragment.ID,
-                        SendFragment.getBundle(asset, amount, true)
+                        SendFragment.getBundle(asset, amount,
+                                recipientAccount, recipientNickname, true)
                 ))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
@@ -422,10 +431,10 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openAtomicSwapBuy(ask: AtomicSwapAskRecord,
-                          requestCode: Int = 0) {
-        context?.intentFor<BuyWithAtomicSwapActivity>()
-                ?.putExtras(BuyWithAtomicSwapActivity.getBundle(ask))
+    fun openMarketplaceBuy(offer: MarketplaceOfferRecord,
+                           requestCode: Int = 0) {
+        context?.intentFor<BuyAssetOnMarketplaceActivity>()
+                ?.putExtras(BuyAssetOnMarketplaceActivity.getBundle(offer))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
@@ -520,12 +529,16 @@ class Navigator private constructor() {
         val kycForm = (kycState as? KycState.Submitted<*>)?.formData
 
         if (kycForm is KycForm.Corporate) {
-            toCorporateMainActivity()
+            if (kycState is KycState.Submitted.Approved<*>) {
+                toCorporateMainActivity()
+            } else {
+                toClientMainActivity()
+            }
         } else if (kycForm is KycForm.General) {
             if (kycState is KycState.Submitted.Pending<*>) {
                 toWaitingForKycApproval()
             } else {
-                toMainActivity()
+                toClientMainActivity()
             }
         } else {
             toClientKyc()
@@ -567,6 +580,11 @@ class Navigator private constructor() {
     fun openCompanyDetails(company: CompanyRecord) {
         context?.intentFor<CompanyDetailsActivity>()
                 ?.putExtras(CompanyDetailsActivity.getBundle(company))
+                ?.also { performIntent(it) }
+    }
+
+    fun openShakeToPay() {
+        context?.intentFor<ShakeToPayActivity>()
                 ?.also { performIntent(it) }
     }
 }

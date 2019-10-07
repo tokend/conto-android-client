@@ -8,7 +8,7 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentRequest
-import org.tokend.template.util.PolicyChecker
+import org.tokend.template.util.RecordWithPolicy
 import org.tokend.wallet.xdr.AssetPairPolicy
 import java.io.Serializable
 import java.math.BigDecimal
@@ -24,7 +24,7 @@ sealed class BalanceChangeCause : Serializable {
     class AmlAlert(
             val reason: String?
     ) : BalanceChangeCause() {
-        constructor(op: OpCreateAMLAlertRequestDetailsResource) : this(
+        constructor(op: CreateAmlAlertRequestOpResource) : this(
                 reason = op.creatorDetails?.get("reason")?.asText()?.takeIf { it.isNotEmpty() }
         )
     }
@@ -41,7 +41,7 @@ sealed class BalanceChangeCause : Serializable {
             val quoteAssetCode: String,
             val fee: SimpleFeeRecord
     ) : BalanceChangeCause() {
-        constructor(op: OpManageOfferDetailsResource) : this(
+        constructor(op: ManageOfferOpResource) : this(
                 offerId = op.offerId,
                 orderBookId = op.orderBookId,
                 price = op.price,
@@ -73,7 +73,7 @@ sealed class BalanceChangeCause : Serializable {
             val funded: ParticularBalanceChangeDetails
 
     ) : Offer(offerId, orderBookId, price, isBuy, baseAmount, baseAssetCode, quoteAssetCode, fee) {
-        constructor(op: OpManageOfferDetailsResource,
+        constructor(op: ManageOfferOpResource,
                     effect: EffectMatchedResource) : this(
                 offerId = effect.offerId,
                 orderBookId = effect.orderBookId,
@@ -136,7 +136,7 @@ sealed class BalanceChangeCause : Serializable {
             val cause: String?,
             val reference: String?
     ) : BalanceChangeCause() {
-        constructor(op: OpCreateIssuanceRequestDetailsResource) : this(
+        constructor(op: CreateIssuanceRequestOpResource) : this(
                 cause = op.creatorDetails?.get("cause")?.asText(),
                 reference = op.reference
         )
@@ -181,7 +181,7 @@ sealed class BalanceChangeCause : Serializable {
         }
 
         companion object {
-            fun fromPaymentOp(op: OpPaymentDetailsResource): Payment {
+            fun fromPaymentOp(op: PaymentOpResource): Payment {
                 val rawSubject = op.subject.takeIf { it.isNotEmpty() }
 
                 val gson = GsonFactory().getBaseGson()
@@ -297,7 +297,7 @@ sealed class BalanceChangeCause : Serializable {
     class WithdrawalRequest(
             val destinationAddress: String
     ) : BalanceChangeCause() {
-        constructor(op: OpCreateWithdrawRequestDetailsResource) : this(
+        constructor(op: CreateWithdrawRequestOpResource) : this(
                 destinationAddress = op.creatorDetails.get("address").asText()
         )
     }
@@ -307,24 +307,24 @@ sealed class BalanceChangeCause : Serializable {
             val baseAsset: Asset,
             val quoteAsset: Asset,
             val physicalPrice: BigDecimal,
-            private val policies: Int
-    ) : BalanceChangeCause(), PolicyChecker {
+            override val policy: Int
+    ) : BalanceChangeCause(), RecordWithPolicy {
 
-        constructor(op: OpManageAssetPairDetailsResource) : this(
+        constructor(op: ManageAssetPairOpResource) : this(
                 baseAsset = SimpleAsset(op.baseAsset),
                 quoteAsset = SimpleAsset(op.quoteAsset),
                 physicalPrice = op.physicalPrice,
-                policies = op.policies.value
+                policy = op.policies.value ?: 0
         )
 
         val isRestrictedByCurrentPrice: Boolean
-            get() = checkPolicy(policies, AssetPairPolicy.CURRENT_PRICE_RESTRICTION.value)
+            get() = hasPolicy(AssetPairPolicy.CURRENT_PRICE_RESTRICTION.value)
 
         val isRestrictedByPhysicalPrice: Boolean
-            get() = checkPolicy(policies, AssetPairPolicy.PHYSICAL_PRICE_RESTRICTION.value)
+            get() = hasPolicy(AssetPairPolicy.PHYSICAL_PRICE_RESTRICTION.value)
 
         val isTradeable: Boolean
-            get() = checkPolicy(policies, AssetPairPolicy.TRADEABLE_SECONDARY_MARKET.value)
+            get() = hasPolicy(AssetPairPolicy.TRADEABLE_SECONDARY_MARKET.value)
     }
 
     // ------- Atomic swap ask creation ------- //

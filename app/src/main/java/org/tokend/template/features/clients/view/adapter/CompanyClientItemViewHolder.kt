@@ -1,5 +1,6 @@
 package org.tokend.template.features.clients.view.adapter
 
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
@@ -12,10 +13,10 @@ import org.apmem.tools.layouts.FlowLayout
 import org.jetbrains.anko.onClick
 import org.jetbrains.anko.onLongClick
 import org.tokend.template.R
+import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
-import org.tokend.template.view.util.LogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
 class CompanyClientItemViewHolder(
@@ -31,7 +32,7 @@ class CompanyClientItemViewHolder(
     private val bgSelected = ContextCompat.getDrawable(view.context, R.drawable.bg_selection)
     private val checkIcon = ContextCompat.getDrawable(view.context, R.drawable.ic_check_circle_accent)
     private lateinit var clientIcon: Drawable
-
+    private val logoFactory = LogoFactory(view.context)
 
     var dividerIsVisible: Boolean
         get() = dividerView.visibility == View.VISIBLE
@@ -42,7 +43,7 @@ class CompanyClientItemViewHolder(
     private val logoSize =
             view.context.resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
 
-    private val balanceThemedContext = ContextThemeWrapper(view.context, R.style.StrokedBadgeText)
+    private val balanceThemedContext = ContextThemeWrapper(view.context, R.style.BadgeText)
     private val balanceTextViewMargin =
             view.context.resources.getDimensionPixelSize(R.dimen.quarter_standard_margin)
 
@@ -55,7 +56,13 @@ class CompanyClientItemViewHolder(
 
     override fun bind(item: CompanyClientListItem) {
         nameTextView.text = item.name ?: item.email
-        clientIcon = LogoUtil.generateLogo(item.email.toUpperCase(), view.context, logoSize)
+
+        clientIcon = BitmapDrawable(
+                itemView.context.resources,
+                logoFactory.getWithAutoBackground(item.name
+                        ?: item.email.toUpperCase(), logoSize, item.email)
+        )
+
         initState(item.isChecked)
         balancesLayout.removeAllViews()
 
@@ -119,7 +126,7 @@ class CompanyClientItemViewHolder(
     }
 
     private fun addBalanceBadge(text: String) {
-        val textView = TextView(balanceThemedContext, null, R.style.StrokedBadgeText)
+        val textView = TextView(balanceThemedContext, null, R.style.BadgeText)
         textView.text = text
         balancesLayout.addView(textView)
         textView.layoutParams = (textView.layoutParams as FlowLayout.LayoutParams).apply {

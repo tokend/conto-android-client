@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="600"
+    android:propertyName="strokeAlpha"
+    android:repeatCount="1"
+    android:repeatMode="reverse"
+    android:startOffset="600"
+    android:valueFrom="0.2"
+    android:valueTo="1" />

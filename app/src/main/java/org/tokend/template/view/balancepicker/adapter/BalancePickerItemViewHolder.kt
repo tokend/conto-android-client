@@ -6,6 +6,7 @@ import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.balances.BalanceItemView
 import org.tokend.template.view.balances.BalanceItemViewImpl
+import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.formatter.AmountFormatter
 
 class BalancePickerItemViewHolder(
@@ -17,7 +18,7 @@ class BalancePickerItemViewHolder(
     private val colorError = ContextCompat.getColor(view.context, R.color.error)
 
     override fun bind(item: BalancePickerListItem) {
-        displayLogo(item.logoUrl, item.asset.code)
+        CircleLogoUtil.setAssetLogo(logoImageView, item.asset)
 
         nameTextView.text = item.displayedName
 

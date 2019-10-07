@@ -2,7 +2,7 @@ package org.tokend.template.data.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.sdk.api.generated.resources.AssetPairResource
-import org.tokend.template.util.PolicyChecker
+import org.tokend.template.util.RecordWithPolicy
 import org.tokend.wallet.xdr.AssetPairPolicy
 import java.io.Serializable
 import java.math.BigDecimal
@@ -11,13 +11,13 @@ class AssetPairRecord(
         val base: Asset,
         val quote: Asset,
         val price: BigDecimal,
-        val policy: Int = 0,
-        val baseAssetLogoUrl: String?
-) : Serializable, PolicyChecker {
+        override val policy: Int,
+        override val logoUrl: String?
+) : Serializable, RecordWithPolicy, RecordWithLogo {
     val id = "$base:$quote"
 
     fun isTradeable(): Boolean {
-        return checkPolicy(policy, AssetPairPolicy.TRADEABLE_SECONDARY_MARKET.value)
+        return hasPolicy(AssetPairPolicy.TRADEABLE_SECONDARY_MARKET.value)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -37,8 +37,9 @@ class AssetPairRecord(
                     base = SimpleAsset(resource.baseAsset),
                     quote = SimpleAsset(resource.quoteAsset),
                     price = resource.price,
-                    policy = resource.policies.value,
-                    baseAssetLogoUrl =
+                    policy = resource.policies.value
+                            ?: throw IllegalStateException("Asset pair must have a policy"),
+                    logoUrl =
                     if (resource.baseAsset.isFilled)
                         AssetRecord.fromResource(resource.baseAsset, urlConfig, objectMapper)
                                 .logoUrl

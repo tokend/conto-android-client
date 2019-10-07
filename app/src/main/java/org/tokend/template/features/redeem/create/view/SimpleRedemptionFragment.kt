@@ -24,6 +24,7 @@ import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.redeem.create.logic.CreateRedemptionRequestUseCase
+import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.wallet.view.PlusMinusAmountInputView
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -48,14 +49,16 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
     override lateinit var balanceId: String
 
-    override var referenceToPoll: String? = null
 
     private val balance: BalanceRecord
         get() = balancesRepository.itemsList.first { it.id == balanceId }
 
-    private var serializedRequestBase64: String = ""
+    private var currentRequest: RedemptionRequest? = null
+    private var currentRequestBase64: String = ""
     override val data: String
-        get() = serializedRequestBase64
+        get() = currentRequestBase64
+    override val referenceToPoll: String?
+        get() = currentRequest?.salt?.toString()
 
     private lateinit var amountView: PlusMinusAmountInputView
     private lateinit var availableTextView: TextView
@@ -138,6 +141,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
         amountView.amountWrapper.onAmountChanged { _, _ -> onAmountChanged() }
+        amountView.amountWrapper.maxPlacesAfterComa = balance.asset.trailingDigits
         scrollable_root_layout.addView(amountView)
 
         preFillAmount()
@@ -170,12 +174,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun preFillAmount() {
-        amountView.amountWrapper.setAmount(
-                if (PRE_FILLED_AMOUNT > balance.available)
-                    BigDecimal.ZERO
-                else
-                    PRE_FILLED_AMOUNT
-        )
+        amountView.amountWrapper.setAmount(PRE_FILLED_AMOUNT.min(balance.available))
     }
 
     private fun subscribeToBalances() {
@@ -236,7 +235,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
         redemptionCreationDisposable?.dispose()
 
-        referenceToPoll = null
+        currentRequest = null
         stopPolling()
 
         val assetCode = balance.assetCode
@@ -261,12 +260,11 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun onRedemptionRequestCreated(result: CreateRedemptionRequestUseCase.Result) {
-        serializedRequestBase64 = result
+        currentRequest = result.request
+        currentRequestBase64 = result
                 .request
                 .serialize(result.networkParams)
                 .encodeBase64String()
-
-        referenceToPoll = result.request.salt.toString()
 
         isAccepted = false
 
@@ -302,6 +300,12 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
         checkDrawable.draw(canvas)
 
         qr_code_image_view.setImageBitmap(source)
+    }
+
+    override fun startPollingIfNeeded() {
+        if (currentRequest?.amount?.signum()?.let { it > 0 } == true) {
+            super.startPollingIfNeeded()
+        }
     }
 
     companion object {

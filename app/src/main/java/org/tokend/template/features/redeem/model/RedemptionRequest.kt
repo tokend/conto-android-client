@@ -1,9 +1,13 @@
 package org.tokend.template.features.redeem.model
 
+import org.tokend.template.data.model.history.SimpleFeeRecord
+import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.wallet.Base32Check
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
+import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.*
+import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -36,6 +40,37 @@ class RedemptionRequest(
             stream.write(signature.signature)
         }
         return byteStream.toByteArray()
+    }
+
+    fun toTransaction(senderBalanceId: String,
+                      recipientAccountId: String,
+                      networkParams: NetworkParams): Transaction {
+        val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
+        val fee = PaymentFee(zeroFee, zeroFee)
+
+        val operation = SimplePaymentOp(
+                sourceBalanceId = senderBalanceId,
+                destAccountId = recipientAccountId,
+                amount = networkParams.amountToPrecised(amount),
+                subject = "",
+                reference = salt.toString(),
+                feeData = PaymentFeeData(
+                        sourceFee = fee.senderFee.toXdrFee(networkParams),
+                        destinationFee = fee.recipientFee.toXdrFee(networkParams),
+                        sourcePaysForDest = false,
+                        ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
+                )
+        )
+
+        val transaction = TransactionBuilder(networkParams, sourceAccountId)
+                .addOperation(Operation.OperationBody.Payment(operation))
+                .setSalt(salt)
+                .setTimeBounds(timeBounds)
+                .build()
+
+        transaction.addSignature(signature)
+
+        return transaction
     }
 
     companion object {

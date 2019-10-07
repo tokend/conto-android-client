@@ -30,6 +30,7 @@ import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.*
 import org.tokend.template.di.providers.*
 import org.tokend.template.logic.Session
+import org.tokend.template.logic.persistance.BackgroundLockManager
 import org.tokend.template.logic.persistance.SessionInfoStorage
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.environments.AppEnvironment
@@ -312,13 +313,19 @@ class App : MultiDexApplication() {
     }
 
     private fun onAppComesToForeground() {
-        val now = System.currentTimeMillis()
         Log.d(LOG_TAG, "onAppComesToForeground()")
         backgroundStateSubject.onNext(false)
-        session.isExpired =
-                logoutTime != 0L &&
-                        now - lastInForeground > logoutTime
+
+        expireSessionIfNeeded()
+
         lastInForeground = 0
+    }
+
+    private fun expireSessionIfNeeded() {
+        val now = System.currentTimeMillis()
+        val backgroundLockManager = BackgroundLockManager(this)
+        session.isExpired = backgroundLockManager.isBackgroundLockEnabled &&
+                logoutTime != 0L && now - lastInForeground > logoutTime
     }
     // endregion
 }

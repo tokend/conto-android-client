@@ -19,6 +19,7 @@ import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.persistance.FingerprintAuthManager
@@ -26,8 +27,8 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
 import org.tokend.template.view.FingerprintIndicatorManager
-import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.dialog.SignOutDialogFactory
+import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 
@@ -62,10 +63,6 @@ class UnlockAppActivity : BaseActivity() {
 
     private lateinit var email: String
     private var lastEnteredPassword: CharArray? = null
-
-    private val animationDuration: Long by lazy {
-        this.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-    }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_unlock_app)
@@ -240,7 +237,6 @@ class UnlockAppActivity : BaseActivity() {
         updatePasswordUnlockAvailability()
 
         if (canUnlockWithPassword) {
-            SoftInputUtil.hideSoftInput(this)
             unlock(email, password_edit_text.text.getChars())
         }
     }
@@ -259,6 +255,8 @@ class UnlockAppActivity : BaseActivity() {
             lastEnteredPassword?.erase()
         }
         lastEnteredPassword = password
+
+        SoftInputUtil.hideSoftInput(this)
 
         SignInUseCase(
                 email,
@@ -285,8 +283,20 @@ class UnlockAppActivity : BaseActivity() {
     }
 
     private fun onUnlockComplete() {
-        Navigator.from(this)
-                .performPostSignInRouting(repositoryProvider.kycState().item)
+        // KYC recovery check.
+        val account = repositoryProvider.account().item
+        if (account != null && account.isKycRecoveryActive) {
+            KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
+                    .getStatusDialog(account, urlConfigProvider.getConfig().client) {
+                        setOnDismissListener {
+                            (application as? App)?.signOut(this@UnlockAppActivity)
+                        }
+                    }
+                    .show()
+        } else {
+            Navigator.from(this)
+                    .performPostSignInRouting(repositoryProvider.kycState().item)
+        }
     }
 
     private fun onUnlockError(error: Throwable) {

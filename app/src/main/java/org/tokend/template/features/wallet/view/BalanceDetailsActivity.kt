@@ -142,14 +142,14 @@ class BalanceDetailsActivity : BaseActivity() {
 
         val actions = mutableListOf<FloatingActionMenuAction>()
 
-        if (asset?.ownerAccountId == accountId
+        if (asset?.isOwnedBy(accountId) == true
                 && !repositoryProvider.kycState().isActualOrForcedGeneral) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,
                     R.drawable.ic_issuance_white,
                     {
-                        val assetCode = asset?.code ?: return@FloatingActionMenuAction
+                        val assetCode = asset.code
                         navigator.openMassIssuance(assetCode = assetCode)
                     }
             ))
@@ -358,11 +358,9 @@ class BalanceDetailsActivity : BaseActivity() {
 
         asset_name_text_view.text = balance.asset.name ?: balance.assetCode
 
-        LogoUtil.setLogo(
+        CircleLogoUtil.setAssetLogo(
                 asset_logo_image_view,
-                balance.asset.code,
-                balance.asset.logoUrl,
-                resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
+                balance.asset
         )
 
         if (balance.convertedAmount != null

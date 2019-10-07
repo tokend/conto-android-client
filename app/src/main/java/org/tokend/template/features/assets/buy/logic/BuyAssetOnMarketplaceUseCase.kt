@@ -2,33 +2,26 @@ package org.tokend.template.features.assets.buy.logic
 
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
+import io.reactivex.rxkotlin.toSingle
 import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceBuyRequestAttributes
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
-import org.tokend.template.data.model.AtomicSwapAskRecord
-import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
-import org.tokend.template.logic.transactions.TxManager
-import org.tokend.wallet.NetworkParams
-import org.tokend.wallet.Transaction
-import org.tokend.wallet.xdr.CreateAtomicSwapBidRequest
-import org.tokend.wallet.xdr.CreateAtomicSwapBidRequestOp
-import org.tokend.wallet.xdr.Operation
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import java.math.BigDecimal
 
 class BuyAssetOnMarketplaceUseCase(
         private val amount: BigDecimal,
         private val quoteAssetCode: String,
-        private val ask: AtomicSwapAskRecord,
+        private val offer: MarketplaceOfferRecord,
         private val apiProvider: ApiProvider,
         private val repositoryProvider: RepositoryProvider,
-        private val walletInfoProvider: WalletInfoProvider,
-        private val accountProvider: AccountProvider
+        private val walletInfoProvider: WalletInfoProvider
 ) {
     private lateinit var accountId: String
-    private lateinit var networkParams: NetworkParams
-    private lateinit var transaction: Transaction
+    private lateinit var buyRequest: MarketplaceBuyRequestAttributes
 
     fun perform(): Single<MarketplaceInvoiceData> {
         return getAccountId()
@@ -36,16 +29,10 @@ class BuyAssetOnMarketplaceUseCase(
                     this.accountId = accountId
                 }
                 .flatMap {
-                    getNetworkParams()
+                    getBuyRequest()
                 }
-                .doOnSuccess { networkParams ->
-                    this.networkParams = networkParams
-                }
-                .flatMap {
-                    getTransaction()
-                }
-                .doOnSuccess { transaction ->
-                    this.transaction = transaction
+                .doOnSuccess { buyRequest ->
+                    this.buyRequest = buyRequest
                 }
                 .flatMap {
                     getInvoice()
@@ -63,49 +50,37 @@ class BuyAssetOnMarketplaceUseCase(
                 .switchIfEmpty(Single.error(IllegalStateException("Missing account ID")))
     }
 
-    private fun getNetworkParams(): Single<NetworkParams> {
-        return repositoryProvider
-                .systemInfo()
-                .getNetworkParams()
-    }
-
-    private fun getTransaction(): Single<Transaction> {
-        val op = CreateAtomicSwapBidRequestOp(
-                request = CreateAtomicSwapBidRequest(
-                        askID = ask.id.toLong(),
-                        quoteAsset = quoteAssetCode,
-                        baseAmount = networkParams.amountToPrecised(amount),
-                        creatorDetails = "",
-                        ext = CreateAtomicSwapBidRequest.CreateAtomicSwapBidRequestExt.EmptyVersion()
-                ),
-                ext = CreateAtomicSwapBidRequestOp.CreateAtomicSwapBidRequestOpExt.EmptyVersion()
-        )
-
-        val account = accountProvider.getAccount()
-                ?: return Single.error(IllegalStateException("Cannot obtain current account"))
-
-        return TxManager.createSignedTransaction(networkParams, accountId, account,
-                Operation.OperationBody.CreateAtomicSwapBidRequest(op))
+    private fun getBuyRequest(): Single<MarketplaceBuyRequestAttributes> {
+        return {
+            MarketplaceBuyRequestAttributes(
+                    amount = amount,
+                    offerId = offer.id.toLong(),
+                    senderAccountId = accountId,
+                    senderEmail = null,
+                    paymentMethodId = offer.paymentMethods
+                            .first {
+                                it.asset.code == quoteAssetCode
+                            }
+                            .id
+                            .toLong()
+            )
+        }.toSingle()
     }
 
     private fun getInvoice(): Single<MarketplaceInvoiceData> {
         return apiProvider.getApi()
                 .integrations
-                // TODO: Replace with .marketplace
-                .fiat
-                .submitBidTransaction(transaction)
+                .marketplace
+                .submitBuyRequest(buyRequest)
                 .toSingle()
-                .map {
-                    MarketplaceInvoiceData.Redirect(it.paymentUrl)
-                }
     }
 
     private fun updateRepositories() {
         listOf(
-                repositoryProvider.allAtomicSwapAsks(null),
-                repositoryProvider.allAtomicSwapAsks(ask.company.id)
+                repositoryProvider.marketplaceOffers(null),
+                repositoryProvider.marketplaceOffers(offer.company.id)
         ).forEach {
-            it.updateAskAvailable(ask.id, -amount)
+            it.updateAvailableAmount(offer.id, -amount)
         }
     }
 }

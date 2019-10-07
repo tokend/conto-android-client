@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:drawable="@drawable/phone_search_circles"
+    tools:ignore="NewApi">
+
+    <target
+        android:name="c1"
+        android:animation="@animator/phone_search_circle_animator" />
+    <target
+        android:name="c2"
+        android:animation="@animator/phone_search_circle_animator_1" />
+    <target
+        android:name="c3"
+        android:animation="@animator/phone_search_circle_animator_2" />
+    <target
+        android:name="c4"
+        android:animation="@animator/phone_search_circle_animator_3" />
+</animated-vector>

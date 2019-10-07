@@ -20,8 +20,10 @@ import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.extensions.*
 import org.tokend.template.features.recovery.logic.RecoverPasswordUseCase
+import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.logic.UrlConfigManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -215,16 +217,26 @@ class RecoveryActivity : BaseActivity() {
                     password.fill('0')
                 }
                 .subscribeBy(
-                        onComplete = {
-                            toastManager.long(R.string.kyc_recovery_initiated_message)
-                            finishWithSuccess()
-                        },
+                        onComplete = this::showInitiatedRecoveryDialogAndFinish,
                         onError = {
                             handleRecoveryError(it)
                             updateRecoveryAvailability()
                         }
                 )
                 .addTo(compositeDisposable)
+    }
+
+    private fun showInitiatedRecoveryDialogAndFinish() {
+        KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
+                .getStatusDialog(
+                        AccountRecord.KycRecoveryStatus.INITIATED,
+                        urlConfigProvider.getConfig().client
+                ) {
+                    setOnDismissListener {
+                        finishWithSuccess()
+                    }
+                }
+                .show()
     }
 
     private fun finishWithSuccess() {

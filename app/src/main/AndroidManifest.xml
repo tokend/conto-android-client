@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -172,7 +173,7 @@
         <activity
             android:name=".features.signin.unlock.UnlockAppActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".features.qr.CaptureActivityPortrait"
             android:screenOrientation="portrait"
@@ -183,7 +184,7 @@
             android:name=".features.wallet.view.BalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
-            android:name=".features.assets.buy.view.BuyWithAtomicSwapActivity"
+            android:name=".features.assets.buy.view.BuyAssetOnMarketplaceActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
@@ -245,11 +246,15 @@
         <activity
             android:name=".features.companies.details.view.CompanyDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".features.shaketopay.view.ShakeToPayActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

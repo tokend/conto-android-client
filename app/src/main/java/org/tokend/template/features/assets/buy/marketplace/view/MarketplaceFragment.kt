@@ -1,4 +1,4 @@
-package org.tokend.template.features.assets.buy.singleprice.view
+package org.tokend.template.features.assets.buy.marketplace.view
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -16,11 +16,11 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.extensions.withArguments
-import org.tokend.template.features.assets.buy.singleprice.repository.AllAtomicSwapAsksRepository
-import org.tokend.template.features.assets.buy.singleprice.view.adapter.SinglePriceAtomicSwapAskListItem
-import org.tokend.template.features.assets.buy.singleprice.view.adapter.SinglePriceAtomicSwapAsksAdapter
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
+import org.tokend.template.features.assets.buy.marketplace.view.adapter.MarketplaceOfferListItem
+import org.tokend.template.features.assets.buy.marketplace.view.adapter.SinglePriceAtomicSwapAsksAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
@@ -29,7 +29,7 @@ import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 
-class AllAtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
+class MarketplaceFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
 
     private val loadingIndicator = LoadingIndicatorManager(
@@ -43,8 +43,8 @@ class AllAtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
         arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, false) ?: false
     }
 
-    private val asksRepository: AllAtomicSwapAsksRepository
-        get() = repositoryProvider.allAtomicSwapAsks(companyId)
+    private val asksRepository: MarketplaceOffersRepository
+        get() = repositoryProvider.marketplaceOffers(companyId)
 
     private lateinit var adapter: SinglePriceAtomicSwapAsksAdapter
     private lateinit var layoutManager: GridLayoutManager
@@ -146,8 +146,9 @@ class AllAtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
     private fun displayAsks() {
         val items = asksRepository
                 .itemsList
+                .filterNot(MarketplaceOfferRecord::isCanceled)
                 .map {
-                    SinglePriceAtomicSwapAskListItem(
+                    MarketplaceOfferListItem(
                             it,
                             withCompany = companyId == null
                     )
@@ -163,8 +164,8 @@ class AllAtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
         }
     }
 
-    private fun openBuy(ask: AtomicSwapAskRecord) {
-        Navigator.from(this).openAtomicSwapBuy(ask)
+    private fun openBuy(offer: MarketplaceOfferRecord) {
+        Navigator.from(this).openMarketplaceBuy(offer)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -187,7 +188,7 @@ class AllAtomicSwapAsksFragment : BaseFragment(), ToolbarProvider {
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
         }
 
-        fun newInstance(bundle: Bundle): AllAtomicSwapAsksFragment =
-                AllAtomicSwapAsksFragment().withArguments(bundle)
+        fun newInstance(bundle: Bundle): MarketplaceFragment =
+                MarketplaceFragment().withArguments(bundle)
     }
 }

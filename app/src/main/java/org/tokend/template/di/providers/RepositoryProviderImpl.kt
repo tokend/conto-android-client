@@ -13,8 +13,8 @@ import org.tokend.template.data.repository.balancechanges.BalanceChangesReposito
 import org.tokend.template.data.repository.base.MemoryOnlyRepositoryCache
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.extensions.getOrPut
+import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
-import org.tokend.template.features.assets.buy.singleprice.repository.AllAtomicSwapAsksRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -142,8 +142,8 @@ class RepositoryProviderImpl(
                 assets(), MemoryOnlyRepositoryCache())
     }
 
-    private val allAtomicSwapAsksRepositories =
-            LruCache<String, AllAtomicSwapAsksRepository>(MAX_SAME_REPOSITORIES_COUNT)
+    private val marketplaceOffersRepositories =
+            LruCache<String, MarketplaceOffersRepository>(MAX_SAME_REPOSITORIES_COUNT)
 
     private val keyValueEntries: KeyValueEntriesRepository by lazy {
         KeyValueEntriesRepository(apiProvider, MemoryOnlyRepositoryCache())
@@ -337,15 +337,13 @@ class RepositoryProviderImpl(
         return blobs
     }
 
-    override fun allAtomicSwapAsks(ownerAccountId: String?): AllAtomicSwapAsksRepository {
-        return allAtomicSwapAsksRepositories.getOrPut(ownerAccountId.toString()) {
-            AllAtomicSwapAsksRepository(
+    override fun marketplaceOffers(ownerAccountId: String?): MarketplaceOffersRepository {
+        return marketplaceOffersRepositories.getOrPut(ownerAccountId.toString()) {
+            MarketplaceOffersRepository(
                     ownerAccountId,
                     apiProvider,
                     assets(),
                     companies(),
-                    urlConfigProvider,
-                    mapper,
                     MemoryOnlyRepositoryCache()
             )
         }

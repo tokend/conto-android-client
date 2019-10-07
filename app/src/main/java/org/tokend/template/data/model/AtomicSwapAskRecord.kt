@@ -11,7 +11,9 @@ class AtomicSwapAskRecord(
         var amount: BigDecimal,
         val isCanceled: Boolean,
         val quoteAssets: List<QuoteAsset>,
-        val company: CompanyRecord
+        val company: CompanyRecord,
+        val price: BigDecimal,
+        val priceAsset: Asset
 ) : Serializable {
     constructor(source: AtomicSwapAskResource,
                 assetsMap: Map<String, Asset>,
@@ -31,10 +33,12 @@ class AtomicSwapAskRecord(
                                 code = it.quoteAsset,
                                 trailingDigits = 6,
                                 price = it.price,
-                                name = assetsMap[it.quoteAsset]?.name
+                                name = assetsMap[it.quoteAsset]?.name,
+                                logoUrl = (assetsMap[it.quoteAsset] as? RecordWithLogo)?.logoUrl
                         )
-                    }
-                    .sortedByDescending { it.code == DEFAULT_QUOTE_ASSET }
+                    },
+            price = source.quoteAssets.first().price,
+            priceAsset = assetsMap[companiesMap[source.owner.id]!!.conversionAssetCode]!!
     )
 
     override fun equals(other: Any?): Boolean {
@@ -49,10 +53,7 @@ class AtomicSwapAskRecord(
             override val code: String,
             override val trailingDigits: Int,
             val price: BigDecimal,
-            override val name: String?
-    ) : Asset
-
-    companion object {
-        private const val DEFAULT_QUOTE_ASSET = "UAH"
-    }
+            override val name: String?,
+            override val logoUrl: String?
+    ) : Asset, RecordWithLogo
 }

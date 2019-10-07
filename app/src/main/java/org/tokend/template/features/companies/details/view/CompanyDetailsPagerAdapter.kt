@@ -23,7 +23,7 @@ class CompanyDetailsPagerAdapter(
                     BALANCES_PAGE
             ),
             Page(
-                    fragmentFactory.getAllAtomicSwapAsksFragment(false, companyId),
+                    fragmentFactory.getMarketplaceFragment(false, companyId),
                     context.getString(R.string.shop_title),
                     SHOP_PAGE
             )

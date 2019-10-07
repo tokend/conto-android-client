@@ -10,7 +10,7 @@ import org.jetbrains.anko.onClick
 import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
-import org.tokend.template.view.util.LogoUtil
+import org.tokend.template.view.util.CircleLogoUtil
 
 class AssetListItemViewHolder(view: View,
                               private val displayDescription: Boolean
@@ -28,10 +28,6 @@ class AssetListItemViewHolder(view: View,
                 view.context.getText(R.string.asset_balance_exists))
     }
 
-    private val logoSize: Int by lazy {
-        view.context.resources.getDimensionPixelSize(R.dimen.asset_list_item_logo_size)
-    }
-
     override fun bind(item: AssetListItem, clickListener: SimpleItemClickListener<AssetListItem>?) {
         super.bind(item, clickListener)
         primaryActionButton.onClick {
@@ -40,7 +36,8 @@ class AssetListItemViewHolder(view: View,
     }
 
     override fun bind(item: AssetListItem) {
-        LogoUtil.setLogo(logoImageView, item.code, item.logoUrl, logoSize)
+        CircleLogoUtil.setLogo(logoImageView, item.name ?: item.code,
+                item.logoUrl, extras = arrayOf(item.code))
 
         nameTextView.text = item.name ?: item.code
 

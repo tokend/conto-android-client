@@ -1,7 +1,6 @@
 package org.tokend.template.features.amountscreen.view
 
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +20,8 @@ import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 open class AmountInputFragment : BaseFragment() {
     protected lateinit var amountWrapper: AmountEditTextWrapper
@@ -68,6 +69,7 @@ open class AmountInputFragment : BaseFragment() {
         initButtons()
         initAssetSelection()
         initExtraView()
+        initAdaptiveTextSize()
 
         subscribeToBalances()
 
@@ -86,19 +88,45 @@ open class AmountInputFragment : BaseFragment() {
         }
         amount_edit_text.requestFocus()
         SoftInputUtil.showSoftInputOnView(amount_edit_text)
-
-        initAdaptiveTextSize()
     }
 
     /**
      * Sets up input field and asset code text size change depending
-     * on [R.dimen.amount_input_height_threshold]
+     * on [getSmallSizingHeightThreshold]
      */
     protected open fun initAdaptiveTextSize() {
-        val minHeight =
-                requireContext().resources.getDimensionPixelSize(R.dimen.amount_input_height_threshold)
+        val minHeight = getSmallSizingHeightThreshold()
+
         var isSmallSize: Boolean? = null
 
+        val heightChanges = PublishSubject.create<Int>()
+
+        root_layout.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            val oldHeight = oldBottom - oldTop
+            val height = bottom - top
+            if (height != oldHeight) {
+                heightChanges.onNext(height)
+            }
+        }
+
+        heightChanges
+                .debounce(100, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { height ->
+                    val useSmallSize = height <= minHeight
+
+                    if (useSmallSize == isSmallSize) {
+                        return@subscribe
+                    }
+
+                    isSmallSize = useSmallSize
+
+                    updateSizing(useSmallSize)
+                }
+                .addTo(compositeDisposable)
+    }
+
+    protected open fun updateSizing(useSmallSize: Boolean) {
         val resources = requireContext().resources
 
         val defaultInputSize = resources.getDimensionPixelSize(R.dimen.text_size_amount_input)
@@ -113,35 +141,26 @@ open class AmountInputFragment : BaseFragment() {
                 .toFloat()
         val smallTitleMargin = 0
 
-        root_layout.viewTreeObserver.addOnGlobalLayoutListener {
-            val height = root_layout?.height ?: return@addOnGlobalLayoutListener
-            val useSmallSize = height <= minHeight
+        val inputSize = if (useSmallSize) smallInputSize else defaultInputSize
+        val assetCodeSize = if (useSmallSize) smallAssetCodeSize else defaultAssetCodeSize
+        val titleMargin = if (useSmallSize) smallTitleMargin else defaultTitleMargin
 
-            if (useSmallSize == isSmallSize) {
-                return@addOnGlobalLayoutListener
-            }
+        amount_edit_text.setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                inputSize
+        )
+        asset_code_text_view.setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                assetCodeSize
+        )
+        title_text_view.layoutParams =
+                (title_text_view.layoutParams as ViewGroup.MarginLayoutParams)
+                        .apply {
+                            setMargins(defaultTitleMargin, titleMargin,
+                                    defaultTitleMargin, titleMargin)
+                        }
 
-            isSmallSize = useSmallSize
-
-            val inputSize = if (useSmallSize) smallInputSize else defaultInputSize
-            val assetCodeSize = if (useSmallSize) smallAssetCodeSize else defaultAssetCodeSize
-            val titleMargin = if (useSmallSize) smallTitleMargin else defaultTitleMargin
-
-            amount_edit_text.setTextSize(
-                    TypedValue.COMPLEX_UNIT_PX,
-                    inputSize
-            )
-            asset_code_text_view.setTextSize(
-                    TypedValue.COMPLEX_UNIT_PX,
-                    assetCodeSize
-            )
-            title_text_view.layoutParams =
-                    (title_text_view.layoutParams as ConstraintLayout.LayoutParams)
-                            .apply {
-                                setMargins(titleMargin, titleMargin,
-                                        titleMargin, titleMargin)
-                            }
-        }
+        asset_code_text_view.maxWidth = (root_layout.width * 0.75).roundToInt()
     }
 
     protected open fun initButtons() {
@@ -175,7 +194,13 @@ open class AmountInputFragment : BaseFragment() {
     }
 
     protected open fun initTitle() {
-        title_text_view.text = getTitleText()
+        val title = getTitleText()
+        if (title != null) {
+            title_text_view.text = title
+            title_text_view.visibility = View.VISIBLE
+        } else {
+            title_text_view.visibility = View.GONE
+        }
     }
 
     protected open fun initExtraView() {
@@ -350,6 +375,13 @@ open class AmountInputFragment : BaseFragment() {
      */
     protected open fun getMinLayoutHeight(): Int {
         return requireContext().resources.getDimensionPixelSize(R.dimen.amount_input_min_height)
+    }
+
+    /**
+     * @return minimal height of the layout before switching to small sizing
+     */
+    protected open fun getSmallSizingHeightThreshold(): Int {
+        return requireContext().resources.getDimensionPixelSize(R.dimen.amount_input_height_threshold)
     }
 
     companion object {
