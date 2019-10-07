@@ -2,7 +2,4 @@
 // for "staging" builds.
 ext {
     enable_analytics = false
-    available_envs = ['config']
-//    default_env_id = 'staging'
-    default_env_id = 'config'
 }
