@@ -42,9 +42,7 @@ class CorporateMainActivity : MainActivity() {
                     items[CompanyClientsFragment.ID],
                     items[CompanyBalancesFragment.ID],
                     items[AssetMovementsFragment.ID],
-                    items[SettingsFragment.ID],
-                    DividerDrawerItem(),
-                    items[CONTRIBUTE_ITEM_ID]
+                    items[SettingsFragment.ID]
             )
         }
     }

@@ -302,9 +302,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             }
 
             addDrawerItems(
-                    items[SettingsFragment.ID],
-                    DividerDrawerItem(),
-                    items[CONTRIBUTE_ITEM_ID]
+                    items[SettingsFragment.ID]
             )
         }
     }
