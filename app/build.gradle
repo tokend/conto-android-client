@@ -23,8 +23,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         resConfigs("en", "ru", "uk")
         manifestPlaceholders = [
-                fabricApiKey: keystoreProperties['FabricApiKey'] != null
-                        ? keystoreProperties['FabricApiKey']
+                fabricApiKey: keystoreProperties['FabricApiKeyUNIT'] != null
+                        ? keystoreProperties['FabricApiKeyUNIT']
                         : ""
         ]
         multiDexKeepFile file('multidex-keep.txt')
