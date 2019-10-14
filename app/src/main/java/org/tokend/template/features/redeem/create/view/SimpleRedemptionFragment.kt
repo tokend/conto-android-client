@@ -49,7 +49,6 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
     override lateinit var balanceId: String
 
-
     private val balance: BalanceRecord
         get() = balancesRepository.itemsList.first { it.id == balanceId }
 

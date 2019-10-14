@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.include_rounded_elevated_bottom_sheet_header.*
 import kotlinx.android.synthetic.main.layout_simple_balance_details_content.*
 import kotlinx.android.synthetic.main.layout_simple_balance_details_redemption.*
@@ -102,21 +103,36 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     private fun initBottomSheet() {
         bottomSheet = BottomSheetBehavior.from(redemption_bottom_sheet_layout)
 
-        // Fade header.
-        bottomSheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(p0: View, p1: Int) {}
+        val bottomSheetVisibilityChanges = BehaviorSubject.createDefault(false)
+        val publishIsVisible = { isVisible: Boolean ->
+            if (isVisible != bottomSheetVisibilityChanges.value) {
+                bottomSheetVisibilityChanges.onNext(isVisible)
+            }
+        }
 
+        bottomSheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(p0: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> publishIsVisible(true)
+                    BottomSheetBehavior.STATE_HIDDEN,
+                    BottomSheetBehavior.STATE_COLLAPSED -> publishIsVisible(false)
+                }
+            }
+
+            // Fade header.
             override fun onSlide(p0: View, offset: Float) {
                 bottom_sheet_header_fade.alpha = offset
             }
         })
 
+        val fragment = SimpleRedemptionFragment
+                .newInstance(SimpleRedemptionFragment.getBundle(balanceId))
         supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container_layout, SimpleRedemptionFragment.newInstance(
-                        SimpleRedemptionFragment.getBundle(balanceId)
-                ))
+                .replace(R.id.fragment_container_layout, fragment)
                 .commit()
+        bottomSheetVisibilityChanges
+                .subscribe(fragment.visibilityChangesSubject)
 
         redemption_bottom_sheet_text_view.setOnClickListener {
             if (bottomSheet.state != BottomSheetBehavior.STATE_EXPANDED) {

@@ -5,16 +5,18 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
 import org.tokend.template.R
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.qr.ShareQrFragment
+import org.tokend.template.fragments.VisibilityChangesConsumer
 import org.tokend.template.logic.wallet.WalletEventsListener
 import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.ObservableTransformers
 import java.util.concurrent.TimeUnit
 
-open class ShareRedemptionQrFragment : ShareQrFragment() {
+open class ShareRedemptionQrFragment : ShareQrFragment(), VisibilityChangesConsumer {
     override val title: String
         get() = ""
 
@@ -27,11 +29,31 @@ open class ShareRedemptionQrFragment : ShareQrFragment() {
     protected open val balanceId: String?
         get() = arguments?.getString(BALANCE_ID_EXTRA)
 
+    override val visibilityChangesSubject = BehaviorSubject.create<Boolean>()
+
     private var pollingDisposable: Disposable? = null
     protected var isAccepted = false
 
+    override fun onInitAllowed() {
+        super.onInitAllowed()
+        subscribeToVisibilityChanges()
+    }
+
+    private fun subscribeToVisibilityChanges() {
+        visibilityChangesSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { isVisible: Boolean ->
+                    if (isVisible) {
+                        startPollingIfNeeded()
+                    } else {
+                        stopPolling()
+                    }
+                }
+                .addTo(compositeDisposable)
+    }
+
     protected open fun startPollingIfNeeded() {
-        if (isAccepted) {
+        if (visibilityChangesSubject.value == false || isAccepted) {
             return
         }
 
