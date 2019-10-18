@@ -2,6 +2,7 @@ package org.tokend.template.features.dashboard.balances.view
 
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_balances.*
+import kotlinx.android.synthetic.main.fragment_balances_collapsing_content.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.extensions.withArguments

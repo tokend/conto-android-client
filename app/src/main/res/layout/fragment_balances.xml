@@ -51,47 +51,12 @@
                             android:background="@android:color/transparent"
                             app:layout_scrollFlags="scroll">
 
-                            <LinearLayout
+                            <ViewStub
+                                android:id="@+id/collapsing_content_stub"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/standard_margin"
-                                android:layout_marginEnd="@dimen/standard_margin"
-                                android:orientation="vertical">
+                                android:layout="@layout/fragment_balances_collapsing_content" />
 
-                                <!-- Required for vertical-offset-based elevation -->
-                                <Space
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp" />
-
-                                <android.support.v7.widget.AppCompatImageView
-                                    android:id="@+id/company_logo_image_view"
-                                    android:layout_width="@dimen/unlock_logo_size"
-                                    android:layout_height="@dimen/unlock_logo_size"
-                                    android:layout_gravity="center"
-                                    android:layout_marginTop="@dimen/half_standard_margin"
-                                    android:visibility="gone"
-                                    tools:background="@color/avatar_placeholder_background" />
-
-                                <me.grantland.widget.AutofitTextView
-                                    android:id="@+id/total_text_view"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginTop="@dimen/standard_margin"
-                                    android:gravity="center"
-                                    android:maxLines="1"
-                                    android:paddingBottom="@dimen/standard_margin"
-                                    android:textSize="@dimen/text_size_heading_large"
-                                    tools:text="14,221.5 USD" />
-
-                                <org.tokend.template.features.dashboard.balances.view.AssetDistributionChart
-                                    android:id="@+id/distribution_chart"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/quarter_standard_margin"
-                                    android:paddingBottom="@dimen/standard_margin"
-                                    android:visibility="gone" />
-
-                            </LinearLayout>
                         </android.support.design.widget.CollapsingToolbarLayout>
                     </android.support.design.widget.AppBarLayout>
 

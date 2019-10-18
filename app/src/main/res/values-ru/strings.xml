@@ -76,7 +76,7 @@
     <string name="sell">Продажа</string>
     <string name="template_price_one_equals">1 %1$s = %2$s</string>
     <string name="cancel_offer_action">Отменить ордер</string>
-    <string name="cancel_offer_confirmation">Вы уверены что хотите отменить ордер?</string>
+    <string name="cancel_offer_confirmation">Вы уверены, что хотите отменить ордер?</string>
     <string name="offer_canceled">Ордер отменен</string>
     <string name="email_verified">Email подтвержден</string>
     <string name="touch_sensor">Прикоснитесь к сенсору</string>
@@ -188,7 +188,7 @@
     <string name="go_to_confirmation_btn_label">К подтверждению</string>
 
     <!-- Deposit -->
-    <string name="create_balance_confirmation">Вы уверены что хотите создать баланс для %1s?</string>
+    <string name="create_balance_confirmation">Вы уверены, что хотите создать баланс для %1s?</string>
     <string name="personal_address">Личный адрес</string>
     <string name="to_make_deposit_send_asset">Для депозита отправьте %1$s на этот адрес</string>
     <string name="show_qr_label">Показать QR код</string>
@@ -244,7 +244,7 @@
     <string name="successfully_invested">Вклад размещен</string>
     <string name="investment_canceled">Вклад отменен</string>
     <string name="investment_updated">Вклад обновлен</string>
-    <string name="cancel_investment_confirmation">Вы уверены что хотите отменить вклад?</string>
+    <string name="cancel_investment_confirmation">Вы уверены, что хотите отменить вклад?</string>
     <string name="sale_details_title">Детали</string>
     <string name="sale_overview_title">Сводка</string>
     <string name="sale_chart_title">График</string>
@@ -489,7 +489,6 @@
     <string name="template_asset_movements">Операции с %1$s</string>
     <string name="explore_companies_title">Поиск компаний</string>
     <string name="scan_title">Сканировать</string>
-    <string name="template_add_company_confirmation">Вы уверены что ходите добавить %1$s?</string>
     <string name="phone_number_settings_title">Номер телефона</string>
     <string name="set_phone_number_explanation">Добавьте ваш номер телефона к аккаунту чтобы ваши друзья могли быстрее вас найти</string>
     <string name="phone_number">Номер телефона</string>

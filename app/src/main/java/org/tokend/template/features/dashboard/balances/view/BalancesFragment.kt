@@ -14,6 +14,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_balances.*
+import kotlinx.android.synthetic.main.fragment_balances_collapsing_content.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -187,12 +188,24 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun onBalancesUpdated() {
+        initCollapsingContentOnce()
         displayBalances()
         displayTotal()
     }
 
     private fun onFilterChanged() {
         displayBalances()
+    }
+
+    private var collapsingContentInitCompleted = false
+    private fun initCollapsingContentOnce() {
+        if (collapsingContentInitCompleted) {
+            return
+        }
+
+        collapsing_content_stub.inflate()
+
+        collapsingContentInitCompleted = true
     }
 
     // region Display
