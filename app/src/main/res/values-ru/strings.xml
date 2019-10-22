@@ -536,4 +536,8 @@
     <string name="obtaining_location_progress">Определение местоположения…</string>
     <string name="no_nearby_users_found">Никто не нашелся</string>
     <string name="people_nearby_enumeration">Люди поблизости:</string>
+    <string name="to_pay">К оплате</string>
+    <string name="promo_code">Промо код</string>
+    <string name="promo_code_hint">Введите код</string>
+    <string name="error_invalid_promo_code">Некорректный код</string>
 </resources>

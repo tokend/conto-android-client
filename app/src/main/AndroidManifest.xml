@@ -254,7 +254,7 @@
         <activity
             android:name=".features.shaketopay.view.ShakeToPayActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
