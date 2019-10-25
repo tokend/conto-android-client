@@ -94,11 +94,15 @@
                     android:text="@string/no_contacts_message"
                     android:textColor="@color/secondary_text"
                     android:visibility="gone" />
-
-                <include layout="@layout/include_appbar_elevation" />
-
             </FrameLayout>
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/standard_margin"
+            android:layout_below="@id/payment_description_edit_text"
+            android:background="@drawable/gradient_background_to_transparent_from_top" />
+
     </RelativeLayout>
 
     <Button

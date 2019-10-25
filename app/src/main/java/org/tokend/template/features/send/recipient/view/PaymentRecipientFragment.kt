@@ -22,7 +22,6 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_payment_recipient.*
-import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_progress.view.*
 import org.jetbrains.anko.enabled
 import org.tokend.template.R
@@ -42,7 +41,6 @@ import org.tokend.template.util.QrScannerUtil
 import org.tokend.template.util.validator.EmailValidator
 import org.tokend.template.util.validator.GlobalPhoneNumberValidator
 import org.tokend.template.view.ContentLoadingProgressBar
-import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.PhoneNumberUtil
 import org.tokend.template.view.util.input.SimpleTextWatcher
@@ -160,8 +158,6 @@ open class PaymentRecipientFragment : BaseFragment() {
                         }
             }
         }
-
-        ElevationUtil.initScrollElevation(contacts_list, appbar_elevation_view)
 
         contactsAdapter.onItemClick { _, item ->
             if (item is CredentialedContactListItem) {
