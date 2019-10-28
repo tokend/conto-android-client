@@ -1,6 +1,5 @@
 package org.tokend.template.features.massissuance.logic
 
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
@@ -8,6 +7,8 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
+import org.tokend.template.features.send.model.PaymentRecipient
+import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import java.math.BigDecimal
 
 /**
@@ -17,6 +18,7 @@ class CreateMassIssuanceRequestUseCase(
         private val emails: Collection<String>,
         private val asset: Asset,
         private val amount: BigDecimal,
+        private val paymentRecipientLoader: PaymentRecipientLoader,
         private val walletInfoProvider: WalletInfoProvider,
         private val repositoryProvider: RepositoryProvider
 ) {
@@ -24,7 +26,7 @@ class CreateMassIssuanceRequestUseCase(
 
     private lateinit var issuerAccountId: String
     private lateinit var issuerBalanceId: String
-    private lateinit var recipients: Collection<MassIssuanceRequest.Account>
+    private lateinit var recipients: Collection<PaymentRecipient>
 
     fun perform(): Single<MassIssuanceRequest> {
         return getIssuerAccount()
@@ -74,18 +76,14 @@ class CreateMassIssuanceRequestUseCase(
                 ))
     }
 
-    private fun getRecipients(): Single<List<MassIssuanceRequest.Account>> {
-        val accountDetailsRepository = repositoryProvider.accountDetails()
-        return Maybe.merge(
-                emails.map { email ->
-                    accountDetailsRepository
-                            .getAccountIdByIdentifier(email)
-                            .onErrorReturnItem("")
-                            .flatMapMaybe { it.takeIf(String::isNotEmpty).toMaybe() }
-                            .map { MassIssuanceRequest.Account(it, email) }
-                }
+    private fun getRecipients(): Single<List<PaymentRecipient>> {
+        return Single.concat(
+                emails.map(paymentRecipientLoader::load)
         )
-                .toList()
+                .collect<MutableList<PaymentRecipient>>(
+                        { mutableListOf() },
+                        { res, recipient -> res.add(recipient) }
+                )
                 .map { recipients ->
                     if (recipients.isEmpty())
                         throw NoValidRecipientsException()

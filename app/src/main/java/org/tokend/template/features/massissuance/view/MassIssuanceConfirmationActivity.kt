@@ -88,7 +88,7 @@ class MassIssuanceConfirmationActivity : BaseActivity() {
         adapter.setData(
                 request.recipients.mapIndexed { i, it ->
                     DetailsItem(
-                            text = it.email,
+                            text = it.displayedValue,
                             icon = icon,
                             singleLineText = true,
                             header = if (i == 0) getString(R.string.issuance_recipients) else null

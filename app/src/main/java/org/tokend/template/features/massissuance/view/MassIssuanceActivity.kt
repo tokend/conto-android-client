@@ -20,6 +20,7 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.massissuance.logic.CreateMassIssuanceRequestUseCase
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
+import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.validator.EmailValidator
@@ -253,7 +254,7 @@ class MassIssuanceActivity : BaseActivity() {
 
         var disposable: Disposable? = null
 
-        val progress = ProgressDialogFactory.getDialog(this) {
+        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
             disposable?.dispose()
         }
 
@@ -261,6 +262,7 @@ class MassIssuanceActivity : BaseActivity() {
                 emails,
                 asset,
                 amount,
+                PaymentRecipientLoader(repositoryProvider.accountDetails(), apiProvider),
                 walletInfoProvider,
                 repositoryProvider
         )
