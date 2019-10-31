@@ -9,8 +9,8 @@ import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.fragments.BaseFragment
-import org.tokend.template.view.details.DetailsItem
-import org.tokend.template.view.details.adapter.DetailsItemViewHolder
+import org.tokend.template.view.util.CircleLogoUtil
+import org.tokend.template.view.util.MarkdownUtil
 
 class CompanyDescriptionFragment : BaseFragment() {
     private lateinit var company: CompanyRecord
@@ -23,39 +23,30 @@ class CompanyDescriptionFragment : BaseFragment() {
         company = arguments?.getSerializable(COMPANY_EXTRA) as? CompanyRecord
                 ?: throw IllegalArgumentException("Missing $COMPANY_EXTRA")
 
-        displayName()
         displayDetails()
         displayDescription()
     }
 
-    private fun displayName() {
-        company_name_text_view.text = company.name
-    }
-
     private fun displayDetails() {
-        val addDetailsItem = { it: DetailsItem ->
-            val view = layoutInflater.inflate(R.layout.list_item_details_row,
-                    details_layout, true)
-            DetailsItemViewHolder(view).apply {
-                bind(it)
-                dividerIsVisible = false
-            }
-            view.findViewById<View>(R.id.icon_frame).visibility = View.GONE
-        }
+        company_name_text_view.text = company.name
 
         if (company.industry != null) {
-            addDetailsItem(DetailsItem(
-                    text = company.industry,
-                    hint = getString(R.string.company_industry)
-            ))
+            company_industry_text_view.text = company.industry
+        } else {
+            company_industry_text_view.visibility = View.GONE
         }
+
+        CircleLogoUtil.setLogo(company_logo_image_view, company.name, company.logoUrl)
     }
 
     private fun displayDescription() {
-        if (company.descriptionMd != null) {
-            description_text_view.text = company.descriptionMd
+        val descriptionMd = company.descriptionMd
+        if (descriptionMd != null) {
+            val markdown = MarkdownUtil(MarkdownUtil.getDefaultConfiguration(requireContext()))
+                    .toMarkdown(descriptionMd)
+            MarkdownUtil.setMarkdownText(markdown, description_text_view)
         } else {
-            description_text_view.visibility = View.GONE
+            description_text_view.text = getString(R.string.no_description)
         }
     }
 

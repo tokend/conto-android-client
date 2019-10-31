@@ -14,7 +14,7 @@ class CompanyDetailsPagerAdapter(
 ) : BaseFragmentPagerAdapter(fragmentManager) {
     private val fragmentFactory = FragmentFactory()
 
-    override val pages = listOf(
+    override val pages = mutableListOf(
             Page(
                     fragmentFactory.getBalancesFragment(
                             withToolbar = false,
@@ -27,15 +27,18 @@ class CompanyDetailsPagerAdapter(
                     fragmentFactory.getMarketplaceFragment(false, company.id),
                     context.getString(R.string.shop_title),
                     SHOP_PAGE
-            ),
-            Page(
+            )
+    ).apply {
+        if (company.descriptionMd != null) {
+            add(Page(
                     CompanyDescriptionFragment.newInstance(
                             CompanyDescriptionFragment.getBundle(company)
                     ),
                     context.getString(R.string.details),
                     DESCRIPTION_PAGE
-            )
-    )
+            ))
+        }
+    }
 
     companion object {
         const val BALANCES_PAGE = 1L
