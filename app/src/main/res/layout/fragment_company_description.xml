@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+    <android.support.v4.widget.NestedScrollView style="@style/LimitedMatchParentWidthConstraint">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/half_standard_margin" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/company_logo_image_view"
+                    android:layout_width="@dimen/asset_list_item_logo_size"
+                    android:layout_height="@dimen/asset_list_item_logo_size"
+                    android:layout_gravity="center"
+                    tools:background="#ff0" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/standard_margin"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/company_name_text_view"
+                        style="@style/HeadingText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:textSize="18sp"
+                        tools:text="Awesome Company" />
+
+                    <TextView
+                        android:id="@+id/company_industry_text_view"
+                        style="@style/SecondaryText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/quarter_standard_margin"
+                        tools:text="industry" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/description_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/half_standard_margin"
+                android:layout_marginEnd="@dimen/standard_margin"
+                android:paddingStart="@dimen/quarter_standard_margin"
+                android:paddingEnd="@dimen/quarter_standard_margin"
+                android:lineSpacingExtra="@dimen/quarter_standard_margin"
+                android:textIsSelectable="true"
+                tools:text="@string/loading_data" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.constraint.ConstraintLayout>

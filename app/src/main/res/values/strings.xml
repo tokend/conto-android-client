@@ -530,6 +530,8 @@
     <string name="promo_code">Promo code</string>
     <string name="promo_code_hint">Enter a code</string>
     <string name="error_invalid_promo_code">Invalid code</string>
+    <string name="company_industry">Industry</string>
+    <string name="no_description">No description</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

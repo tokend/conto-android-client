@@ -540,4 +540,6 @@
     <string name="promo_code">Промо код</string>
     <string name="promo_code_hint">Введіть код</string>
     <string name="error_invalid_promo_code">Некоректний код</string>
+    <string name="company_industry">Індустрія</string>
+    <string name="no_description">Опис відсутній</string>
 </resources>

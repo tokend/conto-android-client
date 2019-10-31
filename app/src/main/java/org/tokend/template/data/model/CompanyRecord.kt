@@ -10,7 +10,9 @@ class CompanyRecord(
         val name: String,
         val industry: String?,
         override val logoUrl: String?,
-        val conversionAssetCode: String?
+        val conversionAssetCode: String?,
+        val bannerUrl: String?,
+        val descriptionMd: String?
 ) : Serializable, RecordWithLogo {
     constructor(source: BusinessResource, urlConfig: UrlConfig?) : this(
             id = source.accountId,
@@ -19,6 +21,10 @@ class CompanyRecord(
             logoUrl = source.logoJson
                     .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
                     .getUrl(urlConfig?.storage),
+            bannerUrl = source.bannerJson
+                    .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
+                    .getUrl(urlConfig?.storage),
+            descriptionMd = source.description.takeIf(String::isNotEmpty),
             conversionAssetCode = source.statsQuoteAsset.takeIf(String::isNotEmpty)
     )
 
