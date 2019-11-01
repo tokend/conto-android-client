@@ -8,10 +8,10 @@ import kotlin.math.abs
 
 class PixelSquareLogoGenerator {
     private val colors = listOf(
-            "#EDF2FE",
-            "#538AF0",
-            "#60BBF0",
-            "#836CF1"
+            "#EED7E4",
+            "#DB8BAC",
+            "#8D1544",
+            "#C01E5D"
     )
             .map { Color.parseColor(it) }
 
