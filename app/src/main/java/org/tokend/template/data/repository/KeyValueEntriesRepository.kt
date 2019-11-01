@@ -40,6 +40,17 @@ class KeyValueEntriesRepository(
                 }
     }
 
+    private fun getItem(key: String): Single<KeyValueEntryRecord> {
+        return apiProvider
+                .getApi()
+                .v3
+                .keyValue
+                .getById(key)
+                .map(KeyValueEntryRecord.Companion::fromResource)
+                .toSingle()
+                .doOnSuccess { entriesMap[key] = it }
+    }
+
     override fun cacheNewItems(newItems: List<KeyValueEntryRecord>) {
         super.cacheNewItems(newItems)
         entriesMap.clear()
@@ -54,7 +65,11 @@ class KeyValueEntriesRepository(
         return if (entriesMap.keys.containsAll(keys))
             Single.just(entriesMap)
         else
-            updateDeferred()
-                    .toSingle { entriesMap }
+            (if (keys.size == 1)
+                getItem(keys.first())
+            else
+                updateDeferred()
+                        .toSingleDefault(true)
+                    ).map { entriesMap }
     }
 }

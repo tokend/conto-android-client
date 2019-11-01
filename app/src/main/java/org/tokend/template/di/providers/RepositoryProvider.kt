@@ -11,6 +11,7 @@ import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
 import org.tokend.template.features.kyc.storage.KycStateRepository
+import org.tokend.template.features.localaccount.repository.LocalAccountRepository
 import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.features.polls.repository.PollsRepository
 import org.tokend.template.features.send.recipient.contacts.repository.ContactsRepository
@@ -46,4 +47,5 @@ interface RepositoryProvider {
     fun keyValueEntries(): KeyValueEntriesRepository
     fun blobs(): BlobsRepository
     fun marketplaceOffers(ownerAccountId: String?): MarketplaceOffersRepository
+    fun localAccount(): LocalAccountRepository
 }

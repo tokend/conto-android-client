@@ -18,6 +18,7 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
 import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
+import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
 import org.tokend.template.features.tfa.view.TfaDialogFactory
 import org.tokend.template.logic.AppTfaCallback
 import org.tokend.template.logic.Session
@@ -25,6 +26,7 @@ import org.tokend.template.logic.persistance.BackgroundLockManager
 import org.tokend.template.logic.persistance.CredentialsPersistor
 import org.tokend.template.logic.persistance.UrlConfigPersistor
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.cipher.DataCipher
 import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.util.environments.AppEnvironmentsManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
@@ -72,6 +74,10 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     lateinit var environmentManager: AppEnvironmentsManager
     @Inject
     lateinit var backgroundLockManager: BackgroundLockManager
+    @Inject
+    lateinit var mnemonicCode: MnemonicCode
+    @Inject
+    lateinit var defaultDataCipher: DataCipher
 
     /**
      * If set to true the activity will be operational

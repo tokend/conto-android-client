@@ -188,6 +188,11 @@ class App : MultiDexApplication() {
                 Context.MODE_PRIVATE)
     }
 
+    private fun getLocalAccountPreferences(): SharedPreferences {
+        return getSharedPreferences("LocalAccountPersistence",
+                Context.MODE_PRIVATE)
+    }
+
     private fun getAppPreferences(): SharedPreferences {
         return defaultSharedPreferences
     }
@@ -228,7 +233,8 @@ class App : MultiDexApplication() {
                 .persistenceModule(PersistenceModule(
                         credentialsPreferences = getCredentialsPreferences(),
                         networkPreferences = getNetworkPreferences(),
-                        kycStatePreferences = getKycStatePreferences()
+                        kycStatePreferences = getKycStatePreferences(),
+                        localAccountPreferences = getLocalAccountPreferences()
                 ))
                 .sessionModule(SessionModule(session))
                 .localeManagerModule(LocaleManagerModule(localeManager))
@@ -249,11 +255,11 @@ class App : MultiDexApplication() {
      */
     @SuppressLint("ApplySharedPref")
     fun signOut(activity: Activity?, soft: Boolean = false) {
+        session.reset()
+
         if (!soft) {
             clearUserData()
             initState()
-        } else {
-            session.reset()
         }
 
         Navigator.from(this).toSignIn()

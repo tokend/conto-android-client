@@ -46,6 +46,8 @@ import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.view.ClientKycActivity
 import org.tokend.template.features.kyc.view.WaitForKycApprovalActivity
 import org.tokend.template.features.limits.LimitsActivity
+import org.tokend.template.features.localaccount.importt.view.ImportLocalAccountActivity
+import org.tokend.template.features.localaccount.view.LocalAccountDetailsActivity
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.massissuance.view.MassIssuanceActivity
 import org.tokend.template.features.massissuance.view.MassIssuanceConfirmationActivity
@@ -71,6 +73,7 @@ import org.tokend.template.features.settings.telegram.view.TelegramUsernameSetti
 import org.tokend.template.features.shaketopay.view.ShakeToPayActivity
 import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
+import org.tokend.template.features.signin.LocalAccountSignInActivity
 import org.tokend.template.features.signin.SignInActivity
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.signin.unlock.UnlockAppActivity
@@ -585,6 +588,21 @@ class Navigator private constructor() {
 
     fun openShakeToPay() {
         context?.intentFor<ShakeToPayActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openLocalAccountSignIn(requestCode: Int) {
+        context?.intentFor<LocalAccountSignInActivity>()
+                ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openLocalAccountDetails() {
+        context?.intentFor<LocalAccountDetailsActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openLocalAccountImport() {
+        context?.intentFor<ImportLocalAccountActivity>()
                 ?.also { performIntent(it) }
     }
 }

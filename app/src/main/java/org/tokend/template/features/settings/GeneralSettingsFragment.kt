@@ -21,6 +21,7 @@ import org.tokend.template.App
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.repository.TfaFactorsRepository
+import org.tokend.template.features.localaccount.mnemonic.view.MnemonicPhraseDialog
 import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
 import org.tokend.template.features.settings.view.OpenSourceLicensesDialog
 import org.tokend.template.features.tfa.logic.DisableTfaUseCase
@@ -105,6 +106,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         initKycItem()
         initPhoneNumberItem()
         initTelegramUsernameItem()
+        initLocalAccountMnemonicItem()
         initSignOutItem()
         hideCategoryIfEmpty("account")
     }
@@ -130,6 +132,32 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         val telegramUsernamePreference = findPreference("telegram")
         telegramUsernamePreference?.setOnPreferenceClickListener {
             Navigator.from(this).openTelegramUsernameSettings()
+            true
+        }
+    }
+
+    private fun initLocalAccountMnemonicItem() {
+        val mnemonicPreference = findPreference("mnemonic") ?: return
+
+        val localAccount = repositoryProvider.localAccount().item
+        val entropy =
+                if (localAccount != null && localAccount.hasEntropy && localAccount.isDecrypted)
+                    localAccount.entropy
+                else
+                    null
+
+        if (!session.isLocalAccountUsed || entropy == null) {
+            mnemonicPreference.isVisible = false
+            return
+        }
+
+        mnemonicPreference.setOnPreferenceClickListener {
+            MnemonicPhraseDialog(
+                    requireContext(),
+                    mnemonicCode.toMnemonic(entropy).joinToString(" "),
+                    toastManager
+            ).show()
+
             true
         }
     }
@@ -162,6 +190,12 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         val lockPreference = findPreference("background_lock")
                 as? SwitchPreferenceCompat
                 ?: return
+
+        if (session.isLocalAccountUsed) {
+            lockPreference.isVisible = false
+            return
+        }
+
         lockPreference.isVisible = backgroundLockManager.canBackgroundLockBeDisabled
         lockPreference.isChecked = backgroundLockManager.isBackgroundLockEnabled
         lockPreference.setOnPreferenceClickListener {
@@ -177,6 +211,12 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
     private fun initTfaItem() {
         tfaPreference = findPreference("tfa") as? SwitchPreferenceCompat
+
+        if (session.isLocalAccountUsed) {
+            tfaPreference?.isVisible = false
+            return
+        }
+
         tfaPreference?.setOnPreferenceClickListener {
             tfaPreference?.isChecked = isTfaEnabled
             switchTfa()
@@ -189,6 +229,12 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
     private fun initChangePasswordItem() {
         val changePasswordPreference = findPreference("change_password")
+
+        if (session.isLocalAccountUsed) {
+            changePasswordPreference?.isVisible = false
+            return
+        }
+
         changePasswordPreference?.setOnPreferenceClickListener {
             activity?.let { parentActivity ->
                 Navigator.from(parentActivity).openPasswordChange(3597)
