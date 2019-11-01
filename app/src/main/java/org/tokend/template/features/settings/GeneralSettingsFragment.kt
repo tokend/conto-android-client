@@ -106,7 +106,6 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         initKycItem()
         initPhoneNumberItem()
         initTelegramUsernameItem()
-        initLocalAccountMnemonicItem()
         initSignOutItem()
         hideCategoryIfEmpty("account")
     }
@@ -136,6 +135,31 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         }
     }
 
+    private fun initSignOutItem() {
+        val signOutPreference = findPreference("sign_out")
+        signOutPreference?.setOnPreferenceClickListener {
+            SignOutDialogFactory.getDialog(requireContext()) {
+                (requireActivity().application as App).signOut(requireActivity())
+            }.show()
+            true
+        }
+    }
+// endregion
+
+    // region Security
+    private fun initSecurityCategory() {
+        if (session.isAuthenticatorUsed) {
+            preferenceScreen.removePreference(findPreference("security"))
+        } else {
+            initLocalAccountMnemonicItem()
+            initBackgroundLockItem()
+            initFingerprintItem()
+            initTfaItem()
+            initChangePasswordItem()
+            hideCategoryIfEmpty("security")
+        }
+    }
+
     private fun initLocalAccountMnemonicItem() {
         val mnemonicPreference = findPreference("mnemonic") ?: return
 
@@ -162,29 +186,6 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         }
     }
 
-    private fun initSignOutItem() {
-        val signOutPreference = findPreference("sign_out")
-        signOutPreference?.setOnPreferenceClickListener {
-            SignOutDialogFactory.getDialog(requireContext()) {
-                (requireActivity().application as App).signOut(requireActivity())
-            }.show()
-            true
-        }
-    }
-// endregion
-
-    // region Security
-    private fun initSecurityCategory() {
-        if (session.isAuthenticatorUsed) {
-            preferenceScreen.removePreference(findPreference("security"))
-        } else {
-            initBackgroundLockItem()
-            initFingerprintItem()
-            initTfaItem()
-            initChangePasswordItem()
-            hideCategoryIfEmpty("security")
-        }
-    }
 
     private fun initBackgroundLockItem() {
         val lockPreference = findPreference("background_lock")
