@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.NullNode
 import org.tokend.sdk.api.base.model.RemoteFile
 import org.tokend.sdk.api.generated.resources.AssetResource
+import org.tokend.sdk.api.v3.assets.model.AssetState
 import org.tokend.sdk.utils.HashCodes
 import org.tokend.template.util.RecordWithPolicy
 import java.io.Serializable
@@ -21,7 +22,8 @@ class AssetRecord(
         val available: BigDecimal?,
         val maximum: BigDecimal,
         val ownerAccountId: String,
-        override val trailingDigits: Int
+        override val trailingDigits: Int,
+        val state: AssetState
 ) : Serializable, RecordWithPolicy, Asset, RecordWithLogo, RecordWithDescription {
     val isBackedByExternalSystem: Boolean
         get() = externalSystemType != null
@@ -41,6 +43,9 @@ class AssetRecord(
     fun isOwnedBy(accountId: String?): Boolean {
         return ownerAccountId == accountId
     }
+
+    val isActive: Boolean
+        get() = state == AssetState.ACTIVE
 
     override fun equals(other: Any?): Boolean {
         return other is AssetRecord
@@ -85,7 +90,6 @@ class AssetRecord(
                     policy = source.policies.value
                             ?: throw IllegalStateException("Asset must have a policy"),
                     name = name,
-                    description = description,
                     logoUrl = logo?.getUrl(urlConfig?.storage),
                     terms = terms,
                     externalSystemType = externalSystemType,
@@ -93,7 +97,9 @@ class AssetRecord(
                     available = source.availableForIssuance,
                     maximum = source.maxIssuanceAmount,
                     ownerAccountId = source.owner.id,
-                    trailingDigits = source.trailingDigits.toInt()
+                    trailingDigits = source.trailingDigits.toInt(),
+                    description = description,
+                    state = AssetState.fromValue(source.state?.value ?: AssetState.ACTIVE.value)
             )
         }
     }
