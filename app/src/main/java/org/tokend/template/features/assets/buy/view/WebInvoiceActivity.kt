@@ -69,9 +69,14 @@ class WebInvoiceActivity : BaseActivity() {
 
         // Successful payment causes redirect to web client.
         if (currentUrl.host() == successRedirectUrl.host()) {
-            setResult(Activity.RESULT_OK)
-            finish()
+            finishWithSuccess()
         }
+    }
+
+    private fun finishWithSuccess() {
+        toastManager.long(R.string.asset_will_be_received_in_a_moment)
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     companion object {

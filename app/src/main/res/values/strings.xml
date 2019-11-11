@@ -569,6 +569,7 @@
     <string name="error_invalid_pin">Invalid PIN</string>
     <string name="creating_local_account_progress">Generating key…</string>
     <string name="mnemonic_phrase_description">Mnemonic phrase is a human readable form of your secret key</string>
+    <string name="asset_will_be_received_in_a_moment">The asset will be received in a moment</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
