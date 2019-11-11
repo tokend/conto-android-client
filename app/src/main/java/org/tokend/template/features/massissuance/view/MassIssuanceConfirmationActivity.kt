@@ -19,7 +19,7 @@ import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.massissuance.logic.ConfirmMassIssuanceRequestUseCase
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.logic.TxManager
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem

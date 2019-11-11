@@ -15,7 +15,7 @@ import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.storage.KycStateRepository
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction

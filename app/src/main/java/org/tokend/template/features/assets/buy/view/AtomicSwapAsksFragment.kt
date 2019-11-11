@@ -23,7 +23,7 @@ import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAskListIte
 import org.tokend.template.features.assets.buy.view.adapter.AtomicSwapAsksAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.logic.wallet.WalletEventsListener
+import org.tokend.template.logic.WalletEventsListener
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 

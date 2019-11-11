@@ -14,7 +14,7 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.features.kyc.logic.SubmitKycRequestUseCase
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.logic.TxManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ElevationUtil

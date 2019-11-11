@@ -11,7 +11,7 @@ import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.fragments.VisibilityChangesConsumer
-import org.tokend.template.logic.wallet.WalletEventsListener
+import org.tokend.template.logic.WalletEventsListener
 import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.ObservableTransformers
 import java.util.concurrent.TimeUnit

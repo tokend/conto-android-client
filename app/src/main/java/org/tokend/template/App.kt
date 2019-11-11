@@ -30,8 +30,8 @@ import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.*
 import org.tokend.template.di.providers.*
 import org.tokend.template.logic.Session
-import org.tokend.template.logic.persistance.BackgroundLockManager
-import org.tokend.template.logic.persistance.SessionInfoStorage
+import org.tokend.template.logic.persistence.BackgroundLockManager
+import org.tokend.template.logic.persistence.SessionInfoStorage
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.util.environments.AppEnvironmentsManager
