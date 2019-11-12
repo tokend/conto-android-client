@@ -578,4 +578,6 @@
     <string name="company_industry">Индустрия</string>
     <string name="no_description">Описание отсутствует</string>
     <string name="asset_will_be_received_in_a_moment">Начисление произойдет в течении минуты</string>
+    <string name="booking_title">Бронирование мест</string>
+    <string name="no_active_bookings">Активных бронирований нет</string>
 </resources>

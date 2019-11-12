@@ -16,7 +16,6 @@ import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
-import com.mikepenz.materialdrawer.model.DividerDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
@@ -32,13 +31,13 @@ import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
+import org.tokend.template.features.booking.view.ActiveBookingsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
@@ -188,6 +187,11 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     .withIcon(R.drawable.ic_shop_cart),
 
             PrimaryDrawerItem()
+                    .withName(R.string.booking_title)
+                    .withIdentifier(ActiveBookingsFragment.ID)
+                    .withIcon(R.drawable.ic_seat_desk),
+
+            PrimaryDrawerItem()
                     .withName(R.string.operations_history_short)
                     .withIdentifier(AssetMovementsFragment.ID)
                     .withIcon(R.drawable.ic_history)
@@ -278,6 +282,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     items[BalancesFragment.ID],
                     items[CompaniesFragment.ID],
                     items[MarketplaceFragment.ID],
+                    items[ActiveBookingsFragment.ID],
                     items[AssetMovementsFragment.ID]
             )
 
@@ -362,6 +367,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             CompaniesFragment.ID -> factory.getCompaniesFragment()
             MarketplaceFragment.ID -> factory
                     .getMarketplaceFragment(withToolbar = true, companyId = null)
+            ActiveBookingsFragment.ID -> factory.getActiveBookingsFragment()
             else -> null
         }
     }
