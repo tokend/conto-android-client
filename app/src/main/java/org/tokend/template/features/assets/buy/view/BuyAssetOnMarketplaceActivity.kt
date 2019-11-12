@@ -21,7 +21,9 @@ import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
+import org.tokend.template.features.assets.buy.marketplace.model.BuySummaryExtras
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceBuySummaryFragment
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -41,6 +43,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     private lateinit var offer: MarketplaceOfferRecord
     private var amount: BigDecimal = BigDecimal.ZERO
     private var asset: Asset? = null
+    private var promoCode: String? = null
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -92,6 +95,32 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         this.amount = amountData.amount
         this.asset = amountData.asset
 
+        toSummaryScreen()
+    }
+
+    private fun toSummaryScreen() {
+        val fragment = MarketplaceBuySummaryFragment.newInstance(
+                MarketplaceBuySummaryFragment.getBundle(
+                        offer,
+                        offer.paymentMethods.first { it.asset.code == asset?.code }.id,
+                        amount
+                )
+        )
+
+        fragment
+                .resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribeBy(
+                        onNext = this::onSummaryConfirmed,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+        displayFragment(fragment, "summary", true)
+    }
+
+    private fun onSummaryConfirmed(extras: BuySummaryExtras) {
+        this.promoCode = extras.promoCode
+
         submitBid()
     }
 
@@ -110,6 +139,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                 amount = amount,
                 quoteAssetCode = assetCode,
                 offer = offer,
+                promoCode = promoCode,
                 repositoryProvider = repositoryProvider,
                 walletInfoProvider = walletInfoProvider,
                 apiProvider = apiProvider
@@ -203,6 +233,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
         return super.onCreateOptionsMenu(menu)
     }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.asset_details -> openAssetDetails()

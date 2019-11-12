@@ -21,7 +21,7 @@ class AccountDetailsFragment : ShareQrFragment() {
 
     override val data: String
         get() = walletInfoProvider.getWalletInfo()
-                ?.run { if (useAccountId) accountId else email }
+                ?.run { if (useAccountId || session.isLocalAccountUsed) accountId else email }
                 ?: throw IllegalStateException("No wallet info found")
 
     override val title: String

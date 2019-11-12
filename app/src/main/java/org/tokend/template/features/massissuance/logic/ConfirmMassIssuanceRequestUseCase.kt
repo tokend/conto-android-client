@@ -8,7 +8,8 @@ import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.features.send.model.PaymentRecipient
+import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.utils.Hashing
@@ -61,8 +62,9 @@ class ConfirmMassIssuanceRequestUseCase(
         val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
                 .toXdrFee(networkParams)
 
-        val operations = request.recipients.map { recipient ->
+        val operations = request.recipients.mapIndexed { i, recipient ->
             val accountId = recipient.accountId
+            val actualSubject = "Mass issuance"
 
             Operation.OperationBody.Payment(
                     SimplePaymentOp(
@@ -73,10 +75,13 @@ class ConfirmMassIssuanceRequestUseCase(
                                     zeroFee, zeroFee, false,
                                     PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                             ),
-                            reference = Hashing.sha256((accountId + request.referenceSeed)
+                            reference = Hashing.sha256((request.referenceSeed + i)
                                     .toByteArray())
                                     .encodeBase64String(),
-                            subject = "Mass issuance"
+                            subject = if (recipient is PaymentRecipient.NotExisting)
+                                recipient.wrapPaymentSubject(request.issuerAccountId, actualSubject)
+                            else
+                                actualSubject
                     )
             )
         }

@@ -28,7 +28,7 @@ import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.logic.TxManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.details.DetailsItem
@@ -192,7 +192,7 @@ class DepositFragment : BaseFragment(), ToolbarProvider {
 
     private fun initAssets(assets: List<AssetRecord>) {
         val depositableAssets = assets
-                .filter { it.isBackedByExternalSystem }
+                .filter { it.isActive && it.isBackedByExternalSystem }
                 .sortedWith(assetComparator)
 
         if (depositableAssets.isEmpty()) {

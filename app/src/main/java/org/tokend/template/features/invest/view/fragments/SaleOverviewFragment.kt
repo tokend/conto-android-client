@@ -21,7 +21,7 @@ import org.tokend.template.features.invest.view.SaleProgressWrapper
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ImageViewUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
-import ru.noties.markwon.Markwon
+import org.tokend.template.view.util.MarkdownUtil
 
 class SaleOverviewFragment : SaleFragment() {
     private val loadingIndicator = LoadingIndicatorManager(
@@ -131,7 +131,7 @@ class SaleOverviewFragment : SaleFragment() {
                 ?: return
 
         SaleOverviewMarkdownLoader(
-                requireContext(),
+                MarkdownUtil(MarkdownUtil.getDefaultConfiguration(requireContext())),
                 repositoryProvider.blobs()
         )
                 .load(blobId)
@@ -144,7 +144,7 @@ class SaleOverviewFragment : SaleFragment() {
                 }
                 .subscribeBy(
                         onSuccess = {
-                            Markwon.setText(sale_overview_text_view, it)
+                            MarkdownUtil.setMarkdownText(it, sale_overview_text_view)
                         },
                         onError = {
                             sale_overview_text_view.text =

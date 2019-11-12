@@ -1,45 +1,16 @@
 package org.tokend.template.features.invest.logic
 
-import android.content.Context
 import com.google.gson.JsonParser
 import io.reactivex.Single
 import org.tokend.sdk.api.blobs.model.Blob
-import org.tokend.sdk.factory.HttpClientFactory
-import org.tokend.template.BuildConfig
 import org.tokend.template.data.repository.BlobsRepository
-import ru.noties.markwon.Markwon
-import ru.noties.markwon.SpannableConfiguration
-import ru.noties.markwon.il.AsyncDrawableLoader
-import ru.noties.markwon.spans.SpannableTheme
+import org.tokend.template.view.util.MarkdownUtil
 
 /**
  * Loads sale overview blob content and transforms it to markdown
  */
-class SaleOverviewMarkdownLoader(context: Context,
+class SaleOverviewMarkdownLoader(private val markdownUtil: MarkdownUtil,
                                  private val blobsRepository: BlobsRepository) {
-    private val markdownConfiguration = SpannableConfiguration
-            .builder(context)
-            .theme(
-                    SpannableTheme
-                            .builderWithDefaults(context)
-                            .headingBreakHeight(0)
-                            .thematicBreakHeight(0)
-                            .build()
-            )
-            .asyncDrawableLoader(
-                    AsyncDrawableLoader
-                            .builder()
-                            .client(
-                                    HttpClientFactory()
-                                            .getBaseHttpClientBuilder(
-                                                    withLogs = BuildConfig.WITH_LOGS
-                                            )
-                                            .build()
-                            )
-                            .build()
-            )
-            .build()
-
     fun load(blobId: String): Single<CharSequence> {
         return blobsRepository
                 .getById(blobId)
@@ -52,8 +23,6 @@ class SaleOverviewMarkdownLoader(context: Context,
                         rawValue
                     }
                 }
-                .map { markdownString ->
-                    Markwon.markdown(markdownConfiguration, markdownString)
-                }
+                .map { markdownUtil.toMarkdown(it) }
     }
 }

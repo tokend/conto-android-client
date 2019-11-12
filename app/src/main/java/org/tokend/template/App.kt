@@ -30,8 +30,8 @@ import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.*
 import org.tokend.template.di.providers.*
 import org.tokend.template.logic.Session
-import org.tokend.template.logic.persistance.BackgroundLockManager
-import org.tokend.template.logic.persistance.SessionInfoStorage
+import org.tokend.template.logic.persistence.BackgroundLockManager
+import org.tokend.template.logic.persistence.SessionInfoStorage
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.util.environments.AppEnvironmentsManager
@@ -188,6 +188,11 @@ class App : MultiDexApplication() {
                 Context.MODE_PRIVATE)
     }
 
+    private fun getLocalAccountPreferences(): SharedPreferences {
+        return getSharedPreferences("LocalAccountPersistence",
+                Context.MODE_PRIVATE)
+    }
+
     private fun getAppPreferences(): SharedPreferences {
         return defaultSharedPreferences
     }
@@ -228,7 +233,8 @@ class App : MultiDexApplication() {
                 .persistenceModule(PersistenceModule(
                         credentialsPreferences = getCredentialsPreferences(),
                         networkPreferences = getNetworkPreferences(),
-                        kycStatePreferences = getKycStatePreferences()
+                        kycStatePreferences = getKycStatePreferences(),
+                        localAccountPreferences = getLocalAccountPreferences()
                 ))
                 .sessionModule(SessionModule(session))
                 .localeManagerModule(LocaleManagerModule(localeManager))
@@ -249,11 +255,11 @@ class App : MultiDexApplication() {
      */
     @SuppressLint("ApplySharedPref")
     fun signOut(activity: Activity?, soft: Boolean = false) {
+        session.reset()
+
         if (!soft) {
             clearUserData()
             initState()
-        } else {
-            session.reset()
         }
 
         Navigator.from(this).toSignIn()

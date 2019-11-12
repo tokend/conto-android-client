@@ -15,6 +15,7 @@ import java.math.BigDecimal
 class BuyAssetOnMarketplaceUseCase(
         private val amount: BigDecimal,
         private val quoteAssetCode: String,
+        private val promoCode: String?,
         private val offer: MarketplaceOfferRecord,
         private val apiProvider: ApiProvider,
         private val repositoryProvider: RepositoryProvider,
@@ -62,7 +63,8 @@ class BuyAssetOnMarketplaceUseCase(
                                 it.asset.code == quoteAssetCode
                             }
                             .id
-                            .toLong()
+                            .toLong(),
+                    promocode = promoCode
             )
         }.toSingle()
     }

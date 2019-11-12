@@ -2,10 +2,8 @@ package org.tokend.template.features.send.logic
 
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
-import org.tokend.sdk.factory.GsonFactory
 import org.tokend.sdk.keyserver.models.WalletInfo
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.send.model.PaymentFee
@@ -84,11 +82,7 @@ class CreatePaymentRequestUseCase(
 
     private fun getSubjectContent(): Single<String> {
         val content = if (recipient is PaymentRecipient.NotExisting)
-            BalanceChangeCause.Payment.PaymentToNotExistingRecipientMeta(
-                    senderAccount = senderAccount,
-                    recipientEmail = recipient.actualEmail,
-                    actualSubject = subject
-            ).let { GsonFactory().getBaseGson().toJson(it) }
+            recipient.wrapPaymentSubject(senderAccount, subject)
         else
             subject ?: ""
 

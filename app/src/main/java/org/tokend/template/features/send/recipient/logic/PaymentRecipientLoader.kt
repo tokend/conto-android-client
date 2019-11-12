@@ -2,7 +2,6 @@ package org.tokend.template.features.send.recipient.logic
 
 import io.reactivex.Single
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.integrations.paymentproxy.PaymentProxyApi
 import org.tokend.template.data.repository.AccountDetailsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.features.send.model.PaymentRecipient
@@ -18,6 +17,8 @@ class PaymentRecipientLoader(
 ) {
     class NoRecipientFoundException(recipient: String)
         : Exception("No recipient account ID found for $recipient")
+
+    private var recipientForNotExistingAccount: String? = null
 
     /**
      * Loads payment recipient info if [recipient] is an email or just
@@ -50,15 +51,21 @@ class PaymentRecipientLoader(
     }
 
     private fun getRecipientForNotExistingAccount(email: String): Single<PaymentRecipient> {
-        return apiProvider
-                .getApi()
-                .integrations
-                .paymentProxy
-                .getInfo()
-                .toSingle()
-                .map { proxyAccountInfo ->
+        val accountSingle =
+                recipientForNotExistingAccount?.let { Single.just(it) }
+                        ?: apiProvider
+                                .getApi()
+                                .integrations
+                                .paymentProxy
+                                .getInfo()
+                                .toSingle()
+                                .map { it.id }
+                                .doOnSuccess { recipientForNotExistingAccount = it }
+
+        return accountSingle
+                .map { counterpartyAccountId ->
                     PaymentRecipient.NotExisting(
-                            counterpartyAccountId = proxyAccountInfo.id,
+                            counterpartyAccountId = counterpartyAccountId,
                             actualEmail = email
                     )
                 }

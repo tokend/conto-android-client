@@ -132,6 +132,8 @@ ext {
     enable_analytics = false
     // Allows TokenD Authenticator usage
     allow_authenticator_auth = false
+    // Allows local account usage for sign in
+    allow_local_account_sign_in = false
     // Allows voting in polls
     allow_polls = false
     // Show terms and conditions
@@ -179,6 +181,7 @@ ext.applyAppConfig = { buildConfig ->
     b.buildConfigField 'Boolean', 'ARE_POLLS_ALLOWED', "${allow_polls}"
     b.buildConfigField 'Boolean', 'ENABLE_ANALYTICS', "${enable_analytics}"
     b.buildConfigField 'Boolean', 'ENABLE_AUTHENTICATOR_AUTH', "${allow_authenticator_auth}"
+    b.buildConfigField 'Boolean', 'ENABLE_LOCAL_ACCOUNT_SIGN_IN', "${allow_local_account_sign_in}"
     b.buildConfigField 'Boolean', 'ENABLE_BALANCES_CONVERSION', "${enable_balances_conversion}"
     b.buildConfigField 'String', 'BALANCES_CONVERSION_ASSET', "\"${balances_conversion_asset}\""
     b.buildConfigField 'Boolean', 'IS_TERMS_ALLOWED', "${allow_terms}"

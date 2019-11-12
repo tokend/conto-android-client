@@ -1,5 +1,7 @@
 package org.tokend.template.features.send.model
 
+import org.tokend.sdk.factory.GsonFactory
+import org.tokend.template.data.model.history.details.BalanceChangeCause
 import java.io.Serializable
 
 /**
@@ -19,9 +21,18 @@ open class PaymentRecipient(
      * which requires counterparty account.
      */
     class NotExisting(
-            val counterpartyAccountId: String,
+            counterpartyAccountId: String,
             val actualEmail: String
-    ): PaymentRecipient(counterpartyAccountId, actualEmail) {
+    ) : PaymentRecipient(counterpartyAccountId, actualEmail) {
         override val displayedValue = actualEmail
+
+        fun wrapPaymentSubject(senderAccount: String,
+                               actualSubject: String?): String {
+            return BalanceChangeCause.Payment.PaymentToNotExistingRecipientMeta(
+                    senderAccount = senderAccount,
+                    recipientEmail = actualEmail,
+                    actualSubject = actualSubject
+            ).let { GsonFactory().getBaseGson().toJson(it) }
+        }
     }
 }

@@ -1,9 +1,11 @@
 package org.tokend.template.features.companies.details.view
 
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.TabLayout
+import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -11,8 +13,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_company_details.*
-import kotlinx.android.synthetic.main.appbar_with_tabs.*
-import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
@@ -20,7 +20,10 @@ import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.repository.ClientCompaniesRepository
 import org.tokend.template.features.companies.details.logic.AddCompanyUseCase
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.view.util.ImageViewUtil
 import org.tokend.template.view.util.ProgressDialogFactory
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 class CompanyDetailsActivity : BaseActivity() {
     private lateinit var company: CompanyRecord
@@ -43,6 +46,7 @@ class CompanyDetailsActivity : BaseActivity() {
         initToolbar()
         initPager()
         initButton()
+        initBanner()
 
         subscribeToClientCompanies()
     }
@@ -54,12 +58,10 @@ class CompanyDetailsActivity : BaseActivity() {
     }
 
     private fun initPager() {
-        adapter = CompanyDetailsPagerAdapter(company.id, this, supportFragmentManager)
+        adapter = CompanyDetailsPagerAdapter(company, this, supportFragmentManager)
         pager.adapter = adapter
         pager.offscreenPageLimit = adapter.count
         appbar_tabs.setupWithViewPager(pager)
-        appbar_tabs.tabGravity = TabLayout.GRAVITY_FILL
-        appbar_tabs.tabMode = TabLayout.MODE_FIXED
 
         switchToShopIfNeeded()
     }
@@ -68,6 +70,32 @@ class CompanyDetailsActivity : BaseActivity() {
         add_button.setOnClickListener {
             addCompany()
         }
+    }
+
+    private fun initBanner() {
+        if (company.bannerUrl != null) {
+            updateBannerSize()
+            ImageViewUtil.loadImage(
+                    company_banner_image_view,
+                    company.bannerUrl,
+                    ColorDrawable(ContextCompat.getColor(this, R.color.imagePlaceholder))
+            )
+        } else {
+            company_banner_image_view.visibility = View.GONE
+        }
+    }
+
+    private fun updateBannerSize() {
+        val maxWidth = resources.getDimensionPixelSize(R.dimen.max_content_width)
+        company_banner_image_view.apply { post {
+            val width = min(pager.width, maxWidth)
+            val height = (width.toDouble() / 3).roundToInt()
+
+            layoutParams = layoutParams.apply {
+                this.width = width
+                this.height = height
+            }
+        } }
     }
 
     private fun subscribeToClientCompanies() {
@@ -168,6 +196,11 @@ class CompanyDetailsActivity : BaseActivity() {
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        updateBannerSize()
     }
 
     companion object {

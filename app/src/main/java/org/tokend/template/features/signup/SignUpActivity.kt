@@ -216,7 +216,8 @@ class SignUpActivity : BaseActivity() {
         SignUpUseCase(
                 email,
                 password,
-                apiProvider.getKeyServer()
+                KeyServer(apiProvider.getApi().wallets),
+                repositoryProvider
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersSingle())

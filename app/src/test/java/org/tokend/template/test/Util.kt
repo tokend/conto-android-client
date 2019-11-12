@@ -17,7 +17,7 @@ import org.tokend.template.features.assets.logic.CreateBalanceUseCase
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.Session
-import org.tokend.template.logic.transactions.TxManager
+import org.tokend.template.logic.TxManager
 import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.*
@@ -37,7 +37,8 @@ object Util {
                           apiProvider: ApiProvider,
                           session: Session,
                           repositoryProvider: RepositoryProvider?): WalletCreateResult {
-        val createResult = apiProvider.getKeyServer().createAndSaveWallet(email, password)
+        val createResult = apiProvider.getKeyServer()
+                .createAndSaveWallet(email, password, apiProvider.getApi().v3.keyValue)
                 .execute().get()
 
         println("Email is $email")
@@ -163,6 +164,8 @@ object Util {
         tx.addSignature(sourceAccount)
 
         txManager.submit(tx).blockingGet()
+
+        repositoryProvider.balances().updateAssetBalance(asset, amount)
 
         return amount
     }

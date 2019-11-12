@@ -73,4 +73,6 @@
     <dimen name="rounded_primary_button_corner_radius">24dp</dimen>
 
     <dimen name="nearby_user_avatar_size">56dp</dimen>
+
+    <dimen name="local_account_logo_size">56dp</dimen>
 </resources>
