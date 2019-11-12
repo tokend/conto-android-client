@@ -25,4 +25,9 @@
         <item quantity="one">%1$d recipient</item>
         <item quantity="other">%1$d recipients</item>
     </plurals>
+
+    <plurals name="seat">
+        <item quantity="one">seat</item>
+        <item quantity="other">seats</item>
+    </plurals>
 </resources>

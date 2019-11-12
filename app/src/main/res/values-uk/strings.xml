@@ -580,4 +580,6 @@
     <string name="asset_will_be_received_in_a_moment">Нарахування відбудется впродовж хвилини</string>
     <string name="booking_title">Бронювання місць</string>
     <string name="no_active_bookings">Активних бронювань немає</string>
+    <string name="time_from">З</string>
+    <string name="time_until">До</string>
 </resources>

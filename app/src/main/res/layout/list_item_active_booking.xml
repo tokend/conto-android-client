@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ImpressiveCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/half_standard_margin"
+    android:layout_marginEnd="@dimen/half_standard_margin"
+    app:contentPadding="0dp"
+    tools:ignore="UnusedAttribute">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/standard_margin"
+            android:paddingTop="@dimen/standard_margin"
+            android:paddingEnd="@dimen/standard_margin">
+
+            <LinearLayout
+                android:id="@+id/seats_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/standard_margin"
+                android:gravity="center_horizontal"
+                android:minWidth="48dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/seats_count_text_view"
+                    style="@style/HeadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_heading_large"
+                    tools:text="2" />
+
+                <TextView
+                    android:id="@+id/seats_hint_text_view"
+                    style="@style/HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="seats" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_marginTop="2sp"
+                    style="@style/HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time_from" />
+
+                <TextView
+                    style="@style/HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6sp"
+                    android:text="@string/time_until" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/half_standard_margin"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/booking_from_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="29 Nov 9:00" />
+
+                <TextView
+                    android:id="@+id/booking_until_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/quarter_standard_margin"
+                    tools:text="30 Nov 15:00" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/details_button"
+            style="@style/DialogButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="@dimen/half_standard_margin"
+            android:layout_marginTop="@dimen/half_standard_margin"
+            android:layout_marginEnd="@dimen/half_standard_margin"
+            android:layout_marginBottom="@dimen/quarter_standard_margin"
+            android:minWidth="0dp"
+            android:text="@string/details" />
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
