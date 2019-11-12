@@ -48,7 +48,7 @@ class AppEnvironmentsManager(
                     id = "unit",
                     config = UrlConfig(
                             api = "https://api.kharkiv.unit.community",
-                            storage = "https://s3.eu-west-1.amazonaws.com/unitcitykharkiv-identity-storage-epic-carson",
+                            storage = "https://s3.eu-north-1.amazonaws.com/unitcitykharkiv-identity-storage-epic-carson",
                             client = "https://kharkiv.unit.community"
                     )
             )

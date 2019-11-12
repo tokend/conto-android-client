@@ -13,6 +13,8 @@ ext {
 
     // ----- Network params -----
 
+    // DO NOT EDIT ENVS HERE, USE AppEnvironmentsManager
+
     // API URL - TokenD instance root URL
     api_url = 'https://api.kharkiv.unit.community'
 
