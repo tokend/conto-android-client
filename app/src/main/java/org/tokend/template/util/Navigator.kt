@@ -29,6 +29,7 @@ import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOffe
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
+import org.tokend.template.features.booking.add.view.BookingActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
@@ -603,6 +604,11 @@ class Navigator private constructor() {
 
     fun openLocalAccountImport() {
         context?.intentFor<ImportLocalAccountActivity>()
+                ?.also { performIntent(it) }
+    }
+
+    fun openBooking() {
+        context?.intentFor<BookingActivity>()
                 ?.also { performIntent(it) }
     }
 }

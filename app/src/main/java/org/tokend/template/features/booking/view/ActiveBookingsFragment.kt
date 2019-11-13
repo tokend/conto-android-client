@@ -19,6 +19,7 @@ import org.tokend.template.features.booking.view.adapter.ActiveBookingListItem
 import org.tokend.template.features.booking.view.adapter.ActiveBookingsAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
+import org.tokend.template.util.Navigator
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.formatter.DateFormatter
@@ -38,6 +39,7 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
         initToolbar()
         initSwipeRefresh()
         initList()
+        initButtons()
 
         update()
         displayActiveBookings()
@@ -77,6 +79,12 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
 
         error_empty_view.observeAdapter(adapter, R.string.no_active_bookings)
 //        error_empty_view.setEmptyViewDenial { repository.isNeverUpdated }
+    }
+
+    private fun initButtons() {
+        add_fab.setOnClickListener {
+            Navigator.from(this).openBooking()
+        }
     }
 
     private fun update(force: Boolean = false) {

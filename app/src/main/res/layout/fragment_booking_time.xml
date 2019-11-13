@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        style="@style/LimitedMatchParentWidthConstraint"
+        android:layout_width="match_parent"
+        android:layout_margin="@dimen/standard_padding"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@null"
+        app:layout_constraintBottom_toTopOf="@id/continue_button">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/select_booking_time"
+            android:textSize="@dimen/text_size_heading" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/double_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8sp"
+                android:background="@drawable/rounded_stroke_field_background"
+                android:gravity="end"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/half_standard_padding"
+                android:paddingTop="@dimen/standard_margin"
+                android:paddingEnd="@dimen/half_standard_padding"
+                android:paddingBottom="@dimen/standard_margin">
+
+                <TextView
+                    android:id="@+id/booking_from_day_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    tools:text="29 November" />
+
+                <TextView
+                    android:id="@+id/booking_from_hours_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textSize="16sp"
+                    tools:text="12:00" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/HintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/half_standard_margin"
+                android:background="@color/background"
+                android:paddingStart="@dimen/quarter_standard_margin"
+                android:paddingEnd="@dimen/quarter_standard_margin"
+                android:text="@string/time_from" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8sp"
+                android:background="@drawable/rounded_stroke_field_background"
+                android:gravity="end"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/half_standard_padding"
+                android:paddingTop="@dimen/standard_margin"
+                android:paddingEnd="@dimen/half_standard_padding"
+                android:paddingBottom="@dimen/standard_margin">
+
+                <TextView
+                    android:id="@+id/booking_to_day_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    tools:text="29 November" />
+
+                <TextView
+                    android:id="@+id/booking_to_hours_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textSize="16sp"
+                    tools:text="12:00" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/HintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/half_standard_margin"
+                android:background="@color/background"
+                android:paddingStart="@dimen/quarter_standard_margin"
+                android:paddingEnd="@dimen/quarter_standard_margin"
+                android:text="@string/time_until" />
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/continue_button"
+        style="@style/PrimaryButton.NoBorders"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/continue_action"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

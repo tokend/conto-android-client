@@ -582,4 +582,6 @@
     <string name="no_active_bookings">Активних бронювань немає</string>
     <string name="time_from">З</string>
     <string name="time_until">До</string>
+    <string name="book_a_seat">Забронювати місце</string>
+    <string name="select_booking_time">Оберіть час</string>
 </resources>

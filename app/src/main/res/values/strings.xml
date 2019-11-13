@@ -574,6 +574,8 @@
     <string name="no_active_bookings">No active bookings found</string>
     <string name="time_from">From</string>
     <string name="time_until">Until</string>
+    <string name="book_a_seat">Book a seat</string>
+    <string name="select_booking_time">Select booking time</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

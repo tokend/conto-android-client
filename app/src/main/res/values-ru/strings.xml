@@ -582,4 +582,6 @@
     <string name="no_active_bookings">Активных бронирований нет</string>
     <string name="time_from">С</string>
     <string name="time_until">До</string>
+    <string name="book_a_seat">Забронировать место</string>
+    <string name="select_booking_time">Выберите время</string>
 </resources>
