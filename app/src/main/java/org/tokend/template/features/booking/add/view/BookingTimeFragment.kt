@@ -3,12 +3,13 @@ package org.tokend.template.features.booking.add.view
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.Single
-import io.reactivex.subjects.SingleSubject
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_booking_time.*
 import org.tokend.template.R
 import org.tokend.template.features.booking.add.model.BookingTime
@@ -17,12 +18,31 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class BookingTimeFragment : BaseFragment() {
-    private val resultSubject = SingleSubject.create<BookingTime>()
-    val resultSingle: Single<BookingTime> = resultSubject
+    private val resultSubject = PublishSubject.create<BookingTime>()
+    val resultObservable: Observable<BookingTime> = resultSubject
 
     private val calendarFrom = Calendar.getInstance()
     private val calendarTo = Calendar.getInstance()
     private var millisDelta = 0L
+
+    private val errorColor: Int by lazy {
+        ContextCompat.getColor(requireContext(), R.color.error)
+    }
+    private val defaultTextColor: Int by lazy {
+        ContextCompat.getColor(requireContext(), R.color.primary_text)
+    }
+
+    private var hasDateError: Boolean = false
+        set(value) {
+            field = value
+            updateContinueAvailability()
+        }
+
+    private var canContinue: Boolean = false
+        set(value) {
+            field = value
+            continue_button.isEnabled = value
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_booking_time, container, false)
@@ -30,6 +50,8 @@ class BookingTimeFragment : BaseFragment() {
 
     override fun onInitAllowed() {
         initFields()
+        initButtons()
+
         preFillDates()
     }
 
@@ -49,11 +71,21 @@ class BookingTimeFragment : BaseFragment() {
         }
     }
 
+    private fun initButtons() {
+        continue_button.setOnClickListener {
+            postResult()
+        }
+    }
+
     private fun preFillDates() {
         val now = Date().time / 1000
         val period = 30 * 60 // 30 minutes
-        val preferredBookingTime = 8 * 60 * 60 // 8 working hours, why not
+
+        // So it sets start time to the nearest period start,
+        // i.e to 12:30 if it's 12:10 now or to 13:00 if's 12:30 now, for example
         val nextPeriodStart = now - now % period + period
+
+        val preferredBookingTime = 8 * 60 * 60 // Let it be 8 working hours
 
         calendarFrom.time = Date(nextPeriodStart * 1000L)
         calendarTo.time = Date((nextPeriodStart + preferredBookingTime) * 1000L)
@@ -70,6 +102,7 @@ class BookingTimeFragment : BaseFragment() {
     private fun onDatesUpdated() {
         millisDelta = calendarTo.timeInMillis - calendarFrom.timeInMillis
         displayDates()
+        updateError()
     }
 
     private fun displayDates() {
@@ -83,6 +116,17 @@ class BookingTimeFragment : BaseFragment() {
         val dateTo = calendarTo.time
         booking_to_day_text_view.text = dayFormat.format(dateTo).capitalize()
         booking_to_hours_text_view.text = hourFormat.format(dateTo)
+    }
+
+    private fun updateError() {
+        hasDateError = millisDelta < 0
+        if (hasDateError) {
+            booking_from_day_text_view.setTextColor(errorColor)
+            booking_from_hours_text_view.setTextColor(errorColor)
+        } else {
+            booking_from_day_text_view.setTextColor(defaultTextColor)
+            booking_from_hours_text_view.setTextColor(defaultTextColor)
+        }
     }
 
     private fun openDatePicker(calendarToUpdate: Calendar,
@@ -127,5 +171,13 @@ class BookingTimeFragment : BaseFragment() {
         ).apply {
             show()
         }
+    }
+
+    private fun updateContinueAvailability() {
+        canContinue = !hasDateError
+    }
+
+    private fun postResult() {
+        resultSubject.onNext(BookingTime(calendarFrom.time, calendarTo.time))
     }
 }
