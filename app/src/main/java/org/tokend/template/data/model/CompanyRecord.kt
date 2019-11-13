@@ -24,7 +24,7 @@ class CompanyRecord(
             bannerUrl = source.bannerJson
                     .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
                     .getUrl(urlConfig?.storage),
-            descriptionMd = source.description.takeIf(String::isNotEmpty),
+            descriptionMd = source.description?.takeIf(String::isNotEmpty),
             conversionAssetCode = source.statsQuoteAsset.takeIf(String::isNotEmpty)
     )
 
