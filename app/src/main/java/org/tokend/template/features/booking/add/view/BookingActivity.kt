@@ -7,20 +7,25 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.toSingle
+import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.features.booking.add.model.BookingTime
+import org.tokend.template.features.booking.add.rooms.view.BookingRoomsFragment
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
 
-class BookingActivity : BaseActivity() {
-    private lateinit var bookingTime: BookingTime
+class BookingActivity : BaseActivity(), BookingInfoHolder {
+    override lateinit var bookingTime: BookingTime
+    override var availableSeats: Int = 25
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
 
         initToolbar()
+        initSwipeRefresh()
 
         toTimeScreen()
     }
@@ -29,6 +34,10 @@ class BookingActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         title = getString(R.string.book_a_seat)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun initSwipeRefresh() {
+        swipe_refresh.isEnabled = false
     }
 
     private fun toTimeScreen() {
@@ -61,8 +70,21 @@ class BookingActivity : BaseActivity() {
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .doOnSubscribe { dialog.show() }
                 .doOnEvent { _, _ -> dialog.dismiss() }
-                .subscribeBy()
+                .subscribeBy(
+                        onSuccess = { onFreeSeatsLoaded()},
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
                 .addTo(compositeDisposable)
+    }
+
+    private fun onFreeSeatsLoaded() {
+        toRoomSelection()
+    }
+
+    private fun toRoomSelection() {
+        val fragment = BookingRoomsFragment()
+
+        displayFragment(fragment, "rooms", true)
     }
 
     private fun displayFragment(

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/standard_margin"
+    android:paddingTop="@dimen/standard_margin"
+    android:paddingEnd="@dimen/standard_margin">
+
+    <ImageView
+        android:id="@+id/room_photo_image_view"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/booking_room_photo_height"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/md_blue_300" />
+
+    <TextView
+        android:id="@+id/room_name_text_view"
+        style="@style/HeadingText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        app:layout_constraintStart_toEndOf="@id/room_photo_image_view"
+        app:layout_constraintTop_toTopOf="@id/room_photo_image_view"
+        app:layout_constraintBottom_toTopOf="@id/available_seats_text_view"
+        tools:text="Big room #1" />
+
+    <TextView
+        android:id="@+id/available_seats_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/quarter_standard_margin"
+        app:layout_constraintStart_toStartOf="@id/room_name_text_view"
+        app:layout_constraintTop_toBottomOf="@id/room_name_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/room_photo_image_view"
+        tools:text="25 seats" />
+
+    <View
+        android:id="@+id/divider_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:background="@drawable/line_divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/room_photo_image_view" />
+
+</android.support.constraint.ConstraintLayout>
