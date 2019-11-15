@@ -1,0 +1,97 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 309 240">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #7878d1;
+      }
+
+      .cls-2, .cls-5 {
+        isolation: isolate;
+        font-family: Roboto-Medium, Roboto;
+      }
+
+      .cls-2 {
+        font-size: 11.82px;
+        fill: #fff;
+      }
+
+      .cls-3 {
+        fill: #78ce95;
+      }
+
+      .cls-4 {
+        fill: #ddd;
+      }
+
+      .cls-5 {
+        font-size: 12px;
+      }
+    </style>
+  </defs>
+  <title>example</title>
+  <g id="expensive">
+    <g id="e11">
+      <g>
+        <rect class="cls-1" x="91" y="59" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(101.03 75.19)">1</text>
+      </g>
+    </g>
+    <g id="e12">
+      <g>
+        <rect class="cls-1" x="145" y="59" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(155.03 75.19)">2</text>
+      </g>
+    </g>
+    <g id="e13">
+      <g>
+        <rect class="cls-1" x="199" y="59" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(209.03 75.19)">3</text>
+      </g>
+    </g>
+  </g>
+  <g id="cheap">
+    <g id="c21">
+      <g>
+        <rect class="cls-3" x="91" y="104" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(101.03 120.19)">1</text>
+      </g>
+    </g>
+    <g id="c22">
+      <g>
+        <rect class="cls-3" x="145" y="104" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(155.03 120.19)">2</text>
+      </g>
+    </g>
+    <g id="c23">
+      <g>
+        <rect class="cls-3" x="199" y="104" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(209.03 120.19)">3</text>
+      </g>
+    </g>
+    <g id="c31">
+      <g>
+        <rect class="cls-3" x="91" y="149" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(101.03 165.19)">1</text>
+      </g>
+    </g>
+    <g id="c32">
+      <g>
+        <rect class="cls-3" x="145" y="149" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(155.03 165.19)">2</text>
+      </g>
+    </g>
+    <g id="c33">
+      <g>
+        <rect class="cls-3" x="199" y="149" width="26" height="26" rx="5.91" ry="5.91"/>
+        <text class="cls-2" transform="translate(209.03 165.19)">3</text>
+      </g>
+    </g>
+  </g>
+  <g id="service">
+    <path class="cls-4" d="M300,0c0,18.23-65.14,33-145.5,33S9,18.23,9,0Z"/>
+    <text class="cls-5" transform="translate(141.94 20.63)">Stage</text>
+    <text class="cls-5" transform="translate(75.24 78.09)">1</text>
+    <text class="cls-5" transform="translate(77.24 123.09)">2</text>
+    <text class="cls-5" transform="translate(77.24 166.09)">3</text>
+  </g>
+</svg>

@@ -69,7 +69,7 @@ class BookingRoomsFragment: BaseFragment() {
         rooms_list.layoutManager = layoutManager
 
         adapter.onItemClick { _, item ->
-            // TODO
+            onRoomSelected(item)
         }
 
         ElevationUtil.initScrollElevation(rooms_list, appbar_elevation_view)
@@ -104,5 +104,9 @@ class BookingRoomsFragment: BaseFragment() {
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateListColumnsCount()
+    }
+
+    private fun onRoomSelected(room: Any) {
+        resultSubject.onNext(room)
     }
 }

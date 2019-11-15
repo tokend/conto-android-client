@@ -71,7 +71,7 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
                 .doOnSubscribe { dialog.show() }
                 .doOnEvent { _, _ -> dialog.dismiss() }
                 .subscribeBy(
-                        onSuccess = { onFreeSeatsLoaded()},
+                        onSuccess = { onFreeSeatsLoaded() },
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
@@ -84,7 +84,22 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
     private fun toRoomSelection() {
         val fragment = BookingRoomsFragment()
 
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe(this::onRoomSelected)
+                .addTo(compositeDisposable)
+
         displayFragment(fragment, "rooms", true)
+    }
+
+    private fun onRoomSelected(room: Any) {
+        toSeatsSelection()
+    }
+
+    private fun toSeatsSelection() {
+        val fragment = BookingSeatsSelectionFragment()
+
+        displayFragment(fragment, "seats", true)
     }
 
     private fun displayFragment(

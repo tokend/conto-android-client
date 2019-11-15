@@ -83,3 +83,8 @@
 
 # Legacy Picasso downloader
 -dontwarn com.squareup.picasso.OkHttpDownloader
+
+# JavaScriptInterface
+-keepclassmembers class * {
+   @android.webkit.JavascriptInterface *;
+}
