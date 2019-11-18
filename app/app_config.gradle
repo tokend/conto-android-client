@@ -133,7 +133,7 @@ ext {
     // Allows TokenD Authenticator usage
     allow_authenticator_auth = false
     // Allows local account usage for sign in
-    allow_local_account_sign_in = true
+    allow_local_account_sign_in = false
     // Allows voting in polls
     allow_polls = false
     // Show terms and conditions
