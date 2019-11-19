@@ -576,6 +576,7 @@
     <string name="time_until">Until</string>
     <string name="book_a_seat">Book a seat</string>
     <string name="select_booking_time">Select booking time</string>
+    <string name="enter_seats_count">Enter seats count</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

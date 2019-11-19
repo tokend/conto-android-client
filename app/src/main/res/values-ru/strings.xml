@@ -584,4 +584,5 @@
     <string name="time_until">До</string>
     <string name="book_a_seat">Забронировать место</string>
     <string name="select_booking_time">Выберите время</string>
+    <string name="enter_seats_count">Укажите количество мест</string>
 </resources>

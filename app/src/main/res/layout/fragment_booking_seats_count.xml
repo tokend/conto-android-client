@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/booking_time_range_text_view"
+        style="@style/SecondaryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        tools:text="29 Nov. 12:30 – 30 Nov. 14:00" />
+
+    <TextView
+        android:id="@+id/room_name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/quarter_standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        tools:text="Big room #1" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/standard_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/footer_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/enter_seats_count"
+                android:textSize="@dimen/text_size_heading" />
+
+            <org.tokend.template.features.wallet.view.PlusMinusAmountInputView
+                android:id="@+id/seats_count_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/double_padding" />
+
+            <TextView
+                android:id="@+id/available_text_view"
+                style="@style/SecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/quarter_standard_margin"
+                tools:text="123.45 available" />
+        </LinearLayout>
+
+        <include layout="@layout/include_appbar_elevation" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/line_divider"
+            app:layout_constraintBottom_toTopOf="@id/footer_layout" />
+
+        <LinearLayout
+            android:id="@+id/footer_layout"
+            style="@style/LimitedMatchParentWidthConstraint"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@null">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:layout_marginEnd="@dimen/standard_margin"
+                android:layout_marginBottom="@dimen/half_standard_padding"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <Button
+                    android:id="@+id/continue_button"
+                    style="@style/PrimaryButton.Rounded"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/continue_action" />
+
+                <TextView
+                    android:id="@+id/amount_text_view"
+                    style="@style/HeadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/continue_button"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="160 USD" />
+
+                <TextView
+                    android:id="@+id/seats_count_text_view"
+                    style="@style/HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/amount_text_view"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/continue_button"
+                    android:text="@string/to_pay" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>

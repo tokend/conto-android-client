@@ -36,7 +36,13 @@ class PlusMinusAmountInputView
     var maxAmount: BigDecimal? = null
         set(value) {
             field = value
-            onMaxAmountChanged()
+            onAmountLimitsChanged()
+        }
+
+    var minAmount: BigDecimal = BigDecimal.ZERO
+        set(value) {
+            field = value
+            onAmountLimitsChanged()
         }
 
     init {
@@ -96,11 +102,15 @@ class PlusMinusAmountInputView
         }
     }
 
-    private fun onMaxAmountChanged() {
+    private fun onAmountLimitsChanged() {
         val maxAmount = this.maxAmount
 
         if (maxAmount != null && amountWrapper.scaledAmount > maxAmount) {
             amountWrapper.setAmount(maxAmount)
+        }
+
+        if (amountWrapper.scaledAmount < minAmount) {
+            amountWrapper.setAmount(minAmount)
         }
     }
 
@@ -111,8 +121,8 @@ class PlusMinusAmountInputView
         val newAmount = amountWrapper.scaledAmount + if (inc) BigDecimal.ONE else MINUS_ONE
         val maxAmount = this.maxAmount
 
-        return if (newAmount.signum() < 0) {
-            amountWrapper.setAmount(BigDecimal.ZERO)
+        return if (newAmount < minAmount) {
+            amountWrapper.setAmount(minAmount)
             return false
         } else if (maxAmount != null && newAmount > maxAmount) {
             amountWrapper.setAmount(maxAmount)

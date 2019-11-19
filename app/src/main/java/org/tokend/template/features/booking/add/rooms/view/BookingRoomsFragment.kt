@@ -19,7 +19,7 @@ import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.formatter.DateFormatter
 
-class BookingRoomsFragment: BaseFragment() {
+class BookingRoomsFragment : BaseFragment() {
     private lateinit var bookingInfoHolder: BookingInfoHolder
 
     private val adapter = BookingRoomsAdapter()

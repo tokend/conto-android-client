@@ -97,7 +97,7 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
     }
 
     private fun toSeatsSelection() {
-        val fragment = BookingSeatsSelectionFragment()
+        val fragment = BookingSeatsCountFragment()//BookingSeatsSelectionFragment()
 
         displayFragment(fragment, "seats", true)
     }
