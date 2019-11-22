@@ -1,4 +1,4 @@
-package org.tokend.template.features.booking.add.model
+package org.tokend.template.features.booking.model
 
 import java.util.*
 

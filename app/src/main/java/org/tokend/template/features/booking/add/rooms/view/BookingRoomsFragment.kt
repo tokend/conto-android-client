@@ -11,6 +11,7 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_booking_rooms.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import org.tokend.template.R
+import org.tokend.template.features.booking.add.logic.RoomAvailableSeats
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.features.booking.add.rooms.view.adapter.BookingRoomListItem
 import org.tokend.template.features.booking.add.rooms.view.adapter.BookingRoomsAdapter
@@ -25,8 +26,8 @@ class BookingRoomsFragment : BaseFragment() {
     private val adapter = BookingRoomsAdapter()
     private lateinit var layoutManager: GridLayoutManager
 
-    private val resultSubject = PublishSubject.create<Any>()
-    val resultObservable: Observable<Any> = resultSubject
+    private val resultSubject = PublishSubject.create<RoomAvailableSeats>()
+    val resultObservable: Observable<RoomAvailableSeats> = resultSubject
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_booking_rooms, container, false)
@@ -50,7 +51,7 @@ class BookingRoomsFragment : BaseFragment() {
 
         booking_time_range_text_view.text = timeRange
 
-        val availableSeats = bookingInfoHolder.availableSeats
+        val availableSeats = bookingInfoHolder.roomAvailableSeats.sumBy { it.second }
         val availableSeatsString = getString(
                 R.string.template_available,
                 "$availableSeats ${requireContext().resources.getQuantityString(
@@ -69,30 +70,15 @@ class BookingRoomsFragment : BaseFragment() {
         rooms_list.layoutManager = layoutManager
 
         adapter.onItemClick { _, item ->
-            onRoomSelected(item)
+            item.source?.also(this::onRoomSelected)
         }
 
         ElevationUtil.initScrollElevation(rooms_list, appbar_elevation_view)
     }
 
     private fun displayRooms() {
-        val items = listOf(
-                BookingRoomListItem(
-                        "Big room #1",
-                        25,
-                        "https://conference-service.com.ua/_img/files/2012_05_25_19_10_35.jpg"
-                ),
-                BookingRoomListItem(
-                        "Hall #1",
-                        60,
-                        "https://conference-service.com.ua/_img/files/2014_08_01_16_16_17.jpg"
-                ),
-                BookingRoomListItem(
-                        "Small room",
-                        25,
-                        "https://conference-service.com.ua/_img/files/2019_08_22_11_28_23.jpg"
-                )
-        )
+        val items = bookingInfoHolder.roomAvailableSeats
+                .map(::BookingRoomListItem)
         adapter.setData(items)
     }
 
@@ -106,7 +92,7 @@ class BookingRoomsFragment : BaseFragment() {
         updateListColumnsCount()
     }
 
-    private fun onRoomSelected(room: Any) {
+    private fun onRoomSelected(room: RoomAvailableSeats) {
         resultSubject.onNext(room)
     }
 }

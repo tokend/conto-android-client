@@ -14,6 +14,7 @@ import org.tokend.template.data.repository.base.MemoryOnlyRepositoryCache
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.extensions.getOrPut
 import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
+import org.tokend.template.features.booking.repository.ActiveBookingsRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
@@ -164,6 +165,10 @@ class RepositoryProviderImpl(
         localAccountPersistor
                 ?: throw IllegalStateException("LocalAccountPersistor is required for this repo")
         LocalAccountRepository(localAccountPersistor)
+    }
+
+    private val activeBookings: ActiveBookingsRepository by lazy {
+        ActiveBookingsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
     }
 
     override fun balances(): BalancesRepository {
@@ -360,6 +365,10 @@ class RepositoryProviderImpl(
 
     override fun localAccount(): LocalAccountRepository {
         return localAccount
+    }
+
+    override fun activeBookings(): ActiveBookingsRepository {
+        return activeBookings
     }
 
     companion object {

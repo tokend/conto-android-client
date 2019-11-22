@@ -9,24 +9,35 @@ import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.fragment_active_bookings.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.features.booking.repository.ActiveBookingsRepository
 import org.tokend.template.features.booking.view.adapter.ActiveBookingListItem
 import org.tokend.template.features.booking.view.adapter.ActiveBookingsAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
+import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
+import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.formatter.DateFormatter
-import java.util.*
 
 class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
+
+    private val bookingsRepository: ActiveBookingsRepository
+        get() = repositoryProvider.activeBookings()
+
+    private val loadingIndicator = LoadingIndicatorManager(
+            showLoading = { swipe_refresh.isRefreshing = true },
+            hideLoading = { swipe_refresh.isRefreshing = false }
+    )
 
     private lateinit var adapter: ActiveBookingsAdapter
     private lateinit var layoutManager: GridLayoutManager
@@ -41,8 +52,9 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
         initList()
         initButtons()
 
+        subscribeToBookings()
+
         update()
-        displayActiveBookings()
     }
 
     private fun initToolbar() {
@@ -78,7 +90,7 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
         bookings_list.addOnScrollListener(hideFabScrollListener)
 
         error_empty_view.observeAdapter(adapter, R.string.no_active_bookings)
-//        error_empty_view.setEmptyViewDenial { repository.isNeverUpdated }
+        error_empty_view.setEmptyViewDenial { bookingsRepository.isNeverUpdated }
     }
 
     private fun initButtons() {
@@ -87,23 +99,44 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
         }
     }
 
-    private fun update(force: Boolean = false) {
+    private fun subscribeToBookings() {
+        bookingsRepository.itemsSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { displayActiveBookings() }
+                .addTo(compositeDisposable)
 
+        bookingsRepository.loadingSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { loadingIndicator.setLoading(it) }
+                .addTo(compositeDisposable)
+
+        bookingsRepository.errorsSubject
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { error ->
+                    if (!adapter.hasData) {
+                        error_empty_view.showError(error, errorHandlerFactory.getDefault()) {
+                            update(true)
+                        }
+                    } else {
+                        errorHandlerFactory.getDefault().handle(error)
+                    }
+                }
+                .addTo(compositeDisposable)
+    }
+
+    private fun update(force: Boolean = false) {
+        if (!force) {
+            bookingsRepository.updateIfNotFresh()
+        } else {
+            bookingsRepository.update()
+        }
     }
 
     private fun displayActiveBookings() {
-        val items = listOf<ActiveBookingListItem>(
-                ActiveBookingListItem(
-                        seatsCount = 1,
-                        dateFrom = Date(((Date().time / 1000L) + 353 * 3600) * 1000L),
-                        dateTo = Date(((Date().time / 1000L) + 370 * 3600) * 1000L)
-                ),
-                ActiveBookingListItem(
-                        seatsCount = 2,
-                        dateFrom = Date(((Date().time / 1000L) + 400 * 3600) * 1000L),
-                        dateTo = Date(((Date().time / 1000L) + 448 * 3600) * 1000L)
-                )
-        )
+        val items = bookingsRepository
+                .itemsList
+                .map(::ActiveBookingListItem)
+
         adapter.setData(items)
     }
 

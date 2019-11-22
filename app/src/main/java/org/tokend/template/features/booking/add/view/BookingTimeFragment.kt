@@ -12,7 +12,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_booking_time.*
 import org.tokend.template.R
-import org.tokend.template.features.booking.add.model.BookingTime
+import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.fragments.BaseFragment
 import java.text.SimpleDateFormat
 import java.util.*

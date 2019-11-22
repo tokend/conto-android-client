@@ -11,7 +11,7 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_booking_seats_count.*
 import org.jetbrains.anko.textColor
 import org.tokend.template.R
-import org.tokend.template.data.model.SimpleAsset
+import org.tokend.template.data.model.Asset
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.view.util.formatter.DateFormatter
@@ -24,7 +24,12 @@ class BookingSeatsCountFragment : BaseFragment() {
 
     private lateinit var bookingInfoHolder: BookingInfoHolder
 
-    private val seatPrice: BigDecimal = BigDecimal("250")
+    private val availableSeatsCount: Int
+        get() = bookingInfoHolder.selectedRoom.second
+    private val seatPrice: BigDecimal
+        get() = bookingInfoHolder.selectedRoom.first.price
+    private val seatPriceAsset: Asset
+        get() = bookingInfoHolder.selectedRoom.first.priceAsset
 
     private var canContinue: Boolean = false
         set(value) {
@@ -67,13 +72,13 @@ class BookingSeatsCountFragment : BaseFragment() {
 
         booking_time_range_text_view.text = timeRange
 
-        room_name_text_view.text = "Big mocked room #1"
+        room_name_text_view.text = bookingInfoHolder.selectedRoom.first.name
     }
 
     private fun initCountView() {
         val availableSeatsString = getString(
                 R.string.template_available,
-                bookingInfoHolder.availableSeats.toString()
+                availableSeatsCount.toString()
         )
         available_text_view.text = availableSeatsString
         defaultAvailableLabelColor = available_text_view.currentTextColor
@@ -87,7 +92,7 @@ class BookingSeatsCountFragment : BaseFragment() {
 
         seats_count_view.apply {
             minAmount = BigDecimal.ONE
-            maxAmount = bookingInfoHolder.availableSeats.toBigDecimal()
+            maxAmount = availableSeatsCount.toBigDecimal()
             editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
         }
     }
@@ -103,7 +108,7 @@ class BookingSeatsCountFragment : BaseFragment() {
     }
 
     private fun updateError() {
-        if (seatsCount > bookingInfoHolder.availableSeats) {
+        if (seatsCount > availableSeatsCount) {
             available_text_view.textColor = errorColor
         } else {
             available_text_view.textColor = defaultAvailableLabelColor
@@ -111,19 +116,18 @@ class BookingSeatsCountFragment : BaseFragment() {
     }
 
     private fun updateContinueAvailability() {
-        canContinue = seatsCount > 0
-                && seatsCount <= bookingInfoHolder.availableSeats
+        canContinue = seatsCount in 1..availableSeatsCount
     }
 
     private fun updateToPayAmount() {
-        if (seatsCount <= 0 || seatsCount > bookingInfoHolder.availableSeats) {
+        if (seatsCount <= 0 || seatsCount > availableSeatsCount) {
             return
         }
 
         val toPay = seatsCount.toBigDecimal().multiply(seatPrice, MathContext.DECIMAL32)
         amount_text_view.text = amountFormatter.formatAssetAmount(
                 toPay,
-                SimpleAsset("UAH"),
+                seatPriceAsset,
                 withAssetCode = true
         )
     }

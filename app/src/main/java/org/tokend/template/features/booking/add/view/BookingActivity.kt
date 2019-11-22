@@ -6,20 +6,26 @@ import android.support.v4.app.FragmentTransaction
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.toSingle
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.booking.add.logic.AvailableSeatsLoader
+import org.tokend.template.features.booking.add.logic.RoomAvailableSeats
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
-import org.tokend.template.features.booking.add.model.BookingTime
+import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.features.booking.add.rooms.view.BookingRoomsFragment
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
 
 class BookingActivity : BaseActivity(), BookingInfoHolder {
     override lateinit var bookingTime: BookingTime
-    override var availableSeats: Int = 25
+    override lateinit var roomAvailableSeats: List<RoomAvailableSeats>
+    override lateinit var selectedRoom: RoomAvailableSeats
+
+    private val availableSeatsLoader: AvailableSeatsLoader by lazy {
+        AvailableSeatsLoader(apiProvider)
+    }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -53,31 +59,30 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
 
     private fun onTimeSelected(time: BookingTime) {
         this.bookingTime = time
-        loadFreeSeatsAndShowRooms()
+        loadAvailableSeatsAndShowRooms()
     }
 
-    private fun loadFreeSeatsAndShowRooms() {
+    private fun loadAvailableSeatsAndShowRooms() {
         var disposable: Disposable? = null
 
         val dialog = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
             disposable?.dispose()
         }
 
-        disposable = ({
-            Thread.sleep(1000)
-            true
-        }).toSingle()
+        disposable = availableSeatsLoader
+                .getAvailableSeats(bookingTime)
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .doOnSubscribe { dialog.show() }
                 .doOnEvent { _, _ -> dialog.dismiss() }
                 .subscribeBy(
-                        onSuccess = { onFreeSeatsLoaded() },
+                        onSuccess = this::onAvailableSeatsLoaded,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
     }
 
-    private fun onFreeSeatsLoaded() {
+    private fun onAvailableSeatsLoaded(seats: List<RoomAvailableSeats>) {
+        roomAvailableSeats = seats
         toRoomSelection()
     }
 
@@ -92,14 +97,24 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
         displayFragment(fragment, "rooms", true)
     }
 
-    private fun onRoomSelected(room: Any) {
-        toSeatsSelection()
+    private fun onRoomSelected(room: RoomAvailableSeats) {
+        selectedRoom = room
+        toSeatCountInput()
     }
 
-    private fun toSeatsSelection() {
-        val fragment = BookingSeatsCountFragment()//BookingSeatsSelectionFragment()
+    private fun toSeatCountInput() {
+        val fragment = BookingSeatsCountFragment()
+
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe(this::onSeatCountEntered)
+                .addTo(compositeDisposable)
 
         displayFragment(fragment, "seats", true)
+    }
+
+    private fun onSeatCountEntered(seatsCount: Int) {
+
     }
 
     private fun displayFragment(
