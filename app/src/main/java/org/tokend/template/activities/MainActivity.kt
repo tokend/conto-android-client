@@ -30,8 +30,8 @@ import kotlinx.android.synthetic.main.navigation_drawer_header.view.*
 import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
-import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
+import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.features.dashboard.view.DashboardFragment

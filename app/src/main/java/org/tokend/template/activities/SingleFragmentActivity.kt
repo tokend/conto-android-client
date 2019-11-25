@@ -6,15 +6,14 @@ import android.support.v4.app.Fragment
 import io.reactivex.rxkotlin.addTo
 import org.tokend.template.R
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
-import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
+import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.GeneralSettingsFragment
-import org.tokend.template.features.settings.SettingsFragment
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
 import org.tokend.template.fragments.ToolbarProvider

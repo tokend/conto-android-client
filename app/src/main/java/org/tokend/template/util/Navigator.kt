@@ -23,12 +23,12 @@ import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
-import org.tokend.template.features.assets.AssetDetailsActivity
-import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
+import org.tokend.template.features.assets.details.view.AssetDetailsActivity
+import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
