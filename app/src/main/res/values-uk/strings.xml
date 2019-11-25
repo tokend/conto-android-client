@@ -579,4 +579,6 @@
     <string name="company_industry">Індустрія</string>
     <string name="no_description">Опис відсутній</string>
     <string name="asset_will_be_received_in_a_moment">Нарахування відбудется впродовж хвилини</string>
+    <string name="asset_refund">Повернення</string>
+    <string name="asset_refund_is_not_available">Повернення цього актива недоступне</string>
 </resources>
