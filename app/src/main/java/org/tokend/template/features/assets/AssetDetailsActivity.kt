@@ -1,13 +1,10 @@
 package org.tokend.template.features.assets
 
 import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_asset_details.*
-import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.fragments.FragmentFactory
 
 class AssetDetailsActivity : BaseActivity() {
 
@@ -29,7 +26,10 @@ class AssetDetailsActivity : BaseActivity() {
     }
 
     private fun setFragment() {
-        val fragment = FragmentFactory().getAssetDetailsFragment(asset)
+        val fragment = AssetDetailsFragment.newInstance(AssetDetailsFragment.getBundle(
+                asset = asset,
+                balanceCreation = false
+        ))
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_layout, fragment)
                 .commit()

@@ -3,8 +3,6 @@ package org.tokend.template.features.assets.buy.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
@@ -28,6 +26,7 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
 
@@ -44,6 +43,9 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     private var amount: BigDecimal = BigDecimal.ZERO
     private var asset: Asset? = null
     private var promoCode: String? = null
+
+    private val fragmentDisplayer =
+            UserFlowFragmentDisplayer(this, R.id.fragment_container_layout)
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -88,7 +90,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
-        displayFragment(fragment, "amount", null)
+        fragmentDisplayer.display(fragment, "amount", null)
     }
 
     private fun onAmountEntered(amountData: AmountInputResult) {
@@ -115,7 +117,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
-        displayFragment(fragment, "summary", true)
+        fragmentDisplayer.display(fragment, "summary", true)
     }
 
     private fun onSummaryConfirmed(extras: BuySummaryExtras) {
@@ -189,24 +191,6 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         finish()
     }
 
-    private fun displayFragment(
-            fragment: Fragment,
-            tag: String,
-            forward: Boolean?
-    ) {
-        supportFragmentManager.beginTransaction()
-                .setTransition(
-                        when (forward) {
-                            true -> FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                            false -> FragmentTransaction.TRANSIT_FRAGMENT_CLOSE
-                            null -> FragmentTransaction.TRANSIT_NONE
-                        }
-                )
-                .replace(R.id.fragment_container_layout, fragment)
-                .addToBackStack(tag)
-                .commit()
-    }
-
     private fun subscribeToBalances() {
         balancesRepository.loadingSubject
                 .compose(ObservableTransformers.defaultSchedulers())
@@ -248,10 +232,8 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount <= 1) {
+        if (!fragmentDisplayer.tryPopBackStack()) {
             finish()
-        } else {
-            supportFragmentManager.popBackStackImmediate()
         }
     }
 

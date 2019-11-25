@@ -231,5 +231,7 @@ open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         val ID = "asset_movements".hashCode().toLong()
+
+        fun newInstance() = AssetMovementsFragment()
     }
 }

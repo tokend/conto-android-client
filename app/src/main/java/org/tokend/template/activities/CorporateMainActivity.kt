@@ -14,7 +14,7 @@ import org.tokend.template.R
 import org.tokend.template.features.clients.view.CompanyClientsFragment
 import org.tokend.template.features.dashboard.balances.view.CompanyBalancesFragment
 import org.tokend.template.features.movements.view.AssetMovementsFragment
-import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ProfileUtil
@@ -42,7 +42,7 @@ class CorporateMainActivity : MainActivity() {
                     items[CompanyClientsFragment.ID],
                     items[CompanyBalancesFragment.ID],
                     items[AssetMovementsFragment.ID],
-                    items[SettingsFragment.ID],
+                    items[GeneralSettingsFragment.ID],
                     DividerDrawerItem(),
                     items[CONTRIBUTE_ITEM_ID]
             )
@@ -100,9 +100,14 @@ class CorporateMainActivity : MainActivity() {
     }
 
     override fun getFragment(screenIdentifier: Long): Fragment? {
-        return super.getFragment(screenIdentifier) ?: when (screenIdentifier) {
-            CompanyClientsFragment.ID -> factory.getCompanyClientsFragment()
-            CompanyBalancesFragment.ID -> factory.getCompanyBalancesFragment()
+        val superFragment: Fragment? = super.getFragment(screenIdentifier)
+        if (superFragment != null) {
+            return superFragment
+        }
+
+        return when (screenIdentifier) {
+            CompanyClientsFragment.ID -> CompanyClientsFragment.newInstance()
+            CompanyBalancesFragment.ID -> CompanyBalancesFragment.newInstance()
             else -> null
         }
     }

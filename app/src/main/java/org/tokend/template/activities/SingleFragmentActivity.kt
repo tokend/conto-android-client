@@ -48,7 +48,7 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
             ExploreAssetsFragment.ID -> ExploreAssetsFragment()
             ShareQrFragment.ID -> bundle?.let(ShareQrFragment.Companion::newInstance)
             AtomicSwapAsksFragment.ID -> bundle?.let(AtomicSwapAsksFragment.Companion::newInstance)
-            SettingsFragment.ID -> GeneralSettingsFragment()
+            GeneralSettingsFragment.ID -> GeneralSettingsFragment()
             ShareRedemptionQrFragment.ID -> bundle?.let(ShareRedemptionQrFragment.Companion::newInstance)
             AccountDetailsFragment.ID -> bundle?.let(AccountDetailsFragment.Companion::newInstance)
             else -> null

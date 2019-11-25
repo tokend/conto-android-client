@@ -67,7 +67,7 @@ import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
-import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.settings.telegram.view.TelegramUsernameSettingsActivity
 import org.tokend.template.features.shaketopay.view.ShakeToPayActivity
@@ -551,7 +551,7 @@ class Navigator private constructor() {
     fun openSettings() {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
-                        SettingsFragment.ID
+                        GeneralSettingsFragment.ID
                 ))
                 ?.also { performIntent(it) }
     }

@@ -288,7 +288,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         fun newInstance(bundle: Bundle): BalancesFragment = BalancesFragment().withArguments(bundle)
 
         fun getBundle(allowToolbar: Boolean,
-                      companyId: String?) = Bundle().apply {
+                      companyId: String? = null) = Bundle().apply {
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
             putString(COMPANY_ID_EXTRA, companyId)
         }
