@@ -15,6 +15,7 @@ import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.extensions.getOrPut
 import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
 import org.tokend.template.features.booking.repository.ActiveBookingsRepository
+import org.tokend.template.features.booking.repository.BookingBusinessRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
@@ -168,7 +169,12 @@ class RepositoryProviderImpl(
     }
 
     private val activeBookings: ActiveBookingsRepository by lazy {
-        ActiveBookingsRepository(apiProvider, walletInfoProvider, MemoryOnlyRepositoryCache())
+        ActiveBookingsRepository(apiProvider, walletInfoProvider, bookingBusiness(),
+                MemoryOnlyRepositoryCache())
+    }
+
+    private val bookingBusiness: BookingBusinessRepository by lazy {
+        BookingBusinessRepository(apiProvider, assetsRepository)
     }
 
     override fun balances(): BalancesRepository {
@@ -369,6 +375,10 @@ class RepositoryProviderImpl(
 
     override fun activeBookings(): ActiveBookingsRepository {
         return activeBookings
+    }
+
+    override fun bookingBusiness(): BookingBusinessRepository {
+        return bookingBusiness
     }
 
     companion object {

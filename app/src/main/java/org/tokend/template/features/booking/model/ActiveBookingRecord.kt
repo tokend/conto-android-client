@@ -1,8 +1,6 @@
 package org.tokend.template.features.booking.model
 
 import org.tokend.sdk.api.integrations.booking.model.generated.resources.BookingResource
-import org.tokend.template.data.model.SimpleAsset
-import java.math.BigDecimal
 
 class ActiveBookingRecord(
         val id: String,
@@ -10,17 +8,12 @@ class ActiveBookingRecord(
         val room: BookingRoom,
         val seatsCount: Int
 ) {
-    // TODO: Actual data
-    constructor(source: BookingResource): this(
+    constructor(source: BookingResource,
+                business: BookingBusinessRecord): this(
             id = source.id,
             time = BookingTime(source.startTime, source.endTime),
-            room = BookingRoom(
-                    id = "",
-                    name = "Mocked room",
-                    seatsCount = 404,
-                    price = BigDecimal.ONE,
-                    priceAsset = SimpleAsset("UAH")
-            ),
-            seatsCount = 404
+            room = business.rooms.find { it.id == source.payload }
+                    ?: throw IllegalStateException("Room ${source.payload} is not in business ${business.id}"),
+            seatsCount = source.participants
     )
 }

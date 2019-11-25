@@ -585,4 +585,5 @@
     <string name="book_a_seat">Забронировать место</string>
     <string name="select_booking_time">Выберите время</string>
     <string name="enter_seats_count">Укажите количество мест</string>
+    <string name="error_no_booking_rooms_available">Нет доступных комнат</string>
 </resources>

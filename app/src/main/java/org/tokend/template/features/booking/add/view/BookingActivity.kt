@@ -10,21 +10,22 @@ import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.features.booking.add.logic.AvailableSeatsLoader
-import org.tokend.template.features.booking.add.logic.RoomAvailableSeats
+import org.tokend.template.features.booking.add.logic.AvailableRoomsLoader
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
-import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.features.booking.add.rooms.view.BookingRoomsFragment
+import org.tokend.template.features.booking.model.BookingRoom
+import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
 
 class BookingActivity : BaseActivity(), BookingInfoHolder {
     override lateinit var bookingTime: BookingTime
-    override lateinit var roomAvailableSeats: List<RoomAvailableSeats>
-    override lateinit var selectedRoom: RoomAvailableSeats
+    override var seatsCount: Int = 0
+    override var availableRooms: Collection<BookingRoom> = emptyList()
+    override lateinit var selectedRoom: BookingRoom
 
-    private val availableSeatsLoader: AvailableSeatsLoader by lazy {
-        AvailableSeatsLoader(apiProvider)
+    private val availableRoomsLoader: AvailableRoomsLoader by lazy {
+        AvailableRoomsLoader(apiProvider, repositoryProvider.bookingBusiness())
     }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
@@ -59,46 +60,6 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
 
     private fun onTimeSelected(time: BookingTime) {
         this.bookingTime = time
-        loadAvailableSeatsAndShowRooms()
-    }
-
-    private fun loadAvailableSeatsAndShowRooms() {
-        var disposable: Disposable? = null
-
-        val dialog = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
-            disposable?.dispose()
-        }
-
-        disposable = availableSeatsLoader
-                .getAvailableSeats(bookingTime)
-                .compose(ObservableTransformers.defaultSchedulersSingle())
-                .doOnSubscribe { dialog.show() }
-                .doOnEvent { _, _ -> dialog.dismiss() }
-                .subscribeBy(
-                        onSuccess = this::onAvailableSeatsLoaded,
-                        onError = { errorHandlerFactory.getDefault().handle(it) }
-                )
-                .addTo(compositeDisposable)
-    }
-
-    private fun onAvailableSeatsLoaded(seats: List<RoomAvailableSeats>) {
-        roomAvailableSeats = seats
-        toRoomSelection()
-    }
-
-    private fun toRoomSelection() {
-        val fragment = BookingRoomsFragment()
-
-        fragment.resultObservable
-                .compose(ObservableTransformers.defaultSchedulers())
-                .subscribe(this::onRoomSelected)
-                .addTo(compositeDisposable)
-
-        displayFragment(fragment, "rooms", true)
-    }
-
-    private fun onRoomSelected(room: RoomAvailableSeats) {
-        selectedRoom = room
         toSeatCountInput()
     }
 
@@ -114,7 +75,53 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
     }
 
     private fun onSeatCountEntered(seatsCount: Int) {
+        this.seatsCount = seatsCount
+        loadAndShowAvailableRooms()
+    }
 
+    private fun loadAndShowAvailableRooms() {
+        var disposable: Disposable? = null
+
+        val dialog = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
+            disposable?.dispose()
+        }
+
+        disposable = availableRoomsLoader
+                .getAvailableRooms(bookingTime, seatsCount)
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { dialog.show() }
+                .doOnEvent { _, _ -> dialog.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::onAvailableRoomsLoaded,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun onAvailableRoomsLoaded(rooms: List<BookingRoom>) {
+        if (rooms.isEmpty()) {
+            toastManager.short(R.string.error_no_booking_rooms_available)
+            return
+        }
+
+        this.availableRooms = rooms
+        toRoomSelection()
+    }
+
+    private fun toRoomSelection() {
+        val fragment = BookingRoomsFragment()
+
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe(this::onRoomSelected)
+                .addTo(compositeDisposable)
+
+        displayFragment(fragment, "rooms", true)
+    }
+
+    private fun onRoomSelected(room: BookingRoom) {
+        this.selectedRoom = room
+        toSeatCountInput()
     }
 
     private fun displayFragment(

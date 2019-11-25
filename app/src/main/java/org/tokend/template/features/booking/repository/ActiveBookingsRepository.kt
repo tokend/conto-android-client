@@ -15,6 +15,7 @@ import org.tokend.template.features.booking.model.ActiveBookingRecord
 class ActiveBookingsRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
+        private val bookingBusinessRepository: BookingBusinessRepository,
         itemsCache: RepositoryCache<ActiveBookingRecord>
 ) : SimpleMultipleItemsRepository<ActiveBookingRecord>(itemsCache) {
 
@@ -27,7 +28,6 @@ class ActiveBookingsRepository(
         val loader = SimplePagedResourceLoader({ nextCursor ->
             signedApi.integrations.booking
                     .getBookings(
-                            businessId = "",
                             params = BookingsPageParams(
                                     participant = accountId,
                                     pagingParams = PagingParamsV2(
@@ -39,11 +39,20 @@ class ActiveBookingsRepository(
                     )
         })
 
-        return loader
-                .loadAll()
-                .toSingle()
-                .map { bookings ->
-                    bookings.map(::ActiveBookingRecord)
+        return bookingBusinessRepository
+                .ensureItem()
+                .flatMap { business ->
+                    loader
+                            .loadAll()
+                            .toSingle()
+                            .map { bookings ->
+                                bookings to business
+                            }
+                }
+                .map { (bookings, business) ->
+                    bookings.map { booking ->
+                        ActiveBookingRecord(booking, business)
+                    }
                 }
     }
 

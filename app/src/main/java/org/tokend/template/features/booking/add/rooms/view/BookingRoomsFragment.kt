@@ -11,10 +11,10 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_booking_rooms.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import org.tokend.template.R
-import org.tokend.template.features.booking.add.logic.RoomAvailableSeats
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.features.booking.add.rooms.view.adapter.BookingRoomListItem
 import org.tokend.template.features.booking.add.rooms.view.adapter.BookingRoomsAdapter
+import org.tokend.template.features.booking.model.BookingRoom
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
@@ -26,8 +26,8 @@ class BookingRoomsFragment : BaseFragment() {
     private val adapter = BookingRoomsAdapter()
     private lateinit var layoutManager: GridLayoutManager
 
-    private val resultSubject = PublishSubject.create<RoomAvailableSeats>()
-    val resultObservable: Observable<RoomAvailableSeats> = resultSubject
+    private val resultSubject = PublishSubject.create<BookingRoom>()
+    val resultObservable: Observable<BookingRoom> = resultSubject
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_booking_rooms, container, false)
@@ -51,15 +51,15 @@ class BookingRoomsFragment : BaseFragment() {
 
         booking_time_range_text_view.text = timeRange
 
-        val availableSeats = bookingInfoHolder.roomAvailableSeats.sumBy { it.second }
-        val availableSeatsString = getString(
-                R.string.template_available,
-                "$availableSeats ${requireContext().resources.getQuantityString(
-                        R.plurals.seat,
-                        availableSeats
-                )}"
-        )
-        available_seats_text_view.text = availableSeatsString
+//        val availableSeats = bookingInfoHolder.roomAvailableSeats.sumBy { it.second }
+//        val availableSeatsString = getString(
+//                R.string.template_available,
+//                "$availableSeats ${requireContext().resources.getQuantityString(
+//                        R.plurals.seat,
+//                        availableSeats
+//                )}"
+//        )
+//        available_seats_text_view.text = availableSeatsString
     }
 
     private fun initList() {
@@ -77,7 +77,7 @@ class BookingRoomsFragment : BaseFragment() {
     }
 
     private fun displayRooms() {
-        val items = bookingInfoHolder.roomAvailableSeats
+        val items = bookingInfoHolder.availableRooms
                 .map(::BookingRoomListItem)
         adapter.setData(items)
     }
@@ -92,7 +92,7 @@ class BookingRoomsFragment : BaseFragment() {
         updateListColumnsCount()
     }
 
-    private fun onRoomSelected(room: RoomAvailableSeats) {
+    private fun onRoomSelected(room: BookingRoom) {
         resultSubject.onNext(room)
     }
 }
