@@ -86,6 +86,10 @@ open class AmountInputFragment : BaseFragment() {
         amountWrapper.onAmountChanged { _, _ ->
             updateActionButtonAvailability()
         }
+        focusAmountField()
+    }
+
+    protected open fun focusAmountField() {
         amount_edit_text.requestFocus()
         SoftInputUtil.showSoftInputOnView(amount_edit_text)
     }

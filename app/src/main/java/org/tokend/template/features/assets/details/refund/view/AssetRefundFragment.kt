@@ -10,11 +10,14 @@ import kotlinx.android.synthetic.main.fragment_asset_refund.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import org.tokend.template.R
 import org.tokend.template.extensions.withArguments
+import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.details.refund.logic.AssetRefundOfferLoader
 import org.tokend.template.features.trade.orderbook.model.OrderBookEntryRecord
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
+import java.math.BigDecimal
 
 class AssetRefundFragment : BaseFragment() {
     private val fragmentDisplayer =
@@ -25,6 +28,8 @@ class AssetRefundFragment : BaseFragment() {
     }
 
     private lateinit var assetCode: String
+    private lateinit var offer: OrderBookEntryRecord
+    private lateinit var amount: BigDecimal
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_asset_refund, container, false)
@@ -64,8 +69,10 @@ class AssetRefundFragment : BaseFragment() {
     }
 
     private fun onRefundOfferLoaded(offer: OrderBookEntryRecord) {
-
+        this.offer = offer
+        toAmountInput()
     }
+
 
     private fun onRefundOfferLoadingError(error: Throwable) {
         if (error is AssetRefundOfferLoader.RefundNotAvailableException) {
@@ -75,6 +82,23 @@ class AssetRefundFragment : BaseFragment() {
                 obtainRefundAvailability()
             }
         }
+    }
+
+    private fun toAmountInput() {
+        val fragment = AssetRefundAmountFragment.newInstance(
+                AssetRefundAmountFragment.getBundle(offer)
+        )
+
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { onAmountEntered((it as AmountInputResult).amount)  }
+                .addTo(compositeDisposable)
+
+        fragmentDisplayer.display(fragment, "amount", true)
+    }
+
+    private fun onAmountEntered(amount: BigDecimal) {
+        ProgressDialogFactory.getDialog(requireContext(), cancelListener = {_ ->})
     }
 
     companion object {

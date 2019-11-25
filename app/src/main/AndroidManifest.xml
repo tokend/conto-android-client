@@ -83,7 +83,8 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
             android:name=".features.assets.details.view.AssetDetailsActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".features.send.PaymentConfirmationActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />

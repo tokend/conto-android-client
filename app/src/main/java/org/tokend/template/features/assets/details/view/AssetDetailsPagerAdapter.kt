@@ -8,6 +8,7 @@ import org.tokend.template.features.assets.details.refund.view.AssetRefundFragme
 import org.tokend.template.view.BaseFragmentPagerAdapter
 
 class AssetDetailsPagerAdapter(asset: AssetRecord,
+                               withRefund: Boolean,
                                context: Context,
                                fragmentManager: FragmentManager
 ) : BaseFragmentPagerAdapter(fragmentManager) {
@@ -20,15 +21,20 @@ class AssetDetailsPagerAdapter(asset: AssetRecord,
                     )),
                     context.getString(R.string.asset_overview),
                     OVERVIEW_PAGE
-            ),
-            Page(
-                    AssetRefundFragment.newInstance(AssetRefundFragment.getBundle(
-                            assetCode = asset.code
-                    )),
-                    context.getString(R.string.asset_refund),
-                    REFUND_PAGE
             )
-    )
+    ).apply {
+        if (withRefund) {
+            add(
+                    Page(
+                            AssetRefundFragment.newInstance(AssetRefundFragment.getBundle(
+                                    assetCode = asset.code
+                            )),
+                            context.getString(R.string.asset_refund),
+                            REFUND_PAGE
+                    )
+            )
+        }
+    }
 
     companion object {
         /**
