@@ -579,4 +579,8 @@
     <string name="company_industry">Индустрия</string>
     <string name="no_description">Описание отсутствует</string>
     <string name="asset_will_be_received_in_a_moment">Начисление произойдет в течении минуты</string>
+    <string name="asset_refund">Возврат</string>
+    <string name="asset_refund_is_not_available">Возврат этого актива недоступен</string>
+    <string name="template_max_refund_amount">Максимальная сумма возврата – %1$s</string>
+    <string name="asset_refund_completed">Возврат выполнен</string>
 </resources>

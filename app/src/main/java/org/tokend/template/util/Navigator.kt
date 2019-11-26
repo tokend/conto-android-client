@@ -27,6 +27,7 @@ import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOffe
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
+import org.tokend.template.features.assets.details.refund.view.AssetRefundConfirmationActivity
 import org.tokend.template.features.assets.details.view.AssetDetailsActivity
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
@@ -604,5 +605,12 @@ class Navigator private constructor() {
     fun openLocalAccountImport() {
         context?.intentFor<ImportLocalAccountActivity>()
                 ?.also { performIntent(it) }
+    }
+
+    fun openAssetRefundConfirmation(offerRequest: OfferRequest,
+                                    requestCode: Int) {
+        context?.intentFor<AssetRefundConfirmationActivity>()
+                ?.putExtras(OfferConfirmationActivity.getBundle(offerRequest))
+                ?.also { performIntent(it, requestCode) }
     }
 }
