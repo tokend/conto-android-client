@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
@@ -41,7 +40,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
     private lateinit var offer: MarketplaceOfferRecord
     private var amount: BigDecimal = BigDecimal.ZERO
-    private var asset: Asset? = null
+    private lateinit var paymentMethod: MarketplaceOfferRecord.PaymentMethod
     private var promoCode: String? = null
 
     private val fragmentDisplayer =
@@ -95,7 +94,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
     private fun onAmountEntered(amountData: AmountInputResult) {
         this.amount = amountData.amount
-        this.asset = amountData.asset
+        this.paymentMethod = offer.paymentMethods.first { it.code == amountData.asset.code }
 
         toSummaryScreen()
     }
@@ -104,7 +103,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         val fragment = MarketplaceBuySummaryFragment.newInstance(
                 MarketplaceBuySummaryFragment.getBundle(
                         offer,
-                        offer.paymentMethods.first { it.asset.code == asset?.code }.id,
+                        paymentMethod.id,
                         amount
                 )
         )
@@ -127,9 +126,6 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     }
 
     private fun submitBid() {
-        val assetCode = asset?.code
-                ?: return
-
         var disposable: Disposable? = null
 
         val progress = ProgressDialogFactory.getDialog(
@@ -139,7 +135,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
         disposable = BuyAssetOnMarketplaceUseCase(
                 amount = amount,
-                quoteAssetCode = assetCode,
+                paymentMethodId = paymentMethod.id,
                 offer = offer,
                 promoCode = promoCode,
                 repositoryProvider = repositoryProvider,
@@ -172,7 +168,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     }
 
     private fun openCryptoInvoiceAndFinish(invoice: MarketplaceInvoiceData.Crypto) {
-        val asset = this.asset ?: return
+        val asset = paymentMethod.asset
         val sendAmountString = amountFormatter.formatAssetAmount(invoice.amount, asset)
         val receiveAmountString = amountFormatter.formatAssetAmount(amount, offer.asset)
 

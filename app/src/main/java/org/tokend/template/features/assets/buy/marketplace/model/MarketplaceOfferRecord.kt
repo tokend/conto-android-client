@@ -2,6 +2,7 @@ package org.tokend.template.features.assets.buy.marketplace.model
 
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferResource
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodResource
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.CompanyRecord
 import java.io.Serializable
@@ -19,14 +20,27 @@ class MarketplaceOfferRecord(
 ) : Serializable {
     class PaymentMethod(
             val id: String,
+            val type: MarketplacePaymentMethodType,
             val asset: Asset
     ) : Serializable, Asset by asset {
         constructor(source: MarketplacePaymentMethodResource,
                     assetsMap: Map<String, Asset>) : this(
                 id = source.id,
                 asset = assetsMap[source.asset]
-                        ?: throw IllegalStateException("Payment method asset ${source.asset} is not in the map")
+                        ?: throw IllegalStateException("Payment method asset ${source.asset} is not in the map"),
+                type = MarketplacePaymentMethodType.fromValue(source.type.value)
         )
+
+        override val code: String
+            get() = id
+
+        // region 🙈
+        private val isCreditCard: Boolean
+            get() = type == MarketplacePaymentMethodType.FORBILL && asset.code == "UAH"
+
+        override val name: String?
+            get() = if (isCreditCard) "Credit card" else asset.name
+        // endregion
     }
 
     constructor(source: MarketplaceOfferResource,

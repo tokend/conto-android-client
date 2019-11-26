@@ -112,7 +112,7 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         quoteAssetTextView.setOnClickListener {
             openQuoteAssetPicker()
         }
-        quoteAsset = quoteAssetPicker.getItemsToDisplay().first().asset
+        quoteAsset = quoteAsset ?: quoteAssetPicker.getItemsToDisplay().first().asset
 
         if (!needQuoteAssetSelection) {
             view.visibility = View.GONE
