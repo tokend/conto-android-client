@@ -121,10 +121,7 @@ open class OfferConfirmationActivity : BaseActivity() {
                 DetailsItem(
                         text = getString(R.string.template_price_one_equals,
                                 request.baseAsset.name ?: request.baseAsset.code,
-                                amountFormatter.formatAssetAmount(
-                                        request.price, request.quoteAsset,
-                                        withAssetName = true
-                                )
+                                amountFormatter.formatAssetAmount(request.price, request.quoteAsset)
                         ),
                         hint = getString(R.string.price),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_price)
