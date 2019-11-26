@@ -30,10 +30,10 @@
             android:layout_height="@dimen/double_padding" />
     </LinearLayout>
 
-    <include layout="@layout/include_error_empty_view" />
-
     <FrameLayout
         android:id="@+id/fragment_container_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <include layout="@layout/include_error_empty_view" />
 </FrameLayout>

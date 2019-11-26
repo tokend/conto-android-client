@@ -582,4 +582,5 @@
     <string name="asset_refund">Повернення</string>
     <string name="asset_refund_is_not_available">Повернення цього актива недоступне</string>
     <string name="template_max_refund_amount">Максимальна сума повернення – %1$s</string>
+    <string name="asset_refund_completed">Повернення виконано</string>
 </resources>

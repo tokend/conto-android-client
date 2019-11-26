@@ -236,6 +236,7 @@ open class AmountInputFragment : BaseFragment() {
     }
 
     protected open fun onBalancesUpdated() {
+        balance = balancesRepository.itemsList.find { it.assetCode == asset }
         displayAssets()
         displayBalance()
         updateActionButtonAvailability()

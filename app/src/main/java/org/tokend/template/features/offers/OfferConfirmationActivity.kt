@@ -119,8 +119,12 @@ open class OfferConfirmationActivity : BaseActivity() {
     protected open fun displayPrice() {
         adapter.addData(
                 DetailsItem(
-                        text = getString(R.string.template_price_one_equals, request.baseAsset.code,
-                                amountFormatter.formatAssetAmount(request.price, request.quoteAsset)
+                        text = getString(R.string.template_price_one_equals,
+                                request.baseAsset.name ?: request.baseAsset.code,
+                                amountFormatter.formatAssetAmount(
+                                        request.price, request.quoteAsset,
+                                        withAssetName = true
+                                )
                         ),
                         hint = getString(R.string.price),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_price)
@@ -142,7 +146,10 @@ open class OfferConfirmationActivity : BaseActivity() {
     protected open fun displayToReceive() {
         adapter.addData(
                 DetailsItem(
-                        text = amountFormatter.formatAssetAmount(toReceiveTotal, receiveAsset),
+                        text = amountFormatter.formatAssetAmount(
+                                toReceiveTotal, receiveAsset,
+                                withAssetName = true
+                        ),
                         hint = getString(R.string.to_receive),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_coins)
                 )
@@ -151,7 +158,10 @@ open class OfferConfirmationActivity : BaseActivity() {
         if (!request.isBuy && request.fee.total.signum() > 0) {
             adapter.addData(
                     DetailsItem(
-                            text = amountFormatter.formatAssetAmount(request.fee.total, receiveAsset),
+                            text = amountFormatter.formatAssetAmount(
+                                    request.fee.total, receiveAsset,
+                                    withAssetName = true
+                            ),
                             hint = getString(R.string.tx_fee),
                             extraView = feeExtraView
                     )

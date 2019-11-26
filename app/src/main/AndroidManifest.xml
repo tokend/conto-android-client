@@ -275,6 +275,9 @@
             android:name=".features.userkey.pin.SetUpPinCodeActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
+            android:name=".features.assets.details.refund.view.AssetRefundConfirmationActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
     </application>
 
 </manifest>
