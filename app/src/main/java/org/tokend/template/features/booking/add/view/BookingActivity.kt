@@ -1,8 +1,6 @@
 package org.tokend.template.features.booking.add.view
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -17,6 +15,7 @@ import org.tokend.template.features.booking.model.BookingRoom
 import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.template.view.util.UserFlowFragmentDisplayer
 
 class BookingActivity : BaseActivity(), BookingInfoHolder {
     override lateinit var bookingTime: BookingTime
@@ -27,6 +26,9 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
     private val availableRoomsLoader: AvailableRoomsLoader by lazy {
         AvailableRoomsLoader(apiProvider, repositoryProvider.bookingBusiness())
     }
+
+    private val fragmentDisplayer =
+            UserFlowFragmentDisplayer(this, R.id.fragment_container_layout)
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -55,7 +57,7 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
                 .subscribe(this::onTimeSelected)
                 .addTo(compositeDisposable)
 
-        displayFragment(fragment, "time", null)
+        fragmentDisplayer.display(fragment, "time", null)
     }
 
     private fun onTimeSelected(time: BookingTime) {
@@ -71,7 +73,7 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
                 .subscribe(this::onSeatCountEntered)
                 .addTo(compositeDisposable)
 
-        displayFragment(fragment, "seats", true)
+        fragmentDisplayer.display(fragment, "seats", true)
     }
 
     private fun onSeatCountEntered(seatsCount: Int) {
@@ -116,7 +118,7 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
                 .subscribe(this::onRoomSelected)
                 .addTo(compositeDisposable)
 
-        displayFragment(fragment, "rooms", true)
+        fragmentDisplayer.display(fragment, "rooms", true)
     }
 
     private fun onRoomSelected(room: BookingRoom) {
@@ -124,29 +126,9 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
         toSeatCountInput()
     }
 
-    private fun displayFragment(
-            fragment: Fragment,
-            tag: String,
-            forward: Boolean?
-    ) {
-        supportFragmentManager.beginTransaction()
-                .setTransition(
-                        when (forward) {
-                            true -> FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                            false -> FragmentTransaction.TRANSIT_FRAGMENT_CLOSE
-                            null -> FragmentTransaction.TRANSIT_NONE
-                        }
-                )
-                .replace(R.id.fragment_container_layout, fragment)
-                .addToBackStack(tag)
-                .commit()
-    }
-
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount <= 1) {
+        if (!fragmentDisplayer.tryPopBackStack()) {
             finish()
-        } else {
-            supportFragmentManager.popBackStackImmediate()
         }
     }
 }

@@ -198,5 +198,7 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         val ID = "companies".hashCode().toLong()
+
+        fun newInstance() = CompaniesFragment()
     }
 }

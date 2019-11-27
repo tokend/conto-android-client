@@ -23,12 +23,13 @@ import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
-import org.tokend.template.features.assets.AssetDetailsActivity
-import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
+import org.tokend.template.features.assets.details.refund.view.AssetRefundConfirmationActivity
+import org.tokend.template.features.assets.details.view.AssetDetailsActivity
+import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.booking.add.view.BookingActivity
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
@@ -68,7 +69,7 @@ import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
-import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.settings.telegram.view.TelegramUsernameSettingsActivity
 import org.tokend.template.features.shaketopay.view.ShakeToPayActivity
@@ -552,7 +553,7 @@ class Navigator private constructor() {
     fun openSettings() {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
-                        SettingsFragment.ID
+                        GeneralSettingsFragment.ID
                 ))
                 ?.also { performIntent(it) }
     }
@@ -610,5 +611,12 @@ class Navigator private constructor() {
     fun openBooking() {
         context?.intentFor<BookingActivity>()
                 ?.also { performIntent(it) }
+    }
+
+    fun openAssetRefundConfirmation(offerRequest: OfferRequest,
+                                    requestCode: Int) {
+        context?.intentFor<AssetRefundConfirmationActivity>()
+                ?.putExtras(OfferConfirmationActivity.getBundle(offerRequest))
+                ?.also { performIntent(it, requestCode) }
     }
 }

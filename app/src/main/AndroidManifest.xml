@@ -82,8 +82,9 @@
             android:name=".features.withdraw.WithdrawalConfirmationActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
-            android:name=".features.assets.AssetDetailsActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
+            android:name=".features.assets.details.view.AssetDetailsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".features.send.PaymentConfirmationActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
@@ -278,6 +279,9 @@
             android:name=".features.booking.add.view.BookingActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".features.assets.details.refund.view.AssetRefundConfirmationActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
     </application>
 
 </manifest>

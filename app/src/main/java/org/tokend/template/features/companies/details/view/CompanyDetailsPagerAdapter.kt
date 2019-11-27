@@ -4,7 +4,8 @@ import android.content.Context
 import android.support.v4.app.FragmentManager
 import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.fragments.FragmentFactory
+import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
+import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.view.BaseFragmentPagerAdapter
 
 class CompanyDetailsPagerAdapter(
@@ -12,19 +13,20 @@ class CompanyDetailsPagerAdapter(
         context: Context,
         fragmentManager: FragmentManager
 ) : BaseFragmentPagerAdapter(fragmentManager) {
-    private val fragmentFactory = FragmentFactory()
-
     override val pages = mutableListOf(
             Page(
-                    fragmentFactory.getBalancesFragment(
-                            withToolbar = false,
+                    BalancesFragment.newInstance(BalancesFragment.getBundle(
+                            allowToolbar = false,
                             companyId = company.id
-                    ),
+                    )),
                     context.getString(R.string.my_balances),
                     BALANCES_PAGE
             ),
             Page(
-                    fragmentFactory.getMarketplaceFragment(false, company.id),
+                    MarketplaceFragment.newInstance(MarketplaceFragment.getBundle(
+                            allowToolbar = false,
+                            companyId = company.id
+                    )),
                     context.getString(R.string.shop_title),
                     SHOP_PAGE
             )

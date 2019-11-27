@@ -87,6 +87,8 @@ class DashboardFragment : BaseFragment(), ToolbarProvider {
     }
 
     companion object {
-        const val ID = 1110L
+        val ID = "dashboard".hashCode().toLong()
+
+        fun newInstance() = DashboardFragment()
     }
 }

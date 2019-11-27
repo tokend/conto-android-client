@@ -3,8 +3,6 @@ package org.tokend.template.features.assets.buy.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
@@ -16,18 +14,20 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
+import org.tokend.template.features.assets.buy.marketplace.logic.PerformMarketplaceInnerPaymentUseCase
 import org.tokend.template.features.assets.buy.marketplace.model.BuySummaryExtras
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceBuySummaryFragment
+import org.tokend.template.logic.TxManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
+import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
 
@@ -42,8 +42,11 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
     private lateinit var offer: MarketplaceOfferRecord
     private var amount: BigDecimal = BigDecimal.ZERO
-    private var asset: Asset? = null
+    private lateinit var paymentMethod: MarketplaceOfferRecord.PaymentMethod
     private var promoCode: String? = null
+
+    private val fragmentDisplayer =
+            UserFlowFragmentDisplayer(this, R.id.fragment_container_layout)
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -88,12 +91,12 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
-        displayFragment(fragment, "amount", null)
+        fragmentDisplayer.display(fragment, "amount", null)
     }
 
     private fun onAmountEntered(amountData: AmountInputResult) {
         this.amount = amountData.amount
-        this.asset = amountData.asset
+        this.paymentMethod = offer.paymentMethods.first { it.code == amountData.asset.code }
 
         toSummaryScreen()
     }
@@ -102,7 +105,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         val fragment = MarketplaceBuySummaryFragment.newInstance(
                 MarketplaceBuySummaryFragment.getBundle(
                         offer,
-                        offer.paymentMethods.first { it.asset.code == asset?.code }.id,
+                        paymentMethod.id,
                         amount
                 )
         )
@@ -115,7 +118,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
-        displayFragment(fragment, "summary", true)
+        fragmentDisplayer.display(fragment, "summary", true)
     }
 
     private fun onSummaryConfirmed(extras: BuySummaryExtras) {
@@ -125,9 +128,6 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     }
 
     private fun submitBid() {
-        val assetCode = asset?.code
-                ?: return
-
         var disposable: Disposable? = null
 
         val progress = ProgressDialogFactory.getDialog(
@@ -137,7 +137,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
         disposable = BuyAssetOnMarketplaceUseCase(
                 amount = amount,
-                quoteAssetCode = assetCode,
+                paymentMethodId = paymentMethod.id,
                 offer = offer,
                 promoCode = promoCode,
                 repositoryProvider = repositoryProvider,
@@ -161,6 +161,8 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                 Navigator.from(this).openWebInvoice(invoice.url, WEB_INVOICE_REQUEST)
             is MarketplaceInvoiceData.Crypto ->
                 openCryptoInvoiceAndFinish(invoice)
+            is MarketplaceInvoiceData.Internal ->
+                submitInternalPaymentAndFinish(invoice)
             else ->
                 errorHandlerFactory.getDefault().handle(
                         NotImplementedError("There is no handler for $invoice")
@@ -170,7 +172,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     }
 
     private fun openCryptoInvoiceAndFinish(invoice: MarketplaceInvoiceData.Crypto) {
-        val asset = this.asset ?: return
+        val asset = paymentMethod.asset
         val sendAmountString = amountFormatter.formatAssetAmount(invoice.amount, asset)
         val receiveAmountString = amountFormatter.formatAssetAmount(amount, offer.asset)
 
@@ -189,22 +191,30 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         finish()
     }
 
-    private fun displayFragment(
-            fragment: Fragment,
-            tag: String,
-            forward: Boolean?
-    ) {
-        supportFragmentManager.beginTransaction()
-                .setTransition(
-                        when (forward) {
-                            true -> FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                            false -> FragmentTransaction.TRANSIT_FRAGMENT_CLOSE
-                            null -> FragmentTransaction.TRANSIT_NONE
-                        }
+    private fun submitInternalPaymentAndFinish(invoice: MarketplaceInvoiceData.Internal) {
+        val progress = ProgressDialogFactory.getDialog(this)
+
+        PerformMarketplaceInnerPaymentUseCase(
+                invoice,
+                offer.asset.code,
+                accountProvider,
+                repositoryProvider,
+                TxManager(apiProvider)
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe { progress.show() }
+                .doOnTerminate { progress.dismiss() }
+                .subscribeBy(
+                        onComplete = this::onInternalPaymentSubmitted,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
-                .replace(R.id.fragment_container_layout, fragment)
-                .addToBackStack(tag)
-                .commit()
+                .addTo(compositeDisposable)
+    }
+
+    private fun onInternalPaymentSubmitted() {
+        toastManager.long(R.string.asset_will_be_received_in_a_moment)
+        finish()
     }
 
     private fun subscribeToBalances() {
@@ -248,10 +258,8 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount <= 1) {
+        if (!fragmentDisplayer.tryPopBackStack()) {
             finish()
-        } else {
-            supportFragmentManager.popBackStackImmediate()
         }
     }
 

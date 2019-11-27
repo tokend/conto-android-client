@@ -29,8 +29,8 @@ import kotlinx.android.synthetic.main.navigation_drawer_header.view.*
 import org.jetbrains.anko.browse
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
-import org.tokend.template.features.assets.ExploreAssetsFragment
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
+import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.booking.view.ActiveBookingsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
@@ -42,13 +42,12 @@ import org.tokend.template.features.kyc.storage.KycStateRepository
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
-import org.tokend.template.features.settings.SettingsFragment
+import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.features.trade.orderbook.view.OrderBookFragment
 import org.tokend.template.features.trade.pairs.view.TradeAssetPairsFragment
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
-import org.tokend.template.fragments.FragmentFactory
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.WalletEventsListener
 import org.tokend.template.util.Navigator
@@ -70,7 +69,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     private var navigationDrawer: Drawer? = null
     private var landscapeNavigationDrawer: Drawer? = null
     private var onBackPressedListener: OnBackPressedListener? = null
-    protected val factory = FragmentFactory()
     private val tablet by lazy {
         resources.getBoolean(R.bool.isTablet)
     }
@@ -172,7 +170,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
             PrimaryDrawerItem()
                     .withName(R.string.settings_title)
-                    .withIdentifier(SettingsFragment.ID)
+                    .withIdentifier(GeneralSettingsFragment.ID)
                     .withIcon(R.drawable.ic_settings),
 
             PrimaryDrawerItem()
@@ -307,7 +305,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             }
 
             addDrawerItems(
-                    items[SettingsFragment.ID]
+                    items[GeneralSettingsFragment.ID]
             )
         }
     }
@@ -354,20 +352,27 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected open fun getFragment(screenIdentifier: Long): Fragment? {
         return when (screenIdentifier) {
-            DashboardFragment.ID -> factory.getDashboardFragment()
-            WithdrawFragment.ID -> factory.getWithdrawFragment()
-            ExploreAssetsFragment.ID -> factory.getExploreFragment()
-            SettingsFragment.ID -> factory.getSettingsFragment()
-            DepositFragment.ID -> factory.getDepositFragment()
-            SalesFragment.ID -> factory.getSalesFragment()
-            TradeAssetPairsFragment.ID -> factory.getTradeAssetPairsFragment()
-            PollsFragment.ID -> factory.getPollsFragment()
-            AssetMovementsFragment.ID -> factory.getAssetMovementsFragment()
-            BalancesFragment.ID -> factory.getBalancesFragment(withToolbar = true)
-            CompaniesFragment.ID -> factory.getCompaniesFragment()
-            MarketplaceFragment.ID -> factory
-                    .getMarketplaceFragment(withToolbar = true, companyId = null)
-            ActiveBookingsFragment.ID -> factory.getActiveBookingsFragment()
+            DashboardFragment.ID -> DashboardFragment.newInstance()
+            WithdrawFragment.ID -> WithdrawFragment.newInstance(WithdrawFragment.getBundle())
+            ExploreAssetsFragment.ID -> ExploreAssetsFragment.newInstance()
+            GeneralSettingsFragment.ID -> GeneralSettingsFragment.newInstance()
+            DepositFragment.ID -> DepositFragment.newInstance(DepositFragment.getBundle())
+            SalesFragment.ID -> SalesFragment.newInstance()
+            TradeAssetPairsFragment.ID -> TradeAssetPairsFragment.newInstance()
+            PollsFragment.ID -> PollsFragment.newInstance(PollsFragment.getBundle(
+                    allowToolbar = true,
+                    ownerAccountId = null
+            ))
+            AssetMovementsFragment.ID -> AssetMovementsFragment.newInstance()
+            BalancesFragment.ID -> BalancesFragment.newInstance(BalancesFragment.getBundle(
+                    allowToolbar = true
+            ))
+            CompaniesFragment.ID -> CompaniesFragment.newInstance()
+            MarketplaceFragment.ID -> MarketplaceFragment.newInstance(MarketplaceFragment.getBundle(
+                    companyId = null,
+                    allowToolbar = true
+            ))
+            ActiveBookingsFragment.ID -> ActiveBookingsFragment.newInstance()
             else -> null
         }
     }

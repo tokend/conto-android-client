@@ -9,6 +9,7 @@ import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.util.confirmation.ConfirmationProvider
 import org.tokend.wallet.*
 import org.tokend.wallet.xdr.Operation
+import org.tokend.wallet.xdr.TransactionEnvelope
 
 /**
  * Manages transactions sending
@@ -23,13 +24,20 @@ class TxManager(
                         ?: Completable.complete()
 
         return confirmationCompletable
-                .andThen(
-                        apiProvider.getApi()
-                                .v3
-                                .transactions
-                                .submit(transaction, true)
-                                .toSingle()
-                )
+                .andThen(submitEnvelope(transaction.getEnvelope()))
+    }
+
+    fun submitWithoutConfirmation(transactionEnvelope: TransactionEnvelope)
+            : Single<SubmitTransactionResponse> {
+        return submitEnvelope(transactionEnvelope)
+    }
+
+    private fun submitEnvelope(envelope: TransactionEnvelope): Single<SubmitTransactionResponse> {
+        return apiProvider.getApi()
+                .v3
+                .transactions
+                .submit(envelope, true)
+                .toSingle()
     }
 
     companion object {

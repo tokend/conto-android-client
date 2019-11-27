@@ -586,4 +586,8 @@
     <string name="select_booking_time">Оберіть час</string>
     <string name="enter_seats_count">Вкажіть кількість місць</string>
     <string name="error_no_booking_rooms_available">Немає доступних кімнат</string>
+    <string name="asset_refund">Повернення</string>
+    <string name="asset_refund_is_not_available">Повернення цього актива недоступне</string>
+    <string name="template_max_refund_amount">Максимальна сума повернення – %1$s</string>
+    <string name="asset_refund_completed">Повернення виконано</string>
 </resources>

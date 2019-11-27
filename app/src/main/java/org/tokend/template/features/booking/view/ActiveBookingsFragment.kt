@@ -151,5 +151,7 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         val ID = "active_bookings".hashCode().toLong()
+
+        fun newInstance() = ActiveBookingsFragment()
     }
 }
