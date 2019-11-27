@@ -38,8 +38,6 @@ class AssetRefundFragment : BaseFragment() {
     private lateinit var offer: OrderBookEntryRecord
     private lateinit var amount: BigDecimal
 
-    private var refundOnceCompleted = false
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_asset_refund, container, false)
     }
@@ -106,7 +104,7 @@ class AssetRefundFragment : BaseFragment() {
                 .subscribe { onAmountEntered((it as AmountInputResult).amount)  }
                 .addTo(compositeDisposable)
 
-        fragmentDisplayer.display(fragment, "amount", forward = !refundOnceCompleted)
+        fragmentDisplayer.display(fragment, "amount", true)
     }
 
     private fun onAmountEntered(amount: BigDecimal) {
@@ -154,11 +152,16 @@ class AssetRefundFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REFUND_REQUEST) {
-                refundOnceCompleted = true
-                obtainRefundAvailability()
+                onOfferConfirmed()
             }
         }
     }
+
+    private fun onOfferConfirmed() {
+        fragmentDisplayer.remove("amount")
+        obtainRefundAvailability()
+    }
+
     companion object {
         // 😈.
         private const val REFUND_ASSET_CODE = "UAH"

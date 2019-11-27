@@ -47,8 +47,22 @@ private constructor(
                             null -> FragmentTransaction.TRANSIT_NONE
                         }
                 )
-                .replace(containerId, fragment)
+                .replace(containerId, fragment, tag)
                 .addToBackStack(tag)
+                .commit()
+
+        fragmentManager.executePendingTransactions()
+    }
+
+    /**
+     * Removes fragment with given [tag]
+     */
+    fun remove(tag: String) {
+        val fragment = fragmentManager.findFragmentByTag(tag)
+                ?: return
+
+        fragmentManager.beginTransaction()
+                .remove(fragment)
                 .commit()
     }
 
