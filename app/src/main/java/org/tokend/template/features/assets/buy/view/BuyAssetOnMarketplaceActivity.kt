@@ -18,9 +18,11 @@ import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
+import org.tokend.template.features.assets.buy.marketplace.logic.PerformMarketplaceInnerPaymentUseCase
 import org.tokend.template.features.assets.buy.marketplace.model.BuySummaryExtras
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceBuySummaryFragment
+import org.tokend.template.logic.TxManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -159,6 +161,8 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                 Navigator.from(this).openWebInvoice(invoice.url, WEB_INVOICE_REQUEST)
             is MarketplaceInvoiceData.Crypto ->
                 openCryptoInvoiceAndFinish(invoice)
+            is MarketplaceInvoiceData.Internal ->
+                submitInternalPaymentAndFinish(invoice)
             else ->
                 errorHandlerFactory.getDefault().handle(
                         NotImplementedError("There is no handler for $invoice")
@@ -184,6 +188,32 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                 ),
                 topText = getString(R.string.template_send_to_address, sendAmountString)
         )
+        finish()
+    }
+
+    private fun submitInternalPaymentAndFinish(invoice: MarketplaceInvoiceData.Internal) {
+        val progress = ProgressDialogFactory.getDialog(this)
+
+        PerformMarketplaceInnerPaymentUseCase(
+                invoice,
+                offer.asset.code,
+                accountProvider,
+                repositoryProvider,
+                TxManager(apiProvider)
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe { progress.show() }
+                .doOnTerminate { progress.dismiss() }
+                .subscribeBy(
+                        onComplete = this::onInternalPaymentSubmitted,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun onInternalPaymentSubmitted() {
+        toastManager.long(R.string.asset_will_be_received_in_a_moment)
         finish()
     }
 
