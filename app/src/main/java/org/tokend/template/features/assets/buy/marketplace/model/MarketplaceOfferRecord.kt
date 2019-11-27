@@ -28,7 +28,8 @@ class MarketplaceOfferRecord(
                 id = source.id,
                 asset = assetsMap[source.asset]
                         ?: throw IllegalStateException("Payment method asset ${source.asset} is not in the map"),
-                type = MarketplacePaymentMethodType.fromValue(source.type.value)
+                type = source.type?.value?.let(MarketplacePaymentMethodType.Companion::fromValue)
+                        ?: MarketplacePaymentMethodType.FORBILL
         )
 
         override val code: String
