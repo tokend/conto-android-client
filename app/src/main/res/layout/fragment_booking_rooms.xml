@@ -17,6 +17,7 @@
 
     <TextView
         android:id="@+id/available_seats_text_view"
+        style="@style/SecondaryText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"

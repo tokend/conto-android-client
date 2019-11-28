@@ -11,13 +11,16 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.booking.add.logic.AvailableRoomsLoader
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.features.booking.add.rooms.view.BookingRoomsFragment
+import org.tokend.template.features.booking.model.BookingBusinessRecord
 import org.tokend.template.features.booking.model.BookingRoom
 import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
+import java.util.concurrent.TimeUnit
 
 class BookingActivity : BaseActivity(), BookingInfoHolder {
+    override lateinit var business: BookingBusinessRecord
     override lateinit var bookingTime: BookingTime
     override var seatsCount: Int = 0
     override var availableRooms: Collection<BookingRoom> = emptyList()
@@ -36,7 +39,7 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
         initToolbar()
         initSwipeRefresh()
 
-        toTimeScreen()
+        ensureBusinessAndStart()
     }
 
     private fun initToolbar() {
@@ -47,6 +50,34 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
 
     private fun initSwipeRefresh() {
         swipe_refresh.isEnabled = false
+    }
+
+    private fun ensureBusinessAndStart() {
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
+            disposable?.dispose()
+            finish()
+        }
+
+        disposable = repositoryProvider
+                .bookingBusiness()
+                .ensureItem()
+                .retryWhen { errors ->
+                    errors.delay(2, TimeUnit.SECONDS)
+                }
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::onBusinessObtained,
+                        onError = { it.printStackTrace() }
+                )
+    }
+
+    private fun onBusinessObtained(business: BookingBusinessRecord) {
+        this.business = business
+        toTimeScreen()
     }
 
     private fun toTimeScreen() {

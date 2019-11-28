@@ -12,14 +12,22 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_booking_time.*
 import org.tokend.template.R
+import org.tokend.template.features.booking.add.model.BookingInfoHolder
+import org.tokend.template.features.booking.model.BookingBusinessRecord
 import org.tokend.template.features.booking.model.BookingTime
 import org.tokend.template.fragments.BaseFragment
+import org.tokend.template.view.util.formatter.DateFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
 class BookingTimeFragment : BaseFragment() {
     private val resultSubject = PublishSubject.create<BookingTime>()
     val resultObservable: Observable<BookingTime> = resultSubject
+
+    private lateinit var bookingInfoHolder: BookingInfoHolder
+
+    private val business: BookingBusinessRecord
+        get() = bookingInfoHolder.business
 
     private val calendarFrom = Calendar.getInstance()
     private val calendarTo = Calendar.getInstance()
@@ -49,8 +57,12 @@ class BookingTimeFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
+        bookingInfoHolder = requireActivity() as? BookingInfoHolder
+                ?: throw IllegalStateException("Parent activity must hold booking info")
+
         initFields()
         initButtons()
+        initSchedule()
 
         preFillDates()
     }
@@ -77,6 +89,59 @@ class BookingTimeFragment : BaseFragment() {
         }
     }
 
+    private fun initSchedule() {
+        val dateFormatter = DateFormatter(requireContext())
+        val shortDayNameFormat = SimpleDateFormat("EEE")
+
+        val scheduleString = business
+                .workingDays
+                .mapValues { (_, time) ->
+                    val calendar = Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, time.start.hours)
+                        set(Calendar.MINUTE, time.start.minutes)
+                    }
+
+                    val startTimeString = dateFormatter.formatTimeOnly(calendar.time)
+
+                    calendar.apply {
+                        set(Calendar.HOUR_OF_DAY, time.end.hours)
+                        set(Calendar.MINUTE, time.end.minutes)
+                    }
+
+                    val endTimeString = dateFormatter.formatTimeOnly(calendar.time)
+
+                    "$startTimeString – $endTimeString"
+                }
+                .entries
+                .groupBy { (_, timeString) ->
+                    timeString
+                }
+                .entries
+                .sortedByDescending { it.value.size }
+                .map { (timeString, entries) ->
+                    val dayNames = entries
+                            .sortedBy { it.key }
+                            .map { (day, _) ->
+                                val calendar = Calendar.getInstance().apply {
+                                    set(Calendar.DAY_OF_WEEK, day)
+                                }
+
+                                shortDayNameFormat.format(calendar.time).capitalize()
+                            }
+
+                    val daysString = when (dayNames.size) {
+                        1 -> dayNames.first()
+                        2 -> dayNames.joinToString()
+                        else -> "${dayNames.first()} – ${dayNames.last()}"
+                    }
+
+                    "$daysString: $timeString"
+                }
+                .joinToString("; ")
+
+        schedule_text_view.text = scheduleString
+    }
+
     private fun preFillDates() {
         val now = Date().time / 1000
         val period = 30 * 60 // 30 minutes
@@ -85,10 +150,25 @@ class BookingTimeFragment : BaseFragment() {
         // i.e to 12:30 if it's 12:10 now or to 13:00 if's 12:30 now, for example
         val nextPeriodStart = now - now % period + period
 
-        val preferredBookingTime = 8 * 60 * 60 // Let it be 8 working hours
+        val preferredBookingTime = 2 * 60 * 60 // Let it be 2 hours
 
         calendarFrom.time = Date(nextPeriodStart * 1000L)
         calendarTo.time = Date((nextPeriodStart + preferredBookingTime) * 1000L)
+
+        if (!business.isWorkingRange(calendarFrom, calendarTo)) {
+            val currentDay = calendarFrom[Calendar.DAY_OF_WEEK]
+            val searchStartIndex = currentDay % 7
+
+            val nextWorkingDayEntry = business.workingDays.entries.find { it.key > searchStartIndex }
+
+            if (nextWorkingDayEntry != null) {
+                calendarFrom[Calendar.DAY_OF_WEEK] = nextWorkingDayEntry.key
+                calendarFrom[Calendar.HOUR_OF_DAY] = nextWorkingDayEntry.value.start.hours
+                calendarFrom[Calendar.MINUTE] = nextWorkingDayEntry.value.start.minutes
+
+                calendarTo.time = Date(calendarFrom.time.time + preferredBookingTime * 1000L)
+            }
+        }
 
         onDatesUpdated()
     }
@@ -119,13 +199,24 @@ class BookingTimeFragment : BaseFragment() {
     }
 
     private fun updateError() {
-        hasDateError = millisDelta < 0
+        val negativeDelta = millisDelta < 0
+        val notWorkingRange = !business.isWorkingRange(calendarFrom, calendarTo)
+        hasDateError = negativeDelta || notWorkingRange
+
         if (hasDateError) {
-            booking_from_day_text_view.setTextColor(errorColor)
-            booking_from_hours_text_view.setTextColor(errorColor)
+            if (negativeDelta || !business.isWorkingTime(calendarFrom)) {
+                booking_from_day_text_view.setTextColor(errorColor)
+                booking_from_hours_text_view.setTextColor(errorColor)
+            }
+            if (!business.isWorkingTime(calendarTo)) {
+                booking_to_day_text_view.setTextColor(errorColor)
+                booking_to_hours_text_view.setTextColor(errorColor)
+            }
         } else {
             booking_from_day_text_view.setTextColor(defaultTextColor)
             booking_from_hours_text_view.setTextColor(defaultTextColor)
+            booking_to_day_text_view.setTextColor(defaultTextColor)
+            booking_to_hours_text_view.setTextColor(defaultTextColor)
         }
     }
 

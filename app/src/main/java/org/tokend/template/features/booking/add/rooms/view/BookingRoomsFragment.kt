@@ -51,15 +51,13 @@ class BookingRoomsFragment : BaseFragment() {
 
         booking_time_range_text_view.text = timeRange
 
-//        val availableSeats = bookingInfoHolder.roomAvailableSeats.sumBy { it.second }
-//        val availableSeatsString = getString(
-//                R.string.template_available,
-//                "$availableSeats ${requireContext().resources.getQuantityString(
-//                        R.plurals.seat,
-//                        availableSeats
-//                )}"
-//        )
-//        available_seats_text_view.text = availableSeatsString
+        val seatsCount = bookingInfoHolder.seatsCount
+        val seatsCountString = "$seatsCount " +
+                requireContext().resources.getQuantityString(
+                        R.plurals.seat,
+                        seatsCount
+                )
+        available_seats_text_view.text = seatsCountString
     }
 
     private fun initList() {

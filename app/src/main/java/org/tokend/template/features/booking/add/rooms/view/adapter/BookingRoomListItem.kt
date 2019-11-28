@@ -11,7 +11,7 @@ class BookingRoomListItem(
     constructor(source: BookingRoom): this(
             name = source.name,
             availableSeatsCount = source.seatsCount,
-            logoUrl = null,
+            logoUrl = source.logoUrl,
             source = source
     )
 }

@@ -32,6 +32,7 @@ class BookingRoomItemViewHolder(view: View) : BaseViewHolder<BookingRoomListItem
         nameTextView.text = item.name
         availableSeatsTextView.text = "${item.availableSeatsCount} " +
                 view.context.resources.getQuantityString(R.plurals.seat, item.availableSeatsCount)
+        availableSeatsTextView.visibility = View.GONE
 
         ImageViewUtil.loadImage(photoImageView, item.logoUrl, imagePlaceholder) {
             transform(RoundedCornersTransform(
