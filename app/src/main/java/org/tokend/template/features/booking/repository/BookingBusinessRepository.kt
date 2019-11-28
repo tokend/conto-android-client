@@ -23,12 +23,9 @@ class BookingBusinessRepository(
                             business
                                     .bookingDetails
                                     .specificDetails
-                                    ?.prices
-                                    ?.elements()
-                                    ?.asSequence()
-                                    ?.map { it["asset"].asText() }
-                                    ?.toList()
-                                    ?: emptyList()
+                                    .map { (_, roomDetails) ->
+                                        roomDetails.price.asset
+                                    }
                     ).map { business to it }
                 }
                 .map { (business, assetsMap) ->

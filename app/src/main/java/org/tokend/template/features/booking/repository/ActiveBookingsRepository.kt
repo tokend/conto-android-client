@@ -29,7 +29,8 @@ class ActiveBookingsRepository(
             signedApi.integrations.booking
                     .getBookings(
                             params = BookingsPageParams(
-                                    participant = accountId,
+                                    owner = accountId,
+                                    state = 1,
                                     pagingParams = PagingParamsV2(
                                             order = PagingOrder.DESC,
                                             page = nextCursor,
