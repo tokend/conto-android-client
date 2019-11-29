@@ -12,6 +12,7 @@ import org.tokend.template.R
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.view.util.formatter.DateFormatter
+import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
 
 class BookingSeatsCountFragment : BaseFragment() {
@@ -73,7 +74,10 @@ class BookingSeatsCountFragment : BaseFragment() {
     }
 
     private fun initButtons() {
-        continue_button.setOnClickListener { postResult() }
+        continue_button.setOnClickListener {
+            SoftInputUtil.hideSoftInput(seats_count_view.editText)
+            postResult()
+        }
     }
 
     private fun onSeatsCountChanged() {
