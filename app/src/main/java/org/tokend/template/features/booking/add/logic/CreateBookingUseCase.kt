@@ -13,7 +13,6 @@ import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.booking.model.BookingBusinessRecord
 import org.tokend.template.features.booking.model.BookingTime
-import java.util.*
 
 /**
  * Creates booking and invoice to pay for it.
@@ -80,7 +79,7 @@ class CreateBookingUseCase(
                         attributes = CreateBookingRequestAttributes(
                                 sourceAccount = accountId,
                                 participantsCount = seatsCount,
-                                startTime = Date(),//time.from,
+                                startTime = time.from,
                                 endTime = time.to,
                                 payload = roomId,
                                 type = 0,

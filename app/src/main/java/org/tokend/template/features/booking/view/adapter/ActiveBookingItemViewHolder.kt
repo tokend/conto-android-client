@@ -15,6 +15,7 @@ class ActiveBookingItemViewHolder(
     private val seatsHintTextView: TextView = view.findViewById(R.id.seats_hint_text_view)
     private val dateFromTextView: TextView = view.findViewById(R.id.booking_from_text_view)
     private val dateToTextView: TextView = view.findViewById(R.id.booking_until_text_view)
+    private val roomNameTextView: TextView = view.findViewById(R.id.booking_room_name_text_view)
 
     override fun bind(item: ActiveBookingListItem) {
         seatsCountTextView.text = item.seatsCount.toString()
@@ -26,6 +27,7 @@ class ActiveBookingItemViewHolder(
 
         dateFromTextView.text = getDateString(item.dateFrom)
         dateToTextView.text = getDateString(item.dateTo)
+        roomNameTextView.text = item.roomName
     }
 
     private fun getDateString(date: Date): String {
