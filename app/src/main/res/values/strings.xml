@@ -583,6 +583,7 @@
     <string name="template_max_refund_amount">Max refund amount is %1$s</string>
     <string name="asset_refund_completed">Refund has been completed</string>
     <string name="template_price_per_hour">%1$s / hour</string>
+    <string name="booking_will_be_confirmed_in_a_moment">Your booking will be confirmed in a moment</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

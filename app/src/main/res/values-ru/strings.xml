@@ -591,4 +591,5 @@
     <string name="template_max_refund_amount">Максимальная сумма возврата – %1$s</string>
     <string name="asset_refund_completed">Возврат выполнен</string>
     <string name="template_price_per_hour">%1$s / час</string>
+    <string name="booking_will_be_confirmed_in_a_moment">Бронирование будет подтверждено в течении минуты</string>
 </resources>

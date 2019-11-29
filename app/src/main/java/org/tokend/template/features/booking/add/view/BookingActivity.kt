@@ -1,19 +1,24 @@
 package org.tokend.template.features.booking.add.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.booking.add.logic.AvailableRoomsLoader
+import org.tokend.template.features.booking.add.logic.CreateBookingUseCase
 import org.tokend.template.features.booking.add.model.BookingInfoHolder
 import org.tokend.template.features.booking.add.rooms.view.BookingRoomsFragment
 import org.tokend.template.features.booking.model.BookingBusinessRecord
 import org.tokend.template.features.booking.model.BookingRoom
 import org.tokend.template.features.booking.model.BookingTime
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
@@ -172,12 +177,55 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
         createBooking()
     }
 
-    private fun createBooking() {}
+    private fun createBooking() {
+        var disposable: Disposable? = null
 
+        val progress = ProgressDialogFactory.getDialog(this) {
+            disposable?.dispose()
+        }
+
+        disposable = CreateBookingUseCase(
+                time = bookingTime,
+                roomId = selectedRoom.id,
+                seatsCount = seatsCount,
+                repositoryProvider = repositoryProvider,
+                apiProvider = apiProvider,
+                walletInfoProvider = walletInfoProvider
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss()}
+                .subscribeBy(
+                        onSuccess = this::onInvoiceObtained,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+    }
+
+    private fun onInvoiceObtained(invoice: MarketplaceInvoiceData.Redirect) {
+        Navigator.from(this).openWebInvoice(invoice.url, INVOICE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == INVOICE_REQUEST && resultCode == Activity.RESULT_OK) {
+            onInvoicePaid()
+        }
+    }
+
+    private fun onInvoicePaid() {
+        toastManager.long(R.string.booking_will_be_confirmed_in_a_moment)
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
 
     override fun onBackPressed() {
         if (!fragmentDisplayer.tryPopBackStack()) {
             finish()
         }
+    }
+
+    companion object {
+        private val INVOICE_REQUEST = "web_invoice".hashCode() and 0xffff
     }
 }

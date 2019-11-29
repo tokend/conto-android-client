@@ -8,6 +8,7 @@ import java.util.*
 class BookingBusinessRecord(
         val id: String,
         val calendarId: String,
+        val paymentMethodId: String,
         val rooms: List<BookingRoom>,
         val workingDays: Map<Int, WorkHours>
 ) {
@@ -71,9 +72,15 @@ class BookingBusinessRecord(
                     ?.mapKeys { daysMap.getValue(it.key) }
                     ?: emptyMap()
 
+            val paymentMethodId = source.details
+                    ?.get("payment_method")
+                    ?.asText()
+                    ?: throw IllegalStateException("Resource must have payment method")
+
             return BookingBusinessRecord(
                     id = source.id,
                     calendarId = source.calendar.id,
+                    paymentMethodId = paymentMethodId,
                     rooms = rooms,
                     workingDays = workingDays
             )
