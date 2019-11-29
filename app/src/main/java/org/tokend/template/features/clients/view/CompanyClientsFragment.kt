@@ -284,5 +284,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
     companion object {
         private val MASS_ISSUANCE_REQUEST = "mass_issuance".hashCode() and 0xffff
         val ID = "company_clients".hashCode().toLong()
+
+        fun newInstance() = CompanyClientsFragment()
     }
 }

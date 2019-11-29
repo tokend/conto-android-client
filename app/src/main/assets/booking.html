@@ -1,0 +1,57 @@
+<html>
+<head>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .booked rect {
+        fill: lightgrey;
+    }
+
+    .booked text {
+        fill: transparent;
+    }
+
+    .picked rect {
+        stroke: rgb(218, 20, 218);
+        stroke-width: 1pt;
+    }
+</style>
+</head>
+<body>
+
+<% svg %>
+
+<script>
+    let seats = <% seats_array %>
+
+    let toggleSeat = function(seat, element) {
+        let picked = seat.picked
+        if (!picked) {
+            element.classList.add('picked')
+            seat.picked = true
+            Android.onSeatPicked(seat.id)
+        } else {
+            element.classList.remove('picked')
+            seat.picked = false
+            Android.onSeatUnpicked(seat.id)
+        }
+    }
+
+    let map = document.getElementById('map')
+
+    for (let seat of seats) {
+        let id = seat.id
+        let element = map.getElementById(id)
+        if (seat.booked) {
+            element.classList.add('booked')
+        } else {
+            element.onclick = () => { toggleSeat(seat, element) }
+        }
+    }
+</script>
+</body>
+</html>

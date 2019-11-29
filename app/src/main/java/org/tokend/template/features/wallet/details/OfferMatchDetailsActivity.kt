@@ -2,12 +2,16 @@ package org.tokend.template.features.wallet.details
 
 import android.support.v4.content.ContextCompat
 import org.tokend.template.R
+import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.view.details.DetailsItem
 
 open class OfferMatchDetailsActivity : BalanceChangeDetailsActivity() {
+    private lateinit var baseAsset: Asset
+    private lateinit var quoteAsset: Asset
+
     override fun displayDetails(item: BalanceChange) {
         super.displayDetails(item)
 
@@ -18,16 +22,19 @@ open class OfferMatchDetailsActivity : BalanceChangeDetailsActivity() {
             return
         }
 
-        displayPrice(details)
+        baseAsset = SimpleAsset(details.baseAssetCode).orMoreDetailed()
+        quoteAsset = SimpleAsset(details.quoteAssetCode).orMoreDetailed()
+
         displayChargedOrFunded(item, details)
+        displayPrice(details)
     }
 
     protected open fun displayPrice(cause: BalanceChangeCause.MatchedOffer) {
         val formattedPrice = amountFormatter
-                .formatAssetAmount(cause.price, SimpleAsset(cause.quoteAssetCode))
+                .formatAssetAmount(cause.price, quoteAsset)
 
         val priceString = getString(R.string.template_price_one_equals,
-                cause.baseAssetCode, formattedPrice)
+                baseAsset.name ?: baseAsset.code, formattedPrice)
 
         adapter.addData(
                 DetailsItem(
@@ -50,11 +57,14 @@ open class OfferMatchDetailsActivity : BalanceChangeDetailsActivity() {
                         Triple(it.amount - it.fee.total, it.fee, it.assetCode)
                     }
 
-        val asset = SimpleAsset(assetCode)
+        val asset = if (baseAsset.code == assetCode) baseAsset else quoteAsset
 
         adapter.addData(
                 DetailsItem(
-                        text = amountFormatter.formatAssetAmount(total, asset),
+                        text = amountFormatter.formatAssetAmount(
+                                total, asset,
+                                withAssetName = true
+                        ),
                         hint =
                         if (item.isReceived == true)
                             getString(R.string.charged)
@@ -67,7 +77,10 @@ open class OfferMatchDetailsActivity : BalanceChangeDetailsActivity() {
         if (fee.total.signum() > 0) {
             adapter.addData(
                     DetailsItem(
-                            text = amountFormatter.formatAssetAmount(fee.total, asset),
+                            text = amountFormatter.formatAssetAmount(
+                                    fee.total, asset,
+                                    withAssetName = true
+                            ),
                             hint = getString(R.string.tx_fee)
                     )
             )

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        style="@style/LimitedMatchParentWidthConstraint"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/footer_layout">
+
+        <LinearLayout
+            style="@style/StrokedCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:orientation="horizontal"
+            android:paddingTop="0dp"
+            android:layout_margin="@dimen/standard_margin"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp">
+
+            <include
+                android:id="@+id/booking_room_layout"
+                layout="@layout/list_item_booking_room" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/details_list"
+            android:layout_width="match_parent"
+            android:overScrollMode="never"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/standard_margin" />
+
+    </LinearLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/line_divider"
+        app:layout_constraintBottom_toTopOf="@id/footer_layout" />
+
+    <LinearLayout
+        android:id="@+id/footer_layout"
+        style="@style/LimitedMatchParentWidthConstraint"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@null">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/half_standard_padding"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <Button
+                android:id="@+id/confirm_button"
+                style="@style/PrimaryButton.Rounded"
+                android:layout_width="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="4dp"
+                android:text="@string/confirm_action" />
+
+            <TextView
+                android:id="@+id/amount_text_view"
+                style="@style/HeadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/continue_button"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="160 USD" />
+
+            <TextView
+                android:id="@+id/seats_count_text_view"
+                style="@style/HintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/amount_text_view"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/continue_button"
+                android:text="@string/to_pay" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

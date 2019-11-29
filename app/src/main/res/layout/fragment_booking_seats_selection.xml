@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/booking_time_range_text_view"
+        style="@style/SecondaryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        tools:text="29 Nov. 12:30 – 30 Nov. 14:00" />
+
+    <TextView
+        android:id="@+id/room_name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/quarter_standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        tools:text="Big room #1" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/standard_margin">
+
+        <FrameLayout
+            android:id="@+id/web_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/footer_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <com.mikepenz.materialdrawer.view.BezelImageView
+            android:id="@+id/zoom_out_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/standard_margin"
+            android:elevation="2dp"
+            android:src="@drawable/minus_round_button"
+            app:layout_constraintBottom_toBottomOf="@id/web_view_container"
+            app:layout_constraintEnd_toEndOf="@id/web_view_container" />
+
+        <com.mikepenz.materialdrawer.view.BezelImageView
+            android:id="@+id/zoom_in_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/standard_margin"
+            android:elevation="2dp"
+            android:src="@drawable/plus_round_button"
+            app:layout_constraintBottom_toTopOf="@id/zoom_out_button"
+            app:layout_constraintEnd_toEndOf="@id/web_view_container" />
+
+        <include layout="@layout/include_appbar_elevation" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/line_divider"
+            app:layout_constraintBottom_toTopOf="@id/footer_layout" />
+
+        <LinearLayout
+            android:id="@+id/footer_layout"
+            style="@style/LimitedMatchParentWidthConstraint"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@null">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:layout_marginEnd="@dimen/standard_margin"
+                android:layout_marginBottom="@dimen/half_standard_padding"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <Button
+                    android:id="@+id/confirm_button"
+                    style="@style/PrimaryButton.Rounded"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/confirm_action" />
+
+                <TextView
+                    android:id="@+id/amount_text_view"
+                    style="@style/HeadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/confirm_button"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="160 USD" />
+
+                <TextView
+                    android:id="@+id/seats_count_text_view"
+                    style="@style/SecondaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/amount_text_view"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/confirm_button"
+                    tools:text="2 seats" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>

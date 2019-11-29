@@ -6,7 +6,7 @@ import kotlinx.android.synthetic.main.fragment_asset_details.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import org.tokend.template.R
 import org.tokend.template.extensions.withArguments
-import org.tokend.template.features.assets.AssetDetailsFragment
+import org.tokend.template.features.assets.details.view.AssetDetailsFragment
 import org.tokend.template.features.invest.logic.InvestmentInfoHolder
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.view.InfoCard

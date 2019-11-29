@@ -13,10 +13,10 @@ import org.apmem.tools.layouts.FlowLayout
 import org.jetbrains.anko.onClick
 import org.jetbrains.anko.onLongClick
 import org.tokend.template.R
-import org.tokend.template.features.assets.LogoFactory
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.view.adapter.base.BaseViewHolder
 import org.tokend.template.view.adapter.base.SimpleItemClickListener
+import org.tokend.template.view.util.LogoFactory
 import org.tokend.template.view.util.formatter.AmountFormatter
 
 class CompanyClientItemViewHolder(

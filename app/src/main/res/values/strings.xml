@@ -570,6 +570,21 @@
     <string name="creating_local_account_progress">Generating key…</string>
     <string name="mnemonic_phrase_description">Mnemonic phrase is a human readable form of your secret key</string>
     <string name="asset_will_be_received_in_a_moment">The asset will be received in a moment</string>
+    <string name="booking_title">Seats booking</string>
+    <string name="no_active_bookings">No active bookings found</string>
+    <string name="time_from">From</string>
+    <string name="time_until">Until</string>
+    <string name="book_a_seat">Book a seat</string>
+    <string name="select_booking_time">Select booking time</string>
+    <string name="enter_seats_count">Enter seats count</string>
+    <string name="error_no_booking_rooms_available">No available rooms found</string>
+    <string name="asset_refund">Refund</string>
+    <string name="asset_refund_is_not_available">Refund is not available for this asset</string>
+    <string name="template_max_refund_amount">Max refund amount is %1$s</string>
+    <string name="asset_refund_completed">Refund has been completed</string>
+    <string name="template_price_per_hour">%1$s / hour</string>
+    <string name="booking_will_be_confirmed_in_a_moment">Your booking will be confirmed in a moment</string>
+    <string name="booking_room">Room</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

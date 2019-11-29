@@ -1,4 +1,4 @@
-package org.tokend.template.features.assets
+package org.tokend.template.features.assets.view
 
 import android.app.Activity
 import android.content.Intent
@@ -323,7 +323,9 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     }
 
     companion object {
-        const val ID = 1114L
+        val ID = "explore-assets".hashCode().toLong()
         const val CREATE_REQUEST = 314
+
+        fun newInstance() = ExploreAssetsFragment()
     }
 }

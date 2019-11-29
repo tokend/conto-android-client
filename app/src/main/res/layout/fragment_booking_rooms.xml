@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/booking_time_range_text_view"
+        style="@style/SecondaryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        tools:text="29 Nov. 12:30 – 30 Nov. 14:00" />
+
+    <TextView
+        android:id="@+id/available_seats_text_view"
+        style="@style/SecondaryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/quarter_standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        tools:text="25 seats available" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/standard_margin">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rooms_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never" />
+
+        <include layout="@layout/include_appbar_elevation" />
+    </FrameLayout>
+</LinearLayout>

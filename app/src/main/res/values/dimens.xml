@@ -75,4 +75,6 @@
     <dimen name="nearby_user_avatar_size">56dp</dimen>
 
     <dimen name="local_account_logo_size">56dp</dimen>
+
+    <dimen name="booking_room_photo_height">80dp</dimen>
 </resources>

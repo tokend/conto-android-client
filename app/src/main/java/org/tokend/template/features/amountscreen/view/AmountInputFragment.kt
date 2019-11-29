@@ -86,6 +86,10 @@ open class AmountInputFragment : BaseFragment() {
         amountWrapper.onAmountChanged { _, _ ->
             updateActionButtonAvailability()
         }
+        focusAmountField()
+    }
+
+    protected open fun focusAmountField() {
         amount_edit_text.requestFocus()
         SoftInputUtil.showSoftInputOnView(amount_edit_text)
     }
@@ -232,6 +236,7 @@ open class AmountInputFragment : BaseFragment() {
     }
 
     protected open fun onBalancesUpdated() {
+        balance = balancesRepository.itemsList.find { it.assetCode == asset }
         displayAssets()
         displayBalance()
         updateActionButtonAvailability()

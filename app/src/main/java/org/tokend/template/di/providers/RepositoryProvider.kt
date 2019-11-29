@@ -5,8 +5,10 @@ import org.tokend.template.data.repository.assets.AssetChartRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
-import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
+import org.tokend.template.features.booking.repository.ActiveBookingsRepository
+import org.tokend.template.features.booking.repository.BookingBusinessRepository
+import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -48,4 +50,6 @@ interface RepositoryProvider {
     fun blobs(): BlobsRepository
     fun marketplaceOffers(ownerAccountId: String?): MarketplaceOffersRepository
     fun localAccount(): LocalAccountRepository
+    fun activeBookings(): ActiveBookingsRepository
+    fun bookingBusiness(): BookingBusinessRepository
 }

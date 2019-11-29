@@ -20,8 +20,9 @@ class DateFormatter(private val context: Context) {
      * Formats given date to the compact string:
      * short month name, 2-digits year number, 12-/24-hour time based on device preference
      */
-    fun formatCompact(date: Date): String {
-        return "${formatCompactDateOnly(date)} ${formatTimeOnly(date)}"
+    fun formatCompact(date: Date,
+                      includeYear: Boolean = true): String {
+        return "${formatCompactDateOnly(date, includeYear)} ${formatTimeOnly(date)}"
     }
 
     /**

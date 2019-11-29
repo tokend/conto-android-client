@@ -43,7 +43,7 @@
 
 # Wallet
 # Uncomment this if you would like to decode XDRs
-#-keep class org.tokend.wallet.xdr.* { *; }
+-keep class org.tokend.wallet.xdr.* { *; }
 
 # General
 -keepattributes SourceFile,LineNumberTable,EnclosingMethod,Exceptions
@@ -83,3 +83,8 @@
 
 # Legacy Picasso downloader
 -dontwarn com.squareup.picasso.OkHttpDownloader
+
+# JavaScriptInterface
+-keepclassmembers class * {
+   @android.webkit.JavascriptInterface *;
+}
