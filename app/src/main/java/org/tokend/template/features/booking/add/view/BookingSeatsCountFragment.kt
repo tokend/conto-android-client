@@ -60,10 +60,10 @@ class BookingSeatsCountFragment : BaseFragment() {
     private fun initCountView() {
         seats_count_view.amountWrapper.apply {
             maxPlacesAfterComa = 0
-            setAmount(bookingInfoHolder.seatsCount.toBigDecimal())
             onAmountChanged { scaled, _ ->
                 seatsCount = scaled.intValueExact()
             }
+            setAmount(bookingInfoHolder.seatsCount.toBigDecimal())
         }
 
         seats_count_view.apply {

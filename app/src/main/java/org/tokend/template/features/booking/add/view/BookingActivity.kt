@@ -154,8 +154,26 @@ class BookingActivity : BaseActivity(), BookingInfoHolder {
 
     private fun onRoomSelected(room: BookingRoom) {
         this.selectedRoom = room
-        toSeatCountInput()
+        toSummary()
     }
+
+    private fun toSummary() {
+        val fragment = BookingSummaryFragment()
+
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe { this.onSummaryConfirmed() }
+                .addTo(compositeDisposable)
+
+        fragmentDisplayer.display(fragment, "summary", true)
+    }
+
+    private fun onSummaryConfirmed() {
+        createBooking()
+    }
+
+    private fun createBooking() {}
+
 
     override fun onBackPressed() {
         if (!fragmentDisplayer.tryPopBackStack()) {

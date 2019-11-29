@@ -32,18 +32,39 @@
         app:layout_constraintVertical_bias="0.4"
         app:layout_constraintStart_toEndOf="@id/room_photo_image_view"
         app:layout_constraintTop_toTopOf="@id/room_photo_image_view"
-        app:layout_constraintBottom_toTopOf="@id/available_seats_text_view"
+        app:layout_constraintBottom_toTopOf="@id/price_layout"
         tools:text="Big room #1" />
 
-    <TextView
-        android:id="@+id/available_seats_text_view"
+    <LinearLayout
+        android:id="@+id/price_layout"
+        style="@style/BadgeText.Colored"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:elevation="1dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:layout_marginTop="@dimen/quarter_standard_margin"
         app:layout_constraintStart_toStartOf="@id/room_name_text_view"
         app:layout_constraintTop_toBottomOf="@id/room_name_text_view"
         app:layout_constraintBottom_toBottomOf="@id/room_photo_image_view"
-        tools:text="25 seats" />
+        android:paddingStart="@dimen/half_standard_margin"
+        android:paddingEnd="@dimen/half_standard_margin">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_coins" />
+
+        <TextView
+            android:id="@+id/price_text_view"
+            android:layout_width="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_marginStart="@dimen/quarter_standard_margin"
+            tools:text="100 UAH / hour" />
+
+    </LinearLayout>
 
     <View
         android:id="@+id/divider_view"

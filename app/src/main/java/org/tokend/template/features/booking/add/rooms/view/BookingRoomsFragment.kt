@@ -23,7 +23,7 @@ import org.tokend.template.view.util.formatter.DateFormatter
 class BookingRoomsFragment : BaseFragment() {
     private lateinit var bookingInfoHolder: BookingInfoHolder
 
-    private val adapter = BookingRoomsAdapter()
+    private lateinit var adapter: BookingRoomsAdapter
     private lateinit var layoutManager: GridLayoutManager
 
     private val resultSubject = PublishSubject.create<BookingRoom>()
@@ -61,6 +61,7 @@ class BookingRoomsFragment : BaseFragment() {
     }
 
     private fun initList() {
+        adapter = BookingRoomsAdapter(amountFormatter)
         layoutManager = GridLayoutManager(requireContext(), 1)
         updateListColumnsCount()
 
