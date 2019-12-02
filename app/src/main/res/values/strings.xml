@@ -574,6 +574,7 @@
     <string name="asset_refund_is_not_available">Refund is not available for this asset</string>
     <string name="template_max_refund_amount">Max refund amount is %1$s</string>
     <string name="asset_refund_completed">Refund has been completed</string>
+    <string name="asset_secondary_market">Secondary market</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

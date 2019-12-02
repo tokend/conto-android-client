@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        style="@style/LimitedMatchParentWidthConstraint">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="200dp">
+
+            <com.mikepenz.materialdrawer.view.BezelImageView
+                android:id="@+id/edit_buy_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignBottom="@id/buy_layout"
+                android:layout_marginStart="@dimen/half_standard_margin"
+                android:layout_marginBottom="22sp"
+                android:layout_toEndOf="@id/buy_layout"
+                android:elevation="2dp"
+                android:src="@drawable/edit_round_button" />
+
+            <LinearLayout
+                android:id="@+id/buy_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/divider_view"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/buy" />
+
+                <TextView
+                    android:id="@+id/buy_amount_text_view"
+                    style="@style/HeadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standard_padding"
+                    android:text="25"
+                    android:textSize="@dimen/text_size_heading_large" />
+
+                <TextView
+                    android:id="@+id/buy_price_text_view"
+                    style="@style/HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/quarter_standard_margin"
+                    android:gravity="center"
+                    android:text="100 UAH за одиницю" />
+
+                <Button
+                    android:id="@+id/create_buy_offer_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogButton"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/half_standard_margin"
+                    android:text="@string/create_offer_title" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/standard_padding"
+                android:background="@color/material_drawer_divider"
+                android:minWidth="@dimen/hepta_margin" />
+
+            <com.mikepenz.materialdrawer.view.BezelImageView
+                android:id="@+id/edit_sell_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignBottom="@id/sell_layout"
+                android:layout_marginStart="@dimen/half_standard_margin"
+                android:layout_marginBottom="22sp"
+                android:layout_toEndOf="@id/sell_layout"
+                android:elevation="2dp"
+                android:src="@drawable/edit_round_button" />
+
+            <LinearLayout
+                android:id="@+id/sell_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider_view"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sell" />
+
+                <TextView
+                    android:id="@+id/sell_amount_text_view"
+                    style="@style/HeadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standard_padding"
+                    android:text="4.75"
+                    android:textSize="@dimen/text_size_heading_large" />
+
+                <TextView
+                    android:id="@+id/sell_price_text_view"
+                    style="@style/HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/quarter_standard_margin"
+                    android:gravity="center"
+                    android:text="150 UAH за одиницю" />
+
+                <Button
+                    android:id="@+id/create_sell_offer_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogButton"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/half_standard_margin"
+                    android:text="@string/create_offer_title" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+</android.support.constraint.ConstraintLayout>

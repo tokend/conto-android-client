@@ -583,4 +583,5 @@
     <string name="asset_refund_is_not_available">Возврат этого актива недоступен</string>
     <string name="template_max_refund_amount">Максимальная сумма возврата – %1$s</string>
     <string name="asset_refund_completed">Возврат выполнен</string>
+    <string name="asset_secondary_market">Вторичный рынок</string>
 </resources>
