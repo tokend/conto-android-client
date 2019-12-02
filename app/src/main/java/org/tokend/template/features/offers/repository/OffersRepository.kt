@@ -28,11 +28,14 @@ import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.xdr.ManageOfferOp
 import org.tokend.wallet.xdr.Operation
+import java.util.concurrent.TimeUnit
 
 class OffersRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val onlyPrimary: Boolean,
+        private val baseAsset: String?,
+        private val quoteAsset: String?,
         itemsCache: RepositoryCache<OfferRecord>
 ) : PagedDataRepository<OfferRecord>(itemsCache) {
     override fun getPage(nextCursor: String?): Single<DataPage<OfferRecord>> {
@@ -44,8 +47,8 @@ class OffersRepository(
         val requestParams = OffersPageParamsV3(
                 ownerAccount = accountId,
                 orderBook = if (onlyPrimary) null else 0L,
-                baseAsset = null,
-                quoteAsset = null,
+                baseAsset = baseAsset,
+                quoteAsset = quoteAsset,
                 isBuy = if (onlyPrimary) true else null,
                 pagingParams = PagingParamsV2(
                         page = nextCursor,
@@ -59,6 +62,7 @@ class OffersRepository(
 
         return signedApi.v3.offers.get(requestParams)
                 .toSingle()
+                .delay(3, TimeUnit.SECONDS)
                 .map {
                     val items = it.items.map { offerResource ->
                         OfferRecord.fromResource(offerResource)

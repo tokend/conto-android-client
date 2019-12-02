@@ -202,10 +202,13 @@ class RepositoryProviderImpl(
         }
     }
 
-    override fun offers(onlyPrimaryMarket: Boolean): OffersRepository {
-        val key = "$onlyPrimaryMarket"
+    override fun offers(onlyPrimaryMarket: Boolean,
+                        baseAsset: String?,
+                        quoteAsset: String?): OffersRepository {
+        val key = "$onlyPrimaryMarket-$baseAsset-$quoteAsset"
         return offersRepositories.getOrPut(key) {
-            OffersRepository(apiProvider, walletInfoProvider, onlyPrimaryMarket, OffersCache())
+            OffersRepository(apiProvider, walletInfoProvider, onlyPrimaryMarket,
+                    baseAsset, quoteAsset, OffersCache())
         }
     }
 
