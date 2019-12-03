@@ -67,13 +67,14 @@
     <string name="template_offer_ask_asset">Аск (%1$s)</string>
     <string name="template_asset_pair">%1$s/%2$s</string>
     <string name="create_offer_title">Створити ордер</string>
+    <string name="update_offer_title">Оновити ордер</string>
     <string name="buy_action">Купити</string>
     <string name="sell_action">Продати</string>
     <string name="offer_confirmation_title">Ордер</string>
     <string name="offer_created">Ордер створено</string>
     <string name="pending_offers_title">Активні ордери</string>
     <string name="no_pending_offers">Немає активних ордерів</string>
-    <string name="buy">Покупка</string>
+    <string name="buy">Купівля</string>
     <string name="sell">Продаж</string>
     <string name="template_price_one_equals">1 %1$s = %2$s</string>
     <string name="cancel_offer_action">Скасувати ордер</string>
@@ -295,7 +296,7 @@
     <string name="capital_deployment_fee">Розміщення</string>
     <string name="operation_fee">Операція</string>
     <string name="payout_fee">Виплата</string>
-    <string name="atomic_swap_sale_fee">Пряма покупка</string>
+    <string name="atomic_swap_sale_fee">Пряма купівля</string>
     <string name="atomic_swap_purchase_fee">Прямий продаж</string>
     <string name="swap_fee">Обмін</string>
     <string name="incoming_outgoing_fee"><![CDATA[Отримання та Відправка]]></string>
@@ -339,7 +340,7 @@
     <string name="balance_change_cause_asset_pair_update">Оновлення торгової пари</string>
     <string name="balance_change_cause_offer_cancellation">Скасування ордера</string>
     <string name="balance_change_cause_aswap_ask_creation">Створення прямого продажу</string>
-    <string name="balance_change_cause_aswap_bid_creation">Пряма покупка</string>
+    <string name="balance_change_cause_aswap_bid_creation">Пряма купівля</string>
     <string name="balance_change_cause_mass_issuance">Масове нарахування</string>
 
     <string name="asset_pair_title">Торгова пара</string>
@@ -583,4 +584,7 @@
     <string name="asset_refund_is_not_available">Повернення цього актива недоступне</string>
     <string name="template_max_refund_amount">Максимальна сума повернення – %1$s</string>
     <string name="asset_refund_completed">Повернення виконано</string>
+    <string name="asset_secondary_market">Вторинний ринок</string>
+    <string name="template_price_each">По %1$s</string>
+    <string name="company_all_assets">Усі активи</string>
 </resources>

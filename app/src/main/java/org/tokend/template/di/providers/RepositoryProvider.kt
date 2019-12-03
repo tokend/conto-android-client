@@ -5,8 +5,8 @@ import org.tokend.template.data.repository.assets.AssetChartRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
-import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
+import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -25,7 +25,8 @@ interface RepositoryProvider {
     fun assets(): AssetsRepository
     fun assetPairs(): AssetPairsRepository
     fun orderBook(baseAsset: String, quoteAsset: String): OrderBookRepository
-    fun offers(onlyPrimaryMarket: Boolean = false): OffersRepository
+    fun offers(onlyPrimaryMarket: Boolean = false, baseAsset: String? = null,
+               quoteAsset: String? = null): OffersRepository
     fun account(): AccountRepository
     fun sales(): SalesRepository
     fun filteredSales(): SalesRepository

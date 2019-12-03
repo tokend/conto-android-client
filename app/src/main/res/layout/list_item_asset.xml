@@ -15,19 +15,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/quarter_standard_margin">
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/standard_margin">
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin">
 
             <android.support.v7.widget.AppCompatImageView
                 android:id="@+id/asset_logo_image_view"
                 android:layout_width="@dimen/asset_list_item_logo_size"
                 android:layout_height="@dimen/asset_list_item_logo_size"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                tools:background="@color/md_green_500" />
 
             <android.support.v7.widget.AppCompatImageView
                 android:id="@+id/asset_balance_exists_image_view"
@@ -56,8 +58,8 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-medium"
-                    android:maxLines="1"
-                    android:textSize="@dimen/text_size_heading"
+                    android:maxLines="2"
+                    android:textSize="18sp"
                     tools:text="Bitcoin" />
 
                 <TextView
@@ -69,56 +71,42 @@
                     android:maxLines="1"
                     android:textColor="@color/secondary_text"
                     android:visibility="gone"
-                    tools:visibility="visible"
-                    tools:text="BTC" />
+                    tools:text="BTC"
+                    tools:visibility="visible" />
             </LinearLayout>
         </RelativeLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="@dimen/half_standard_margin" />
 
         <TextView
             android:id="@+id/asset_description_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:lineSpacingExtra="@dimen/quarter_standard_margin"
-            android:paddingBottom="@dimen/standard_margin"
-            android:visibility="gone"
-            tools:text="Asset\nDescription" />
-
-        <View
-            android:id="@+id/asset_card_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
             android:layout_marginTop="@dimen/quarter_standard_margin"
-            android:background="@color/material_drawer_divider" />
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:ellipsize="end"
+            android:lines="2"
+            android:maxLines="2"
+            tools:text="Tonight fat have keen intact happy social powder tired shaft length cram" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/asset_details_button"
+            style="@style/DialogButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/half_standard_margin"
-            android:layout_marginEnd="@dimen/half_standard_margin">
+            android:layout_marginStart="@dimen/quarter_standard_margin"
+            android:layout_marginTop="@dimen/quarter_standard_margin"
+            android:layout_marginBottom="@dimen/quarter_standard_margin"
+            android:minWidth="0dp"
+            android:text="@string/details" />
 
-            <Button
-                android:id="@+id/asset_primary_action_button"
-                style="@style/DialogButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:tag="primary_action"
-                android:theme="@style/PrimaryButton.Overlay"
-                tools:text="@string/view_asset_history_action" />
-
-            <Button
-                android:id="@+id/asset_details_button"
-                style="@style/SecondaryButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/asset_primary_action_button"
-                android:layout_alignBottom="@+id/asset_primary_action_button"
-                android:layout_alignParentStart="true"
-                android:minWidth="0dp"
-                android:text="@string/details" />
-
-        </RelativeLayout>
+        <Space
+            android:id="@+id/details_button_placeholder"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/standard_margin"
+            android:visibility="gone" />
     </LinearLayout>
 </android.support.v7.widget.CardView>

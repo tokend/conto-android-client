@@ -45,6 +45,10 @@ class CancelOfferUseCase(
                     offer.baseAsset.code,
                     offer.quoteAsset.code
             ).updateIfEverUpdated()
+
+            repositoryProvider
+                    .offers(isPrimaryMarket, offer.baseAsset.code, offer.quoteAsset.code)
+                    .removeLocally(offer)
         }
         repositoryProvider.balances().updateIfEverUpdated()
 

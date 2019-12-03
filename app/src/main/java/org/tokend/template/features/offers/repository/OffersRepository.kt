@@ -33,6 +33,8 @@ class OffersRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val onlyPrimary: Boolean,
+        private val baseAsset: String?,
+        private val quoteAsset: String?,
         itemsCache: RepositoryCache<OfferRecord>
 ) : PagedDataRepository<OfferRecord>(itemsCache) {
     override fun getPage(nextCursor: String?): Single<DataPage<OfferRecord>> {
@@ -44,8 +46,8 @@ class OffersRepository(
         val requestParams = OffersPageParamsV3(
                 ownerAccount = accountId,
                 orderBook = if (onlyPrimary) null else 0L,
-                baseAsset = null,
-                quoteAsset = null,
+                baseAsset = baseAsset,
+                quoteAsset = quoteAsset,
                 isBuy = if (onlyPrimary) true else null,
                 pagingParams = PagingParamsV2(
                         page = nextCursor,
@@ -141,7 +143,7 @@ class OffersRepository(
                     isLoading = false
                 }
                 .doOnComplete {
-                    update()
+                    updateIfEverUpdated()
                 }
     }
 
@@ -227,10 +229,7 @@ class OffersRepository(
                     isLoading = false
                 }
                 .doOnComplete {
-                    itemsCache.transform(emptyList()) {
-                        it.id == offer.id
-                    }
-                    broadcast()
+                    removeLocally(offer)
                 }
     }
 
@@ -261,4 +260,10 @@ class OffersRepository(
                 }
     }
     // endregion
+
+    fun removeLocally(offerToRemove: OfferRecord) {
+        if (itemsCache.delete(offerToRemove)) {
+            broadcast()
+        }
+    }
 }
