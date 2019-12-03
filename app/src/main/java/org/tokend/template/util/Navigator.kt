@@ -365,9 +365,11 @@ class Navigator private constructor() {
 
     fun openCreateOffer(baseAsset: Asset,
                         quoteAsset: Asset,
-                        requiredPrice: BigDecimal? = null) {
+                        requiredPrice: BigDecimal? = null,
+                        forcedOfferType: CreateOfferActivity.ForcedOfferType? = null) {
         context?.intentFor<CreateOfferActivity>()
-                ?.putExtras(CreateOfferActivity.getBundle(baseAsset, quoteAsset, requiredPrice))
+                ?.putExtras(CreateOfferActivity.getBundle(baseAsset, quoteAsset,
+                        requiredPrice, forcedOfferType))
                 ?.also { performIntent(it) }
     }
 

@@ -14,6 +14,7 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.extensions.withArguments
+import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.fragments.BaseFragment
@@ -152,7 +153,7 @@ class AssetSecondaryMarketFragment : BaseFragment() {
             )
 
             priceTextView.text = getString(
-                    R.string.template_price_for_item,
+                    R.string.template_price_each,
                     amountFormatter.formatAssetAmount(
                             offer.price,
                             offer.quoteAsset,
@@ -191,7 +192,12 @@ class AssetSecondaryMarketFragment : BaseFragment() {
             navigator.openCreateOffer(
                     baseAsset = asset,
                     quoteAsset = quoteAsset,
-                    requiredPrice = null
+                    requiredPrice = null,
+                    forcedOfferType =
+                    if (isBuy)
+                        CreateOfferActivity.ForcedOfferType.BUY
+                    else
+                        CreateOfferActivity.ForcedOfferType.SELL
             )
         }
     }

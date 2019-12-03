@@ -94,7 +94,12 @@ class UpdateOfferActivity : CreateOfferActivity() {
                     getBundle(
                             baseAsset = prevOffer.baseAsset,
                             quoteAsset = prevOffer.quoteAsset,
-                            requiredPrice = prevOffer.price
+                            requiredPrice = prevOffer.price,
+                            forcedOfferType =
+                            if (prevOffer.isBuy)
+                                ForcedOfferType.BUY
+                            else
+                                ForcedOfferType.SELL
                     )
             )
         }

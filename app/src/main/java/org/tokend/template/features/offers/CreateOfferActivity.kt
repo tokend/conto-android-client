@@ -9,6 +9,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.view.View
 import com.rengwuxian.materialedittext.MaterialEditText
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -38,6 +39,9 @@ import java.math.BigDecimal
 import java.math.MathContext
 
 open class CreateOfferActivity : BaseActivity() {
+    enum class ForcedOfferType {
+        BUY, SELL;
+    }
 
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
@@ -45,7 +49,7 @@ open class CreateOfferActivity : BaseActivity() {
     private lateinit var baseAsset: Asset
     private lateinit var quoteAsset: Asset
     protected lateinit var requiredPrice: BigDecimal
-    protected var forceIsBuy: Boolean? = null
+    protected var forcedOfferType: ForcedOfferType? = null
 
     protected val baseScale: Int
         get() = baseAsset.trailingDigits
@@ -73,6 +77,11 @@ open class CreateOfferActivity : BaseActivity() {
         quoteAsset = intent.getSerializableExtra(QUOTE_ASSET_EXTRA) as? Asset
                 ?: return
         requiredPrice = intent.getBigDecimalExtra(PRICE_STRING_EXTRA)
+        forcedOfferType = try {
+            ForcedOfferType.valueOf(intent.getStringExtra(FORCED_OFFER_TYPE_EXTRA))
+        } catch (_: Exception) {
+            null
+        }
 
         initViews()
         subscribeToBalances()
@@ -95,10 +104,10 @@ open class CreateOfferActivity : BaseActivity() {
 
         price_edit_text.floatingLabelText =
                 getString(R.string.template_offer_creation_price,
-                        quoteAsset.code, baseAsset.code)
+                        quoteAsset.code, baseAsset.name ?: baseAsset.code)
 
         amount_edit_text.floatingLabelText =
-                getString(R.string.template_amount_hint, baseAsset.code)
+                getString(R.string.template_amount_hint, baseAsset.name ?: baseAsset.code)
 
         total_edit_text.floatingLabelText =
                 getString(R.string.template_total_hint, quoteAsset.code)
@@ -195,6 +204,19 @@ open class CreateOfferActivity : BaseActivity() {
             total_edit_text.setAmount(quoteBalance, quoteScale)
             total_edit_text.requestFocus()
         }
+
+        when (forcedOfferType) {
+            ForcedOfferType.BUY -> {
+                sell_btn.visibility = View.GONE
+                max_sell_text_view.visibility = View.GONE
+                sell_hint.visibility = View.GONE
+            }
+            ForcedOfferType.SELL -> {
+                buy_btn.visibility = View.GONE
+                max_buy_text_view.visibility = View.GONE
+                buy_hint.visibility = View.GONE
+            }
+        }
     }
 
     protected fun MaterialEditText.setAmount(amount: BigDecimal, scale: Int) {
@@ -210,7 +232,8 @@ open class CreateOfferActivity : BaseActivity() {
     private fun updateActionHints() {
         val amount = amountFormatter.formatAssetAmount(
                 amountEditTextWrapper.rawAmount,
-                baseAsset
+                baseAsset,
+                withAssetName = true
         )
         val total = amountFormatter.formatAssetAmount(
                 totalEditTextWrapper.rawAmount,
@@ -351,14 +374,16 @@ open class CreateOfferActivity : BaseActivity() {
         private const val BASE_ASSET_EXTRA = "base_asset"
         private const val QUOTE_ASSET_EXTRA = "quote_asset"
         private const val PRICE_STRING_EXTRA = "price"
-        private const val FORCE_IS_BUY_EXTRA = "force_is_buy"
+        private const val FORCED_OFFER_TYPE_EXTRA = "forced_offer_type"
 
         fun getBundle(baseAsset: Asset,
                       quoteAsset: Asset,
-                      requiredPrice: BigDecimal?) = Bundle().apply {
+                      requiredPrice: BigDecimal?,
+                      forcedOfferType: ForcedOfferType?) = Bundle().apply {
             putSerializable(BASE_ASSET_EXTRA, baseAsset)
             putSerializable(QUOTE_ASSET_EXTRA, quoteAsset)
             putString(PRICE_STRING_EXTRA, BigDecimalUtil.toPlainString(requiredPrice))
+            putString(FORCED_OFFER_TYPE_EXTRA, forcedOfferType?.name)
         }
     }
 }
