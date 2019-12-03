@@ -593,4 +593,5 @@
     <string name="template_price_per_hour">%1$s / година</string>
     <string name="booking_will_be_confirmed_in_a_moment">Бронювання буде підтверджене впродовж хвилини</string>
     <string name="booking_room">Кімната</string>
+    <string name="pick_a_room">Оберіть кімнату</string>
 </resources>

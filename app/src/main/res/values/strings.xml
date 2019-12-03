@@ -585,6 +585,7 @@
     <string name="template_price_per_hour">%1$s / hour</string>
     <string name="booking_will_be_confirmed_in_a_moment">Your booking will be confirmed in a moment</string>
     <string name="booking_room">Room</string>
+    <string name="pick_a_room">Select a room</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

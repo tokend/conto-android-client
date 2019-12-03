@@ -25,10 +25,18 @@
         android:layout_marginEnd="@dimen/standard_margin"
         tools:text="25 seats available" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard_padding"
+        android:gravity="center"
+        android:text="Оберіть кімнату"
+        android:textSize="@dimen/text_size_heading" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/standard_margin">
+        android:layout_marginTop="@dimen/standard_padding">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rooms_list"
