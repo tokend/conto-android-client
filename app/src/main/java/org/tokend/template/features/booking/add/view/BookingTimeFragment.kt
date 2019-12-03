@@ -63,8 +63,7 @@ class BookingTimeFragment : BaseFragment() {
         initFields()
         initButtons()
         initSchedule()
-
-        preFillDates()
+        initDates()
     }
 
     private fun initFields() {
@@ -144,6 +143,19 @@ class BookingTimeFragment : BaseFragment() {
         schedule_text_view.text = scheduleString
     }
 
+    private fun initDates() {
+        val currentTime = bookingInfoHolder.bookingTime
+
+        if (currentTime.isZero) {
+            preFillDates()
+        } else {
+            calendarFrom.time = currentTime.from
+            calendarTo.time = currentTime.to
+        }
+
+        onDatesUpdated()
+    }
+
     private fun preFillDates() {
         val now = Date().time / 1000
         val period = 30 * 60 // 30 minutes
@@ -171,8 +183,6 @@ class BookingTimeFragment : BaseFragment() {
 //                calendarTo.time = Date(calendarFrom.time.time + preferredBookingTime * 1000L)
 //            }
 //        }
-
-        onDatesUpdated()
     }
 
     private fun adjustToDateOnFromDateChange() {
@@ -210,8 +220,7 @@ class BookingTimeFragment : BaseFragment() {
             if (negativeDelta) {
                 booking_from_day_text_view.setTextColor(errorColor)
                 booking_from_hours_text_view.setTextColor(errorColor)
-            }
-            if (lessThanMinimum || moreThanMaximum) {
+            } else if (lessThanMinimum || moreThanMaximum) {
                 booking_to_day_text_view.setTextColor(errorColor)
                 booking_to_hours_text_view.setTextColor(errorColor)
             }

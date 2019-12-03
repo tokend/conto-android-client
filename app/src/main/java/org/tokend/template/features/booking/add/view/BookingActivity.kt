@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 
 class BookingActivity : BaseActivity(), BookingInfoHolder {
     override lateinit var business: BookingBusinessRecord
-    override lateinit var bookingTime: BookingTime
+    override var bookingTime: BookingTime = BookingTime.ZERO
     override var seatsCount: Int = 0
     override var availableRooms: Collection<BookingRoom> = emptyList()
     override lateinit var selectedRoom: BookingRoom
