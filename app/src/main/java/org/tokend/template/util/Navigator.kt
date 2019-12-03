@@ -281,7 +281,7 @@ class Navigator private constructor() {
         }
         context?.intentFor<AssetDetailsActivity>()
                 ?.putExtras(AssetDetailsActivity.getBundle(asset))
-                ?.also { performIntent(it, requestCode, transitionBundle) }
+                ?.also { performIntent(it, requestCode) }
     }
 
     fun openPaymentConfirmation(requestCode: Int, paymentRequest: PaymentRequest) {

@@ -586,4 +586,5 @@
     <string name="asset_refund_completed">Возврат выполнен</string>
     <string name="asset_secondary_market">Вторичный рынок</string>
     <string name="template_price_each">По %1$s</string>
+    <string name="company_all_assets">Все активы</string>
 </resources>

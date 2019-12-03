@@ -25,10 +25,10 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.adapter.AssetListItem
 import org.tokend.template.features.assets.adapter.AssetsAdapter
 import org.tokend.template.features.assets.logic.CreateBalanceUseCase
@@ -49,6 +49,11 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     )
 
     private var searchItem: MenuItem? = null
+
+    private val allowToolbar: Boolean by lazy {
+        arguments?.getBoolean(ALLOW_TOOLBAR_EXTRA, false) ?: false
+    }
+    private var ownerAccountId: String? = null
 
     private val assetsRepository: AssetsRepository
         get() = repositoryProvider.assets()
@@ -71,10 +76,9 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onInitAllowed() {
-        toolbarSubject.onNext(toolbar)
+        ownerAccountId = arguments?.getString(OWNER_ACCOUNT_ID_EXTRA)
 
-        toolbar.title = getString(R.string.explore_assets_title)
-
+        initToolbar()
         initSwipeRefresh()
         initAssetsList()
         initMenu()
@@ -86,6 +90,17 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     }
 
     // region Init
+    private fun initToolbar() {
+        if (allowToolbar) {
+            toolbar.title = getString(R.string.explore_assets_title)
+            ElevationUtil.initScrollElevation(recycler_view, appbar_elevation_view)
+        } else {
+            toolbar.visibility = View.GONE
+            appbar_elevation_view.visibility = View.GONE
+        }
+
+        toolbarSubject.onNext(toolbar)
+    }
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.accent))
         swipe_refresh.setOnRefreshListener { update(force = true) }
@@ -114,8 +129,6 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
         assetsAdapter.registerAdapterDataObserver(
                 ScrollOnTopItemUpdateAdapterObserver(recycler_view)
         )
-
-        ElevationUtil.initScrollElevation(recycler_view, appbar_elevation_view)
     }
 
     private fun initMenu() {
@@ -186,7 +199,9 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
 
         val items = assetsRepository.itemsList
                 .asSequence()
-                .filter(AssetRecord::isActive)
+                .filter {
+                    it.isActive && (ownerAccountId == null || it.isOwnedBy(ownerAccountId))
+                }
                 .map { asset ->
                     AssetListItem(
                             asset,
@@ -325,7 +340,16 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     companion object {
         val ID = "explore-assets".hashCode().toLong()
         const val CREATE_REQUEST = 314
+        private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
+        private const val OWNER_ACCOUNT_ID_EXTRA = "owner_account_id"
 
-        fun newInstance() = ExploreAssetsFragment()
+        fun newInstance(bundle: Bundle): ExploreAssetsFragment =
+                ExploreAssetsFragment().withArguments(bundle)
+
+        fun getBundle(allowToolbar: Boolean,
+                      ownerAccountId: String?) = Bundle().apply {
+            putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
+            putString(OWNER_ACCOUNT_ID_EXTRA, ownerAccountId)
+        }
     }
 }
