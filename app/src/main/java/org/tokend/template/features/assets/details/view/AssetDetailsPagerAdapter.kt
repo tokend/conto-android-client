@@ -38,7 +38,9 @@ class AssetDetailsPagerAdapter(asset: AssetRecord,
 
         add(
                 Page(
-                        AssetSecondaryMarketFragment.newInstance(),
+                        AssetSecondaryMarketFragment.newInstance(AssetSecondaryMarketFragment.getBundle(
+                                asset = asset
+                        )),
                         context.getString(R.string.asset_secondary_market),
                         SECONDARY_MARKET_PAGE
                 )

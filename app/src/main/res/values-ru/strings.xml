@@ -67,6 +67,7 @@
     <string name="template_offer_ask_asset">Аск (%1$s)</string>
     <string name="template_asset_pair">%1$s/%2$s</string>
     <string name="create_offer_title">Создать ордер</string>
+    <string name="update_offer_title">Обновить ордер</string>
     <string name="buy_action">Купить</string>
     <string name="sell_action">Продать</string>
     <string name="offer_confirmation_title">Ордер</string>

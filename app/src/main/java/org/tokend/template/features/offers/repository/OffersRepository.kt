@@ -28,7 +28,6 @@ import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.xdr.ManageOfferOp
 import org.tokend.wallet.xdr.Operation
-import java.util.concurrent.TimeUnit
 
 class OffersRepository(
         private val apiProvider: ApiProvider,
@@ -62,7 +61,6 @@ class OffersRepository(
 
         return signedApi.v3.offers.get(requestParams)
                 .toSingle()
-                .delay(3, TimeUnit.SECONDS)
                 .map {
                     val items = it.items.map { offerResource ->
                         OfferRecord.fromResource(offerResource)
@@ -145,7 +143,7 @@ class OffersRepository(
                     isLoading = false
                 }
                 .doOnComplete {
-                    update()
+                    updateIfEverUpdated()
                 }
     }
 
@@ -231,10 +229,7 @@ class OffersRepository(
                     isLoading = false
                 }
                 .doOnComplete {
-                    itemsCache.transform(emptyList()) {
-                        it.id == offer.id
-                    }
-                    broadcast()
+                    removeLocally(offer)
                 }
     }
 
@@ -265,4 +260,10 @@ class OffersRepository(
                 }
     }
     // endregion
+
+    fun removeLocally(offerToRemove: OfferRecord) {
+        if (itemsCache.delete(offerToRemove)) {
+            broadcast()
+        }
+    }
 }

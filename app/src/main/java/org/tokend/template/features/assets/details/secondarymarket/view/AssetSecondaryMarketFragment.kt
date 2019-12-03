@@ -10,9 +10,14 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_asset_secondary_market.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import org.tokend.template.R
+import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.data.model.SimpleAsset
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.fragments.BaseFragment
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 
@@ -28,13 +33,13 @@ class AssetSecondaryMarketFragment : BaseFragment() {
             content_layout.visibility = if (value) View.VISIBLE else View.GONE
         }
 
-    private val assetCode: String = ""
+    private lateinit var asset: Asset
 
     private val offersRepository: OffersRepository
         get() = repositoryProvider.offers(
                 onlyPrimaryMarket = false,
-                baseAsset = assetCode,
-                quoteAsset = REFUND_ASSET_CODE
+                baseAsset = asset.code,
+                quoteAsset = QUOTE_ASSET_CODE
         )
 
     private val buyOffer: OfferRecord?
@@ -48,6 +53,9 @@ class AssetSecondaryMarketFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
+        asset = arguments?.getSerializable(ASSET_EXTRA) as? Asset
+                ?: throw IllegalArgumentException("No $ASSET_EXTRA specified")
+
         initSwipeRefresh()
         initButtons()
 
@@ -62,6 +70,13 @@ class AssetSecondaryMarketFragment : BaseFragment() {
     }
 
     private fun initButtons() {
+        listOf(create_buy_offer_button, edit_buy_button).forEach {
+            it.setOnClickListener { createOffer(isBuy = true) }
+        }
+
+        listOf(create_sell_offer_button, edit_sell_button).forEach {
+            it.setOnClickListener { createOffer(isBuy = false) }
+        }
     }
 
     private fun update(force: Boolean = false) {
@@ -126,7 +141,7 @@ class AssetSecondaryMarketFragment : BaseFragment() {
                                    createButton: View) {
         if (offer != null) {
             amountTextView.visibility = View.VISIBLE
-            priceTextView.visibility  = View.VISIBLE
+            priceTextView.visibility = View.VISIBLE
             editButton.visibility = View.VISIBLE
             createButton.visibility = View.GONE
 
@@ -146,16 +161,52 @@ class AssetSecondaryMarketFragment : BaseFragment() {
             )
         } else {
             amountTextView.visibility = View.GONE
-            priceTextView.visibility  = View.GONE
+            priceTextView.visibility = View.GONE
             editButton.visibility = View.GONE
             createButton.visibility = View.VISIBLE
         }
     }
 
+    private fun createOffer(isBuy: Boolean) {
+        val prevOffer =
+                if (isBuy)
+                    buyOffer
+                else
+                    sellOffer
+
+        val quoteAsset: Asset = repositoryProvider.balances()
+                .itemsList
+                .find { it.assetCode == QUOTE_ASSET_CODE }
+                ?.asset
+                ?: repositoryProvider.assets()
+                        .itemsList
+                        .find { it.code == QUOTE_ASSET_CODE }
+                ?: SimpleAsset(QUOTE_ASSET_CODE)
+
+        val navigator = Navigator.from(this)
+
+        if (prevOffer != null) {
+            navigator.openUpdateOffer(prevOffer)
+        } else {
+            navigator.openCreateOffer(
+                    baseAsset = asset,
+                    quoteAsset = quoteAsset,
+                    requiredPrice = null
+            )
+        }
+    }
+
     companion object {
         // 😈.
-        private const val REFUND_ASSET_CODE = "UAH"
+        private const val QUOTE_ASSET_CODE = "UAH"
 
-        fun newInstance() = AssetSecondaryMarketFragment()
+        private const val ASSET_EXTRA = "asset"
+
+        fun newInstance(bundle: Bundle): AssetSecondaryMarketFragment =
+                AssetSecondaryMarketFragment().withArguments(bundle)
+
+        fun getBundle(asset: AssetRecord) = Bundle().apply {
+            putSerializable(ASSET_EXTRA, asset)
+        }
     }
 }

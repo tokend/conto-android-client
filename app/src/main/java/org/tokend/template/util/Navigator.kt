@@ -55,6 +55,7 @@ import org.tokend.template.features.massissuance.view.MassIssuanceConfirmationAc
 import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.OfferConfirmationActivity
 import org.tokend.template.features.offers.OffersActivity
+import org.tokend.template.features.offers.UpdateOfferActivity
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.features.offers.model.OfferRequest
 import org.tokend.template.features.offers.view.details.PendingInvestmentDetailsActivity
@@ -367,6 +368,12 @@ class Navigator private constructor() {
                         requiredPrice: BigDecimal? = null) {
         context?.intentFor<CreateOfferActivity>()
                 ?.putExtras(CreateOfferActivity.getBundle(baseAsset, quoteAsset, requiredPrice))
+                ?.also { performIntent(it) }
+    }
+
+    fun openUpdateOffer(prevOffer: OfferRecord) {
+        context?.intentFor<UpdateOfferActivity>()
+                ?.putExtras(UpdateOfferActivity.getBundle(prevOffer))
                 ?.also { performIntent(it) }
     }
 
