@@ -90,6 +90,8 @@ class BookingTimeFragment : BaseFragment() {
     }
 
     private fun initSchedule() {
+        schedule_text_view.visibility = View.INVISIBLE
+
         val dateFormatter = DateFormatter(requireContext())
         val shortDayNameFormat = SimpleDateFormat("EEE")
 
@@ -155,20 +157,20 @@ class BookingTimeFragment : BaseFragment() {
         calendarFrom.time = Date(nextPeriodStart * 1000L)
         calendarTo.time = Date((nextPeriodStart + preferredBookingTime) * 1000L)
 
-        if (!business.isWorkingRange(calendarFrom, calendarTo)) {
-            val currentDay = calendarFrom[Calendar.DAY_OF_WEEK]
-            val searchStartIndex = currentDay % 7
-
-            val nextWorkingDayEntry = business.workingDays.entries.find { it.key > searchStartIndex }
-
-            if (nextWorkingDayEntry != null) {
-                calendarFrom[Calendar.DAY_OF_WEEK] = nextWorkingDayEntry.key
-                calendarFrom[Calendar.HOUR_OF_DAY] = nextWorkingDayEntry.value.start.hours
-                calendarFrom[Calendar.MINUTE] = nextWorkingDayEntry.value.start.minutes
-
-                calendarTo.time = Date(calendarFrom.time.time + preferredBookingTime * 1000L)
-            }
-        }
+//        if (!business.isWorkingRange(calendarFrom, calendarTo)) {
+//            val currentDay = calendarFrom[Calendar.DAY_OF_WEEK]
+//            val searchStartIndex = currentDay % 7
+//
+//            val nextWorkingDayEntry = business.workingDays.entries.find { it.key > searchStartIndex }
+//
+//            if (nextWorkingDayEntry != null) {
+//                calendarFrom[Calendar.DAY_OF_WEEK] = nextWorkingDayEntry.key
+//                calendarFrom[Calendar.HOUR_OF_DAY] = nextWorkingDayEntry.value.start.hours
+//                calendarFrom[Calendar.MINUTE] = nextWorkingDayEntry.value.start.minutes
+//
+//                calendarTo.time = Date(calendarFrom.time.time + preferredBookingTime * 1000L)
+//            }
+//        }
 
         onDatesUpdated()
     }
@@ -200,15 +202,16 @@ class BookingTimeFragment : BaseFragment() {
 
     private fun updateError() {
         val negativeDelta = millisDelta < 0
-        val notWorkingRange = !business.isWorkingRange(calendarFrom, calendarTo)
-        hasDateError = negativeDelta || notWorkingRange
+        val lessThanMinimum = millisDelta < MIN_BOOKING_TIME_MS
+        val moreThanMaximum = millisDelta > MAX_BOOKING_TIME_MS
+        hasDateError = negativeDelta || lessThanMinimum || moreThanMaximum
 
         if (hasDateError) {
-            if (negativeDelta || !business.isWorkingTime(calendarFrom)) {
+            if (negativeDelta) {
                 booking_from_day_text_view.setTextColor(errorColor)
                 booking_from_hours_text_view.setTextColor(errorColor)
             }
-            if (!business.isWorkingTime(calendarTo)) {
+            if (lessThanMinimum || moreThanMaximum) {
                 booking_to_day_text_view.setTextColor(errorColor)
                 booking_to_hours_text_view.setTextColor(errorColor)
             }
@@ -270,5 +273,10 @@ class BookingTimeFragment : BaseFragment() {
 
     private fun postResult() {
         resultSubject.onNext(BookingTime(calendarFrom.time, calendarTo.time))
+    }
+
+    companion object {
+        private const val MIN_BOOKING_TIME_MS = 1000L * 3600
+        private const val MAX_BOOKING_TIME_MS = 1000L * 3600 * 24 * 5
     }
 }
