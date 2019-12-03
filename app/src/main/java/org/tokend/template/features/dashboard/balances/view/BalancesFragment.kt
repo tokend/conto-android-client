@@ -210,8 +210,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
 
     // region Display
     protected open fun displayBalances() {
-        val systemAssetLabel = getString(R.string.system_asset)
-
         val items = balancesRepository
                 .itemsList
                 .sortedWith(balanceComparator)
@@ -223,7 +221,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                             if (companyId != null)
                                 null
                             else
-                                it.company?.name ?: systemAssetLabel
+                                it.company?.name
                     BalanceListItem(it, ownerName)
                 }
                 .filter { item ->

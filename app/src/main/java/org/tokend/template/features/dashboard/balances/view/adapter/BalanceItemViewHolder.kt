@@ -18,27 +18,20 @@ class BalanceItemViewHolder(
 
         nameTextView.text = item.displayedName
 
+        altAmountLayout.visibility = View.VISIBLE
+        altAmountTextView.text =
+                amountFormatter.formatAssetAmount(
+                        item.available,
+                        item.asset,
+                        withAssetCode = false,
+                        abbreviation = true
+                )
+
         if (item.ownerName != null) {
+            bottomTextView.visibility = View.VISIBLE
             bottomTextView.text = item.ownerName
-            altAmountLayout.visibility = View.VISIBLE
-            altAmountTextView.text =
-                    amountFormatter.formatAssetAmount(
-                            item.available,
-                            item.asset,
-                            withAssetCode = false,
-                            abbreviation = true
-                    )
         } else {
-            bottomTextView.text = view.context.getString(
-                    R.string.template_available,
-                    amountFormatter.formatAssetAmount(
-                            item.available,
-                            item.asset,
-                            withAssetCode = false,
-                            abbreviation = true
-                    )
-            )
-            altAmountLayout.visibility = View.GONE
+            bottomTextView.visibility = View.GONE
         }
     }
 }
