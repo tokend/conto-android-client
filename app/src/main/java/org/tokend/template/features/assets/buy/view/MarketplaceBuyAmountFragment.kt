@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_amount_input.*
 import kotlinx.android.synthetic.main.include_text_view_spinner_for_centering.view.*
+import kotlinx.android.synthetic.main.layout_atomic_swap_quote_asset_selection.view.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.layoutInflater
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
 import org.tokend.template.R
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
@@ -27,10 +29,11 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
 
     private lateinit var quoteAssetTextView: TextView
     private lateinit var quoteAssetPicker: BalancePickerBottomDialog
+    private lateinit var quoteAssetAvailableTextView: TextView
     private var quoteAsset: Asset? = null
         set(value) {
             field = value
-            quoteAssetTextView.text = value?.name ?: value?.code
+            onQuoteAssetChanged()
         }
 
     override fun onInitAllowed() {
@@ -87,7 +90,26 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
             )
     )
 
-    override fun displayBalance() {}
+    override fun displayBalance() {
+        val paymentMethod = offer.paymentMethods
+                .first { it.code == quoteAsset?.code }
+        val balance = balancesRepository.itemsList
+                .find { it.assetCode == paymentMethod.asset.code }
+
+        if (paymentMethod.type == MarketplacePaymentMethodType.INTERNAL
+                && balance != null) {
+            quoteAssetAvailableTextView.visibility = View.VISIBLE
+            quoteAssetAvailableTextView.text = getString(
+                    R.string.template_available,
+                    amountFormatter.formatAssetAmount(
+                            balance.available, balance.asset,
+                            withAssetCode = false
+                    )
+            )
+        } else {
+            quoteAssetAvailableTextView.visibility = View.GONE
+        }
+    }
 
     override fun checkAmount() {
         val availableExceeded = amountWrapper.scaledAmount > offer.amount
@@ -109,6 +131,7 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
                 R.layout.layout_atomic_swap_quote_asset_selection, parent, false)
 
         quoteAssetTextView = view.spinner_text_view
+        quoteAssetAvailableTextView = view.available_text_view
         quoteAssetTextView.setOnClickListener {
             openQuoteAssetPicker()
         }
@@ -127,6 +150,11 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         }
     }
 
+    private fun onQuoteAssetChanged() {
+        quoteAssetTextView.text = quoteAsset?.name ?: quoteAsset?.code
+        displayBalance()
+    }
+
     override fun postResult() {
         val amount = amountWrapper.scaledAmount
         val asset = quoteAsset
@@ -135,16 +163,21 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         resultSubject.onNext(AmountInputResult(amount, asset))
     }
 
-    override fun getMinLayoutHeight(): Int {
-        return if (needQuoteAssetSelection)
-            requireContext().dip(240)
-        else
-            super.getMinLayoutHeight()
-    }
-
-    override fun getSmallSizingHeightThreshold(): Int {
-        return requireContext().dip(290)
-    }
+//    override fun getMinLayoutHeight(): Int {
+//        return super.getMinLayoutHeight() +
+//                if (needQuoteAssetSelection)
+//                    requireContext().dip(24)
+//                else
+//                    0
+//    }
+//
+//    override fun getSmallSizingHeightThreshold(): Int {
+//        return super.getSmallSizingHeightThreshold() +
+//                if (needQuoteAssetSelection)
+//                    requireContext().dip(48)
+//                else
+//                    0
+//    }
 
     override fun updateSizing(useSmallSize: Boolean) {
         super.updateSizing(useSmallSize)
