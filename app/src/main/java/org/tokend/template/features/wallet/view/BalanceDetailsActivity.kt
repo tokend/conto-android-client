@@ -217,7 +217,7 @@ class BalanceDetailsActivity : BaseActivity() {
                         val assetCode = asset?.code ?: return@FloatingActionMenuAction
                         navigator.openWithdraw(0, assetCode)
                     },
-                    isEnabled = asset?.isBackedByExternalSystem == true
+                    isEnabled = asset?.isWithdrawable == true
             ))
         }
 

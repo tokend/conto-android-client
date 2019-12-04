@@ -164,20 +164,18 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
     }
 
 //    override fun getMinLayoutHeight(): Int {
-//        return super.getMinLayoutHeight() +
-//                if (needQuoteAssetSelection)
-//                    requireContext().dip(24)
-//                else
-//                    0
+//        return if (needQuoteAssetSelection)
+//            requireContext().dip(248)
+//        else
+//            super.getMinLayoutHeight()
 //    }
-//
-//    override fun getSmallSizingHeightThreshold(): Int {
-//        return super.getSmallSizingHeightThreshold() +
-//                if (needQuoteAssetSelection)
-//                    requireContext().dip(48)
-//                else
-//                    0
-//    }
+
+    override fun getSmallSizingHeightThreshold(): Int {
+        return if (needQuoteAssetSelection)
+            requireContext().dip(270)
+        else
+            super.getSmallSizingHeightThreshold()
+    }
 
     override fun updateSizing(useSmallSize: Boolean) {
         super.updateSizing(useSmallSize)

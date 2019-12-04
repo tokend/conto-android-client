@@ -1,15 +1,20 @@
 package org.tokend.template.features.amountscreen.view
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
+import kotlinx.android.synthetic.main.activity_offers.*
 import kotlinx.android.synthetic.main.fragment_amount_input.*
+import kotlinx.android.synthetic.main.fragment_amount_input.container
 import org.tokend.template.R
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
@@ -20,6 +25,7 @@ import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
@@ -74,11 +80,31 @@ open class AmountInputFragment : BaseFragment() {
         subscribeToBalances()
 
         updateActionButtonAvailability()
+
+        val h = Handler(Looper.getMainLooper())
+        Handler().postDelayed({
+            container.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    container.height)
+
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    h.post {
+                        if (isDetached) {
+                            this.cancel()
+                            return@post
+                        }
+                        container.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                container.height - 20
+                        )
+                    }
+                }
+            }, 500, 500)
+        }, 1000)
     }
 
     // region Init
     protected open fun initLayout() {
-        root_layout.minimumHeight = getMinLayoutHeight() + action_button.height
+        root_layout.minHeight = getMinLayoutHeight() + action_button.height
     }
 
     protected open fun initFields() {
@@ -105,16 +131,20 @@ open class AmountInputFragment : BaseFragment() {
 
         val heightChanges = PublishSubject.create<Int>()
 
-        root_layout.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+        container.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             val oldHeight = oldBottom - oldTop
             val height = bottom - top
             if (height != oldHeight) {
-                heightChanges.onNext(height)
+                val rootLayoutHeight = height - action_button.height -
+                        if (title_text_view.visibility == View.VISIBLE)
+                            title_text_view.height
+                        else
+                            0
+                heightChanges.onNext(rootLayoutHeight)
             }
         }
 
         heightChanges
-                .map { it - action_button.height }
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { height ->
