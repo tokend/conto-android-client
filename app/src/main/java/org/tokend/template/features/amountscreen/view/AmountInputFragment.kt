@@ -1,20 +1,15 @@
 package org.tokend.template.features.amountscreen.view
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
-import kotlinx.android.synthetic.main.activity_offers.*
 import kotlinx.android.synthetic.main.fragment_amount_input.*
-import kotlinx.android.synthetic.main.fragment_amount_input.container
 import org.tokend.template.R
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
@@ -25,7 +20,6 @@ import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
@@ -80,26 +74,6 @@ open class AmountInputFragment : BaseFragment() {
         subscribeToBalances()
 
         updateActionButtonAvailability()
-
-        val h = Handler(Looper.getMainLooper())
-        Handler().postDelayed({
-            container.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    container.height)
-
-            Timer().schedule(object : TimerTask() {
-                override fun run() {
-                    h.post {
-                        if (isDetached) {
-                            this.cancel()
-                            return@post
-                        }
-                        container.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                container.height - 20
-                        )
-                    }
-                }
-            }, 500, 500)
-        }, 1000)
     }
 
     // region Init
