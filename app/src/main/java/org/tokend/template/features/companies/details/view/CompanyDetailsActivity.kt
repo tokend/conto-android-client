@@ -79,7 +79,10 @@ class CompanyDetailsActivity : BaseActivity() {
                     company_banner_image_view,
                     company.bannerUrl,
                     ColorDrawable(ContextCompat.getColor(this, R.color.imagePlaceholder))
-            )
+            ) {
+                fit()
+                centerCrop()
+            }
         } else {
             company_banner_image_view.visibility = View.GONE
         }
