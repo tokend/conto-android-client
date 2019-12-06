@@ -17,6 +17,7 @@ import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.extensions.tryOrNull
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import java.math.BigDecimal
 
@@ -69,8 +70,10 @@ class MarketplaceOffersRepository(
                             }
                 }
                 .map { (page, assetsMap, companiesMap) ->
-                    page.mapItems {
-                        MarketplaceOfferRecord(it, assetsMap, companiesMap)
+                    page.mapItemsNotNull {
+                        tryOrNull {
+                            MarketplaceOfferRecord(it, assetsMap, companiesMap)
+                        }
                     }
                 }
     }
