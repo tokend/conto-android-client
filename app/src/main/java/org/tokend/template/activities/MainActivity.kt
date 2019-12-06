@@ -354,7 +354,10 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         return when (screenIdentifier) {
             DashboardFragment.ID -> DashboardFragment.newInstance()
             WithdrawFragment.ID -> WithdrawFragment.newInstance(WithdrawFragment.getBundle())
-            ExploreAssetsFragment.ID -> ExploreAssetsFragment.newInstance()
+            ExploreAssetsFragment.ID -> ExploreAssetsFragment.newInstance(ExploreAssetsFragment.getBundle(
+                    allowToolbar = true,
+                    ownerAccountId = null
+            ))
             GeneralSettingsFragment.ID -> GeneralSettingsFragment.newInstance()
             DepositFragment.ID -> DepositFragment.newInstance(DepositFragment.getBundle())
             SalesFragment.ID -> SalesFragment.newInstance()

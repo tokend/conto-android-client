@@ -6,7 +6,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +27,7 @@ import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
+import org.tokend.template.view.util.HideFabScrollListener
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.fab.FloatingActionMenuAction
 import org.tokend.template.view.util.fab.addActions
@@ -92,17 +92,6 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         swipe_refresh.setOnRefreshListener { update(force = true) }
     }
 
-    private val hideFabScrollListener =
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (dy > 2) {
-                        menu_fab.hideMenuButton(true)
-                    } else if (dy < -2 && menu_fab.isEnabled) {
-                        menu_fab.showMenuButton(true)
-                    }
-                }
-            }
-
     private fun initList() {
         adapter = CompanyClientItemsAdapter(amountFormatter)
         layoutManager = GridLayoutManager(requireContext(), 1)
@@ -110,7 +99,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
 
         clients_list.adapter = adapter
         clients_list.layoutManager = layoutManager
-        clients_list.addOnScrollListener(hideFabScrollListener)
+        clients_list.addOnScrollListener(HideFabScrollListener(menu_fab))
         clients_list.listenBottomReach({ adapter.getDataItemCount() }) {
             clientsRepository.loadMore() || clientsRepository.noMoreItems
         }

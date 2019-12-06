@@ -24,6 +24,7 @@ import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.redeem.create.logic.CreateRedemptionRequestUseCase
+import org.tokend.template.features.redeem.logic.NfcRedemptionService
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.wallet.view.PlusMinusAmountInputView
 import org.tokend.template.util.ObservableTransformers
@@ -53,9 +54,9 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
         get() = balancesRepository.itemsList.first { it.id == balanceId }
 
     private var currentRequest: RedemptionRequest? = null
-    private var currentRequestBase64: String = ""
+    private var currentRequestSerialized: ByteArray = byteArrayOf()
     override val data: String
-        get() = currentRequestBase64
+        get() = currentRequestSerialized.encodeBase64String()
     override val referenceToPoll: String?
         get() = currentRequest?.salt?.toString()
 
@@ -260,10 +261,9 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
 
     private fun onRedemptionRequestCreated(result: CreateRedemptionRequestUseCase.Result) {
         currentRequest = result.request
-        currentRequestBase64 = result
+        currentRequestSerialized = result
                 .request
                 .serialize(result.networkParams)
-                .encodeBase64String()
 
         isAccepted = false
 
@@ -304,7 +304,15 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     override fun startPollingIfNeeded() {
         if (currentRequest?.amount?.signum()?.let { it > 0 } == true) {
             super.startPollingIfNeeded()
+            currentRequestSerialized
+                    .takeIf(ByteArray::isNotEmpty)
+                    ?.also(NfcRedemptionService.Companion::broadcast)
         }
+    }
+
+    override fun stopPolling() {
+        super.stopPolling()
+        NfcRedemptionService.cancelBroadcast()
     }
 
     companion object {

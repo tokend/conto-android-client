@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager
 import org.tokend.template.R
 import org.tokend.template.data.model.CompanyRecord
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragment
+import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
 import org.tokend.template.view.BaseFragmentPagerAdapter
 
@@ -29,6 +30,14 @@ class CompanyDetailsPagerAdapter(
                     )),
                     context.getString(R.string.shop_title),
                     SHOP_PAGE
+            ),
+            Page(
+                    ExploreAssetsFragment.newInstance(ExploreAssetsFragment.getBundle(
+                            allowToolbar = false,
+                            ownerAccountId = company.id
+                    )),
+                    context.getString(R.string.company_all_assets),
+                    ASSETS_PAGE
             )
     ).apply {
         if (company.descriptionMd != null) {
@@ -46,5 +55,6 @@ class CompanyDetailsPagerAdapter(
         const val BALANCES_PAGE = 1L
         const val SHOP_PAGE = 2L
         const val DESCRIPTION_PAGE = 3L
+        const val ASSETS_PAGE = 4L
     }
 }

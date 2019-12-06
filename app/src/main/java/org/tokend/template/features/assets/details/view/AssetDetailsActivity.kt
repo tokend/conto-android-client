@@ -25,8 +25,6 @@ class AssetDetailsActivity : BaseActivity() {
 
         setTitle(R.string.asset_details)
 
-        supportPostponeEnterTransition()
-
         initViewPager()
     }
 

@@ -14,6 +14,9 @@ import kotlinx.android.synthetic.main.activity_balance_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.data.model.Asset
+import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.features.offers.logic.CancelOfferUseCase
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.logic.TxManager
@@ -28,6 +31,7 @@ open class PendingOfferDetailsActivity : BaseActivity() {
     protected val adapter = DetailsItemsAdapter()
     protected lateinit var mainDataView: BalanceChangeMainDataView
 
+    protected lateinit var assetsMap: Map<String, Asset>
     protected lateinit var item: OfferRecord
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
@@ -44,6 +48,7 @@ open class PendingOfferDetailsActivity : BaseActivity() {
 
         initToolbar()
         initMainDataView()
+        initAssetsMap()
 
         details_list.layoutManager = LinearLayoutManager(this)
         details_list.adapter = adapter
@@ -67,6 +72,14 @@ open class PendingOfferDetailsActivity : BaseActivity() {
         mainDataView = BalanceChangeMainDataView(appbar, amountFormatter)
     }
 
+    private fun initAssetsMap() {
+        assetsMap = repositoryProvider
+                .balances()
+                .itemsList
+                .map(BalanceRecord::asset)
+                .associateBy(AssetRecord::code)
+    }
+
     protected open fun displayDetails(item: OfferRecord) {
         displayOperationName()
         displayDate(item)
@@ -85,8 +98,8 @@ open class PendingOfferDetailsActivity : BaseActivity() {
         val fee = if (item.isBuy && item.isCancellable) item.fee else BigDecimal.ZERO
         val total = amount + fee
 
-        mainDataView.displayAmount(total, asset, false)
-        mainDataView.displayNonZeroFee(fee, asset)
+        mainDataView.displayAmount(total, asset.orMoreDetailed(), false)
+        mainDataView.displayNonZeroFee(fee, asset.orMoreDetailed())
     }
 
     protected open fun displayToReceive(item: OfferRecord) {
@@ -97,7 +110,8 @@ open class PendingOfferDetailsActivity : BaseActivity() {
 
         adapter.addData(
                 DetailsItem(
-                        text = amountFormatter.formatAssetAmount(total, asset),
+                        text = amountFormatter.formatAssetAmount(total, asset.orMoreDetailed(),
+                                withAssetName = item.isBuy),
                         hint = getString(R.string.to_receive),
                         icon = ContextCompat.getDrawable(this, R.drawable.ic_coins)
                 )
@@ -106,7 +120,7 @@ open class PendingOfferDetailsActivity : BaseActivity() {
         if (fee.signum() > 0) {
             adapter.addData(
                     DetailsItem(
-                            text = amountFormatter.formatAssetAmount(fee, asset),
+                            text = amountFormatter.formatAssetAmount(fee, asset.orMoreDetailed()),
                             hint = getString(R.string.tx_fee)
                     )
             )
@@ -117,8 +131,9 @@ open class PendingOfferDetailsActivity : BaseActivity() {
         val formattedPrice = amountFormatter
                 .formatAssetAmount(item.price, item.quoteAsset)
 
+        val baseAsset = item.baseAsset.orMoreDetailed()
         val priceString = getString(R.string.template_price_one_equals,
-                item.baseAsset.code, formattedPrice)
+                baseAsset.name ?: baseAsset.code, formattedPrice)
 
         adapter.addData(
                 DetailsItem(
@@ -186,6 +201,14 @@ open class PendingOfferDetailsActivity : BaseActivity() {
     private fun finishWithSuccess() {
         setResult(Activity.RESULT_OK)
         finish()
+    }
+
+    /**
+     * @return object with more details obtained from balances repo
+     * or the same object if the detailed is not found
+     */
+    protected open fun Asset.orMoreDetailed(): Asset {
+        return assetsMap[this.code] ?: this
     }
 
     companion object {

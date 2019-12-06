@@ -78,7 +78,7 @@ open class AmountInputFragment : BaseFragment() {
 
     // region Init
     protected open fun initLayout() {
-        root_layout.minimumHeight = getMinLayoutHeight() + action_button.height
+        root_layout.minHeight = getMinLayoutHeight() + action_button.height
     }
 
     protected open fun initFields() {
@@ -105,16 +105,20 @@ open class AmountInputFragment : BaseFragment() {
 
         val heightChanges = PublishSubject.create<Int>()
 
-        root_layout.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+        container.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             val oldHeight = oldBottom - oldTop
             val height = bottom - top
             if (height != oldHeight) {
-                heightChanges.onNext(height)
+                val rootLayoutHeight = height - action_button.height -
+                        if (title_text_view.visibility == View.VISIBLE)
+                            title_text_view.height
+                        else
+                            0
+                heightChanges.onNext(rootLayoutHeight)
             }
         }
 
         heightChanges
-                .map { it - action_button.height }
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { height ->

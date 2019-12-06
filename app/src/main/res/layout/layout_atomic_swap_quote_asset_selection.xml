@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -17,6 +18,14 @@
         android:layout_height="@dimen/half_standard_padding" />
 
     <include layout="@layout/include_text_view_spinner_for_centering" />
+
+    <TextView
+        android:id="@+id/available_text_view"
+        style="@style/HintText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/quarter_standard_margin"
+        tools:text="10 available" />
 
     <View
         android:id="@+id/divider_view"

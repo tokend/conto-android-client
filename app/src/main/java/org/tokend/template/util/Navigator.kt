@@ -56,6 +56,7 @@ import org.tokend.template.features.massissuance.view.MassIssuanceConfirmationAc
 import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.OfferConfirmationActivity
 import org.tokend.template.features.offers.OffersActivity
+import org.tokend.template.features.offers.UpdateOfferActivity
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.features.offers.model.OfferRequest
 import org.tokend.template.features.offers.view.details.PendingInvestmentDetailsActivity
@@ -281,7 +282,7 @@ class Navigator private constructor() {
         }
         context?.intentFor<AssetDetailsActivity>()
                 ?.putExtras(AssetDetailsActivity.getBundle(asset))
-                ?.also { performIntent(it, requestCode, transitionBundle) }
+                ?.also { performIntent(it, requestCode) }
     }
 
     fun openPaymentConfirmation(requestCode: Int, paymentRequest: PaymentRequest) {
@@ -365,9 +366,17 @@ class Navigator private constructor() {
 
     fun openCreateOffer(baseAsset: Asset,
                         quoteAsset: Asset,
-                        requiredPrice: BigDecimal? = null) {
+                        requiredPrice: BigDecimal? = null,
+                        forcedOfferType: CreateOfferActivity.ForcedOfferType? = null) {
         context?.intentFor<CreateOfferActivity>()
-                ?.putExtras(CreateOfferActivity.getBundle(baseAsset, quoteAsset, requiredPrice))
+                ?.putExtras(CreateOfferActivity.getBundle(baseAsset, quoteAsset,
+                        requiredPrice, forcedOfferType))
+                ?.also { performIntent(it) }
+    }
+
+    fun openUpdateOffer(prevOffer: OfferRecord) {
+        context?.intentFor<UpdateOfferActivity>()
+                ?.putExtras(UpdateOfferActivity.getBundle(prevOffer))
                 ?.also { performIntent(it) }
     }
 

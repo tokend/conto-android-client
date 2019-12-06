@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager
 import org.tokend.template.R
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.details.refund.view.AssetRefundFragment
+import org.tokend.template.features.assets.details.secondarymarket.view.AssetSecondaryMarketFragment
 import org.tokend.template.view.BaseFragmentPagerAdapter
 
 class AssetDetailsPagerAdapter(asset: AssetRecord,
@@ -34,6 +35,15 @@ class AssetDetailsPagerAdapter(asset: AssetRecord,
                     )
             )
         }
+        add(
+                Page(
+                        AssetSecondaryMarketFragment.newInstance(AssetSecondaryMarketFragment.getBundle(
+                                asset = asset
+                        )),
+                        context.getString(R.string.asset_secondary_market),
+                        SECONDARY_MARKET_PAGE
+                )
+        )
     }
 
     companion object {
@@ -44,5 +54,6 @@ class AssetDetailsPagerAdapter(asset: AssetRecord,
 
         const val OVERVIEW_PAGE = 1L
         const val REFUND_PAGE = 2L
+        const val SECONDARY_MARKET_PAGE = 3L
     }
 }

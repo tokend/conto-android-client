@@ -84,7 +84,7 @@ open class ShareRedemptionQrFragment : ShareQrFragment(), VisibilityChangesConsu
                 .addTo(compositeDisposable)
     }
 
-    protected fun stopPolling() {
+    protected open fun stopPolling() {
         pollingDisposable?.dispose()
     }
 

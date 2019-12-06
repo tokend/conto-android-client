@@ -8,7 +8,6 @@ import android.support.v7.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,7 +19,6 @@ import kotlinx.android.synthetic.main.fragment_asset_details.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.list_item_asset.*
-import kotlinx.android.synthetic.main.list_item_asset.view.*
 import org.jetbrains.anko.find
 import org.jetbrains.anko.onClick
 import org.tokend.template.R
@@ -62,14 +60,6 @@ open class AssetDetailsFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_asset_details, container, false)
-        val card = view.asset_card
-        card.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                card.viewTreeObserver.removeOnPreDrawListener(this)
-                activity!!.supportStartPostponedEnterTransition()
-                return true
-            }
-        })
         fileDownloader = FileDownloader(
                 requireActivity(),
                 urlConfigProvider.getConfig().storage,
@@ -79,6 +69,8 @@ open class AssetDetailsFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
+        asset_card.visibility = View.GONE
+
         initScrollElevation()
 
         getAsset()
@@ -119,9 +111,15 @@ open class AssetDetailsFragment : BaseFragment() {
     }
 
     private fun displayLogoAndName() {
+        asset_card.visibility = View.VISIBLE
+
+        asset_description_text_view.setLines(-1)
+        asset_description_text_view.maxLines = Int.MAX_VALUE
         AssetListItemViewHolder(asset_card, true).bind(
                 AssetListItem(asset, balanceId)
         )
+        asset_code_text_view.visibility = View.VISIBLE
+        asset_code_text_view.text = asset.code
     }
 
     protected open fun displaySummary() {
@@ -176,17 +174,7 @@ open class AssetDetailsFragment : BaseFragment() {
 
     private fun initButtons() {
         asset_details_button.visibility = View.GONE
-
-        if (balanceId == null && isBalanceCreationEnabled) {
-            asset_primary_action_button.visibility = View.VISIBLE
-            asset_primary_action_button.text = getString(R.string.create_balance_action)
-            asset_primary_action_button.onClick {
-                createBalanceWithConfirmation()
-            }
-        } else {
-            asset_primary_action_button.visibility = View.GONE
-            asset_card_divider.visibility = View.GONE
-        }
+        details_button_placeholder.visibility = View.VISIBLE
     }
 
     private fun createBalanceWithConfirmation() {

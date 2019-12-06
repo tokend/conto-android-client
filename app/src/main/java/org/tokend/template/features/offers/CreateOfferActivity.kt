@@ -9,6 +9,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.view.View
 import com.rengwuxian.materialedittext.MaterialEditText
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -27,6 +28,7 @@ import org.tokend.template.extensions.getBigDecimalExtra
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.isMaxPossibleAmount
 import org.tokend.template.features.offers.logic.CreateOfferRequestUseCase
+import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.logic.FeeManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -36,18 +38,22 @@ import org.tokend.template.view.util.input.AmountEditTextWrapper
 import java.math.BigDecimal
 import java.math.MathContext
 
-class CreateOfferActivity : BaseActivity() {
+open class CreateOfferActivity : BaseActivity() {
+    enum class ForcedOfferType {
+        BUY, SELL;
+    }
 
     private val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
     private lateinit var baseAsset: Asset
     private lateinit var quoteAsset: Asset
-    private lateinit var requiredPrice: BigDecimal
+    protected lateinit var requiredPrice: BigDecimal
+    protected var forcedOfferType: ForcedOfferType? = null
 
-    private val baseScale: Int
+    protected val baseScale: Int
         get() = baseAsset.trailingDigits
-    private val quoteScale: Int
+    protected val quoteScale: Int
         get() = quoteAsset.trailingDigits
 
     private lateinit var amountEditTextWrapper: AmountEditTextWrapper
@@ -63,7 +69,7 @@ class CreateOfferActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_create_offer)
         setSupportActionBar(toolbar)
-        setTitle(R.string.create_offer_title)
+        title = getTitleString()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         baseAsset = intent.getSerializableExtra(BASE_ASSET_EXTRA) as? Asset
@@ -71,6 +77,11 @@ class CreateOfferActivity : BaseActivity() {
         quoteAsset = intent.getSerializableExtra(QUOTE_ASSET_EXTRA) as? Asset
                 ?: return
         requiredPrice = intent.getBigDecimalExtra(PRICE_STRING_EXTRA)
+        forcedOfferType = try {
+            ForcedOfferType.valueOf(intent.getStringExtra(FORCED_OFFER_TYPE_EXTRA))
+        } catch (_: Exception) {
+            null
+        }
 
         initViews()
         subscribeToBalances()
@@ -80,6 +91,7 @@ class CreateOfferActivity : BaseActivity() {
         update()
     }
 
+    protected open fun getTitleString(): String = getString(R.string.create_offer_title)
 
     private fun initViews() {
         initTextFields()
@@ -90,24 +102,28 @@ class CreateOfferActivity : BaseActivity() {
     private fun initTextFields() {
         initAmountWrappers()
 
-        price_edit_text.setAmount(requiredPrice, quoteScale)
         price_edit_text.floatingLabelText =
                 getString(R.string.template_offer_creation_price,
-                        quoteAsset.code, baseAsset.code)
+                        quoteAsset.code, baseAsset.name ?: baseAsset.code)
 
         amount_edit_text.floatingLabelText =
-                getString(R.string.template_amount_hint, baseAsset.code)
+                getString(R.string.template_amount_hint, baseAsset.name ?: baseAsset.code)
 
         total_edit_text.floatingLabelText =
                 getString(R.string.template_total_hint, quoteAsset.code)
 
+        preFillFields()
+
+        triggerOthers = true
+    }
+
+    protected open fun preFillFields() {
+        price_edit_text.setAmount(requiredPrice, quoteScale)
         if (requiredPrice.signum() == 0) {
             price_edit_text.requestFocus()
         } else {
             amount_edit_text.requestFocus()
         }
-
-        triggerOthers = true
     }
 
     private fun initAmountWrappers() {
@@ -188,9 +204,22 @@ class CreateOfferActivity : BaseActivity() {
             total_edit_text.setAmount(quoteBalance, quoteScale)
             total_edit_text.requestFocus()
         }
+
+        when (forcedOfferType) {
+            ForcedOfferType.BUY -> {
+                sell_btn.visibility = View.GONE
+                max_sell_text_view.visibility = View.GONE
+                sell_hint.visibility = View.GONE
+            }
+            ForcedOfferType.SELL -> {
+                buy_btn.visibility = View.GONE
+                max_buy_text_view.visibility = View.GONE
+                buy_hint.visibility = View.GONE
+            }
+        }
     }
 
-    private fun MaterialEditText.setAmount(amount: BigDecimal, scale: Int) {
+    protected fun MaterialEditText.setAmount(amount: BigDecimal, scale: Int) {
         if (amount.signum() > 0) {
             val value = BigDecimalUtil.scaleAmount(amount, scale)
             setText(BigDecimalUtil.toPlainString(value))
@@ -203,7 +232,8 @@ class CreateOfferActivity : BaseActivity() {
     private fun updateActionHints() {
         val amount = amountFormatter.formatAssetAmount(
                 amountEditTextWrapper.rawAmount,
-                baseAsset
+                baseAsset,
+                withAssetName = true
         )
         val total = amountFormatter.formatAssetAmount(
                 totalEditTextWrapper.rawAmount,
@@ -310,7 +340,7 @@ class CreateOfferActivity : BaseActivity() {
                 orderBookId = 0,
                 baseAsset = baseAsset,
                 quoteAsset = quoteAsset,
-                offerToCancel = null,
+                offerToCancel = getOfferToCancel(),
                 walletInfoProvider = walletInfoProvider,
                 feeManager = FeeManager(apiProvider)
         )
@@ -329,6 +359,8 @@ class CreateOfferActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
+    protected open fun getOfferToCancel(): OfferRecord? = null
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CREATE_OFFER_REQUEST && resultCode == Activity.RESULT_OK) {
             finish()
@@ -342,13 +374,16 @@ class CreateOfferActivity : BaseActivity() {
         private const val BASE_ASSET_EXTRA = "base_asset"
         private const val QUOTE_ASSET_EXTRA = "quote_asset"
         private const val PRICE_STRING_EXTRA = "price"
+        private const val FORCED_OFFER_TYPE_EXTRA = "forced_offer_type"
 
         fun getBundle(baseAsset: Asset,
                       quoteAsset: Asset,
-                      requiredPrice: BigDecimal?) = Bundle().apply {
+                      requiredPrice: BigDecimal?,
+                      forcedOfferType: ForcedOfferType?) = Bundle().apply {
             putSerializable(BASE_ASSET_EXTRA, baseAsset)
             putSerializable(QUOTE_ASSET_EXTRA, quoteAsset)
             putString(PRICE_STRING_EXTRA, BigDecimalUtil.toPlainString(requiredPrice))
+            putString(FORCED_OFFER_TYPE_EXTRA, forcedOfferType?.name)
         }
     }
 }

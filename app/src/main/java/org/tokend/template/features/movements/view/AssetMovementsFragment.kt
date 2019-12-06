@@ -69,18 +69,24 @@ open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
 
     // region Init
     protected open fun initToolbar() {
-        toolbar.title = getString(R.string.operations_history)
-
         val dropDownButton = ImageButton(requireContext()).apply {
             setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_arrow_drop_down))
             background = null
-
-            setOnClickListener {
-                openBalancePicker()
-            }
         }
 
         toolbar.addView(dropDownButton)
+
+        toolbar.subtitle = "*"
+        toolbar.title = "*"
+        val toolbarTextViews = ArrayList<View>().apply {
+            toolbar.findViewsWithText(this, "*", ViewGroup.FIND_VIEWS_WITH_TEXT)
+        }
+
+        listOf(*toolbarTextViews.toTypedArray(), dropDownButton).forEach {
+            it.setOnClickListener { openBalancePicker() }
+        }
+
+        toolbar.title = getString(R.string.operations_history)
 
         ElevationUtil.initScrollElevation(history_list, appbar_elevation_view)
 
