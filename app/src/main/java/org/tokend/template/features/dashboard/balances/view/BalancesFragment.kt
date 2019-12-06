@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -85,24 +84,13 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     // region Init
-    private val hideFabScrollListener =
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (dy > 2) {
-                        menu_fab.hideMenuButton(true)
-                    } else if (dy < -2 && menu_fab.isEnabled) {
-                        menu_fab.showMenuButton(true)
-                    }
-                }
-            }
-
     private fun initList() {
         layoutManager = GridLayoutManager(requireContext(), 1)
         adapter = BalanceItemsAdapter(amountFormatter)
         updateListColumnsCount()
         balances_list.adapter = adapter
         balances_list.layoutManager = layoutManager
-        balances_list.addOnScrollListener(hideFabScrollListener)
+        balances_list.addOnScrollListener(HideFabScrollListener(menu_fab))
         adapter.registerAdapterDataObserver(ScrollOnTopItemUpdateAdapterObserver(balances_list))
         adapter.onItemClick { _, item ->
             item.source?.id?.also { openWallet(it) }
