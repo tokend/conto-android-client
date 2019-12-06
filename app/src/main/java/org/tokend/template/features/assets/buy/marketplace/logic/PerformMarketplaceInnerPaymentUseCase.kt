@@ -33,6 +33,7 @@ class PerformMarketplaceInnerPaymentUseCase(
     private lateinit var envelope: TransactionEnvelope
     private lateinit var account: Account
     private lateinit var networkParams: NetworkParams
+    private lateinit var resultMeta: String
 
     fun perform(): Completable {
         return getAccount()
@@ -62,6 +63,9 @@ class PerformMarketplaceInnerPaymentUseCase(
                 }
                 .flatMap {
                     submitTransaction()
+                }
+                .doOnSuccess { response ->
+                    this.resultMeta = response.resultMetaXdr!!
                 }
                 .doOnSuccess {
                     updateRepositories()
@@ -99,9 +103,6 @@ class PerformMarketplaceInnerPaymentUseCase(
         val ownPayment = (envelope.tx.operations.getOrNull(0)?.body
             as? Operation.OperationBody.Payment)?.paymentOp
 
-        val marketplacePayment = (envelope.tx.operations.getOrNull(1)?.body
-                as? Operation.OperationBody.Payment)?.paymentOp
-
         val balancesRepository = repositoryProvider.balances()
         val buyingAssetBalance = balancesRepository.itemsList.find {
             it.assetCode == assetToBuy
@@ -112,18 +113,10 @@ class PerformMarketplaceInnerPaymentUseCase(
                 ?.wrapped
                 ?.let(Base32Check::encodeBalanceId)
 
-        if (ownPayment != null && marketplacePayment != null
-                && buyingAssetBalance != null && paymentBalanceId != null) {
-            balancesRepository.updateBalance(
-                    buyingAssetBalance.id,
-                    networkParams.amountFromPrecised(marketplacePayment.amount)
-            )
-            balancesRepository.updateBalance(
-                    paymentBalanceId,
-                    networkParams.amountFromPrecised(ownPayment.amount).negate()
-            )
-        } else {
-            balancesRepository.updateIfEverUpdated()
+        balancesRepository.apply {
+            if (!updateBalancesByTransactionResultMeta(resultMeta, networkParams)) {
+                updateIfEverUpdated()
+            }
         }
 
         if (paymentBalanceId != null) {

@@ -160,10 +160,12 @@ class ConfirmRedemptionRequestUseCase(
                         senderNickname = senderNickname
                 )
             }
-            repositoryProvider.balances().updateAssetBalance(
-                    request.assetCode,
-                    request.amount
-            )
+
+            repositoryProvider.balances().apply {
+                if (!updateBalancesByTransactionResultMeta(submitTransactionResponse.resultMetaXdr!!,
+                                networkParams))
+                    updateBalanceByDelta(balanceId, request.amount)
+            }
         } else {
             balanceChangesRepositories.forEach { it.updateIfEverUpdated() }
             repositoryProvider.balances().updateIfNotFresh()
