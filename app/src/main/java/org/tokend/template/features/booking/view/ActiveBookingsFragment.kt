@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.features.booking.model.ActiveBookingRecord
 import org.tokend.template.features.booking.repository.ActiveBookingsRepository
 import org.tokend.template.features.booking.view.adapter.ActiveBookingListItem
 import org.tokend.template.features.booking.view.adapter.ActiveBookingsAdapter
@@ -80,6 +81,10 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
 
     private fun initList() {
         adapter = ActiveBookingsAdapter(DateFormatter(requireContext()))
+        adapter.onItemClick { _, item ->
+            item.source?.also(this::openBookingQr)
+        }
+
         layoutManager = GridLayoutManager(requireContext(), 1)
         updateListColumnsCount()
 
@@ -138,6 +143,18 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
                 .map(::ActiveBookingListItem)
 
         adapter.setData(items)
+    }
+
+    private fun openBookingQr(booking: ActiveBookingRecord) {
+        Navigator.from(this).openQrShare(
+                data = booking.reference,
+                title = getString(R.string.booking_title),
+                topText = booking.seatsCount.toString() + " " + resources.getQuantityString(
+                        R.plurals.seat,
+                        booking.seatsCount
+                ),
+                shareLabel = getString(R.string.share)
+        )
     }
 
     private fun updateListColumnsCount() {

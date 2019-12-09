@@ -6,7 +6,8 @@ class ActiveBookingRecord(
         val id: String,
         val time: BookingTime,
         val room: BookingRoom,
-        val seatsCount: Int
+        val seatsCount: Int,
+        val reference: String
 ) {
     constructor(source: BookingResource,
                 business: BookingBusinessRecord): this(
@@ -14,6 +15,7 @@ class ActiveBookingRecord(
             time = BookingTime(source.startTime, source.endTime),
             room = business.rooms.find { it.id == source.payload }
                     ?: throw IllegalStateException("Room ${source.payload} is not in business ${business.id}"),
-            seatsCount = source.participants
+            seatsCount = source.participants,
+            reference = source.reference
     )
 }

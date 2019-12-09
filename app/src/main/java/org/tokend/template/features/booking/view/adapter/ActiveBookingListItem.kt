@@ -7,12 +7,14 @@ class ActiveBookingListItem(
         val seatsCount: Int,
         val dateFrom: Date,
         val dateTo: Date,
-        val roomName: String
+        val roomName: String,
+        val source: ActiveBookingRecord?
 ) {
     constructor(source: ActiveBookingRecord): this(
             seatsCount = source.seatsCount,
             dateFrom = source.time.from,
             dateTo = source.time.to,
-            roomName = source.room.name
+            roomName = source.room.name,
+            source = source
     )
 }
