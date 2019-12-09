@@ -15,6 +15,9 @@ import kotlinx.android.synthetic.main.fragment_active_bookings.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.sdk.uri.TokenDUri
+import org.tokend.sdk.utils.extentions.encodeBase64
+import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
 import org.tokend.template.features.booking.model.ActiveBookingRecord
 import org.tokend.template.features.booking.repository.ActiveBookingsRepository
@@ -146,8 +149,16 @@ class ActiveBookingsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun openBookingQr(booking: ActiveBookingRecord) {
+        val data = TokenDUri
+                .Builder("booking.conto")
+                .addQueryParam("reference", booking.reference)
+                .build()
+                .toString()
+                .toByteArray(Charsets.UTF_8)
+                .encodeBase64String()
+
         Navigator.from(this).openQrShare(
-                data = booking.reference,
+                data = data,
                 title = getString(R.string.booking_title),
                 topText = booking.seatsCount.toString() + " " + resources.getQuantityString(
                         R.plurals.seat,
