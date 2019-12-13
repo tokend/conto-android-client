@@ -5,10 +5,9 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.v3.fees.params.FeeCalculationParams
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.ApiProvider
-import org.tokend.wallet.xdr.FeeType
-import org.tokend.wallet.xdr.PaymentFeeType
 import java.math.BigDecimal
 
+// TODO: Adapt for new API
 /**
  * Manages operation fees loading
  */
@@ -24,8 +23,9 @@ class FeeManager(
      * @param amount operation amount
      * @param asset operation asset
      */
-    fun getFee(type: FeeType, subtype: Int,
+    fun getFee(type: Int, subtype: Int,
                accountId: String, asset: String, amount: BigDecimal): Single<SimpleFeeRecord> {
+        return Single.just(SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO))
         val signedApi = apiProvider.getSignedApi()
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
 
@@ -54,10 +54,10 @@ class FeeManager(
                       isOutgoing: Boolean): Single<SimpleFeeRecord> {
         val subtype =
                 if (isOutgoing)
-                    PaymentFeeType.OUTGOING.value
+                    0
                 else
-                    PaymentFeeType.INCOMING.value
-        return getFee(FeeType.PAYMENT_FEE, subtype, accountId, asset, amount)
+                    1
+        return getFee(0, subtype, accountId, asset, amount)
     }
 
     /**
@@ -66,7 +66,7 @@ class FeeManager(
      * @see getFee
      */
     fun getWithdrawalFee(accountId: String, asset: String, amount: BigDecimal): Single<SimpleFeeRecord> {
-        return getFee(FeeType.WITHDRAWAL_FEE, 0, accountId, asset, amount)
+        return getFee(0, 0, accountId, asset, amount)
     }
 
     /**
@@ -76,8 +76,8 @@ class FeeManager(
      */
     fun getOfferFee(orderBookId: Long, accountId: String, asset: String, amount: BigDecimal): Single<SimpleFeeRecord> {
         val feeType = if (orderBookId != 0L) {
-            FeeType.INVEST_FEE
-        } else FeeType.OFFER_FEE
+            0
+        } else 0
 
         return getFee(feeType, 0, accountId, asset, amount)
     }

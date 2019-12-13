@@ -187,9 +187,6 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
-            android:name=".features.limits.LimitsActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
-        <activity
             android:name=".features.fees.view.FeesActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity

@@ -3,10 +3,9 @@ package org.tokend.template.features.fees.adapter
 import org.tokend.template.extensions.isMaxPossibleAmount
 import org.tokend.template.features.fees.model.FeeRecord
 import org.tokend.template.view.util.formatter.AmountFormatter
-import org.tokend.wallet.xdr.FeeType
 
 class FeeListItem(
-        val type: FeeType,
+        val type: Int,
         val subtype: Subtype,
         val fixed: String,
         val percent: String,
@@ -21,8 +20,6 @@ class FeeListItem(
 
     companion object {
         fun fromFee(fee: FeeRecord, amountFormatter: AmountFormatter): FeeListItem {
-            val type = FeeType.values().find { fee.feeType == it.value }!!
-
             val subtype = Subtype.values().find { fee.subtype == it.value }!!
 
             val fixed = amountFormatter.formatAssetAmount(fee.fixed, fee.asset)
@@ -48,7 +45,7 @@ class FeeListItem(
                                 abbreviation = true,
                                 withAssetCode = false)
 
-            return FeeListItem(type, subtype, fixed, percent, lowerBound, upperBound)
+            return FeeListItem(fee.feeType, subtype, fixed, percent, lowerBound, upperBound)
         }
     }
 }

@@ -6,9 +6,10 @@ import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.general.model.SystemInfo
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
+import org.tokend.sdk.api.ingester.generated.resources.IngesterStateResource
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
+import org.tokend.sdk.utils.extentions.toNetworkParams
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
@@ -27,11 +28,11 @@ class ConfirmRedemptionRequestUseCase(
     class RedemptionAlreadyProcessedException : Exception()
 
     private lateinit var accountId: String
-    private lateinit var systemInfo: SystemInfo
+    private lateinit var systemInfo: IngesterStateResource
     private lateinit var networkParams: NetworkParams
     private lateinit var senderBalanceId: String
     private lateinit var transaction: Transaction
-    private lateinit var submitTransactionResponse: SubmitTransactionResponse
+    private lateinit var submitTransactionResponse: TransactionResource
 
     fun perform(): Completable {
         return getSystemInfo()
@@ -72,7 +73,7 @@ class ConfirmRedemptionRequestUseCase(
                 .ignoreElement()
     }
 
-    private fun getSystemInfo(): Single<SystemInfo> {
+    private fun getSystemInfo(): Single<IngesterStateResource> {
         val systemInfoRepository = repositoryProvider.systemInfo()
 
         return systemInfoRepository
@@ -116,15 +117,15 @@ class ConfirmRedemptionRequestUseCase(
         }.toSingle().subscribeOn(Schedulers.newThread())
     }
 
-    private fun submitTransaction(): Single<SubmitTransactionResponse> {
+    private fun submitTransaction(): Single<TransactionResource> {
         return txManager.submit(transaction)
     }
 
     private fun ensureActualSubmit(): Single<Boolean> {
-        val latestBlockBeforeSubmit = systemInfo.ledgersState[SystemInfo.LEDGER_CORE]?.latest
+        val latestBlockBeforeSubmit = systemInfo.core.latest
                 ?: return Single.error(IllegalStateException("Cannot obtain latest core block"))
 
-        val transactionBlock = submitTransactionResponse.ledger ?: 0
+        val transactionBlock = submitTransactionResponse.ledgerSequence ?: 0
 
         // The exactly same transaction is always accepted without any errors
         // but if it wasn't the first submit the block number will be lower than the latest one.

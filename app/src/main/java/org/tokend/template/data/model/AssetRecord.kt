@@ -3,8 +3,8 @@ package org.tokend.template.data.model
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.NullNode
 import org.tokend.sdk.api.base.model.RemoteFile
-import org.tokend.sdk.api.generated.resources.AssetResource
-import org.tokend.sdk.api.v3.assets.model.AssetState
+import org.tokend.sdk.api.ingester.assets.model.AssetState
+import org.tokend.sdk.api.ingester.generated.resources.AssetResource
 import org.tokend.sdk.utils.HashCodes
 import org.tokend.template.util.RecordWithPolicy
 import java.io.Serializable
@@ -28,17 +28,17 @@ class AssetRecord(
     val isBackedByExternalSystem: Boolean
         get() = externalSystemType != null
 
+    // TODO: Figure out
     val isTransferable: Boolean
-        get() = hasPolicy(org.tokend.wallet.xdr.AssetPolicy.TRANSFERABLE.value)
+        get() = true
 
+    // TODO: Figure out
     val isWithdrawable: Boolean
-        get() = hasPolicy(org.tokend.wallet.xdr.AssetPolicy.WITHDRAWABLE.value)
+        get() = true
 
-    val canBeBaseForAtomicSwap: Boolean
-        get() = hasPolicy(org.tokend.wallet.xdr.AssetPolicy.CAN_BE_BASE_IN_ATOMIC_SWAP.value)
-
+    // TODO: Figure out
     val isBase: Boolean
-        get() = hasPolicy(org.tokend.wallet.xdr.AssetPolicy.BASE_ASSET.value)
+        get() = true
 
     fun isOwnedBy(accountId: String?): Boolean {
         return ownerAccountId == accountId
@@ -87,19 +87,20 @@ class AssetRecord(
 
             return AssetRecord(
                     code = source.id,
-                    policy = source.policies.value
-                            ?: throw IllegalStateException("Asset must have a policy"),
+                    // TODO: Figure out
+                    policy = 0,
                     name = name,
                     logoUrl = logo?.getUrl(urlConfig?.storage),
                     terms = terms,
                     externalSystemType = externalSystemType,
                     issued = source.issued,
-                    available = source.availableForIssuance,
+                    // TODO: Figure out
+                    available = BigDecimal.ZERO,
                     maximum = source.maxIssuanceAmount,
                     ownerAccountId = source.owner.id,
                     trailingDigits = source.trailingDigits.toInt(),
                     description = description,
-                    state = AssetState.fromValue(source.state?.value ?: AssetState.ACTIVE.value)
+                    state = AssetState.fromValue(source.state.toInt())
             )
         }
     }

@@ -2,7 +2,7 @@ package org.tokend.template.features.massissuance.logic
 
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
@@ -11,11 +11,13 @@ import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
+import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.utils.Hashing
+import org.tokend.wallet.xdr.MovementDestination
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.PaymentFeeData
-import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
+import org.tokend.wallet.xdr.PaymentOp
 import java.math.BigDecimal
 
 /**
@@ -67,9 +69,11 @@ class ConfirmMassIssuanceRequestUseCase(
             val actualSubject = "Mass issuance"
 
             Operation.OperationBody.Payment(
-                    SimplePaymentOp(
-                            sourceBalanceId = request.issuerBalanceId,
-                            destAccountId = accountId,
+                    PaymentOp(
+                            sourceBalanceID = PublicKeyFactory.fromBalanceId(request.issuerBalanceId),
+                            destination = MovementDestination.Account(
+                                    accountID = PublicKeyFactory.fromAccountId(accountId)
+                            ),
                             amount = networkParams.amountToPrecised(request.amount),
                             feeData = PaymentFeeData(
                                     zeroFee, zeroFee, false,
@@ -81,7 +85,10 @@ class ConfirmMassIssuanceRequestUseCase(
                             subject = if (recipient is PaymentRecipient.NotExisting)
                                 recipient.wrapPaymentSubject(request.issuerAccountId, actualSubject)
                             else
-                                actualSubject
+                                actualSubject,
+                            // TODO: Figure out
+                            securityType = 0,
+                            ext = PaymentOp.PaymentOpExt.EmptyVersion()
                     )
             )
         }
@@ -93,7 +100,7 @@ class ConfirmMassIssuanceRequestUseCase(
                 *operations.toTypedArray())
     }
 
-    private fun submitTransaction(): Single<SubmitTransactionResponse> {
+    private fun submitTransaction(): Single<TransactionResource> {
         return txManager.submit(transaction)
     }
 

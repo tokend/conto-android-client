@@ -9,7 +9,6 @@ import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.util.RecordWithPolicy
-import org.tokend.wallet.xdr.AssetPairPolicy
 import java.io.Serializable
 import java.math.BigDecimal
 
@@ -317,14 +316,17 @@ sealed class BalanceChangeCause : Serializable {
                 policy = op.policies.value ?: 0
         )
 
+        // TODO: Figure out
         val isRestrictedByCurrentPrice: Boolean
-            get() = hasPolicy(AssetPairPolicy.CURRENT_PRICE_RESTRICTION.value)
+            get() = true
 
+        // TODO: Figure out
         val isRestrictedByPhysicalPrice: Boolean
-            get() = hasPolicy(AssetPairPolicy.PHYSICAL_PRICE_RESTRICTION.value)
+            get() = true
 
+        // TODO: Figure out
         val isTradeable: Boolean
-            get() = hasPolicy(AssetPairPolicy.TRADEABLE_SECONDARY_MARKET.value)
+            get() = true
     }
 
     // ------- Atomic swap ask creation ------- //

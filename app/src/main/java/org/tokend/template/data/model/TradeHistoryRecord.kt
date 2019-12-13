@@ -1,7 +1,5 @@
 package org.tokend.template.data.model
 
-import org.tokend.sdk.api.trades.model.MatchedOrder
-import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.sdk.utils.HashCodes
 import java.io.Serializable
 import java.math.BigDecimal
@@ -26,21 +24,5 @@ class TradeHistoryRecord(
 
     override fun hashCode(): Int {
         return HashCodes.ofMany(id.hashCode(), hasPositiveTrend.hashCode())
-    }
-
-    companion object {
-        @JvmStatic
-        fun fromMatchedOrder(source: MatchedOrder): TradeHistoryRecord {
-            return TradeHistoryRecord(
-                    id = source.id.toLong(),
-                    baseAsset = SimpleAsset(source.baseAsset),
-                    quoteAsset = SimpleAsset(source.quoteAsset),
-                    baseAmount = BigDecimalUtil.valueOf(source.baseAmount),
-                    quoteAmount = BigDecimalUtil.valueOf(source.quoteAmount),
-                    price = BigDecimalUtil.valueOf(source.price),
-                    createdAt = source.createdAt,
-                    hasPositiveTrend = true
-            )
-        }
     }
 }

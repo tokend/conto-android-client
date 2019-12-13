@@ -1,7 +1,7 @@
 package org.tokend.template.data.model
 
-import org.tokend.sdk.api.generated.resources.AccountResource
 import org.tokend.sdk.api.generated.resources.ExternalSystemIDResource
+import org.tokend.sdk.api.ingester.generated.resources.AccountResource
 import java.io.Serializable
 import java.util.*
 
@@ -18,7 +18,8 @@ class AccountRecord(
                     ?.toUpperCase(Locale.ENGLISH)
                     ?.let(KycRecoveryStatus::valueOf)
                     ?: KycRecoveryStatus.NONE,
-            depositAccounts = source.externalSystemIds?.map(::DepositAccount) ?: emptyList()
+            // TODO: Deposit
+            depositAccounts = emptyList()
     )
 
     class DepositAccount(

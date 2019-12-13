@@ -9,14 +9,13 @@ import org.tokend.template.extensions.getNullableStringExtra
 import org.tokend.template.features.offers.OfferConfirmationActivity
 import org.tokend.template.features.offers.model.OfferRequest
 import org.tokend.template.view.details.DetailsItem
-import org.tokend.wallet.xdr.FeeType
 
 class InvestmentConfirmationActivity : OfferConfirmationActivity() {
     private var saleName: String? = null
     private var displayToReceive = false
 
     override val feeType: Int
-        get() = FeeType.INVEST_FEE.value
+        get() = throw NotImplementedError("Fees are not yet supported")
 
     override fun displayDetails() {
         saleName = intent.getNullableStringExtra(SALE_NAME_EXTRA)

@@ -113,9 +113,9 @@ class ChangePasswordUseCase(
 
     private fun getCurrentSigners(): Single<List<SignerData>> {
         return apiProvider.getApi()
-                .v3
-                .signers
-                .get(currentWalletInfo.accountId)
+                .ingester
+                .accounts
+                .getAccountSigners(currentWalletInfo.accountId)
                 .map { signers ->
                     signers.map { SignerData(it) }
                 }

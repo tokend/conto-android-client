@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.node.NullNode
 import org.tokend.sdk.api.base.model.RemoteFile
 import org.tokend.sdk.api.generated.resources.SaleQuoteAssetResource
 import org.tokend.sdk.api.generated.resources.SaleResource
-import org.tokend.sdk.api.sales.model.SaleState
+import org.tokend.sdk.api.v3.sales.model.SaleState
 import org.tokend.template.data.model.*
-import org.tokend.wallet.xdr.SaleType
 import java.io.Serializable
 import java.math.BigDecimal
 import java.util.*
@@ -24,7 +23,7 @@ class SaleRecord(
         val startDate: Date,
         val endDate: Date,
         val state: SaleState,
-        val type: SaleType,
+        val type: Int,
         val softCap: BigDecimal,
         val hardCap: BigDecimal,
         val baseHardCap: BigDecimal,
@@ -100,10 +99,6 @@ class SaleRecord(
             val defaultQuoteAsset = QuoteAsset(source.defaultQuoteAsset)
             val quoteAssets = source.quoteAssets.map(::QuoteAsset)
 
-            val saleType = SaleType.values()
-                    .find { it.value == source.saleType.value }
-                    ?: throw IllegalArgumentException("Unknown sale type ${source.saleType.value}")
-
             val logo = source.details.get("logo")?.takeIf { it !is NullNode }?.let {
                 mapper.convertValue(it, RemoteFile::class.java)
             }
@@ -131,7 +126,7 @@ class SaleRecord(
                     startDate = source.startTime,
                     endDate = source.endTime,
                     state = SaleState.fromValue(source.saleState.value),
-                    type = saleType,
+                    type = source.saleType.value,
                     baseHardCap = source.baseHardCap,
                     currentCap = defaultQuoteAsset.currentCap,
                     softCap = defaultQuoteAsset.softCap,

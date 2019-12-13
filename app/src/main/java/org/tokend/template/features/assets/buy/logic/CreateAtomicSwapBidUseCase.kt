@@ -1,20 +1,9 @@
 package org.tokend.template.features.assets.buy.logic
 
-import android.util.Log
-import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
-import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.base.model.DataPage
-import org.tokend.sdk.api.base.params.PagingOrder
-import org.tokend.sdk.api.base.params.PagingParamsV2
-import org.tokend.sdk.api.generated.resources.CreateAtomicSwapBidRequestResource
-import org.tokend.sdk.api.generated.resources.ReviewableRequestResource
-import org.tokend.sdk.api.requests.model.base.RequestState
-import org.tokend.sdk.api.v3.requests.params.RequestParamsV3
-import org.tokend.sdk.api.v3.requests.params.RequestsPageParamsV3
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.data.model.AtomicSwapAskRecord
@@ -26,13 +15,8 @@ import org.tokend.template.features.assets.buy.model.AtomicSwapInvoice
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.xdr.CreateAtomicSwapBidRequest
-import org.tokend.wallet.xdr.CreateAtomicSwapBidRequestOp
-import org.tokend.wallet.xdr.Operation
-import org.tokend.wallet.xdr.ReviewableRequestType
 import java.math.BigDecimal
 import java.security.SecureRandom
-import java.util.concurrent.TimeUnit
 
 /**
  * Submits [CreateAtomicSwapBidRequestOp] and waits
@@ -118,23 +102,7 @@ class CreateAtomicSwapBidUseCase(
     }
 
     private fun getTransaction(): Single<Transaction> {
-        val op = CreateAtomicSwapBidRequestOp(
-                request = CreateAtomicSwapBidRequest(
-                        askID = ask.id.toLong(),
-                        quoteAsset = quoteAssetCode,
-                        baseAmount = networkParams.amountToPrecised(amount),
-                        // Unique data is required to identify the request
-                        creatorDetails = "{\"$REFERENCE_KEY\":\"$reference\"}",
-                        ext = CreateAtomicSwapBidRequest.CreateAtomicSwapBidRequestExt.EmptyVersion()
-                ),
-                ext = CreateAtomicSwapBidRequestOp.CreateAtomicSwapBidRequestOpExt.EmptyVersion()
-        )
-
-        val account = accountProvider.getAccount()
-                ?: return Single.error(IllegalStateException("Cannot obtain current account"))
-
-        return TxManager.createSignedTransaction(networkParams, accountId, account,
-                Operation.OperationBody.CreateAtomicSwapBidRequest(op))
+        return Single.error(NotImplementedError("Atomic swaps are not supported"))
     }
 
     private fun submitTransaction(): Single<Boolean> {
@@ -144,54 +112,7 @@ class CreateAtomicSwapBidUseCase(
     }
 
     private fun getPendingRequestId(): Single<String> {
-        val signedApi = apiProvider.getSignedApi()
-                ?: return Single.error(IllegalStateException("No signed API instance found"))
-
-        class NoRequestYetException : Exception()
-
-        val getRequestWithReference = {
-            signedApi
-                    .v3
-                    .requests
-                    .get(
-                            RequestsPageParamsV3(
-                                    requestor = accountId,
-                                    type = ReviewableRequestType.CREATE_ATOMIC_SWAP_BID,
-                                    includes = listOf(RequestParamsV3.Includes.REQUEST_DETAILS),
-                                    pagingParams = PagingParamsV2(
-                                            order = PagingOrder.DESC,
-                                            limit = 3
-                                    )
-                            )
-                    )
-                    .toSingle()
-                    .map(DataPage<ReviewableRequestResource>::items)
-                    .map { recentRequests ->
-                        recentRequests
-                                .find { request ->
-                                    val details = request.requestDetails
-                                    details is CreateAtomicSwapBidRequestResource
-                                            && details.creatorDetails
-                                            .get(REFERENCE_KEY).asText() == reference
-                                }
-                                ?.id
-                                ?: throw NoRequestYetException()
-                    }
-        }
-
-        // Wait for request to appear.
-        return Single.defer(getRequestWithReference)
-                .retryWhen { errors ->
-                    errors.flatMap { error ->
-                        if (error is NoRequestYetException) {
-                            Log.i(LOG_TAG, "No request yet, retry...")
-                            Flowable.just(true)
-                                    .delay(POLL_INTERVAL_MS, TimeUnit.MILLISECONDS)
-                        } else {
-                            Flowable.error(error)
-                        }
-                    }
-                }
+        return Single.error(NotImplementedError("Atomic swaps are not supported"))
     }
 
     private fun getInvoiceFromRequest(): Single<AtomicSwapInvoice> {
@@ -202,49 +123,8 @@ class CreateAtomicSwapBidUseCase(
         class RequestRejectedException : Exception()
         class InvoiceParsingException(cause: Exception) : Exception(cause)
 
-        val getInvoiceFromRequest = {
-            signedApi
-                    .v3
-                    .requests
-                    .getById(
-                            requestorAccount = accountId,
-                            requestId = pendingRequestId
-                    )
-                    .toSingle()
-                    .map { request ->
-                        if (request.stateI == RequestState.PERMANENTLY_REJECTED.i
-                                || request.stateI == RequestState.REJECTED.i) {
-                            throw RequestRejectedException()
-                        }
 
-                        request.externalDetails
-                                ?.withArray(REQUEST_DATA_ARRAY_KEY)
-                                ?.get(0)
-                                ?.get(INVOICE_KEY)
-                                ?: throw NoInvoiceYetException()
-                    }
-                    .map { invoiceJson ->
-                        try {
-                            objectMapper.treeToValue(invoiceJson, AtomicSwapInvoice::class.java)
-                        } catch (e: Exception) {
-                            throw InvoiceParsingException(e)
-                        }
-                    }
-        }
-
-        // Wait for invoice to appear in the request.
-        return Single.defer(getInvoiceFromRequest)
-                .retryWhen { errors ->
-                    errors.flatMap { error ->
-                        if (error is NoInvoiceYetException) {
-                            Log.i(LOG_TAG, "No invoice yet, retry...")
-                            Flowable.just(true)
-                                    .delay(POLL_INTERVAL_MS, TimeUnit.MILLISECONDS)
-                        } else {
-                            Flowable.error(error)
-                        }
-                    }
-                }
+        return Single.error(NotImplementedError("Atomic swaps are not supported"))
     }
 
     private fun updateRepositories() {

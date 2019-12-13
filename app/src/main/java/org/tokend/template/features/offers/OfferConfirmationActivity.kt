@@ -30,7 +30,6 @@ import org.tokend.template.view.details.ExtraViewProvider
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.ProgressDialogFactory
-import org.tokend.wallet.xdr.FeeType
 import java.math.BigDecimal
 
 open class OfferConfirmationActivity : BaseActivity() {
@@ -70,7 +69,7 @@ open class OfferConfirmationActivity : BaseActivity() {
     protected val cancellationOnly: Boolean
         get() = request.baseAmount.signum() == 0 && offerToCancel != null
 
-    protected open val feeType: Int = FeeType.OFFER_FEE.value
+    protected open val feeType: Int = throw NotImplementedError("Offers are not yet supported")
 
     protected val feeExtraView: AppCompatImageView by lazy {
         ExtraViewProvider.getFeeView(this) {

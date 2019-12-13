@@ -33,7 +33,6 @@ import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.AmountEditTextWrapper
-import org.tokend.wallet.xdr.SaleType
 import java.math.BigDecimal
 import java.math.MathContext
 
@@ -366,8 +365,8 @@ class SaleInvestActivity : BaseActivity(), InvestmentInfoHolder {
                                             INVESTMENT_REQUEST,
                                             request = offerRequest,
                                             saleName = sale.name,
-                                            displayToReceive =
-                                            sale.type.value == SaleType.BASIC_SALE.value
+                                            // TODO: Sale types
+                                            displayToReceive = true
                                     )
                                 },
                                 onError = {

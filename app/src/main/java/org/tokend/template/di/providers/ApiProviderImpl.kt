@@ -12,6 +12,7 @@ import org.tokend.template.BuildConfig
 class ApiProviderImpl(
         private val urlConfigProvider: UrlConfigProvider,
         private val accountProvider: AccountProvider,
+        private val walletInfoProvider: WalletInfoProvider,
         private val tfaCallback: TfaCallback?,
         cookieJar: CookieJar?) : ApiProvider {
     private val url: String
@@ -58,7 +59,9 @@ class ApiProviderImpl(
 
     override fun getSignedApi(): TokenDApi? = synchronized(this) {
         val account = accountProvider.getAccount() ?: return null
-        val hash = HashCodes.ofMany(account.accountId, url)
+        val walletInfo = walletInfoProvider.getWalletInfo() ?: return null
+
+        val hash = HashCodes.ofMany(account.accountId, walletInfo.accountId, url)
 
         val signedApi =
                 signedApiByHash
@@ -68,7 +71,7 @@ class ApiProviderImpl(
                         ?.second
                         ?: TokenDApi(
                                 url,
-                                AccountRequestSigner(account),
+                                AccountRequestSigner(walletInfo.accountId, account),
                                 tfaCallback,
                                 cookieJarProvider,
                                 withLogs = withLogs

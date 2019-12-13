@@ -20,7 +20,7 @@ class FeesViewHolder(view: View) : BaseViewHolder<List<FeeListItem>>(view) {
 
     override fun bind(item: List<FeeListItem>) {
         val fee = item.first()
-        feeTypeText.text = localizedName.forFeeType(fee.type)
+        feeTypeText.text = fee.type.toString()
         feeSubtypeText.text = localizedName.forFeeSubtype(fee.subtype)
         setFeeList(item)
     }

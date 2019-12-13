@@ -1,8 +1,8 @@
 package org.tokend.template.data.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.tokend.sdk.api.generated.resources.BalanceResource
 import org.tokend.sdk.api.generated.resources.ConvertedBalanceStateResource
+import org.tokend.sdk.api.ingester.generated.resources.BalanceResource
 import java.io.Serializable
 import java.math.BigDecimal
 
@@ -33,7 +33,7 @@ class BalanceRecord(
                 companiesMap: Map<String, CompanyRecord>) : this(
             id = source.balance.id,
             available = source.initialAmounts.available,
-            asset = AssetRecord.fromResource(source.balance.asset, urlConfig, mapper),
+            asset = throw NotImplementedError("Converted balances are not yet supported"),
             conversionAsset = conversionAsset,
             convertedAmount =
             if (source.isConverted)

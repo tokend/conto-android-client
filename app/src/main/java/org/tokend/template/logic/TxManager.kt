@@ -4,7 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.util.confirmation.ConfirmationProvider
 import org.tokend.wallet.*
@@ -18,7 +18,7 @@ class TxManager(
         private val apiProvider: ApiProvider,
         private val confirmationProvider: ConfirmationProvider<Transaction>? = null
 ) {
-    fun submit(transaction: Transaction): Single<SubmitTransactionResponse> {
+    fun submit(transaction: Transaction): Single<TransactionResource> {
         val confirmationCompletable =
                 confirmationProvider?.requestConfirmation(transaction)
                         ?: Completable.complete()
@@ -28,13 +28,13 @@ class TxManager(
     }
 
     fun submitWithoutConfirmation(transactionEnvelope: TransactionEnvelope)
-            : Single<SubmitTransactionResponse> {
+            : Single<TransactionResource> {
         return submitEnvelope(transactionEnvelope)
     }
 
-    private fun submitEnvelope(envelope: TransactionEnvelope): Single<SubmitTransactionResponse> {
+    private fun submitEnvelope(envelope: TransactionEnvelope): Single<TransactionResource> {
         return apiProvider.getApi()
-                .v3
+                .ingester
                 .transactions
                 .submit(envelope, true)
                 .toSingle()

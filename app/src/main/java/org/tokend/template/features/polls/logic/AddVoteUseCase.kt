@@ -2,15 +2,12 @@ package org.tokend.template.features.polls.logic
 
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.TransactionBuilder
-import org.tokend.wallet.xdr.*
 
 /**
  * Submits user's vote in the poll.
@@ -54,41 +51,7 @@ class AddVoteUseCase(
     }
 
     private fun getTransaction(): Single<Transaction> {
-        return Single.defer {
-            val operation = ManageVoteOp(
-                    data = ManageVoteOp.ManageVoteOpData.Create(
-                            CreateVoteData(
-                                    pollId.toLong(),
-                                    VoteData.SingleChoice(
-                                            SingleChoiceVote(
-                                                    choiceIndex + 1,
-                                                    EmptyExt.EmptyVersion()
-                                            )
-                                    ),
-                                    CreateVoteData.CreateVoteDataExt.EmptyVersion()
-                            )
-                    ),
-                    ext = ManageVoteOp.ManageVoteOpExt.EmptyVersion()
-            )
-
-            val account = accountProvider.getAccount()
-                    ?: return@defer Single.error<Transaction>(
-                            IllegalStateException("Cannot obtain current account")
-                    )
-
-            val sourceAccountId = walletInfoProvider.getWalletInfo()?.accountId
-                    ?: return@defer Single.error<Transaction>(
-                            IllegalStateException("No wallet info found")
-                    )
-
-            val transaction =
-                    TransactionBuilder(networkParams, sourceAccountId)
-                            .addOperation(Operation.OperationBody.ManageVote(operation))
-                            .addSigner(account)
-                            .build()
-
-            Single.just(transaction)
-        }.subscribeOn(Schedulers.newThread())
+        return Single.error(NotImplementedError("Polls are not yet supported  "))
     }
 
     private fun updateRepository() {

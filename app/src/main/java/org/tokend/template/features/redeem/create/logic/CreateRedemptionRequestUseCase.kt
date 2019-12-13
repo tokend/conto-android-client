@@ -9,14 +9,9 @@ import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.redeem.model.RedemptionRequest
-import org.tokend.wallet.Account
-import org.tokend.wallet.NetworkParams
+import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.TransactionBuilder
-import org.tokend.wallet.xdr.Fee
-import org.tokend.wallet.xdr.Operation
-import org.tokend.wallet.xdr.PaymentFeeData
-import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
+import org.tokend.wallet.xdr.*
 import java.math.BigDecimal
 import kotlin.random.Random
 
@@ -116,9 +111,11 @@ class CreateRedemptionRequestUseCase(
 
         val salt = Random.nextLong() and 0xffffffffL
 
-        val op = SimplePaymentOp(
-                sourceBalanceId = balance.id,
-                destAccountId = recipientAccountId,
+        val op = PaymentOp(
+                sourceBalanceID = PublicKeyFactory.fromBalanceId(balance.id),
+                destination = MovementDestination.Account(
+                        accountID = PublicKeyFactory.fromAccountId(recipientAccountId)
+                ),
                 amount = networkParams.amountToPrecised(amount),
                 feeData = PaymentFeeData(
                         sourceFee = emptyFee,
@@ -126,7 +123,11 @@ class CreateRedemptionRequestUseCase(
                         sourcePaysForDest = false,
                         ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                 ),
-                reference = salt.toString()
+                reference = salt.toString(),
+                subject = "",
+                // TODO: Figure out
+                securityType = 0,
+                ext = PaymentOp.PaymentOpExt.EmptyVersion()
         )
 
         return {

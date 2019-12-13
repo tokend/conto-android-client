@@ -1,6 +1,6 @@
 package org.tokend.template.data.model.history.converter
 
-import org.tokend.sdk.api.generated.resources.ParticipantsEffectResource
+import org.tokend.sdk.api.ingester.generated.resources.ParticipantsEffectResource
 import org.tokend.template.data.model.history.BalanceChange
 
 /**

@@ -20,8 +20,7 @@ import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.TransactionBuilder
-import org.tokend.wallet.xdr.CreateChangeRoleRequestOp
-import org.tokend.wallet.xdr.Operation
+import org.tokend.wallet.xdr.*
 
 /**
  * Creates and submits change-role request with general KYC data.
@@ -128,18 +127,22 @@ class SubmitKycRequestUseCase(
                 ?: return Single.error(IllegalStateException("Cannot obtain current account"))
 
         return Single.defer {
-            val operation = CreateChangeRoleRequestOp(
-                    requestID = requestIdToSubmit,
+            val operation = ChangeAccountRolesOp(
                     destinationAccount = PublicKeyFactory.fromAccountId(accountId),
-                    accountRoleToSet = roleToSet,
-                    creatorDetails = "{\"blob_id\":\"$formBlobId\"}",
-                    allTasks = null,
-                    ext = CreateChangeRoleRequestOp.CreateChangeRoleRequestOpExt.EmptyVersion()
+                    rolesToSet = arrayOf(roleToSet),
+                    details = "{\"blob_id\":\"$formBlobId\"}",
+                    ext = EmptyExt.EmptyVersion()
+            )
+
+            val request = CreateReviewableRequestOp(
+                    operations = arrayOf(ReviewableRequestOperation.ChangeAccountRoles(operation)),
+                    securityType = 0,
+                    ext = EmptyExt.EmptyVersion()
             )
 
             val transaction =
                     TransactionBuilder(networkParams, accountId)
-                            .addOperation(Operation.OperationBody.CreateChangeRoleRequest(operation))
+                            .addOperation(Operation.OperationBody.CreateReviewableRequest(request))
                             .build()
 
             transaction.addSignature(account)

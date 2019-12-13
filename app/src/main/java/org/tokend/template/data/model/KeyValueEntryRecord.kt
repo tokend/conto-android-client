@@ -1,6 +1,6 @@
 package org.tokend.template.data.model
 
-import org.tokend.sdk.api.generated.resources.KeyValueEntryResource
+import org.tokend.sdk.api.ingester.generated.resources.KeyValueEntryResource
 import org.tokend.wallet.xdr.KeyValueEntryType
 
 sealed class KeyValueEntryRecord(val key: kotlin.String) {

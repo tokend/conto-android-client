@@ -5,8 +5,7 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.model.DataPage
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
-import org.tokend.sdk.api.v3.history.params.ParticipantEffectsPageParams
-import org.tokend.sdk.api.v3.history.params.ParticipantEffectsParams
+import org.tokend.sdk.api.ingester.history.params.IngesterMovementsPageParams
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.BalanceChangeAction
@@ -53,14 +52,14 @@ class BalanceChangesRepository(
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
 
         return signedApi
-                .v3
+                .ingester
                 .history
-                .getMovements(
-                        ParticipantEffectsPageParams.Builder()
+                .getMovementsPage(
+                        IngesterMovementsPageParams.Builder()
                                 .withInclude(
-                                        ParticipantEffectsParams.Includes.EFFECT,
-                                        ParticipantEffectsParams.Includes.OPERATION,
-                                        ParticipantEffectsParams.Includes.OPERATION_DETAILS
+                                        IngesterMovementsPageParams.EFFECT,
+                                        IngesterMovementsPageParams.OPERATION,
+                                        IngesterMovementsPageParams.OPERATION_DETAILS
                                 )
                                 .withPagingParams(
                                         PagingParamsV2(

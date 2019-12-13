@@ -181,7 +181,7 @@ class FeesActivity : BaseActivity() {
 
             if (toRequestedItems) {
                 list_fees.scrollToPosition(
-                        sortedData.indexOfFirst { it.first().type.value == requestedType }
+                        sortedData.indexOfFirst { it.first().type == requestedType }
                 )
                 toRequestedItems = false
             }

@@ -46,7 +46,6 @@ import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.view.ClientKycActivity
 import org.tokend.template.features.kyc.view.WaitForKycApprovalActivity
-import org.tokend.template.features.limits.LimitsActivity
 import org.tokend.template.features.localaccount.importt.view.ImportLocalAccountActivity
 import org.tokend.template.features.localaccount.view.LocalAccountDetailsActivity
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
@@ -376,11 +375,6 @@ class Navigator private constructor() {
     fun openUpdateOffer(prevOffer: OfferRecord) {
         context?.intentFor<UpdateOfferActivity>()
                 ?.putExtras(UpdateOfferActivity.getBundle(prevOffer))
-                ?.also { performIntent(it) }
-    }
-
-    fun openLimits() {
-        context?.intentFor<LimitsActivity>()
                 ?.also { performIntent(it) }
     }
 

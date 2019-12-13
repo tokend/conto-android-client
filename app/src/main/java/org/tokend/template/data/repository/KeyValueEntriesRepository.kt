@@ -4,6 +4,7 @@ import io.reactivex.Single
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
+import org.tokend.sdk.api.v3.base.PageQueryParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.data.repository.base.RepositoryCache
@@ -21,14 +22,14 @@ class KeyValueEntriesRepository(
         val loader = SimplePagedResourceLoader({ nextCursor ->
             apiProvider
                     .getApi()
-                    .v3
+                    .ingester
                     .keyValue
-                    .get(
-                            PagingParamsV2(
+                    .getPage(
+                            PageQueryParams(PagingParamsV2(
                                     order = PagingOrder.ASC,
                                     limit = 20,
                                     page = nextCursor
-                            )
+                            ))
                     )
         }, distinct = false)
 
@@ -43,7 +44,7 @@ class KeyValueEntriesRepository(
     private fun getItem(key: String): Single<KeyValueEntryRecord> {
         return apiProvider
                 .getApi()
-                .v3
+                .ingester
                 .keyValue
                 .getById(key)
                 .map(KeyValueEntryRecord.Companion::fromResource)

@@ -106,10 +106,6 @@ class RepositoryProviderImpl(
         ContactsRepository(context, MemoryOnlyRepositoryCache())
     }
 
-    private val limitsRepository: LimitsRepository by lazy {
-        LimitsRepository(apiProvider, walletInfoProvider)
-    }
-
     private val feesRepository: FeesRepository by lazy {
         FeesRepository(apiProvider, walletInfoProvider)
     }
@@ -230,10 +226,6 @@ class RepositoryProviderImpl(
 
     override fun contacts(): ContactsRepository {
         return contactsRepository
-    }
-
-    override fun limits(): LimitsRepository {
-        return limitsRepository
     }
 
     override fun fees(): FeesRepository {

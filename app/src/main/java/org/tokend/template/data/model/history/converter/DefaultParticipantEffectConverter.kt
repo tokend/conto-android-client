@@ -1,14 +1,18 @@
 package org.tokend.template.data.model.history.converter
 
 import android.util.Log
+import org.tokend.sdk.api.base.model.BaseResource
 import org.tokend.sdk.api.generated.resources.*
+import org.tokend.sdk.api.ingester.generated.resources.BaseEffectResource
+import org.tokend.sdk.api.ingester.generated.resources.BaseOperationDetailsResource
+import org.tokend.sdk.api.ingester.generated.resources.ParticipantsEffectResource
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.BalanceChangeAction
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 
-class DefaultParticipantEffectConverter: ParticipantEffectConverter {
+class DefaultParticipantEffectConverter : ParticipantEffectConverter {
     override fun toBalanceChanges(participantEffects: Collection<ParticipantsEffectResource>)
             : Collection<BalanceChange> {
         val result = ArrayList<BalanceChange>(participantEffects.size)
@@ -82,7 +86,7 @@ class DefaultParticipantEffectConverter: ParticipantEffectConverter {
                             }
                         else -> {
                             logError("Cannot choose 'funded' or 'charged' " +
-                                    "for balance $balanceId and effect ${effect.id}")
+                                    "for balance $balanceId and effect ${(effect as BaseResource).id}")
                             return@forEach
                         }
                     }

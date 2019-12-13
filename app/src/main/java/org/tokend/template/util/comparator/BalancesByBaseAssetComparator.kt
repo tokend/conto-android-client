@@ -1,7 +1,6 @@
 package org.tokend.template.util.comparator
 
 import org.tokend.template.data.model.BalanceRecord
-import org.tokend.wallet.xdr.AssetPolicy
 
 /**
  * Compares [BalanceRecord]s by checking [AssetPolicy.BASE_ASSET] policy

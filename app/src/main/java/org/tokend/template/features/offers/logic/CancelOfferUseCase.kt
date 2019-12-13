@@ -2,7 +2,7 @@ package org.tokend.template.features.offers.logic
 
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.offers.model.OfferRecord
@@ -32,7 +32,7 @@ class CancelOfferUseCase(
                     cancelOffer()
                 }
                 .doOnSuccess { response ->
-                    this.resultMeta = response.resultMetaXdr!!
+                    this.resultMeta = response.resultMetaXdr
                 }
                 .doOnSuccess {
                     updateRepositories()
@@ -44,7 +44,7 @@ class CancelOfferUseCase(
         return repositoryProvider.systemInfo().getNetworkParams()
     }
 
-    private fun cancelOffer(): Single<SubmitTransactionResponse> {
+    private fun cancelOffer(): Single<TransactionResource> {
         return repositoryProvider
                 .offers(isPrimaryMarket)
                 .cancel(

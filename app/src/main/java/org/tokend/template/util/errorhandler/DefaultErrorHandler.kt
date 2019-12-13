@@ -1,7 +1,7 @@
 package org.tokend.template.util.errorhandler
 
 import android.content.Context
-import org.tokend.sdk.api.transactions.model.TransactionFailedException
+import org.tokend.sdk.api.ingester.transactions.model.TransactionFailedException
 import org.tokend.template.R
 import org.tokend.template.view.ToastManager
 import retrofit2.HttpException
@@ -61,7 +61,7 @@ open class DefaultErrorHandler(
     private fun getTransactionFailedMessage(error: TransactionFailedException): String? {
         return when (error.transactionResultCode) {
             TransactionFailedException.TX_FAILED ->
-                when (error.firstOperationResultCode) {
+                when (error.firstFailedOperationResultCode) {
                     TransactionFailedException.OP_LIMITS_EXCEEDED ->
                         context.getString(R.string.error_tx_limits)
                     TransactionFailedException.OP_INSUFFICIENT_BALANCE ->

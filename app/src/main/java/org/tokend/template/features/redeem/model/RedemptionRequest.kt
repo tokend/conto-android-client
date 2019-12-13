@@ -2,12 +2,9 @@ package org.tokend.template.features.redeem.model
 
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentFee
-import org.tokend.wallet.Base32Check
-import org.tokend.wallet.NetworkParams
+import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.*
-import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -48,9 +45,11 @@ class RedemptionRequest(
         val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
         val fee = PaymentFee(zeroFee, zeroFee)
 
-        val operation = SimplePaymentOp(
-                sourceBalanceId = senderBalanceId,
-                destAccountId = recipientAccountId,
+        val operation = PaymentOp(
+                sourceBalanceID = PublicKeyFactory.fromBalanceId(senderBalanceId),
+                destination = MovementDestination.Account(
+                        accountID = PublicKeyFactory.fromAccountId(recipientAccountId)
+                ),
                 amount = networkParams.amountToPrecised(amount),
                 subject = "",
                 reference = salt.toString(),
@@ -59,7 +58,10 @@ class RedemptionRequest(
                         destinationFee = fee.recipientFee.toXdrFee(networkParams),
                         sourcePaysForDest = false,
                         ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
-                )
+                ),
+                // TODO: Figure out
+                securityType = 0,
+                ext = PaymentOp.PaymentOpExt.EmptyVersion()
         )
 
         val transaction = TransactionBuilder(networkParams, sourceAccountId)

@@ -6,7 +6,8 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.v3.accounts.AccountsApiV3
+import org.tokend.sdk.api.ingester.accounts.IngesterAccountsApi
+import org.tokend.sdk.api.ingester.accounts.params.IngesterAccountParams
 import org.tokend.sdk.api.v3.balances.BalancesApi
 import org.tokend.sdk.api.v3.balances.params.ConvertedBalancesParams
 import org.tokend.sdk.utils.extentions.isNotFound
@@ -25,7 +26,6 @@ import org.tokend.template.logic.TxManager
 import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.xdr.*
-import org.tokend.wallet.xdr.op_extensions.CreateBalanceOp
 import retrofit2.HttpException
 import java.math.BigDecimal
 import java.math.MathContext
@@ -63,7 +63,7 @@ class BalancesRepository(
                             Log.e("BalancesRepo",
                                     "This env is unable to convert balances into $conversionAssetCode")
                             getBalances(
-                                    signedApi.v3.accounts,
+                                    signedApi.ingester.accounts,
                                     accountId,
                                     urlConfigProvider,
                                     mapper
@@ -73,7 +73,7 @@ class BalancesRepository(
                     }
         else
             getBalances(
-                    signedApi.v3.accounts,
+                    signedApi.ingester.accounts,
                     accountId,
                     urlConfigProvider,
                     mapper
@@ -116,13 +116,20 @@ class BalancesRepository(
                 }
     }
 
-    private fun getBalances(signedAccountsApi: AccountsApiV3,
+    private fun getBalances(signedAccountsApi: IngesterAccountsApi,
                             accountId: String,
                             urlConfigProvider: UrlConfigProvider,
                             mapper: ObjectMapper): Single<List<BalanceRecord>> {
         return signedAccountsApi
-                .getBalances(accountId)
+                .getById(
+                        accountId,
+                        IngesterAccountParams(listOf(IngesterAccountParams.BALANCES,
+                                IngesterAccountParams.BALANCE_STATES,
+                                IngesterAccountParams.BALANCE_ASSETS
+                        ))
+                )
                 .toSingle()
+                .map { it.balances }
                 .flatMap { sourceList ->
                     companiesRepository
                             .ensureCompanies(sourceList.map { it.asset.owner.id })
@@ -175,12 +182,16 @@ class BalancesRepository(
                                                  assets: Array<out String>): Single<Transaction> {
         return Single.defer {
             val operations = assets.map {
-                CreateBalanceOp(sourceAccountId, it)
+                CreateBalanceOp(
+                        destination = PublicKeyFactory.fromAccountId(sourceAccountId),
+                        asset = it,
+                        ext = CreateBalanceOp.CreateBalanceOpExt.EmptyVersion()
+                )
             }
 
             val transaction =
                     TransactionBuilder(networkParams, PublicKeyFactory.fromAccountId(sourceAccountId))
-                            .addOperations(operations.map(Operation.OperationBody::ManageBalance))
+                            .addOperations(operations.map(Operation.OperationBody::CreateBalance))
                             .build()
 
             transaction.addSignature(signer)

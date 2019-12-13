@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.layout_balance_change_main_data.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.onClick
 import org.tokend.sdk.utils.extentions.decodeBase64
+import org.tokend.sdk.utils.extentions.toNetworkParams
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
@@ -58,8 +59,6 @@ class ConfirmRedemptionActivity : BaseActivity() {
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_balance_change_confirmation)
-
-        val errorHandler = errorHandlerFactory.getDefault()
 
         val balanceId = intent.getStringExtra(EXTRA_BALANCE_ID)
         if (balanceId == null) {

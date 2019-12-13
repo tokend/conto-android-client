@@ -1,15 +1,11 @@
 package org.tokend.template.features.offers.repository
 
-import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.toMaybe
-import io.reactivex.rxkotlin.toSingle
-import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.model.DataPage
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.sdk.api.v3.offers.params.OfferParamsV3
 import org.tokend.sdk.api.v3.offers.params.OffersPageParamsV3
 import org.tokend.sdk.utils.SimplePagedResourceLoader
@@ -24,10 +20,7 @@ import org.tokend.template.features.offers.model.OfferRequest
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.Account
 import org.tokend.wallet.NetworkParams
-import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.xdr.ManageOfferOp
-import org.tokend.wallet.xdr.Operation
 
 class OffersRepository(
         private val apiProvider: ApiProvider,
@@ -118,7 +111,7 @@ class OffersRepository(
                baseBalanceId: String,
                quoteBalanceId: String,
                offerRequest: OfferRequest,
-               offerToCancel: OfferRecord? = null): Single<SubmitTransactionResponse> {
+               offerToCancel: OfferRecord? = null): Single<TransactionResource> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Single.error(IllegalStateException("No wallet info found"))
         val account = accountProvider.getAccount()
@@ -153,49 +146,7 @@ class OffersRepository(
                                                quoteBalanceId: String,
                                                offerRequest: OfferRequest,
                                                offerToCancel: OfferRecord?): Single<Transaction> {
-        return offerToCancel
-                .toMaybe()
-                .toObservable()
-                .map<ManageOfferOp> {
-                    ManageOfferOp(
-                            baseBalance =
-                            PublicKeyFactory.fromBalanceId(it.baseBalanceId),
-                            quoteBalance =
-                            PublicKeyFactory.fromBalanceId(it.quoteBalanceId),
-                            amount = 0,
-                            price = networkParams.amountToPrecised(it.price),
-                            fee = networkParams.amountToPrecised(it.fee),
-                            isBuy = it.isBuy,
-                            orderBookID = it.orderBookId,
-                            offerID = it.id,
-                            ext = ManageOfferOp.ManageOfferOpExt.EmptyVersion()
-                    )
-                }
-                .concatWith(
-                        Observable.just(
-                                ManageOfferOp(
-                                        baseBalance =
-                                        PublicKeyFactory.fromBalanceId(baseBalanceId),
-                                        quoteBalance =
-                                        PublicKeyFactory.fromBalanceId(quoteBalanceId),
-                                        amount = networkParams.amountToPrecised(offerRequest.baseAmount),
-                                        price = networkParams.amountToPrecised(offerRequest.price),
-                                        fee = networkParams.amountToPrecised(offerRequest.fee.total),
-                                        isBuy = offerRequest.isBuy,
-                                        orderBookID = offerRequest.orderBookId,
-                                        offerID = 0L,
-                                        ext = ManageOfferOp.ManageOfferOpExt.EmptyVersion()
-                                )
-                        )
-                )
-                .subscribeOn(Schedulers.newThread())
-                .map { Operation.OperationBody.ManageOffer(it) }
-                .toList()
-                .map { it.toTypedArray() }
-                .flatMap { operations ->
-                    TxManager.createSignedTransaction(networkParams, sourceAccountId, signer,
-                            *operations)
-                }
+        return Single.error(NotImplementedError("Offers are not yet supported"))
     }
     // endregion
 
@@ -207,7 +158,7 @@ class OffersRepository(
     fun cancel(accountProvider: AccountProvider,
                systemInfoRepository: SystemInfoRepository,
                txManager: TxManager,
-               offer: OfferRecord): Single<SubmitTransactionResponse> {
+               offer: OfferRecord): Single<TransactionResource> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Single.error(IllegalStateException("No wallet info found"))
         val account = accountProvider.getAccount()
@@ -235,27 +186,7 @@ class OffersRepository(
                                                    sourceAccountId: String,
                                                    signer: Account,
                                                    offer: OfferRecord): Single<Transaction> {
-        return {
-            ManageOfferOp(
-                    baseBalance =
-                    PublicKeyFactory.fromBalanceId(offer.baseBalanceId),
-                    quoteBalance =
-                    PublicKeyFactory.fromBalanceId(offer.quoteBalanceId),
-                    amount = 0,
-                    price = networkParams.amountToPrecised(offer.price),
-                    fee = networkParams.amountToPrecised(offer.fee),
-                    isBuy = offer.isBuy,
-                    orderBookID = offer.orderBookId,
-                    offerID = offer.id,
-                    ext = ManageOfferOp.ManageOfferOpExt.EmptyVersion()
-            )
-        }
-                .toSingle()
-                .subscribeOn(Schedulers.newThread())
-                .map { Operation.OperationBody.ManageOffer(it) }
-                .flatMap {
-                    TxManager.createSignedTransaction(networkParams, sourceAccountId, signer, it)
-                }
+        return Single.error(NotImplementedError("Offers are not yet supported"))
     }
     // endregion
 

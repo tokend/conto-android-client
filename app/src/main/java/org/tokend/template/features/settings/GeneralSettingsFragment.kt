@@ -314,23 +314,10 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
 
     // region Info
     private fun initInfoCategory() {
-        initLimitsItem()
         initFeesItem()
         initTermsItem()
         initOpenSourceLicensesItem()
         hideCategoryIfEmpty("info")
-    }
-
-    private fun initLimitsItem() {
-        val limitsPreference = findPreference("limits")
-        limitsPreference?.setOnPreferenceClickListener {
-            Navigator.from(this).openLimits()
-            true
-        }
-        if (!BuildConfig.IS_LIMITS_ALLOWED) {
-            (findPreference("info") as? PreferenceCategory)
-                    ?.removePreference(limitsPreference)
-        }
     }
 
     private fun initFeesItem() {

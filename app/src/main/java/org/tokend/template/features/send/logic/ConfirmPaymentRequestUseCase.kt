@@ -8,11 +8,13 @@ import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
+import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.TransactionBuilder
+import org.tokend.wallet.xdr.MovementDestination
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.PaymentFeeData
-import org.tokend.wallet.xdr.op_extensions.SimplePaymentOp
+import org.tokend.wallet.xdr.PaymentOp
 
 /**
  * Sends payment identified by given payment request.
@@ -49,9 +51,11 @@ class ConfirmPaymentRequestUseCase(
 
     private fun getTransaction(): Single<Transaction> {
         return Single.defer {
-            val operation = SimplePaymentOp(
-                    sourceBalanceId = request.senderBalanceId,
-                    destAccountId = request.recipient.accountId,
+            val operation = PaymentOp(
+                    sourceBalanceID = PublicKeyFactory.fromBalanceId(request.senderBalanceId),
+                    destination = MovementDestination.Account(
+                            accountID = PublicKeyFactory.fromAccountId(request.recipient.accountId)
+                    ),
                     amount = networkParams.amountToPrecised(request.amount),
                     subject = request.paymentSubject ?: "",
                     reference = request.reference,
@@ -60,7 +64,10 @@ class ConfirmPaymentRequestUseCase(
                             destinationFee = request.fee.recipientFee.toXdrFee(networkParams),
                             sourcePaysForDest = request.fee.senderPaysForRecipient,
                             ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
-                    )
+                    ),
+                    // TODO: Figure out
+                    securityType = 0,
+                    ext = PaymentOp.PaymentOpExt.EmptyVersion()
             )
 
             val transaction =

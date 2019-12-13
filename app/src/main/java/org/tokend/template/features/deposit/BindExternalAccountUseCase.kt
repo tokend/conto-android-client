@@ -4,19 +4,16 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
-import org.tokend.sdk.api.transactions.model.TransactionFailedException
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
+import org.tokend.sdk.api.ingester.transactions.model.TransactionFailedException
 import org.tokend.template.data.repository.AccountRepository
-import org.tokend.template.data.repository.SystemInfoRepository
 import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.data.repository.SystemInfoRepository
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.Transaction
-import org.tokend.wallet.xdr.Operation
-import org.tokend.wallet.xdr.op_extensions.BindExternalAccountOp
-import org.tokend.wallet.xdr.op_extensions.CreateBalanceOp
 
 /**
  * Binds external payment system account, i.e. Bitcoin or Ethereum address,
@@ -108,24 +105,10 @@ class BindExternalAccountUseCase(
     }
 
     private fun getTransaction(): Single<Transaction> {
-        val operations = mutableListOf<Operation.OperationBody>()
-
-        if (isBalanceCreationRequired) {
-            val createBalanceOp = CreateBalanceOp(accountId, asset)
-            operations.add(Operation.OperationBody.ManageBalance(createBalanceOp))
-        }
-
-        val bindOp = BindExternalAccountOp(externalSystemType)
-        operations.add(Operation.OperationBody.BindExternalSystemAccountId(bindOp))
-
-        val account = accountProvider.getAccount()
-                ?: throw IllegalStateException("Cannot obtain current account")
-
-        return TxManager.createSignedTransaction(networkParams, accountId, account,
-                *operations.toTypedArray())
+        return Single.error(NotImplementedError("Deposit is not yet supported"))
     }
 
-    private fun submitTransaction(): Single<SubmitTransactionResponse> {
+    private fun submitTransaction(): Single<TransactionResource> {
         return txManager
                 .submit(transaction)
                 // Throw special error if there are no available addresses.

@@ -22,7 +22,7 @@ class AtomicSwapAskRecord(
                 mapper: ObjectMapper
     ) : this(
             id = source.id,
-            asset = AssetRecord.fromResource(source.baseAsset, urlConfig, mapper),
+            asset = throw NotImplementedError("Atomic swaps are not supported"),
             amount = source.availableAmount,
             isCanceled = source.isCanceled,
             company = companiesMap[source.owner.id]

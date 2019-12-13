@@ -5,8 +5,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
+import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
-import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.logic.TxManager
@@ -65,7 +65,7 @@ class PerformMarketplaceInnerPaymentUseCase(
                     submitTransaction()
                 }
                 .doOnSuccess { response ->
-                    this.resultMeta = response.resultMetaXdr!!
+                    this.resultMeta = response.resultMetaXdr
                 }
                 .doOnSuccess {
                     updateRepositories()
@@ -95,7 +95,7 @@ class PerformMarketplaceInnerPaymentUseCase(
         }.toSingle().subscribeOn(Schedulers.computation())
     }
 
-    private fun submitTransaction(): Single<SubmitTransactionResponse> {
+    private fun submitTransaction(): Single<TransactionResource> {
         return txManager.submitWithoutConfirmation(envelope)
     }
 

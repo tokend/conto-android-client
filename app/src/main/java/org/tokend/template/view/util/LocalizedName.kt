@@ -9,8 +9,6 @@ import org.tokend.template.features.fees.adapter.FeeListItem
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.view.assetchart.AssetChartScale
-import org.tokend.wallet.xdr.FeeType
-import org.tokend.wallet.xdr.StatsOpType
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
@@ -19,22 +17,6 @@ import kotlin.math.absoluteValue
  * Holds localized name getters for enums
  */
 class LocalizedName(private val context: Context) {
-    fun forFeeType(type: FeeType): String {
-        return when (type) {
-            FeeType.PAYMENT_FEE -> context.getString(R.string.payment_fee)
-            FeeType.OFFER_FEE -> context.getString(R.string.offer_fee)
-            FeeType.WITHDRAWAL_FEE -> context.getString(R.string.withdrawal_fee)
-            FeeType.ISSUANCE_FEE -> context.getString(R.string.issuance_fee)
-            FeeType.INVEST_FEE -> context.getString(R.string.invest_fee)
-            FeeType.CAPITAL_DEPLOYMENT_FEE -> context.getString(R.string.capital_deployment_fee)
-            FeeType.OPERATION_FEE -> context.getString(R.string.operation_fee)
-            FeeType.PAYOUT_FEE -> context.getString(R.string.payout_fee)
-            FeeType.ATOMIC_SWAP_SALE_FEE -> context.getString(R.string.atomic_swap_sale_fee)
-            FeeType.ATOMIC_SWAP_PURCHASE_FEE -> context.getString(R.string.atomic_swap_purchase_fee)
-            FeeType.SWAP_FEE -> context.getString(R.string.swap_fee)
-        }
-    }
-
     fun forFeeSubtype(subtype: FeeListItem.Subtype): String {
         return when (subtype) {
             FeeListItem.Subtype.INCOMING_OUTGOING -> context.getString(R.string.incoming_outgoing_fee)
@@ -94,16 +76,6 @@ class LocalizedName(private val context: Context) {
             is BalanceChangeCause.AtomicSwapBidCreation ->
                 context.getString(R.string.balance_change_cause_aswap_bid_creation)
             else -> context.getString(R.string.unknown_balance_change)
-        }
-    }
-
-    fun forLimitType(limitType: StatsOpType): String {
-        return when (limitType) {
-            StatsOpType.PAYMENT_OUT -> context.getString(R.string.payment)
-            StatsOpType.WITHDRAW -> context.getString(R.string.withdraw_title)
-            StatsOpType.DEPOSIT -> context.getString(R.string.deposit)
-            StatsOpType.SPEND -> context.getString(R.string.spend)
-            StatsOpType.PAYOUT -> context.getString(R.string.payout)
         }
     }
 

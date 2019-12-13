@@ -1,6 +1,5 @@
 package org.tokend.template.features.kyc.storage
 
-import android.util.Log
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -10,12 +9,10 @@ import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.TokenDApi
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
-import org.tokend.sdk.api.generated.resources.ChangeRoleRequestResource
-import org.tokend.sdk.api.generated.resources.ReviewableRequestResource
-import org.tokend.sdk.api.requests.model.base.RequestState
-import org.tokend.sdk.api.v3.requests.params.ChangeRoleRequestPageParams
-import org.tokend.sdk.api.v3.requests.params.RequestParamsV3
-import org.tokend.sdk.utils.extentions.getTypedRequestDetails
+import org.tokend.sdk.api.ingester.generated.resources.ReviewableRequestResource
+import org.tokend.sdk.api.ingester.requests.model.RequestState
+import org.tokend.sdk.api.ingester.requests.params.IngesterRequestParams
+import org.tokend.sdk.api.ingester.requests.params.IngesterRequestsPageParams
 import org.tokend.template.data.repository.BlobsRepository
 import org.tokend.template.data.repository.base.SimpleSingleItemRepository
 import org.tokend.template.di.providers.ApiProvider
@@ -23,6 +20,7 @@ import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.signin.model.ForcedAccountType
+import org.tokend.wallet.xdr.OperationType
 
 /**
  * Holds user's KYC data and it's state
@@ -125,18 +123,17 @@ class KycStateRepository(
     private fun getLastKycRequest(signedApi: TokenDApi,
                                   accountId: String): Maybe<ReviewableRequestResource> {
         return signedApi
-                .v3
+                .ingester
                 .requests
-                .getChangeRoleRequests(
-                        ChangeRoleRequestPageParams(
-                                requestor = accountId,
-                                includes = listOf(RequestParamsV3.Includes.REQUEST_DETAILS),
-                                pagingParams = PagingParamsV2(
-                                        order = PagingOrder.DESC,
-                                        limit = 1
-                                )
+                .getPage(IngesterRequestsPageParams(
+                        requestor = accountId,
+                        type = OperationType.CHANGE_ACCOUNT_ROLES.value,
+                        include = listOf(IngesterRequestParams.REQUEST_DETAILS),
+                        pagingParams = PagingParamsV2(
+                                order = PagingOrder.DESC,
+                                limit = 1
                         )
-                )
+                ))
                 .toSingle()
                 .flatMapMaybe { page ->
                     page.items.firstOrNull().toMaybe()
@@ -145,8 +142,8 @@ class KycStateRepository(
 
     private fun getKycRequestAttributes(request: ReviewableRequestResource): KycRequestAttributes? {
         return try {
-            val state = RequestState.fromI(request.stateI)
-            val blobId = request.getTypedRequestDetails<ChangeRoleRequestResource>()
+            val state = RequestState.fromValue(request.stateI)
+            val blobId = request.requestDetails
                     .creatorDetails
                     .get("blob_id")
                     ?.asText()
