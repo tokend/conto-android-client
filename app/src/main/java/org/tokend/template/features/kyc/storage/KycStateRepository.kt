@@ -79,6 +79,11 @@ class KycStateRepository(
     }
 
     override fun getItem(): Observable<KycState> {
+        // TODO: KYC
+        return Observable.just(KycState.Submitted.Approved(
+                formData = KycForm.General("Dummy", "Data"),
+                requestId = 42L
+        ))
         val signedApi = apiProvider.getSignedApi()
                 ?: return Observable.error(IllegalStateException("No signed API instance found"))
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
