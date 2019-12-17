@@ -23,8 +23,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         resConfigs("en", "ru", "uk")
         manifestPlaceholders = [
-                fabricApiKey: keystoreProperties['FabricApiKeyUNIT'] != null
-                        ? keystoreProperties['FabricApiKeyUNIT']
+                fabricApiKey: keystoreProperties['FabricApiKey'] != null
+                        ? keystoreProperties['FabricApiKey']
                         : ""
         ]
         multiDexKeepFile file('multidex-keep.txt')
@@ -118,7 +118,7 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.13'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    implementation "org.tokend:sdk:3.3.2-x.5"
+    implementation "org.tokend:sdk:3.3.3-x.0"
     implementation "org.tokend:rx-sdk:2.2.0"
 
     implementation 'io.reactivex.rxjava2:rxkotlin:2.0.0'
