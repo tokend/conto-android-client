@@ -206,15 +206,10 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
                 .doOnSubscribe { progress.show() }
                 .doOnTerminate { progress.dismiss() }
                 .subscribeBy(
-                        onComplete = this::onInternalPaymentSubmitted,
+                        onComplete = this::finishWithSuccessMessage,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
-    }
-
-    private fun onInternalPaymentSubmitted() {
-        toastManager.long(R.string.asset_will_be_received_in_a_moment)
-        finish()
     }
 
     private fun subscribeToBalances() {
@@ -266,9 +261,14 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == WEB_INVOICE_REQUEST && resultCode == Activity.RESULT_OK) {
-            setResult(Activity.RESULT_OK)
-            finish()
+            finishWithSuccessMessage()
         }
+    }
+
+    private fun finishWithSuccessMessage() {
+        toastManager.long(R.string.asset_will_be_received_in_a_moment)
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     companion object {

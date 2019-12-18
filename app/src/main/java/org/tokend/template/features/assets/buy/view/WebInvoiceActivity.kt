@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -88,7 +87,6 @@ class WebInvoiceActivity : BaseActivity() {
     }
 
     private fun finishWithSuccess() {
-        toastManager.long(R.string.asset_will_be_received_in_a_moment)
         setResult(Activity.RESULT_OK)
         finish()
     }
