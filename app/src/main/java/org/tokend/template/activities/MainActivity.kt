@@ -38,7 +38,7 @@ import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.features.kyc.storage.KycStateRepository
+import org.tokend.template.features.kyc.storage.ActiveKycRepository
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -80,8 +80,8 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     private var toolbar: Toolbar? = null
 
-    protected val kycStateRepository: KycStateRepository
-        get() = repositoryProvider.kycState()
+    protected val activeKycRepository: ActiveKycRepository
+        get() = repositoryProvider.activeKyc()
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
@@ -216,8 +216,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     protected open fun initAccountTypeSwitch(accountHeader: AccountHeader) {
         val view = accountHeader.view.findViewById<View>(R.id.account_type_switch_layout)
                 ?: return
-        if (kycStateRepository.itemFormData is KycForm.Corporate
-                && kycStateRepository.isFormApproved) {
+        if (activeKycRepository.itemFormData is KycForm.Corporate) {
             view.visibility = View.VISIBLE
             view.account_type_switch_hint.text = getAccountTypeSwitchHint()
             view.account_type_switch_button.setOnClickListener {
@@ -241,9 +240,9 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     }
 
     protected open fun getProfileHeaderItem(email: String): ProfileDrawerItem {
-        val kycState = kycStateRepository.item
-        val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
-        val name = ProfileUtil.getDisplayedName(kycState, email)
+        val activeKyc = activeKycRepository.item
+        val avatarUrl = ProfileUtil.getAvatarUrl(activeKyc, urlConfigProvider, email)
+        val name = ProfileUtil.getDisplayedName(activeKyc, email)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)
@@ -313,7 +312,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
     // endregion
 
     private fun subscribeToKycChanges() {
-        kycStateRepository
+        activeKycRepository
                 .itemSubject
                 .map { true }
                 .subscribe(profileUpdatesSubject)

@@ -131,6 +131,6 @@ class ClientKycActivity : BaseActivity() {
     }
 
     private fun onFormSubmitted() {
-        Navigator.from(this).toWaitingForKycApproval()
+        Navigator.from(this).toClientMainActivity()
     }
 }

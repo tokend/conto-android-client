@@ -269,7 +269,7 @@ class SignInActivity : BaseActivity() {
             canSignIn = false
 
             Navigator.from(this)
-                    .performPostSignInRouting(repositoryProvider.kycState().item)
+                    .performPostSignInRouting(repositoryProvider.activeKyc().item)
         }
     }
 

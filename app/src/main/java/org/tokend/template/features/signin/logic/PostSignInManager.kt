@@ -19,9 +19,9 @@ class PostSignInManager(
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
                 repositoryProvider.account().updateDeferred(),
-                repositoryProvider.kycState().updateDeferred()
+                repositoryProvider.activeKyc().updateDeferred()
                         .doOnComplete {
-                            repositoryProvider.kycState().forcedType = forcedAccountType
+                            repositoryProvider.activeKyc().forcedType = forcedAccountType
                         },
                 repositoryProvider.balances().updateDeferred()
         )

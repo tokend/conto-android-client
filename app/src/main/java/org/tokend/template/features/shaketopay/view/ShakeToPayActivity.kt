@@ -214,10 +214,10 @@ class ShakeToPayActivity : BaseActivity() {
                 ?: return
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return
-        val kycState = repositoryProvider.kycState().item
+        val activeKyc = repositoryProvider.activeKyc().item
                 ?: return
-        val avatar = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
-        val name = ProfileUtil.getDisplayedName(kycState, email) ?: email
+        val avatar = ProfileUtil.getAvatarUrl(activeKyc, urlConfigProvider, email)
+        val name = ProfileUtil.getDisplayedName(activeKyc, email) ?: email
 
         val userData = MinimalUserData(avatar, name, email)
 

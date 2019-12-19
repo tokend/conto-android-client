@@ -88,7 +88,7 @@ class UnlockAppActivity : BaseActivity() {
         initButtons()
         initErrorEmptyView()
         user_email_text.text = email
-        ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, kycStatePersistor.loadState())
+        ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, activeKycPersistor.load())
     }
 
     private fun initButtons() {
@@ -295,7 +295,7 @@ class UnlockAppActivity : BaseActivity() {
                     .show()
         } else {
             Navigator.from(this)
-                    .performPostSignInRouting(repositoryProvider.kycState().item)
+                    .performPostSignInRouting(repositoryProvider.activeKyc().item)
         }
     }
 

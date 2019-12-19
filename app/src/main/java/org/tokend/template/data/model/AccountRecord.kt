@@ -1,5 +1,6 @@
 package org.tokend.template.data.model
 
+import com.fasterxml.jackson.databind.JsonNode
 import org.tokend.sdk.api.generated.resources.ExternalSystemIDResource
 import org.tokend.sdk.api.ingester.generated.resources.AccountResource
 import java.io.Serializable
@@ -9,7 +10,8 @@ class AccountRecord(
         val id: String,
         val kycRecoveryStatus: KycRecoveryStatus,
         val depositAccounts: List<DepositAccount>,
-        val roles: MutableSet<Long>
+        val roles: MutableSet<Long>,
+        val kycBlob: String?
 ) : Serializable {
     constructor(source: AccountResource) : this(
             id = source.id,
@@ -20,6 +22,12 @@ class AccountRecord(
                     ?.let(KycRecoveryStatus::valueOf)
                     ?: KycRecoveryStatus.NONE,
             roles = source.roles.map { it.id.toLong() }.toMutableSet(),
+            kycBlob = source
+                    .kycData
+                    ?.kycData
+                    ?.get("blob_id")
+                    ?.takeIf(JsonNode::isTextual)
+                    ?.asText(),
             // TODO: Deposit
             depositAccounts = emptyList()
     )

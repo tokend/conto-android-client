@@ -18,8 +18,9 @@ import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
-import org.tokend.template.features.kyc.storage.KycStateRepository
-import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
+import org.tokend.template.features.kyc.storage.ActiveKycPersistor
+import org.tokend.template.features.kyc.storage.ActiveKycRepository
+import org.tokend.template.features.kyc.storage.KycRequestStateRepository
 import org.tokend.template.features.localaccount.repository.LocalAccountRepository
 import org.tokend.template.features.localaccount.storage.LocalAccountPersistor
 import org.tokend.template.features.offers.repository.OffersCache
@@ -39,8 +40,8 @@ class RepositoryProviderImpl(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         private val context: Context? = null,
-        private val kycStatePersistor: SubmittedKycStatePersistor? = null,
-        private val localAccountPersistor: LocalAccountPersistor? = null
+        private val localAccountPersistor: LocalAccountPersistor? = null,
+        private val activeKycPersistor: ActiveKycPersistor? = null
 ) : RepositoryProvider {
     private val conversionAssetCode =
             if (BuildConfig.ENABLE_BALANCES_CONVERSION)
@@ -162,6 +163,10 @@ class RepositoryProviderImpl(
         LocalAccountRepository(localAccountPersistor)
     }
 
+    private val activeKyc: ActiveKycRepository by lazy {
+        ActiveKycRepository(account(), blobs(), activeKycPersistor)
+    }
+
     override fun balances(): BalancesRepository {
         return balancesRepository
     }
@@ -208,8 +213,8 @@ class RepositoryProviderImpl(
         }
     }
 
-    private val kycStateRepository: KycStateRepository by lazy {
-        KycStateRepository(apiProvider, walletInfoProvider, kycStatePersistor, blobs())
+    private val kycRequestStateRepository: KycRequestStateRepository by lazy {
+        KycRequestStateRepository(apiProvider, walletInfoProvider, blobs(), keyValueEntries())
     }
 
     override fun account(): AccountRepository {
@@ -276,8 +281,8 @@ class RepositoryProviderImpl(
         }
     }
 
-    override fun kycState(): KycStateRepository {
-        return kycStateRepository
+    override fun kycRequestState(): KycRequestStateRepository {
+        return kycRequestStateRepository
     }
 
     override fun investmentInfo(sale: SaleRecord): InvestmentInfoRepository {
@@ -355,6 +360,10 @@ class RepositoryProviderImpl(
 
     override fun localAccount(): LocalAccountRepository {
         return localAccount
+    }
+
+    override fun activeKyc(): ActiveKycRepository {
+        return activeKyc
     }
 
     companion object {

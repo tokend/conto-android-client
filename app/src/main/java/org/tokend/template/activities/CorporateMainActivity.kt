@@ -70,9 +70,9 @@ class CorporateMainActivity : MainActivity() {
     }
 
     override fun getProfileHeaderItem(email: String): ProfileDrawerItem {
-        val kycState = kycStateRepository.item
-        val avatarUrl = ProfileUtil.getAvatarUrl(kycState, urlConfigProvider, email)
-        val name = ProfileUtil.getDisplayedName(kycState, email)
+        val activeKyc = activeKycRepository.item
+        val avatarUrl = ProfileUtil.getAvatarUrl(activeKyc, urlConfigProvider, email)
+        val name = ProfileUtil.getDisplayedName(activeKyc, email)
 
         return ProfileDrawerItem()
                 .withIdentifier(1)

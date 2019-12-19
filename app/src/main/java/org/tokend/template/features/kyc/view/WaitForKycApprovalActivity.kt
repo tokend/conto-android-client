@@ -8,16 +8,16 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_loading_data.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.features.kyc.model.KycState
-import org.tokend.template.features.kyc.storage.KycStateRepository
+import org.tokend.template.features.kyc.model.KycRequestState
+import org.tokend.template.features.kyc.storage.KycRequestStateRepository
 import org.tokend.template.util.IntervalPoller
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import java.util.concurrent.TimeUnit
 
 class WaitForKycApprovalActivity : BaseActivity() {
-    private val kycStateRepository: KycStateRepository
-        get() = repositoryProvider.kycState()
+    private val kycRequestStateRepository: KycRequestStateRepository
+        get() = repositoryProvider.kycRequestState()
 
     private var pollingDisposable: Disposable? = null
 
@@ -31,12 +31,12 @@ class WaitForKycApprovalActivity : BaseActivity() {
                 POLL_INTERVAL_S,
                 TimeUnit.SECONDS,
                 deferredDataSource = Single.defer {
-                    kycStateRepository
+                    kycRequestStateRepository
                             .updateDeferred()
                             .toSingleDefault(true)
                             .map {
                                 val isApproved =
-                                        kycStateRepository.item is KycState.Submitted.Approved<*>
+                                        kycRequestStateRepository.item is KycRequestState.Submitted.Approved<*>
 
                                 if (!isApproved) {
                                     throw IllegalStateException("KYC request is not approved yet")

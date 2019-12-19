@@ -6,9 +6,9 @@ import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.ingester.accounts.params.IngesterAccountParams
 import org.tokend.sdk.api.ingester.generated.resources.IngesterStateResource
 import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
-import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
 import org.tokend.sdk.utils.extentions.toNetworkParams
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
@@ -87,9 +87,9 @@ class ConfirmRedemptionRequestUseCase(
         val signedApi = apiProvider.getSignedApi()
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
 
-        return signedApi.v3.accounts
-                .getById(request.sourceAccountId, AccountParamsV3(
-                        listOf(AccountParamsV3.Includes.BALANCES)
+        return signedApi.ingester.accounts
+                .getById(request.sourceAccountId, IngesterAccountParams(
+                        listOf(IngesterAccountParams.Includes.BALANCES)
                 ))
                 .map { it.balances }
                 .toSingle()

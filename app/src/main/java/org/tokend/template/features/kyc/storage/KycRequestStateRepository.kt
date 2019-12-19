@@ -20,19 +20,17 @@ import org.tokend.template.data.repository.base.SimpleSingleItemRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.features.kyc.model.KycState
-import org.tokend.template.features.signin.model.ForcedAccountType
+import org.tokend.template.features.kyc.model.KycRequestState
 
 /**
- * Holds user's KYC data and it's state
+ * Holds user's KYC request data and it's state
  */
-class KycStateRepository(
+class KycRequestStateRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
-        private val submittedStatePersistor: SubmittedKycStatePersistor?,
         private val blobsRepository: BlobsRepository,
         private val keyValueEntriesRepository: KeyValueEntriesRepository
-) : SimpleSingleItemRepository<KycState>() {
+) : SimpleSingleItemRepository<KycRequestState>() {
     private class NoRequestFoundException : Exception()
 
     private data class KycRequestAttributes(
@@ -41,46 +39,7 @@ class KycStateRepository(
             val blobId: String?
     )
 
-    // region Persistence
-    override fun getStoredItem(): Observable<KycState> {
-        return Observable.defer {
-            val state = submittedStatePersistor?.loadState()
-
-            if (state != null)
-                Observable.just(state)
-            else
-                Observable.empty()
-        }
-    }
-
-    override fun storeItem(item: KycState) {
-        // Store only submitted states as the only valuable ones.
-        if (item !is KycState.Submitted<*>) {
-            return
-        }
-
-        submittedStatePersistor?.saveState(item)
-    }
-    // endregion
-
-    val itemFormData: KycForm?
-        get() = (item as? KycState.Submitted<*>)?.formData
-
-    val isFormApproved: Boolean
-        get() = item is KycState.Submitted.Approved<*>
-
-    var forcedType: ForcedAccountType? = null
-
-    val isActualOrForcedGeneral: Boolean
-        get() = itemFormData is KycForm.General
-                || itemFormData is KycForm.Corporate && !isFormApproved
-                || forcedType == ForcedAccountType.GENERAL
-
-    fun set(newState: KycState) {
-        onNewItem(newState)
-    }
-
-    override fun getItem(): Observable<KycState> {
+    override fun getItem(): Observable<KycRequestState> {
         val signedApi = apiProvider.getSignedApi()
                 ?: return Observable.error(IllegalStateException("No signed API instance found"))
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
@@ -103,19 +62,19 @@ class KycStateRepository(
                                 Triple(state, rejectReason, kycForm)
                             }
                 }
-                .map<KycState> { (state, rejectReason, kycForm) ->
+                .map<KycRequestState> { (state, rejectReason, kycForm) ->
                     when (state) {
                         RequestState.REJECTED ->
-                            KycState.Submitted.Rejected(kycForm, requestId, rejectReason)
+                            KycRequestState.Submitted.Rejected(kycForm, requestId, rejectReason)
                         RequestState.APPROVED ->
-                            KycState.Submitted.Approved(kycForm, requestId)
+                            KycRequestState.Submitted.Approved(kycForm, requestId)
                         else ->
-                            KycState.Submitted.Pending(kycForm, requestId)
+                            KycRequestState.Submitted.Pending(kycForm, requestId)
                     }
                 }
                 .onErrorResumeNext { error ->
                     if (error is NoRequestFoundException)
-                        Single.just(KycState.Empty)
+                        Single.just(KycRequestState.Empty)
                     else
                         Single.error(error)
                 }

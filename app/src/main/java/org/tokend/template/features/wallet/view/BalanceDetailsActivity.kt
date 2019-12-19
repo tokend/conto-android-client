@@ -142,7 +142,7 @@ class BalanceDetailsActivity : BaseActivity() {
         val actions = mutableListOf<FloatingActionMenuAction>()
 
         if (asset?.isOwnedBy(accountId) == true
-                && !repositoryProvider.kycState().isActualOrForcedGeneral) {
+                && !repositoryProvider.activeKyc().isActualOrForcedGeneral) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,

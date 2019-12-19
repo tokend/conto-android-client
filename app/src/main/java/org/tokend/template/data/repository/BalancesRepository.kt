@@ -1,6 +1,5 @@
 package org.tokend.template.data.repository
 
-import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -8,12 +7,8 @@ import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.ingester.accounts.IngesterAccountsApi
 import org.tokend.sdk.api.ingester.accounts.params.IngesterAccountParams
-import org.tokend.sdk.api.v3.balances.BalancesApi
-import org.tokend.sdk.api.v3.balances.params.ConvertedBalancesParams
-import org.tokend.sdk.utils.extentions.isNotFound
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.AccountProvider
@@ -26,7 +21,6 @@ import org.tokend.template.logic.TxManager
 import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.xdr.*
-import retrofit2.HttpException
 import java.math.BigDecimal
 import java.math.MathContext
 
@@ -50,27 +44,28 @@ class BalancesRepository(
                 ?: return Single.error(IllegalStateException("No wallet info found"))
 
         return if (conversionAssetCode != null)
-            getConvertedBalances(
-                    signedApi.v3.balances,
-                    accountId,
-                    urlConfigProvider,
-                    mapper,
-                    conversionAssetCode
-            )
-                    .onErrorResumeNext {
-                        // It's back!
-                        if (it is HttpException && it.isNotFound()) {
-                            Log.e("BalancesRepo",
-                                    "This env is unable to convert balances into $conversionAssetCode")
-                            getBalances(
-                                    signedApi.ingester.accounts,
-                                    accountId,
-                                    urlConfigProvider,
-                                    mapper
-                            )
-                        } else
-                            Single.error(it)
-                    }
+            Single.error(NotImplementedError("Converted balances are not yet supported"))
+//            getConvertedBalances(
+//                    signedApi.v3.balances,
+//                    accountId,
+//                    urlConfigProvider,
+//                    mapper,
+//                    conversionAssetCode
+//            )
+//                    .onErrorResumeNext {
+//                        // It's back!
+//                        if (it is HttpException && it.isNotFound()) {
+//                            Log.e("BalancesRepo",
+//                                    "This env is unable to convert balances into $conversionAssetCode")
+//                            getBalances(
+//                                    signedApi.ingester.accounts,
+//                                    accountId,
+//                                    urlConfigProvider,
+//                                    mapper
+//                            )
+//                        } else
+//                            Single.error(it)
+//                    }
         else
             getBalances(
                     signedApi.ingester.accounts,
@@ -80,41 +75,41 @@ class BalancesRepository(
             )
     }
 
-    private fun getConvertedBalances(signedBalancesApi: BalancesApi,
-                                     accountId: String,
-                                     urlConfigProvider: UrlConfigProvider,
-                                     mapper: ObjectMapper,
-                                     conversionAssetCode: String): Single<List<BalanceRecord>> {
-        return signedBalancesApi
-                .getConvertedBalances(
-                        accountId = accountId,
-                        assetCode = conversionAssetCode,
-                        params = ConvertedBalancesParams(
-                                include = listOf(
-                                        ConvertedBalancesParams.Includes.BALANCE_ASSET,
-                                        ConvertedBalancesParams.Includes.STATES,
-                                        ConvertedBalancesParams.Includes.ASSET
-                                )
-                        )
-                )
-                .toSingle()
-                .flatMap { convertedBalances ->
-                    companiesRepository
-                            .ensureCompanies(
-                                    convertedBalances.states.map { it.balance.asset.owner.id }
-                            )
-                            .map { convertedBalances to it }
-                }
-                .map { (convertedBalances, companiesMap) ->
-                    conversionAsset = SimpleAsset(convertedBalances.asset)
-                    convertedBalances
-                            .states
-                            .mapSuccessful {
-                                BalanceRecord(it, urlConfigProvider.getConfig(),
-                                        mapper, conversionAsset, companiesMap)
-                            }
-                }
-    }
+//    private fun getConvertedBalances(signedBalancesApi: BalancesApi,
+//                                     accountId: String,
+//                                     urlConfigProvider: UrlConfigProvider,
+//                                     mapper: ObjectMapper,
+//                                     conversionAssetCode: String): Single<List<BalanceRecord>> {
+//        return signedBalancesApi
+//                .getConvertedBalances(
+//                        accountId = accountId,
+//                        assetCode = conversionAssetCode,
+//                        params = ConvertedBalancesParams(
+//                                include = listOf(
+//                                        ConvertedBalancesParams.Includes.BALANCE_ASSET,
+//                                        ConvertedBalancesParams.Includes.STATES,
+//                                        ConvertedBalancesParams.Includes.ASSET
+//                                )
+//                        )
+//                )
+//                .toSingle()
+//                .flatMap { convertedBalances ->
+//                    companiesRepository
+//                            .ensureCompanies(
+//                                    convertedBalances.states.map { it.balance.asset.owner.id }
+//                            )
+//                            .map { convertedBalances to it }
+//                }
+//                .map { (convertedBalances, companiesMap) ->
+//                    conversionAsset = SimpleAsset(convertedBalances.asset)
+//                    convertedBalances
+//                            .states
+//                            .mapSuccessful {
+//                                BalanceRecord(it, urlConfigProvider.getConfig(),
+//                                        mapper, conversionAsset, companiesMap)
+//                            }
+//                }
+//    }
 
     private fun getBalances(signedAccountsApi: IngesterAccountsApi,
                             accountId: String,
@@ -185,6 +180,7 @@ class BalancesRepository(
                 CreateBalanceOp(
                         destination = PublicKeyFactory.fromAccountId(sourceAccountId),
                         asset = it,
+                        additional = false,
                         ext = CreateBalanceOp.CreateBalanceOpExt.EmptyVersion()
                 )
             }

@@ -18,6 +18,11 @@ abstract class SingleItemRepository<T> : Repository() {
      */
     val itemSubject: BehaviorSubject<T> = BehaviorSubject.create()
 
+    open fun set(item: T) {
+        onNewItem(item)
+        storeItem(item)
+    }
+
     protected open fun broadcast() {
         item?.let { itemSubject.onNext(it) }
     }
