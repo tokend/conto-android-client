@@ -8,7 +8,8 @@ import java.util.*
 class AccountRecord(
         val id: String,
         val kycRecoveryStatus: KycRecoveryStatus,
-        val depositAccounts: List<DepositAccount>
+        val depositAccounts: List<DepositAccount>,
+        val roles: MutableSet<Long>
 ) : Serializable {
     constructor(source: AccountResource) : this(
             id = source.id,
@@ -18,6 +19,7 @@ class AccountRecord(
                     ?.toUpperCase(Locale.ENGLISH)
                     ?.let(KycRecoveryStatus::valueOf)
                     ?: KycRecoveryStatus.NONE,
+            roles = source.roles.map { it.id.toLong() }.toMutableSet(),
             // TODO: Deposit
             depositAccounts = emptyList()
     )

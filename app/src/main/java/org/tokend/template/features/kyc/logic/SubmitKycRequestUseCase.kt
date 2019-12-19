@@ -1,12 +1,15 @@
 package org.tokend.template.features.kyc.logic
 
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.blobs.model.Blob
 import org.tokend.sdk.api.blobs.model.BlobType
 import org.tokend.sdk.factory.GsonFactory
+import org.tokend.sdk.keyserver.KeyServer
 import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
@@ -36,15 +39,35 @@ class SubmitKycRequestUseCase(
 ) {
     private val requestIdToSubmit = 0L
 
-    private var roleToSet: Long = 0L
+    private var roleToAdd: Long = 0L
+    private var requestType: Long = 0L
+    private lateinit var currentRoles: Set<Long>
     private lateinit var formBlobId: String
     private lateinit var networkParams: NetworkParams
     private lateinit var newKycState: KycState
 
     fun perform(): Completable {
-        return getRoleToSet()
+        return ensureKeyValues()
+                .flatMap {
+                    getRoleToAdd()
+                }
                 .doOnSuccess { roleToSet ->
-                    this.roleToSet = roleToSet
+                    this.roleToAdd = roleToSet
+                }
+                .flatMap {
+                    getRequestType()
+                }
+                .doOnSuccess { requestType ->
+                    this.requestType = requestType
+                }
+                .flatMap {
+                    getCurrentRoles()
+                }
+                .doOnSuccess { currentRoles ->
+                    this.currentRoles = currentRoles
+                }
+                .flatMap {
+                    validateRoleToSet()
                 }
                 .flatMap {
                     uploadFormAsBlob()
@@ -76,7 +99,18 @@ class SubmitKycRequestUseCase(
                 .ignoreElement()
     }
 
-    private fun getRoleToSet(): Single<Long> {
+    private fun ensureKeyValues(): Single<Boolean> {
+        return repositoryProvider
+                .keyValueEntries()
+                .ensureEntries(listOf(
+                        KEY_GENERAL_ACCOUNT_ROLE,
+                        KEY_CORPORATE_ACCOUNT_ROLE,
+                        KycStateRepository.CHANGE_ROLE_REQUEST_TYPE_KEY
+                ))
+                .map { true }
+    }
+
+    private fun getRoleToAdd(): Single<Long> {
         val key = when (form) {
             is KycForm.General -> KEY_GENERAL_ACCOUNT_ROLE
             is KycForm.Corporate -> KEY_CORPORATE_ACCOUNT_ROLE
@@ -87,10 +121,41 @@ class SubmitKycRequestUseCase(
 
         return repositoryProvider
                 .keyValueEntries()
-                .ensureEntries(listOf(key))
-                .map { it[key] }
+                .getEntry(key)
+                .toMaybe()
                 .map { it as KeyValueEntryRecord.Number }
                 .map { it.value }
+                .switchIfEmpty(Single.error(IllegalStateException("No role key value found: $key")))
+    }
+
+    private fun getRequestType(): Single<Long> {
+        return repositoryProvider
+                .keyValueEntries()
+                .getEntry(KeyServer.DEFAULT_SIGNER_ROLE_KEY_VALUE_KEY)
+                .toMaybe()
+                .map { it as KeyValueEntryRecord.Number }
+                .map { it.value }
+                .switchIfEmpty(Single.error(IllegalStateException("No request type key value found: " +
+                        KeyServer.DEFAULT_SIGNER_ROLE_KEY_VALUE_KEY)))
+    }
+
+    private fun getCurrentRoles(): Single<Set<Long>> {
+        return repositoryProvider
+                .account()
+                .run {
+                    updateIfNotFreshDeferred()
+                            .andThen(Maybe.defer<Set<Long>> { item?.roles.toMaybe() })
+                            .switchIfEmpty(Single.error(
+                                    IllegalStateException("Unable to obtain current roles")))
+                }
+    }
+
+    private fun validateRoleToSet(): Single<Boolean> {
+        return if (currentRoles.contains(roleToAdd))
+            Single.error(IllegalArgumentException(
+                    "Attempt to add role $roleToAdd which is already there"))
+        else
+            Single.just(true)
     }
 
     private fun uploadFormAsBlob(): Single<String> {
@@ -129,14 +194,14 @@ class SubmitKycRequestUseCase(
         return Single.defer {
             val operation = ChangeAccountRolesOp(
                     destinationAccount = PublicKeyFactory.fromAccountId(accountId),
-                    rolesToSet = arrayOf(roleToSet),
+                    rolesToSet = arrayOf(*currentRoles.toTypedArray(), roleToAdd),
                     details = "{\"blob_id\":\"$formBlobId\"}",
                     ext = EmptyExt.EmptyVersion()
             )
 
             val request = CreateReviewableRequestOp(
                     operations = arrayOf(ReviewableRequestOperation.ChangeAccountRoles(operation)),
-                    securityType = 0,
+                    securityType = requestType.toInt(),
                     ext = EmptyExt.EmptyVersion()
             )
 
@@ -148,7 +213,7 @@ class SubmitKycRequestUseCase(
             transaction.addSignature(account)
 
             Single.just(transaction)
-        }.subscribeOn(Schedulers.newThread())
+        }.subscribeOn(Schedulers.computation())
     }
 
     private fun getNewKycState(): Single<KycState.Submitted.Pending<KycForm>> {
@@ -168,11 +233,17 @@ class SubmitKycRequestUseCase(
                 .kycState()
                 .set(newKycState)
 
+        repositoryProvider
+                .account()
+                .item
+                ?.roles
+                ?.add(roleToAdd)
+
         return Single.just(true)
     }
 
     private companion object {
-        private const val KEY_GENERAL_ACCOUNT_ROLE = "account_role:general"
-        private const val KEY_CORPORATE_ACCOUNT_ROLE = "account_role:corporate"
+        private const val KEY_GENERAL_ACCOUNT_ROLE = "role:general"
+        private const val KEY_CORPORATE_ACCOUNT_ROLE = "role:corporate"
     }
 }

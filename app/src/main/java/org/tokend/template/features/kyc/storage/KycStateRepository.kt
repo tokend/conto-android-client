@@ -13,14 +13,15 @@ import org.tokend.sdk.api.ingester.generated.resources.ReviewableRequestResource
 import org.tokend.sdk.api.ingester.requests.model.RequestState
 import org.tokend.sdk.api.ingester.requests.params.IngesterRequestParams
 import org.tokend.sdk.api.ingester.requests.params.IngesterRequestsPageParams
+import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.data.repository.BlobsRepository
+import org.tokend.template.data.repository.KeyValueEntriesRepository
 import org.tokend.template.data.repository.base.SimpleSingleItemRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.signin.model.ForcedAccountType
-import org.tokend.wallet.xdr.OperationType
 
 /**
  * Holds user's KYC data and it's state
@@ -29,7 +30,8 @@ class KycStateRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val submittedStatePersistor: SubmittedKycStatePersistor?,
-        private val blobsRepository: BlobsRepository
+        private val blobsRepository: BlobsRepository,
+        private val keyValueEntriesRepository: KeyValueEntriesRepository
 ) : SimpleSingleItemRepository<KycState>() {
     private class NoRequestFoundException : Exception()
 
@@ -79,11 +81,6 @@ class KycStateRepository(
     }
 
     override fun getItem(): Observable<KycState> {
-        // TODO: KYC
-        return Observable.just(KycState.Submitted.Approved(
-                formData = KycForm.General("Dummy", "Data"),
-                requestId = 42L
-        ))
         val signedApi = apiProvider.getSignedApi()
                 ?: return Observable.error(IllegalStateException("No signed API instance found"))
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
@@ -127,19 +124,25 @@ class KycStateRepository(
 
     private fun getLastKycRequest(signedApi: TokenDApi,
                                   accountId: String): Maybe<ReviewableRequestResource> {
-        return signedApi
-                .ingester
-                .requests
-                .getPage(IngesterRequestsPageParams(
-                        requestor = accountId,
-                        type = OperationType.CHANGE_ACCOUNT_ROLES.value,
-                        include = listOf(IngesterRequestParams.REQUEST_DETAILS),
-                        pagingParams = PagingParamsV2(
-                                order = PagingOrder.DESC,
-                                limit = 1
-                        )
-                ))
-                .toSingle()
+        return keyValueEntriesRepository
+                .ensureEntries(listOf(CHANGE_ROLE_REQUEST_TYPE_KEY))
+                .map { it[CHANGE_ROLE_REQUEST_TYPE_KEY] as KeyValueEntryRecord.Number }
+                .map { it.value.toInt() }
+                .flatMap { requestType ->
+                    signedApi
+                            .ingester
+                            .requests
+                            .getPage(IngesterRequestsPageParams(
+                                    requestor = accountId,
+                                    type = requestType,
+                                    include = listOf(IngesterRequestParams.REQUEST_DETAILS),
+                                    pagingParams = PagingParamsV2(
+                                            order = PagingOrder.DESC,
+                                            limit = 1
+                                    )
+                            ))
+                            .toSingle()
+                }
                 .flatMapMaybe { page ->
                     page.items.firstOrNull().toMaybe()
                 }
@@ -188,5 +191,9 @@ class KycStateRepository(
                         KycForm.Empty
                     }
                 }
+    }
+
+    companion object {
+        const val CHANGE_ROLE_REQUEST_TYPE_KEY = "request:change_role"
     }
 }
