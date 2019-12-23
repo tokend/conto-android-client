@@ -40,7 +40,7 @@ class MarketplaceOfferRecord(
             get() = type == MarketplacePaymentMethodType.FORBILL && asset.code == "UAH"
 
         override val name: String?
-            get() = if (isCreditCard) "Credit card" else asset.name
+            get() = if (isCreditCard) "Credit card" else asset.name ?: asset.code
         // endregion
     }
 
