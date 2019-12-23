@@ -10,6 +10,7 @@ import android.webkit.WebViewClient
 import kotlinx.android.synthetic.main.activity_web_invoice.*
 import kotlinx.android.synthetic.main.toolbar.*
 import okhttp3.HttpUrl
+import org.tokend.sdk.redirects.ClientRedirectPayload
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 
@@ -67,14 +68,25 @@ class WebInvoiceActivity : BaseActivity() {
         val currentUrl = HttpUrl.parse(url)
                 ?: return
 
-        // Successful payment causes redirect to web client.
+        // Completed or failed payment causes redirect to web client.
         if (currentUrl.host() == successRedirectUrl.host()) {
-            finishWithSuccess()
+            val isSuccess = ClientRedirectPayload.fromUrl(url)
+                    ?.meta
+                    ?.get("is_success")
+                    ?.takeIf { it.isJsonPrimitive }
+                    ?.asJsonPrimitive
+                    ?.takeIf { it.isBoolean }
+                    ?.asBoolean == true
+
+            if (isSuccess) {
+                finishWithSuccess()
+            } else {
+                finish()
+            }
         }
     }
 
     private fun finishWithSuccess() {
-        toastManager.long(R.string.asset_will_be_received_in_a_moment)
         setResult(Activity.RESULT_OK)
         finish()
     }
