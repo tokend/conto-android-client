@@ -20,6 +20,7 @@ open class PaymentRecipient(
      * Recipient for [PaymentRequest] to not existing account
      * which requires counterparty account.
      */
+    // TODO: Remove me after legacy support is expired
     class NotExisting(
             counterpartyAccountId: String,
             val actualEmail: String

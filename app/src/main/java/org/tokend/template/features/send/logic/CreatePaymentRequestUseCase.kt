@@ -29,7 +29,6 @@ class CreatePaymentRequestUseCase(
 
     private lateinit var senderAccount: String
     private lateinit var senderBalance: String
-    private var subjectContent = subject
 
     fun perform(): Single<PaymentRequest> {
         return getSenderInfo()
@@ -45,12 +44,6 @@ class CreatePaymentRequestUseCase(
                 }
                 .doOnSuccess { senderBalance ->
                     this.senderBalance = senderBalance
-                }
-                .flatMap {
-                    getSubjectContent()
-                }
-                .doOnSuccess { subjectContent ->
-                    this.subjectContent = subjectContent.takeIf(String::isNotEmpty)
                 }
                 .flatMap {
                     getPaymentRequest()
@@ -80,15 +73,6 @@ class CreatePaymentRequestUseCase(
                 ))
     }
 
-    private fun getSubjectContent(): Single<String> {
-        val content = if (recipient is PaymentRecipient.NotExisting)
-            recipient.wrapPaymentSubject(senderAccount, subject)
-        else
-            subject ?: ""
-
-        return Single.just(content)
-    }
-
     private fun getPaymentRequest(): Single<PaymentRequest> {
         return Single.just(
                 PaymentRequest(
@@ -98,7 +82,7 @@ class CreatePaymentRequestUseCase(
                         senderBalanceId = senderBalance,
                         recipient = recipient,
                         fee = fee,
-                        paymentSubject = subjectContent,
+                        paymentSubject = subject,
                         actualPaymentSubject = subject
                 )
         )
