@@ -19,11 +19,13 @@ class CompanyRecord(
             name = source.name.takeIf(String::isNotEmpty) ?: "Unnamed company",
             industry = source.industry.takeIf(String::isNotEmpty),
             logoUrl = source.logoJson
-                    .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
-                    .getUrl(urlConfig?.storage),
+                    ?.takeIf(String::isNotEmpty)
+                    ?.let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
+                    ?.getUrl(urlConfig?.storage),
             bannerUrl = source.bannerJson
-                    .let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
-                    .getUrl(urlConfig?.storage),
+                    ?.takeIf(String::isNotEmpty)
+                    ?.let { GsonFactory().getBaseGson().fromJson(it, RemoteFile::class.java) }
+                    ?.getUrl(urlConfig?.storage),
             descriptionMd = source.description?.takeIf(String::isNotEmpty),
             conversionAssetCode = source.statsQuoteAsset.takeIf(String::isNotEmpty)
     )
