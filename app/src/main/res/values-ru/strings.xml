@@ -539,6 +539,7 @@
     <string name="account_setup_completed">Регистрация завершена</string>
     <string name="complete_account_setup_explanation">Дополните ваши данные чтобы завершить регистрацию</string>
     <string name="error_no_recipients_for_issuance">Не найдено получателей для начисления</string>
+    <string name="error_recipient_list_contains_non_existing_accounts">Некоторые аккаунты не существуют</string>
     <string name="issuance_recipients">Получатели</string>
     <string name="sign_out_by_env_change_explanation">Выход из-за смены окружения</string>
     <string name="environment">Окружение</string>

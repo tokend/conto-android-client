@@ -262,7 +262,7 @@ class MassIssuanceActivity : BaseActivity() {
                 emails,
                 asset,
                 amount,
-                PaymentRecipientLoader(repositoryProvider.accountDetails(), apiProvider),
+                PaymentRecipientLoader(repositoryProvider.accountDetails()),
                 walletInfoProvider,
                 repositoryProvider
         )
@@ -289,11 +289,14 @@ class MassIssuanceActivity : BaseActivity() {
         when (error) {
             is CreateMassIssuanceRequestUseCase.NoValidRecipientsException -> {
                 emails_edit_text.setErrorAndFocus(R.string.error_no_recipients_for_issuance)
-                updateIssuanceAvailability()
+            }
+            is PaymentRecipientLoader.NoRecipientFoundException -> {
+                emails_edit_text.setErrorAndFocus(R.string.error_recipient_list_contains_non_existing_accounts)
             }
             else ->
                 errorHandlerFactory.getDefault().handle(error)
         }
+        updateIssuanceAvailability()
     }
 
     private fun update(force: Boolean = false) {

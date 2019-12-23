@@ -44,6 +44,7 @@ import org.tokend.template.util.validator.GlobalPhoneNumberValidator
 import org.tokend.template.view.ContentLoadingProgressBar
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.PhoneNumberUtil
+import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.wallet.Base32Check
 import java.util.concurrent.TimeUnit
@@ -66,6 +67,10 @@ open class PaymentRecipientFragment : BaseFragment() {
         get() = repositoryProvider.contacts()
 
     private val contactsAdapter = ContactsAdapter()
+
+    private val paymentRecipientLoader: PaymentRecipientLoader by lazy {
+        PaymentRecipientLoader(repositoryProvider.accountDetails())
+    }
 
     private var canContinue: Boolean = false
         set(value) {
@@ -294,10 +299,7 @@ open class PaymentRecipientFragment : BaseFragment() {
 
         recipientLoadingDisposable?.dispose()
         recipientLoadingDisposable =
-                PaymentRecipientLoader(
-                        repositoryProvider.accountDetails(),
-                        apiProvider
-                )
+                paymentRecipientLoader
                         .load(recipient)
                         .compose(ObservableTransformers.defaultSchedulersSingle())
                         .doOnSubscribe {
@@ -310,32 +312,31 @@ open class PaymentRecipientFragment : BaseFragment() {
                         }
                         .subscribeBy(
                                 onSuccess = this::onRecipientLoaded,
-                                onError = this::onRecipientLoadingError
+                                onError = { this.onRecipientLoadingError(it, recipient) }
                         )
                         .addTo(compositeDisposable)
     }
 
     private fun onRecipientLoaded(recipient: PaymentRecipient) {
         val currentAccountId = walletInfoProvider.getWalletInfo()?.accountId
-        val description = payment_description_edit_text.text
-                .toString()
-                .trim()
-                .takeIf { it.isNotEmpty() }
 
         if (currentAccountId == recipient.accountId) {
             recipient_edit_text.error = getString(R.string.error_cannot_send_to_yourself)
             updateContinueAvailability()
-        } else if (recipient is PaymentRecipient.NotExisting) {
-            showNotExistingRecipientWarning(recipient, description)
         } else {
-            resultSubject.onNext(PaymentRecipientAndDescription(recipient, description))
+            postResult(recipient)
         }
     }
 
-    private fun onRecipientLoadingError(e: Throwable) {
+    private fun onRecipientLoadingError(e: Throwable,
+                                        recipient: String) {
         when (e) {
             is PaymentRecipientLoader.NoRecipientFoundException ->
-                recipient_edit_text.error = getString(R.string.error_invalid_recipient)
+                if (EmailValidator.isValid(recipient)) {
+                    showNotExistingRecipientWarning(recipient)
+                } else {
+                    recipient_edit_text.error = getString(R.string.error_invalid_recipient)
+                }
             else ->
                 errorHandlerFactory.getDefault().handle(e)
         }
@@ -343,19 +344,45 @@ open class PaymentRecipientFragment : BaseFragment() {
     }
 
     @Suppress("DEPRECATION")
-    private fun showNotExistingRecipientWarning(recipient: PaymentRecipient.NotExisting,
-                                                description: String?) {
+    private fun showNotExistingRecipientWarning(email: String) {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.not_existing_payment_recipient_warning_title)
                 .setMessage(Html.fromHtml(resources.getString(
                         R.string.template_not_existing_payment_recipient_warning,
-                        recipient.actualEmail
+                        email
                 )))
                 .setPositiveButton(R.string.continue_action) { _, _ ->
-                    resultSubject.onNext(PaymentRecipientAndDescription(recipient, description))
+                    loadAndUseNotExistingRecipient(email)
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
+    }
+
+    private fun loadAndUseNotExistingRecipient(email: String) {
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getDialog(requireContext(), R.string.loading_data) {
+            disposable?.dispose()
+        }
+
+        disposable = paymentRecipientLoader
+                .loadForNotExistingAccount(email)
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::postResult,
+                        onError = { onRecipientLoadingError(it, email) }
+                )
+    }
+
+    private fun postResult(recipient: PaymentRecipient) {
+        val description = payment_description_edit_text.text
+                .toString()
+                .trim()
+                .takeIf { it.isNotEmpty() }
+
+        resultSubject.onNext(PaymentRecipientAndDescription(recipient, description))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -539,6 +539,7 @@
     <string name="account_setup_completed">Реєстрацію завершено</string>
     <string name="complete_account_setup_explanation">Доповніть ваші дані щоб завершити реєстрацію</string>
     <string name="error_no_recipients_for_issuance">Не знайдено отримувачів для нарахування</string>
+    <string name="error_recipient_list_contains_non_existing_accounts">Деякі акаунти не існують</string>
     <string name="issuance_recipients">Отримувачі</string>
     <string name="sign_out_by_env_change_explanation">Вихід через зміну оточення</string>
     <string name="environment">Оточення</string>

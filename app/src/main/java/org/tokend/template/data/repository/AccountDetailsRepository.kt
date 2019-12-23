@@ -168,4 +168,22 @@ class AccountDetailsRepository(
     fun invalidateCachedIdentity(accountId: String) {
         identities.remove(getCachedIdentity(accountId))
     }
+
+    fun createIdentity(email: String): Single<IdentityRecord> {
+        return apiProvider.getApi().identities
+                .create(email)
+                .toSingle()
+                .map(::IdentityRecord)
+                .doOnSuccess { createdIdentity ->
+                    identities.add(createdIdentity)
+                    listOf(
+                            createdIdentity.accountId,
+                            createdIdentity.email,
+                            createdIdentity.phoneNumber
+                    )
+                            .forEach {
+                                notExistingIdentifiers.remove(it)
+                            }
+                }
+    }
 }

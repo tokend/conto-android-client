@@ -3,8 +3,6 @@ package org.tokend.template.data.repository
 import io.reactivex.Single
 import org.jetbrains.anko.collections.forEachReversedByIndex
 import org.tokend.sdk.api.base.model.DataPage
-import org.tokend.sdk.api.base.params.PagingOrder
-import org.tokend.sdk.api.base.params.PagingParams
 import org.tokend.template.data.model.TradeHistoryRecord
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository

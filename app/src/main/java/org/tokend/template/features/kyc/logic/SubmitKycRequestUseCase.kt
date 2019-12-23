@@ -204,6 +204,7 @@ class SubmitKycRequestUseCase(
             val request = CreateReviewableRequestOp(
                     operations = arrayOf(ReviewableRequestOperation.ChangeAccountRoles(operation)),
                     securityType = requestType.toInt(),
+                    creatorDetails = "{}",
                     ext = EmptyExt.EmptyVersion()
             )
 
