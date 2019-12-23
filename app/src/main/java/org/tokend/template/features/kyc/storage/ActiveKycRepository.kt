@@ -75,14 +75,14 @@ class ActiveKycRepository(
                     try {
                         val valueJson = JSONObject(blob.valueString)
 
-                        val isGeneral = valueJson.has(KycForm.General.FIRST_NAME_KEY)
                         val isCorporate = valueJson.has(KycForm.Corporate.COMPANY_KEY)
+                        val isGeneral = valueJson.has(KycForm.General.FIRST_NAME_KEY)
 
                         when {
-                            isGeneral ->
-                                blob.getValue(KycForm.General::class.java)
                             isCorporate ->
                                 blob.getValue(KycForm.Corporate::class.java)
+                            isGeneral ->
+                                blob.getValue(KycForm.General::class.java)
                             else ->
                                 throw IllegalStateException("Unknown KYC form type")
                         }

@@ -44,7 +44,6 @@ import org.tokend.template.features.invest.view.SaleInvestActivity
 import org.tokend.template.features.invites.view.InviteNewUsersActivity
 import org.tokend.template.features.kyc.model.ActiveKyc
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.features.kyc.model.KycRequestState
 import org.tokend.template.features.kyc.view.ClientKycActivity
 import org.tokend.template.features.kyc.view.WaitForKycApprovalActivity
 import org.tokend.template.features.localaccount.importt.view.ImportLocalAccountActivity
@@ -536,20 +535,16 @@ class Navigator private constructor() {
     fun performPostSignInRouting(activeKyc: ActiveKyc?) {
         val kycForm = (activeKyc as? ActiveKyc.Form)?.formData
 
-        if (kycForm is KycForm.Corporate) {
-            if (activeKyc is KycRequestState.Submitted.Approved<*>) {
+        when (kycForm) {
+            is KycForm.Corporate -> {
                 toCorporateMainActivity()
-            } else {
+            }
+            is KycForm.General -> {
                 toClientMainActivity()
             }
-        } else if (kycForm is KycForm.General) {
-            if (activeKyc is KycRequestState.Submitted.Pending<*>) {
-                toWaitingForKycApproval()
-            } else {
-                toClientMainActivity()
+            else -> {
+                toClientKyc()
             }
-        } else {
-            toClientKyc()
         }
     }
 
