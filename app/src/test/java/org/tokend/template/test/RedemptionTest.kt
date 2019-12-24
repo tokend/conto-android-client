@@ -61,7 +61,7 @@ class RedemptionTest {
                 ),
                 feeData = PaymentFeeData(emptyFee, emptyFee, false,
                         PaymentFeeData.PaymentFeeDataExt.EmptyVersion()),
-                reference = RedemptionRequest.getReferenceFromSalt(salt),
+                reference = "$salt",
                 subject = "",
                 ext = PaymentOp.PaymentOpExt.EmptyVersion(),
                 securityType = 0
