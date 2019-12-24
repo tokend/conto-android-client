@@ -1,6 +1,5 @@
 package org.tokend.template.features.redeem.model
 
-import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.template.features.send.model.PaymentType
@@ -128,9 +127,6 @@ class RedemptionRequest(
 
         fun fromSerialized(networkParams: NetworkParams,
                            serializedRequest: ByteArray): RedemptionRequest {
-            println(serializedRequest.forEachIndexed { i, byte ->
-                println("#${i + 1} ${byteArrayOf(byte).encodeHexString()}")
-            })
             try {
                 DataInputStream(ByteArrayInputStream(serializedRequest)).use { stream ->
                     return RedemptionRequest(
