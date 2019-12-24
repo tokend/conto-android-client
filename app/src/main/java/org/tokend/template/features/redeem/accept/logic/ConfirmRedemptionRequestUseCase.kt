@@ -10,6 +10,7 @@ import org.tokend.sdk.api.ingester.accounts.params.IngesterAccountParams
 import org.tokend.sdk.api.ingester.generated.resources.IngesterStateResource
 import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.sdk.utils.extentions.toNetworkParams
+import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
@@ -31,6 +32,7 @@ class ConfirmRedemptionRequestUseCase(
     private lateinit var systemInfo: IngesterStateResource
     private lateinit var networkParams: NetworkParams
     private lateinit var senderBalanceId: String
+    private var securityType: Int = 0
     private lateinit var transaction: Transaction
     private lateinit var submitTransactionResponse: TransactionResource
 
@@ -51,6 +53,12 @@ class ConfirmRedemptionRequestUseCase(
                 }
                 .doOnSuccess { accountId ->
                     this.accountId = accountId
+                }
+                .flatMap {
+                    getSecurityType()
+                }
+                .doOnSuccess { securityType ->
+                    this.securityType = securityType
                 }
                 .flatMap {
                     getTransaction()
@@ -111,9 +119,17 @@ class ConfirmRedemptionRequestUseCase(
                 .switchIfEmpty(Single.error(IllegalStateException("Missing account ID")))
     }
 
+    private fun getSecurityType(): Single<Int> {
+        return repositoryProvider
+                .keyValueEntries()
+                .ensureEntries(listOf(RedemptionRequest.PAYMENT_TYPE.keyValueKey))
+                .map { it[RedemptionRequest.PAYMENT_TYPE.keyValueKey] as KeyValueEntryRecord.Number }
+                .map { it.value.toInt() }
+    }
+
     private fun getTransaction(): Single<Transaction> {
         return {
-            request.toTransaction(senderBalanceId, accountId, networkParams)
+            request.toTransaction(senderBalanceId, accountId, networkParams, securityType)
         }.toSingle().subscribeOn(Schedulers.newThread())
     }
 

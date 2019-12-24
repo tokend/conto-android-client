@@ -9,6 +9,7 @@ import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.features.send.model.PaymentType
 import java.math.BigDecimal
 
 /**
@@ -17,6 +18,7 @@ import java.math.BigDecimal
  * loads sender's and recipient's fees
  */
 class CreatePaymentRequestUseCase(
+        private val type: PaymentType,
         private val recipient: PaymentRecipient,
         private val amount: BigDecimal,
         private val asset: Asset,
@@ -76,6 +78,7 @@ class CreatePaymentRequestUseCase(
     private fun getPaymentRequest(): Single<PaymentRequest> {
         return Single.just(
                 PaymentRequest(
+                        type = type,
                         amount = amount,
                         asset = asset,
                         senderAccountId = senderAccount,

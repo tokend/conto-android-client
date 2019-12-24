@@ -14,6 +14,7 @@ import org.tokend.template.di.providers.WalletInfoProviderFactory
 import org.tokend.template.features.send.amount.logic.PaymentFeeLoader
 import org.tokend.template.features.send.logic.ConfirmPaymentRequestUseCase
 import org.tokend.template.features.send.logic.CreatePaymentRequestUseCase
+import org.tokend.template.features.send.model.PaymentType
 import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import org.tokend.template.logic.FeeManager
 import org.tokend.template.logic.Session
@@ -65,6 +66,7 @@ class PaymentsTest {
         val fee = feeLoader.load(paymentAmount, asset, recipient.accountId).blockingGet()
 
         val useCase = CreatePaymentRequestUseCase(
+                PaymentType.USER_TO_USER,
                 recipient,
                 paymentAmount,
                 SimpleAsset(asset),
@@ -122,6 +124,7 @@ class PaymentsTest {
                 .blockingGet()
 
         val request = CreatePaymentRequestUseCase(
+                PaymentType.USER_TO_USER,
                 recipient,
                 paymentAmount,
                 SimpleAsset(asset),

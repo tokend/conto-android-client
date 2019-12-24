@@ -5,6 +5,7 @@ import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
@@ -35,6 +36,7 @@ class CreateRedemptionRequestUseCase(
     private lateinit var networkParams: NetworkParams
     private lateinit var senderAccountId: String
     private lateinit var balance: BalanceRecord
+    private var securityType: Int = 0
     private lateinit var transaction: Transaction
 
     fun perform(): Single<Result> {
@@ -59,6 +61,12 @@ class CreateRedemptionRequestUseCase(
                 }
                 .doOnSuccess { balance ->
                     this.balance = balance
+                }
+                .flatMap {
+                    getSecurityType()
+                }
+                .doOnSuccess { securityType ->
+                    this.securityType = securityType
                 }
                 .flatMap {
                     getTransaction()
@@ -104,6 +112,14 @@ class CreateRedemptionRequestUseCase(
                 .switchIfEmpty(Single.error(IllegalStateException("Missing account ID")))
     }
 
+    private fun getSecurityType(): Single<Int> {
+        return repositoryProvider
+                .keyValueEntries()
+                .ensureEntries(listOf(RedemptionRequest.PAYMENT_TYPE.keyValueKey))
+                .map { it[RedemptionRequest.PAYMENT_TYPE.keyValueKey] as KeyValueEntryRecord.Number }
+                .map { it.value.toInt() }
+    }
+
     private fun getTransaction(): Single<Transaction> {
         val recipientAccountId = balance.asset.ownerAccountId
 
@@ -125,8 +141,7 @@ class CreateRedemptionRequestUseCase(
                 ),
                 reference = salt.toString(),
                 subject = "",
-                // TODO: Figure out
-                securityType = 0,
+                securityType = securityType,
                 ext = PaymentOp.PaymentOpExt.EmptyVersion()
         )
 

@@ -7,6 +7,7 @@ import java.math.BigDecimal
 import java.security.SecureRandom
 
 data class PaymentRequest(
+        val type: PaymentType,
         val amount: BigDecimal,
         val asset: Asset,
         val senderAccountId: String,

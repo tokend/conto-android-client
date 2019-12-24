@@ -3,6 +3,7 @@ package org.tokend.template.features.send.logic
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.send.model.PaymentRequest
@@ -27,12 +28,19 @@ class ConfirmPaymentRequestUseCase(
         private val txManager: TxManager
 ) {
     private lateinit var networkParams: NetworkParams
+    private var securityType: Int = 0
     private lateinit var resultMetaXdr: String
 
     fun perform(): Completable {
         return getNetworkParams()
                 .doOnSuccess { networkParams ->
                     this.networkParams = networkParams
+                }
+                .flatMap {
+                    getSecurityType()
+                }
+                .doOnSuccess { securityType ->
+                    this.securityType = securityType
                 }
                 .flatMap {
                     getTransaction()
@@ -65,8 +73,7 @@ class ConfirmPaymentRequestUseCase(
                             sourcePaysForDest = request.fee.senderPaysForRecipient,
                             ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                     ),
-                    // TODO: Figure out
-                    securityType = 0,
+                    securityType = securityType,
                     ext = PaymentOp.PaymentOpExt.EmptyVersion()
             )
 
@@ -90,6 +97,14 @@ class ConfirmPaymentRequestUseCase(
         return repositoryProvider
                 .systemInfo()
                 .getNetworkParams()
+    }
+
+    private fun getSecurityType(): Single<Int> {
+        return repositoryProvider
+                .keyValueEntries()
+                .ensureEntries(listOf(request.type.keyValueKey))
+                .map { it[request.type.keyValueKey] as KeyValueEntryRecord.Number }
+                .map { it.value.toInt() }
     }
 
     private fun updateRepositories() {

@@ -3,6 +3,7 @@ package org.tokend.template.features.redeem.model
 import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentFee
+import org.tokend.template.features.send.model.PaymentType
 import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.xdr.*
@@ -42,7 +43,8 @@ class RedemptionRequest(
 
     fun toTransaction(senderBalanceId: String,
                       recipientAccountId: String,
-                      networkParams: NetworkParams): Transaction {
+                      networkParams: NetworkParams,
+                      securityType: Int): Transaction {
         val zeroFee = SimpleFeeRecord(BigDecimal.ZERO, BigDecimal.ZERO)
         val fee = PaymentFee(zeroFee, zeroFee)
 
@@ -60,8 +62,7 @@ class RedemptionRequest(
                         sourcePaysForDest = false,
                         ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                 ),
-                // TODO: Figure out
-                securityType = 0,
+                securityType = securityType,
                 ext = PaymentOp.PaymentOpExt.EmptyVersion()
         )
 
@@ -78,6 +79,7 @@ class RedemptionRequest(
 
     companion object {
         private val STRING_CHARSET = Charsets.UTF_8
+        val PAYMENT_TYPE = PaymentType.USER_TO_USER
 
         fun fromTransaction(transaction: Transaction,
                             assetCode: String): RedemptionRequest {
@@ -127,7 +129,7 @@ class RedemptionRequest(
         fun fromSerialized(networkParams: NetworkParams,
                            serializedRequest: ByteArray): RedemptionRequest {
             println(serializedRequest.forEachIndexed { i, byte ->
-                println("#${i+1} ${byteArrayOf(byte).encodeHexString()}")
+                println("#${i + 1} ${byteArrayOf(byte).encodeHexString()}")
             })
             try {
                 DataInputStream(ByteArrayInputStream(serializedRequest)).use { stream ->

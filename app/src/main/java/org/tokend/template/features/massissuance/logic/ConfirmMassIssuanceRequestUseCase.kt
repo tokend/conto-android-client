@@ -4,11 +4,13 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.tokend.sdk.api.ingester.generated.resources.TransactionResource
 import org.tokend.sdk.utils.extentions.encodeBase64String
+import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.send.model.PaymentRecipient
+import org.tokend.template.features.send.model.PaymentType
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.PublicKeyFactory
@@ -32,12 +34,19 @@ class ConfirmMassIssuanceRequestUseCase(
         private val repositoryProvider: RepositoryProvider
 ) {
     private lateinit var networkParams: NetworkParams
+    private var securityType: Int = 0
     private lateinit var transaction: Transaction
 
     fun perform(): Completable {
         return getNetworkParams()
                 .doOnSuccess { networkParams ->
                     this.networkParams = networkParams
+                }
+                .flatMap {
+                    getSecurityType()
+                }
+                .doOnSuccess { securityType ->
+                    this.securityType = securityType
                 }
                 .flatMap {
                     getTransaction()
@@ -58,6 +67,14 @@ class ConfirmMassIssuanceRequestUseCase(
         return repositoryProvider
                 .systemInfo()
                 .getNetworkParams()
+    }
+
+    private fun getSecurityType(): Single<Int> {
+        return repositoryProvider
+                .keyValueEntries()
+                .ensureEntries(listOf(PAYMENT_TYPE.keyValueKey))
+                .map { it[PAYMENT_TYPE.keyValueKey] as KeyValueEntryRecord.Number }
+                .map { it.value.toInt() }
     }
 
     private fun getTransaction(): Single<Transaction> {
@@ -86,8 +103,7 @@ class ConfirmMassIssuanceRequestUseCase(
                                 recipient.wrapPaymentSubject(request.issuerAccountId, actualSubject)
                             else
                                 actualSubject,
-                            // TODO: Figure out
-                            securityType = 0,
+                            securityType = securityType,
                             ext = PaymentOp.PaymentOpExt.EmptyVersion()
                     )
             )
@@ -107,5 +123,9 @@ class ConfirmMassIssuanceRequestUseCase(
     private fun updateRepositories() {
         repositoryProvider.balances().updateIfEverUpdated()
         repositoryProvider.balanceChanges(request.issuerBalanceId).updateIfEverUpdated()
+    }
+
+    companion object {
+        private val PAYMENT_TYPE = PaymentType.USER_TO_USER
     }
 }

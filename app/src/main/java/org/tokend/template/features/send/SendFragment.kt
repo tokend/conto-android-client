@@ -31,6 +31,7 @@ import org.tokend.template.features.send.logic.CreatePaymentRequestUseCase
 import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.send.model.PaymentRequest
+import org.tokend.template.features.send.model.PaymentType
 import org.tokend.template.features.send.recipient.model.PaymentRecipientAndDescription
 import org.tokend.template.features.send.recipient.view.PaymentRecipientFragment
 import org.tokend.template.fragments.BaseFragment
@@ -276,6 +277,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
         paymentRequestDisposable?.dispose()
         paymentRequestDisposable = CreatePaymentRequestUseCase(
+                PaymentType.USER_TO_USER,
                 recipient,
                 amount,
                 asset,
