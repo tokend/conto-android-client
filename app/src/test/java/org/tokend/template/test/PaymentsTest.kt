@@ -58,7 +58,7 @@ class PaymentsTest {
         Util.getSomeMoney(asset, emissionAmount,
                 repositoryProvider, session, txManager)
 
-        val recipient = PaymentRecipientLoader(repositoryProvider.accountDetails(), apiProvider)
+        val recipient = PaymentRecipientLoader(repositoryProvider.accountDetails())
                 .load(recipientEmail)
                 .blockingGet()
 
@@ -115,7 +115,7 @@ class PaymentsTest {
         val initialBalance = Util.getSomeMoney(asset, emissionAmount,
                 repositoryProvider, session, txManager)
 
-        val recipient = PaymentRecipientLoader(repositoryProvider.accountDetails(), apiProvider)
+        val recipient = PaymentRecipientLoader(repositoryProvider.accountDetails())
                 .load(recipientEmail)
                 .blockingGet()
 
@@ -214,7 +214,7 @@ class PaymentsTest {
         val initialBalance = Util.getSomeMoney(asset, emissionAmount,
                 repositoryProvider, session, txManager)
 
-        val recipient = PaymentRecipientLoader(repositoryProvider.accountDetails(), apiProvider)
+        val recipient = PaymentRecipientLoader(repositoryProvider.accountDetails())
                 .load(recipientEmail)
                 .blockingGet()
 
