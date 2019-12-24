@@ -2,7 +2,12 @@ package org.tokend.template.data.model.history.details
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
-import org.tokend.sdk.api.generated.resources.*
+import org.tokend.sdk.api.generated.resources.CreateWithdrawRequestOpResource
+import org.tokend.sdk.api.generated.resources.EffectMatchedResource
+import org.tokend.sdk.api.generated.resources.ManageAssetPairOpResource
+import org.tokend.sdk.api.generated.resources.ManageOfferOpResource
+import org.tokend.sdk.api.ingester.generated.resources.IssuanceOpResource
+import org.tokend.sdk.api.ingester.generated.resources.PaymentOpResource
 import org.tokend.sdk.factory.GsonFactory
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.SimpleAsset
@@ -23,9 +28,9 @@ sealed class BalanceChangeCause : Serializable {
     class AmlAlert(
             val reason: String?
     ) : BalanceChangeCause() {
-        constructor(op: CreateAmlAlertRequestOpResource) : this(
-                reason = op.creatorDetails?.get("reason")?.asText()?.takeIf { it.isNotEmpty() }
-        )
+//        constructor(op: CreateAmlAlertRequestOpResource) : this(
+//                reason = op.creatorDetails?.get("reason")?.asText()?.takeIf { it.isNotEmpty() }
+//        )
     }
 
     // ------- Offer -------- //
@@ -135,7 +140,7 @@ sealed class BalanceChangeCause : Serializable {
             val cause: String?,
             val reference: String?
     ) : BalanceChangeCause() {
-        constructor(op: CreateIssuanceRequestOpResource) : this(
+        constructor(op: IssuanceOpResource) : this(
                 cause = op.creatorDetails?.get("cause")?.asText(),
                 reference = op.reference
         )

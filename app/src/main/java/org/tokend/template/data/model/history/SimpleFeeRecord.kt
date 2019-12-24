@@ -1,7 +1,7 @@
 package org.tokend.template.data.model.history
 
-import org.tokend.sdk.api.generated.inner.Fee
-import org.tokend.sdk.api.generated.resources.CalculatedFeeResource
+import org.tokend.sdk.api.ingester.generated.inner.Fee
+import org.tokend.sdk.api.ingester.generated.resources.CalculatedFeeResource
 import org.tokend.wallet.NetworkParams
 import java.io.Serializable
 import java.math.BigDecimal
@@ -12,7 +12,11 @@ class SimpleFeeRecord(
 ): Serializable {
     constructor(feeResponse: Fee): this(feeResponse.fixed, feeResponse.calculatedPercent)
 
+    constructor(feeResponse: org.tokend.sdk.api.generated.inner.Fee): this(feeResponse.fixed, feeResponse.calculatedPercent)
+
     constructor(feeResponse: CalculatedFeeResource): this(feeResponse.fixed, feeResponse.calculatedPercent)
+
+    constructor(feeResponse: org.tokend.sdk.api.generated.resources.CalculatedFeeResource): this(feeResponse.fixed, feeResponse.calculatedPercent)
 
     val total = fixed + percent
 

@@ -1,11 +1,9 @@
 package org.tokend.template.data.model.history.converter
 
 import android.util.Log
-import org.tokend.sdk.api.base.model.BaseResource
-import org.tokend.sdk.api.generated.resources.*
-import org.tokend.sdk.api.ingester.generated.resources.BaseEffectResource
-import org.tokend.sdk.api.ingester.generated.resources.BaseOperationDetailsResource
-import org.tokend.sdk.api.ingester.generated.resources.ParticipantsEffectResource
+import org.tokend.sdk.api.generated.resources.EffectMatchedResource
+import org.tokend.sdk.api.generated.resources.EffectsWithdrawnResource
+import org.tokend.sdk.api.ingester.generated.resources.*
 import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.BalanceChangeAction
@@ -74,23 +72,23 @@ class DefaultParticipantEffectConverter : ParticipantEffectConverter {
             val (amount, fee, assetCode) = when (effect) {
                 is EffectBalanceChangeResource ->
                     Triple(effect.amount, effect.fee, relatedAssetCode)
-                is EffectMatchedResource -> {
-                    when (balanceId) {
-                        effect.charged.balanceAddress ->
-                            effect.charged.let {
-                                Triple(it.amount, it.fee, it.assetCode)
-                            }
-                        effect.funded.balanceAddress ->
-                            effect.funded.let {
-                                Triple(it.amount, it.fee, it.assetCode)
-                            }
-                        else -> {
-                            logError("Cannot choose 'funded' or 'charged' " +
-                                    "for balance $balanceId and effect ${(effect as BaseResource).id}")
-                            return@forEach
-                        }
-                    }
-                }
+//                is EffectMatchedResource -> {
+//                    when (balanceId) {
+//                        effect.charged.balanceAddress ->
+//                            effect.charged.let {
+//                                Triple(it.amount, it.fee, it.assetCode)
+//                            }
+//                        effect.funded.balanceAddress ->
+//                            effect.funded.let {
+//                                Triple(it.amount, it.fee, it.assetCode)
+//                            }
+//                        else -> {
+//                            logError("Cannot choose 'funded' or 'charged' " +
+//                                    "for balance $balanceId and effect ${(effect as BaseResource).id}")
+//                            return@forEach
+//                        }
+//                    }
+//                }
                 else -> {
                     logError("Cannot obtain amount and fee from effect ${effect.id} $effect")
                     return@forEach
@@ -141,31 +139,31 @@ class DefaultParticipantEffectConverter : ParticipantEffectConverter {
             when (operationDetails) {
                 is PaymentOpResource ->
                     BalanceChangeCause.Payment.fromPaymentOp(operationDetails)
-                is CreateIssuanceRequestOpResource ->
+                is IssuanceOpResource ->
                     BalanceChangeCause.Issuance(operationDetails)
-                is CreateWithdrawRequestOpResource ->
-                    BalanceChangeCause.WithdrawalRequest(operationDetails)
-                is ManageOfferOpResource ->
-                    when (effect) {
-                        is EffectMatchedResource -> BalanceChangeCause.MatchedOffer(operationDetails, effect)
-                        is EffectsUnlockedResource -> BalanceChangeCause.OfferCancellation
-                        else -> BalanceChangeCause.Offer(operationDetails)
-                    }
-                is CheckSaleStateOpResource ->
-                    when (effect) {
-                        is EffectMatchedResource -> BalanceChangeCause.Investment(effect)
-                        is EffectsIssuedResource -> BalanceChangeCause.Issuance(null, null)
-                        is EffectsUnlockedResource -> BalanceChangeCause.SaleCancellation
-                        else -> BalanceChangeCause.Unknown
-                    }
-                is CreateAmlAlertRequestOpResource ->
-                    BalanceChangeCause.AmlAlert(operationDetails)
-                is ManageAssetPairOpResource ->
-                    BalanceChangeCause.AssetPairUpdate(operationDetails)
-                is CreateAtomicSwapAskRequestOpResource ->
-                    BalanceChangeCause.AtomicSwapAskCreation
-                is CreateAtomicSwapBidRequestOpResource ->
-                    BalanceChangeCause.AtomicSwapAskCreation
+//                is CreateWithdrawRequestOpResource ->
+//                    BalanceChangeCause.WithdrawalRequest(operationDetails)
+//                is ManageOfferOpResource ->
+//                    when (effect) {
+//                        is EffectMatchedResource -> BalanceChangeCause.MatchedOffer(operationDetails, effect)
+//                        is EffectsUnlockedResource -> BalanceChangeCause.OfferCancellation
+//                        else -> BalanceChangeCause.Offer(operationDetails)
+//                    }
+//                is CheckSaleStateOpResource ->
+//                    when (effect) {
+//                        is EffectMatchedResource -> BalanceChangeCause.Investment(effect)
+//                        is EffectsIssuedResource -> BalanceChangeCause.Issuance(null, null)
+//                        is EffectsUnlockedResource -> BalanceChangeCause.SaleCancellation
+//                        else -> BalanceChangeCause.Unknown
+//                    }
+//                is CreateAmlAlertRequestOpResource ->
+//                    BalanceChangeCause.AmlAlert(operationDetails)
+//                is ManageAssetPairOpResource ->
+//                    BalanceChangeCause.AssetPairUpdate(operationDetails)
+//                is CreateAtomicSwapAskRequestOpResource ->
+//                    BalanceChangeCause.AtomicSwapAskCreation
+//                is CreateAtomicSwapBidRequestOpResource ->
+//                    BalanceChangeCause.AtomicSwapAskCreation
                 else ->
                     BalanceChangeCause.Unknown
             }

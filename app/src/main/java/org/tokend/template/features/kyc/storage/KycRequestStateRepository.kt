@@ -109,8 +109,8 @@ class KycRequestStateRepository(
 
     private fun getKycRequestAttributes(request: ReviewableRequestResource): KycRequestAttributes? {
         return try {
-            val state = RequestState.fromValue(request.stateI)
-            val blobId = request.requestDetails
+            val state = RequestState.fromValue(request.state.value)
+            val blobId = request
                     .creatorDetails
                     .get("blob_id")
                     ?.asText()
