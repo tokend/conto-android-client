@@ -27,9 +27,9 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
     private val needQuoteAssetSelection: Boolean
         get() = offer.paymentMethods.size > 1
 
-    private lateinit var quoteAssetTextView: TextView
-    private lateinit var quoteAssetPicker: BalancePickerBottomDialog
-    private lateinit var quoteAssetAvailableTextView: TextView
+    private var quoteAssetTextView: TextView? = null
+    private var quoteAssetPicker: BalancePickerBottomDialog? = null
+    private var quoteAssetAvailableTextView: TextView? = null
     private var quoteAsset: Asset? = null
         set(value) {
             field = value
@@ -41,9 +41,8 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
                 ?: throw IllegalArgumentException("No $OFFER_EXTRA specified")
 
         super.onInitAllowed()
-        onAssetChanged()
 
-        amount_edit_text.setText(PRE_FILLED_AMOUNT)
+        amountWrapper.setAmount(PRE_FILLED_AMOUNT)
     }
 
     override fun initFields() {
@@ -92,14 +91,14 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
 
     override fun displayBalance() {
         val paymentMethod = offer.paymentMethods
-                .first { it.code == quoteAsset?.code }
+                .find { it.code == quoteAsset?.code }
         val balance = balancesRepository.itemsList
-                .find { it.assetCode == paymentMethod.asset.code }
+                .find { it.assetCode == paymentMethod?.asset?.code }
 
-        if (paymentMethod.type == MarketplacePaymentMethodType.INTERNAL
+        if (paymentMethod?.type == MarketplacePaymentMethodType.INTERNAL
                 && balance != null) {
-            quoteAssetAvailableTextView.visibility = View.VISIBLE
-            quoteAssetAvailableTextView.text = getString(
+            quoteAssetAvailableTextView?.visibility = View.VISIBLE
+            quoteAssetAvailableTextView?.text = getString(
                     R.string.template_available,
                     amountFormatter.formatAssetAmount(
                             balance.available, balance.asset,
@@ -107,7 +106,7 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
                     )
             )
         } else {
-            quoteAssetAvailableTextView.visibility = View.GONE
+            quoteAssetAvailableTextView?.visibility = View.GONE
         }
     }
 
@@ -132,10 +131,13 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
 
         quoteAssetTextView = view.spinner_text_view
         quoteAssetAvailableTextView = view.available_text_view
-        quoteAssetTextView.setOnClickListener {
+        quoteAssetTextView?.setOnClickListener {
             openQuoteAssetPicker()
         }
-        quoteAsset = quoteAsset ?: quoteAssetPicker.getItemsToDisplay().first().asset
+        quoteAsset = quoteAsset
+                ?: (quoteAssetPicker
+                        ?: throw IllegalStateException("Quote asset picker must be initialized at this point"))
+                        .getItemsToDisplay().first().asset
 
         if (!needQuoteAssetSelection) {
             view.visibility = View.GONE
@@ -145,13 +147,13 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
     }
 
     private fun openQuoteAssetPicker() {
-        quoteAssetPicker.show {
+        quoteAssetPicker?.show {
             quoteAsset = it.asset
         }
     }
 
     private fun onQuoteAssetChanged() {
-        quoteAssetTextView.text = quoteAsset?.name ?: quoteAsset?.code
+        quoteAssetTextView?.text = quoteAsset?.name ?: quoteAsset?.code
         displayBalance()
     }
 
@@ -197,7 +199,7 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
     }
 
     companion object {
-        private const val PRE_FILLED_AMOUNT = "1"
+        private val PRE_FILLED_AMOUNT = BigDecimal.ONE
         private const val OFFER_EXTRA = "offer"
 
         fun getBundle(offer: MarketplaceOfferRecord) = Bundle().apply {

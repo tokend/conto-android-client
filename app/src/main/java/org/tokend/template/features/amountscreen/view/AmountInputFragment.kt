@@ -11,12 +11,14 @@ import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.fragment_amount_input.*
 import org.tokend.template.R
+import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
+import org.tokend.template.view.balancepicker.adapter.BalancePickerListItem
 import org.tokend.template.view.util.input.AmountEditTextWrapper
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
@@ -37,11 +39,13 @@ open class AmountInputFragment : BaseFragment() {
     protected val balancesRepository: BalancesRepository
         get() = repositoryProvider.balances()
 
-    protected open var asset: String = ""
+    protected var mAsset: Asset? = null
         set(value) {
             field = value
             onAssetChanged()
         }
+    protected val asset: Asset
+        get() = mAsset!!
 
     protected var balance: BalanceRecord? = null
 
@@ -67,6 +71,7 @@ open class AmountInputFragment : BaseFragment() {
         initTitle()
         initFields()
         initButtons()
+        initAsset()
         initAssetSelection()
         initExtraView()
         initAdaptiveTextSize()
@@ -181,12 +186,36 @@ open class AmountInputFragment : BaseFragment() {
         balancePicker = getBalancePicker()
     }
 
+    protected open fun initAsset() {
+        val assetsToDisplay = balancePicker
+                .getItemsToDisplay()
+                .map(BalancePickerListItem::asset)
+
+        if (assetsToDisplay.isEmpty()) {
+            return
+        }
+
+        val requestedAssetCode = this.requestedAsset
+
+        var requestedAssetFound = true
+        if (!requestedAssetSet) {
+            requestedAssetFound = assetsToDisplay
+                    .find { it.code == requestedAssetCode }
+                    ?.also { mAsset = it } != null
+            requestedAssetSet = true
+        }
+
+        if (!requestedAssetFound) {
+            mAsset = assetsToDisplay.first()
+        }
+    }
+
     protected open fun initAssetSelection() {
         asset_code_text_view.setOnClickListener {
             SoftInputUtil.hideSoftInput(requireActivity())
             balancePicker.show(
                     onItemPicked = { result ->
-                        asset = result.asset.code
+                        mAsset = result.asset
                     },
                     onDismiss = {
                         amount_edit_text.requestFocus()
@@ -197,7 +226,7 @@ open class AmountInputFragment : BaseFragment() {
             )
         }
 
-        if (asset.isNotEmpty()) {
+        if (mAsset != null) {
             onAssetChanged()
         }
     }
@@ -233,15 +262,14 @@ open class AmountInputFragment : BaseFragment() {
     }
 
     protected open fun onAssetChanged() {
-        balance = balancesRepository.itemsList.find { it.assetCode == asset }
+        balance = balancesRepository.itemsList.find { it.assetCode == asset.code }
         displayBalance()
-        amountWrapper.maxPlacesAfterComa = balance?.asset?.trailingDigits ?: 0
-        asset_code_text_view.text = balance?.asset?.name ?: asset
+        amountWrapper.maxPlacesAfterComa = asset.trailingDigits
+        asset_code_text_view.text = asset.code
     }
 
     protected open fun onBalancesUpdated() {
-        balance = balancesRepository.itemsList.find { it.assetCode == asset }
-        displayAssets()
+        balance = balancesRepository.itemsList.find { it.assetCode == asset.code }
         displayBalance()
         updateActionButtonAvailability()
     }
@@ -257,25 +285,6 @@ open class AmountInputFragment : BaseFragment() {
                 R.string.template_available,
                 amountFormatter.formatAssetAmount(available, asset, withAssetCode = false)
         )
-    }
-
-    protected open fun displayAssets() {
-        val assetsToDisplay = balancePicker
-                .getItemsToDisplay()
-                .map { it.asset.code }
-
-        if (assetsToDisplay.isEmpty()) {
-            return
-        }
-
-        if (!requestedAssetSet) {
-            requestedAsset?.also { asset = it }
-            requestedAssetSet = true
-        }
-
-        if (!assetsToDisplay.contains(asset)) {
-            asset = assetsToDisplay.first()
-        }
     }
 
     /**
