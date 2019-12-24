@@ -1,5 +1,6 @@
 package org.tokend.template.features.redeem.model
 
+import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.wallet.Base32Check
@@ -123,6 +124,9 @@ class RedemptionRequest(
 
         fun fromSerialized(networkParams: NetworkParams,
                            serializedRequest: ByteArray): RedemptionRequest {
+            println(serializedRequest.forEachIndexed { i, byte ->
+                println("#${i+1} ${byteArrayOf(byte).encodeHexString()}")
+            })
             try {
                 DataInputStream(ByteArrayInputStream(serializedRequest)).use { stream ->
                     return RedemptionRequest(
@@ -130,7 +134,12 @@ class RedemptionRequest(
                                     ByteArray(32).also { stream.read(it) }
                             ),
                             assetCode = String(
-                                    ByteArray(stream.readInt()).also { stream.read(it) },
+                                    ByteArray(
+                                            stream.readInt()
+                                                    .also { length ->
+                                                        require(length <= 32) { "Asset code length is too big" }
+                                                    }
+                                    ).also { stream.read(it) },
                                     STRING_CHARSET
                             ),
                             amount = networkParams.amountFromPrecised(stream.readLong()),
@@ -143,7 +152,11 @@ class RedemptionRequest(
                                     hint = XdrByteArrayFixed4(
                                             ByteArray(4).also { stream.read(it) }
                                     ),
-                                    signature = ByteArray(stream.available()).also { stream.read(it) }
+                                    signature = ByteArray(
+                                            stream.available().also { length ->
+                                                require(length <= 2048) { "Signature length is too big" }
+                                            }
+                                    ).also { stream.read(it) }
                             )
                     )
                 }
