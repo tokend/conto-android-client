@@ -24,7 +24,7 @@ class CreateBalanceTest {
         val password = Config.DEFAULT_PASSWORD
 
         val apiProvider =
-                ApiProviderFactory().createApiProvider(urlConfigProvider, session)
+                ApiProviderFactory().createApiProvider(urlConfigProvider, session, session)
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 

@@ -64,7 +64,7 @@ class TfaTest {
         }
 
         val apiProvider =
-                ApiProviderFactory().createApiProvider(urlConfigProvider, session, tfaCallback)
+                ApiProviderFactory().createApiProvider(urlConfigProvider, session, session, tfaCallback)
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 
@@ -131,7 +131,7 @@ class TfaTest {
         }
 
         val apiProvider =
-                ApiProviderFactory().createApiProvider(urlConfigProvider, session, tfaCallback)
+                ApiProviderFactory().createApiProvider(urlConfigProvider, session, session, tfaCallback)
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
 

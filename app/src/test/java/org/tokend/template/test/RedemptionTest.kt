@@ -56,14 +56,15 @@ class RedemptionTest {
         val op = PaymentOp(
                 sourceBalanceID = PublicKeyFactory.fromBalanceId(sourceBalanceId),
                 amount = netParams.amountToPrecised(amount),
-                destination = PaymentOp.PaymentOpDestination.Account(
+                destination = MovementDestination.Account(
                         PublicKeyFactory.fromAccountId(destinationAccountId)
                 ),
                 feeData = PaymentFeeData(emptyFee, emptyFee, false,
                         PaymentFeeData.PaymentFeeDataExt.EmptyVersion()),
                 reference = "$salt",
                 subject = "",
-                ext = PaymentOp.PaymentOpExt.EmptyVersion()
+                ext = PaymentOp.PaymentOpExt.EmptyVersion(),
+                securityType = 0
         )
 
         val tx = TransactionBuilder(netParams, sourceAccountId)

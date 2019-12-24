@@ -39,7 +39,7 @@ class PasswordChangeTest {
         }
 
         val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session,
-                tfaCallback)
+                session, tfaCallback)
 
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper())
@@ -59,9 +59,9 @@ class PasswordChangeTest {
         useCase.perform().blockingAwait()
 
         val signers = apiProvider.getApi()
-                .v3
-                .signers
-                .get(session.getWalletInfo()!!.accountId)
+                .ingester
+                .accounts
+                .getAccountSigners(session.getWalletInfo()!!.accountId)
                 .execute()
                 .get()
 

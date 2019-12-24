@@ -31,14 +31,14 @@ class SignInTest {
                 WalletInfoProviderFactory().createWalletInfoProvider(),
                 AccountProviderFactory().createAccountProvider()
         )
-        val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session)
+        val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session, session)
 
         val email = Util.getEmail()
         val password = Config.DEFAULT_PASSWORD
 
         val (walletData, rootAccount)
                 = apiProvider.getKeyServer()
-                .createAndSaveWallet(email, password, apiProvider.getApi().v3.keyValue)
+                .createAndSaveWallet(email, password, apiProvider.getApi().ingester.keyValue)
                 .execute().get()
 
         println("Email is $email")
@@ -80,7 +80,7 @@ class SignInTest {
                 WalletInfoProviderFactory().createWalletInfoProvider(),
                 AccountProviderFactory().createAccountProvider()
         )
-        val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session)
+        val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session, session)
 
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper(),
@@ -118,7 +118,7 @@ class SignInTest {
 
         try {
             apiProvider.getApi()
-                    .v3
+                    .ingester
                     .accounts
                     .getById(account.accountId)
                     .execute()
@@ -147,7 +147,7 @@ class SignInTest {
                 WalletInfoProviderFactory().createWalletInfoProvider(),
                 AccountProviderFactory().createAccountProvider()
         )
-        val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session)
+        val apiProvider = ApiProviderFactory().createApiProvider(urlConfigProvider, session, session)
 
         val repositoryProvider = RepositoryProviderImpl(apiProvider, session, urlConfigProvider,
                 JsonApiToolsProvider.getObjectMapper(),
@@ -224,9 +224,9 @@ class SignInTest {
     }
 
     private fun checkRepositories(repositoryProvider: RepositoryProvider) {
-        Assert.assertTrue("Companies repository must be updated after sign in",
-                repositoryProvider.clientCompanies().isFresh)
         Assert.assertTrue("Account repository must be updated after sign in",
                 repositoryProvider.account().isFresh)
+        Assert.assertTrue("Balances repository must be updated after sign in",
+                repositoryProvider.balances().isFresh)
     }
 }

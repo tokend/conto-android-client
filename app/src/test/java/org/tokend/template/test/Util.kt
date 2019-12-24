@@ -1,15 +1,12 @@
 package org.tokend.template.test
 
-import org.tokend.sdk.api.assets.model.AssetDetails
-import org.tokend.sdk.api.base.params.PagingOrder
-import org.tokend.sdk.api.base.params.PagingParams
-import org.tokend.sdk.api.requests.model.base.RequestState
-import org.tokend.sdk.api.requests.params.AssetRequestsParams
+import org.tokend.sdk.api.blobs.model.Blob
+import org.tokend.sdk.api.blobs.model.BlobType
+import org.tokend.sdk.api.ingester.assets.model.AssetState
 import org.tokend.sdk.factory.GsonFactory
 import org.tokend.sdk.keyserver.models.WalletCreateResult
-import org.tokend.sdk.utils.extentions.bitmask
-import org.tokend.sdk.utils.extentions.decodeHex
 import org.tokend.sdk.utils.extentions.encodeHexString
+import org.tokend.sdk.utils.extentions.toNetworkParams
 import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.data.repository.SystemInfoRepository
 import org.tokend.template.di.providers.*
@@ -21,11 +18,12 @@ import org.tokend.template.logic.TxManager
 import org.tokend.wallet.PublicKeyFactory
 import org.tokend.wallet.TransactionBuilder
 import org.tokend.wallet.xdr.*
-import org.tokend.wallet.xdr.op_extensions.CreateFeeOp
 import java.math.BigDecimal
 import java.security.SecureRandom
 
 object Util {
+    private val changeRoleBlob = "{\"first_name\":\"Verified\",\"last_name\":\"User\",\"company\":\"Mak\",\"headquarters\":\"\",\"industry\":\"Food delivery, mobile development \",\"homepage\":\"https://distributedlab.com\",\"description\":\"\",\"documents\":{\"kyc_avatar\":{\"mime_type\":\"image/png\",\"name\":\"new__mak_pusheen.png\",\"key\":\"dpurex4ingy25drvezv66zjnymjxbqj2qnh4og7ctouxampddozxgq4tdh5nfcnc67uk73hsyngwjaovjox2fcdz\"},\"bravo\":{\"mime_type\":\"image/jpeg\",\"name\":\"new__IMG_6468.jpg\",\"key\":\"dpurex4ingy25drvezv66zjnymjxbqj2qnh4og7ctouxampddozxgq4tdh5nfv6hspgesuhopecraurpmfuj3ayg\"}},\"bank_account\":null,\"invite\":\"\"}"
+
     fun getUrlConfigProvider(url: String = Config.API): UrlConfigProvider {
         return UrlConfigProviderFactory().createUrlConfigProvider(
                 UrlConfig(url, "", "")
@@ -38,7 +36,7 @@ object Util {
                           session: Session,
                           repositoryProvider: RepositoryProvider?): WalletCreateResult {
         val createResult = apiProvider.getKeyServer()
-                .createAndSaveWallet(email, password, apiProvider.getApi().v3.keyValue)
+                .createAndSaveWallet(email, password, apiProvider.getApi().ingester.keyValue)
                 .execute().get()
 
         println("Email is $email")
@@ -83,13 +81,13 @@ object Util {
         val api = apiProvider.getApi()
 
         val roleToSet = api
-                .v3
+                .ingester
                 .keyValue
                 .getById(roleKey)
                 .execute()
                 .get()
                 .value
-                .u32!!
+                .u64!!
 
         val netParams = systemInfoRepository
                 .getNetworkParams()
@@ -97,17 +95,24 @@ object Util {
 
         val sourceAccount = Config.ADMIN_ACCOUNT
 
-        val op = CreateChangeRoleRequestOp(
-                requestID = 0,
+        val op = ChangeAccountRolesOp(
                 destinationAccount = PublicKeyFactory.fromAccountId(accountId),
-                accountRoleToSet = roleToSet,
-                creatorDetails = "{}",
-                allTasks = 0,
-                ext = CreateChangeRoleRequestOp.CreateChangeRoleRequestOpExt.EmptyVersion()
+                rolesToSet = arrayOf(roleToSet),
+                details = GsonFactory().getBaseGson().toJson(mapOf(
+                        "blob_id" to api.blobs
+                                .create(
+                                        Blob(BlobType.ALPHA, changeRoleBlob),
+                                        Config.ADMIN_ACCOUNT.accountId
+                                )
+                                .execute()
+                                .get()
+                                .id
+                )),
+                ext = EmptyExt.EmptyVersion()
         )
 
         val tx = TransactionBuilder(netParams, sourceAccount.accountId)
-                .addOperation(Operation.OperationBody.CreateChangeRoleRequest(op))
+                .addOperation(Operation.OperationBody.ChangeAccountRoles(op))
                 .build()
 
         tx.addSignature(sourceAccount)
@@ -140,26 +145,21 @@ object Util {
                 .find { it.assetCode == asset }!!
                 .id
 
-        val issuance = IssuanceRequest(
-                asset,
-                netParams.amountToPrecised(amount),
-                PublicKeyFactory.fromBalanceId(balanceId),
-                "{}",
-                Fee(0, 0, Fee.FeeExt.EmptyVersion()),
-                IssuanceRequest.IssuanceRequestExt.EmptyVersion()
-        )
-
-        val op = CreateIssuanceRequestOp(
-                issuance,
-                "${System.currentTimeMillis()}",
-                0,
-                CreateIssuanceRequestOp.CreateIssuanceRequestOpExt.EmptyVersion()
+        val op = IssuanceOp(
+                securityType = 0,
+                creatorDetails = "{}",
+                reference = System.currentTimeMillis().toString(),
+                destination = MovementDestination.Balance(PublicKeyFactory.fromBalanceId(balanceId)),
+                amount = netParams.amountToPrecised(amount),
+                fee = Fee(0, 0, Fee.FeeExt.EmptyVersion()),
+                asset = asset,
+                ext = EmptyExt.EmptyVersion()
         )
 
         val sourceAccount = Config.ADMIN_ACCOUNT
 
         val tx = TransactionBuilder(netParams, sourceAccount.accountId)
-                .addOperation(Operation.OperationBody.CreateIssuanceRequest(op))
+                .addOperation(Operation.OperationBody.Issuance(op))
                 .build()
         tx.addSignature(sourceAccount)
 
@@ -170,47 +170,47 @@ object Util {
         return amount
     }
 
-    fun addFeeForAccount(
-            rootAccountId: String,
-            apiProvider: ApiProvider,
-            txManager: TxManager,
-            feeType: FeeType,
-            feeSubType: Int = 0,
-            asset: String
-    ): Boolean {
-        val sourceAccount = Config.ADMIN_ACCOUNT
-
-        val netParams = apiProvider.getApi().general.getSystemInfo().execute().get().toNetworkParams()
-
-        val fixedFee = netParams.amountToPrecised(BigDecimal("0.050000"))
-        val percentFee = netParams.amountToPrecised(BigDecimal("0.001000"))
-        val upperBound = netParams.amountToPrecised(BigDecimal.TEN)
-        val lowerBound = netParams.amountToPrecised(BigDecimal.ONE)
-
-        val feeOp =
-                CreateFeeOp(
-                        feeType,
-                        asset,
-                        fixedFee,
-                        percentFee,
-                        upperBound,
-                        lowerBound,
-                        feeSubType.toLong(),
-                        accountId = rootAccountId
-                )
-
-        val op = Operation.OperationBody.SetFees(feeOp)
-
-        val tx = TransactionBuilder(netParams, sourceAccount.accountId)
-                .addOperation(op)
-                .build()
-
-        tx.addSignature(sourceAccount)
-
-        val response = txManager.submit(tx).blockingGet()
-
-        return response.isSuccess
-    }
+//    fun addFeeForAccount(
+//            rootAccountId: String,
+//            apiProvider: ApiProvider,
+//            txManager: TxManager,
+//            feeType: FeeType,
+//            feeSubType: Int = 0,
+//            asset: String
+//    ): Boolean {
+//        val sourceAccount = Config.ADMIN_ACCOUNT
+//
+//        val netParams = apiProvider.getApi().general.getSystemInfo().execute().get().toNetworkParams()
+//
+//        val fixedFee = netParams.amountToPrecised(BigDecimal("0.050000"))
+//        val percentFee = netParams.amountToPrecised(BigDecimal("0.001000"))
+//        val upperBound = netParams.amountToPrecised(BigDecimal.TEN)
+//        val lowerBound = netParams.amountToPrecised(BigDecimal.ONE)
+//
+//        val feeOp =
+//                CreateFeeOp(
+//                        feeType,
+//                        asset,
+//                        fixedFee,
+//                        percentFee,
+//                        upperBound,
+//                        lowerBound,
+//                        feeSubType.toLong(),
+//                        accountId = rootAccountId
+//                )
+//
+//        val op = Operation.OperationBody.SetFees(feeOp)
+//
+//        val tx = TransactionBuilder(netParams, sourceAccount.accountId)
+//                .addOperation(op)
+//                .build()
+//
+//        tx.addSignature(sourceAccount)
+//
+//        val response = txManager.submit(tx).blockingGet()
+//
+//        return response.isSuccess
+//    }
 
     fun createAsset(
             apiProvider: ApiProvider,
@@ -223,112 +223,36 @@ object Util {
 
         val systemInfo =
                 apiProvider.getApi()
-                        .general
-                        .getSystemInfo()
+                        .ingester
+                        .info
+                        .get()
                         .execute()
                         .get()
         val netParams = systemInfo.toNetworkParams()
 
-        val statsAssetExists =
-                apiProvider.getApi()
-                        .assets
-                        .get()
-                        .execute()
-                        .get()
-                        .any {
-                            (it.policy and AssetPolicy.STATS_QUOTE_ASSET.value) ==
-                                    AssetPolicy.STATS_QUOTE_ASSET.value
-                        }
+        val assetDetailsJson = GsonFactory().getBaseGson().toJson(mapOf(
+                "name" to "$code token",
+                "external_system_type" to externalSystemType,
+                "description" to "$code description"
+        ))
 
-        val assetDetailsJson = GsonFactory().getBaseGson().toJson(
-                AssetDetails("$code token", null, null, externalSystemType)
+        val op = CreateAssetOp(
+                code = code,
+                securityType = 0,
+                state = AssetState.ACTIVE.value,
+                details = assetDetailsJson,
+                maxIssuanceAmount = netParams.amountToPrecised(BigDecimal("10000")),
+                trailingDigitsCount = 6,
+                ext = CreateAssetOp.CreateAssetOpExt.EmptyVersion()
         )
-
-        var policies = listOf(
-                AssetPolicy.TRANSFERABLE.value,
-                AssetPolicy.WITHDRAWABLE.value
-        ).map(Int::toLong).bitmask().toInt()
-
-        if (!statsAssetExists) {
-            policies = policies or AssetPolicy.STATS_QUOTE_ASSET.value
-        }
-
-        val request = ManageAssetOp.ManageAssetOpRequest.CreateAssetCreationRequest(
-                ManageAssetOp.ManageAssetOpRequest.ManageAssetOpCreateAssetCreationRequest(
-                        AssetCreationRequest(
-                                code = code,
-                                preissuedAssetSigner = PublicKeyFactory.fromAccountId(
-                                        systemInfo.adminAccountId
-                                ),
-                                maxIssuanceAmount = netParams.amountToPrecised(BigDecimal("10000")),
-                                policies = policies,
-                                initialPreissuedAmount = netParams.amountToPrecised(BigDecimal("10000")),
-                                creatorDetails = assetDetailsJson,
-                                ext = AssetCreationRequest.AssetCreationRequestExt.EmptyVersion(),
-                                sequenceNumber = 0,
-                                trailingDigitsCount = 6,
-                                type = 0
-                        ),
-                        0,
-                        ManageAssetOp.ManageAssetOpRequest
-                                .ManageAssetOpCreateAssetCreationRequest
-                                .ManageAssetOpCreateAssetCreationRequestExt
-                                .EmptyVersion()
-                )
-        )
-
-        val manageOp = ManageAssetOp(0, request,
-                ManageAssetOp.ManageAssetOpExt.EmptyVersion())
 
         val tx = TransactionBuilder(netParams, sourceAccount.accountId)
-                .addOperation(Operation.OperationBody.ManageAsset(manageOp))
+                .addOperation(Operation.OperationBody.CreateAsset(op))
                 .build()
 
         tx.addSignature(sourceAccount)
 
         txManager.submit(tx).blockingGet()
-
-        val requestToReview =
-                ApiProviderFactory().createApiProvider(
-                        urlConfigProvider = getUrlConfigProvider(),
-                        account = Config.ADMIN_ACCOUNT
-                )
-                        .getSignedApi()!!
-                        .requests
-                        .getAssets(
-                                AssetRequestsParams(
-                                        pagingParams = PagingParams(
-                                                order = PagingOrder.DESC,
-                                                limit = 1
-                                        ),
-                                        asset = code
-                                )
-                        )
-                        .execute()
-                        .get()
-                        .items
-                        .firstOrNull()
-
-        if (requestToReview != null && requestToReview.state == RequestState.PENDING) {
-            val reviewOp = ReviewRequestOp(
-                    requestID = requestToReview.id,
-                    requestHash = XdrByteArrayFixed32(requestToReview.hash.decodeHex()),
-                    action = ReviewRequestOpAction.APPROVE,
-                    reason = "",
-                    reviewDetails = ReviewDetails(0, requestToReview.pendingTasks,
-                            "", ReviewDetails.ReviewDetailsExt.EmptyVersion()),
-                    ext = ReviewRequestOp.ReviewRequestOpExt.EmptyVersion(),
-                    requestDetails = object : ReviewRequestOp.ReviewRequestOpRequestDetails(ReviewableRequestType.CREATE_ASSET) {}
-            )
-
-            val reviewTx = TransactionBuilder(netParams, sourceAccount.accountId)
-                    .addOperation(Operation.OperationBody.ReviewRequest(reviewOp))
-                    .build()
-
-            reviewTx.addSignature(sourceAccount)
-
-            txManager.submit(reviewTx).blockingGet()
-        }
 
         return code
     }
