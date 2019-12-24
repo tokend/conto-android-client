@@ -139,7 +139,7 @@ class CreateRedemptionRequestUseCase(
                         sourcePaysForDest = false,
                         ext = PaymentFeeData.PaymentFeeDataExt.EmptyVersion()
                 ),
-                reference = salt.toString(),
+                reference = RedemptionRequest.getReferenceFromSalt(salt),
                 subject = "",
                 securityType = securityType,
                 ext = PaymentOp.PaymentOpExt.EmptyVersion()

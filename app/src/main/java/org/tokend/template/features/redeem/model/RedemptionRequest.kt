@@ -6,6 +6,7 @@ import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.template.features.send.model.PaymentType
 import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
+import org.tokend.wallet.utils.Hashing
 import org.tokend.wallet.xdr.*
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -55,7 +56,7 @@ class RedemptionRequest(
                 ),
                 amount = networkParams.amountToPrecised(amount),
                 subject = "",
-                reference = salt.toString(),
+                reference = getReferenceFromSalt(salt),
                 feeData = PaymentFeeData(
                         sourceFee = fee.senderFee.toXdrFee(networkParams),
                         destinationFee = fee.recipientFee.toXdrFee(networkParams),
@@ -109,9 +110,9 @@ class RedemptionRequest(
 
             val salt = transaction.salt
 
-            if (op.reference.toLongOrNull() != salt) {
-                throw IllegalArgumentException("Redemption transaction salt must be equal " +
-                        "to the payment operation reference")
+            if (op.reference != getReferenceFromSalt(salt)) {
+                throw IllegalArgumentException("Redemption transaction reference must be " +
+                        "a SHA-256 hash of it's salt")
             }
 
             return RedemptionRequest(
@@ -167,6 +168,10 @@ class RedemptionRequest(
             } catch (e: Exception) {
                 throw RedemptionRequestFormatException(e)
             }
+        }
+
+        fun getReferenceFromSalt(salt: Long): String {
+            return Hashing.sha256(salt.toString().toByteArray(STRING_CHARSET)).encodeHexString()
         }
     }
 }

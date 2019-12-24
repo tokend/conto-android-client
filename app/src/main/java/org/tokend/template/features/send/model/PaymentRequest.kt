@@ -1,7 +1,8 @@
 package org.tokend.template.features.send.model
 
-import org.tokend.sdk.utils.extentions.encodeBase64String
+import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.data.model.Asset
+import org.tokend.wallet.utils.Hashing
 import java.io.Serializable
 import java.math.BigDecimal
 import java.security.SecureRandom
@@ -16,5 +17,5 @@ data class PaymentRequest(
         val fee: PaymentFee,
         val paymentSubject: String?,
         val actualPaymentSubject: String?,
-        val reference: String = SecureRandom.getSeed(16).encodeBase64String()
+        val reference: String = Hashing.sha256(SecureRandom.getSeed(16)).encodeHexString()
 ) : Serializable
