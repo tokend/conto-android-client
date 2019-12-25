@@ -4,7 +4,6 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
-import org.json.JSONObject
 import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.data.repository.AccountRepository
 import org.tokend.template.data.repository.BlobsRepository
@@ -73,19 +72,7 @@ class ActiveKycRepository(
                 .getById(blobId, true)
                 .map { blob ->
                     try {
-                        val valueJson = JSONObject(blob.valueString)
-
-                        val isCorporate = valueJson.has(KycForm.Corporate.COMPANY_KEY)
-                        val isGeneral = valueJson.has(KycForm.General.FIRST_NAME_KEY)
-
-                        when {
-                            isCorporate ->
-                                blob.getValue(KycForm.Corporate::class.java)
-                            isGeneral ->
-                                blob.getValue(KycForm.General::class.java)
-                            else ->
-                                throw IllegalStateException("Unknown KYC form type")
-                        }
+                        KycForm.fromBlob(blob)
                     } catch (e: Exception) {
                         e.printStackTrace()
                         KycForm.Empty

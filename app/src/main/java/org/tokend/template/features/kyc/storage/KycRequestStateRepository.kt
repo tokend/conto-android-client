@@ -4,11 +4,11 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
-import org.json.JSONObject
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.TokenDApi
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.sdk.api.base.params.PagingParamsV2
+import org.tokend.sdk.api.ingester.generated.resources.ChangeAccountRolesOpResource
 import org.tokend.sdk.api.ingester.generated.resources.ReviewableRequestResource
 import org.tokend.sdk.api.ingester.requests.model.RequestState
 import org.tokend.sdk.api.ingester.requests.params.IngesterRequestParams
@@ -94,7 +94,7 @@ class KycRequestStateRepository(
                             .getPage(IngesterRequestsPageParams(
                                     requestor = accountId,
                                     type = requestType,
-                                    include = listOf(IngesterRequestParams.REQUEST_DETAILS),
+                                    include = listOf(IngesterRequestParams.OPERATIONS),
                                     pagingParams = PagingParamsV2(
                                             order = PagingOrder.DESC,
                                             limit = 1
@@ -111,8 +111,11 @@ class KycRequestStateRepository(
         return try {
             val state = RequestState.fromValue(request.state.value)
             val blobId = request
-                    .creatorDetails
-                    .get("blob_id")
+                    .operations
+                    .filterIsInstance(ChangeAccountRolesOpResource::class.java)
+                    .firstOrNull()
+                    ?.creatorDetails
+                    ?.get("blob_id")
                     ?.asText()
             val rejectReason = request.rejectReason ?: ""
 
@@ -132,19 +135,7 @@ class KycRequestStateRepository(
                 .getById(blobId, true)
                 .map { blob ->
                     try {
-                        val valueJson = JSONObject(blob.valueString)
-
-                        val isGeneral = valueJson.has(KycForm.General.FIRST_NAME_KEY)
-                        val isCorporate = valueJson.has(KycForm.Corporate.COMPANY_KEY)
-
-                        when {
-                            isGeneral ->
-                                blob.getValue(KycForm.General::class.java)
-                            isCorporate ->
-                                blob.getValue(KycForm.Corporate::class.java)
-                            else ->
-                                throw IllegalStateException("Unknown KYC form type")
-                        }
+                        KycForm.fromBlob(blob)
                     } catch (e: Exception) {
                         e.printStackTrace()
                         KycForm.Empty
