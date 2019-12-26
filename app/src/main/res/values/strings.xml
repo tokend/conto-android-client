@@ -390,7 +390,7 @@
     <string name="asset_distribution_other">Other</string>
     <string name="operations_history">Operations history</string>
     <string name="operations_history_short">History</string>
-    <string name="balances_screen_title">Balances</string>
+    <string name="balances_screen_title">Wallet</string>
     <string name="unlock_label">Unlock</string>
     <string name="use_password">Use password</string>
     <string name="receive_title">Receive</string>
