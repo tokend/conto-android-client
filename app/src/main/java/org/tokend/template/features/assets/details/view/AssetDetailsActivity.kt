@@ -5,6 +5,7 @@ import android.support.design.widget.TabLayout
 import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
@@ -29,11 +30,14 @@ class AssetDetailsActivity : BaseActivity() {
     }
 
     private fun initViewPager() {
+        val withSecondaryMarketTab = BuildConfig.IS_ASSET_SECONDARY_MARKET_ALLOWED
+
         val withRefundTab = repositoryProvider.balances().itemsList.find {
             it.assetCode == asset.code
-        } != null
+        } != null && BuildConfig.IS_ASSET_SECONDARY_MARKET_ALLOWED
 
-        val adapter = AssetDetailsPagerAdapter(asset, withRefundTab, this, supportFragmentManager)
+        val adapter = AssetDetailsPagerAdapter(asset, withRefundTab, withSecondaryMarketTab,
+                this, supportFragmentManager)
 
         pager.adapter = adapter
         appbar_tabs.setupWithViewPager(pager)

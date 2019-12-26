@@ -387,7 +387,7 @@
     <string name="asset_distribution_other">Інше</string>
     <string name="operations_history">Історія операцій</string>
     <string name="operations_history_short">Історія</string>
-    <string name="balances_screen_title">Баланси</string>
+    <string name="balances_screen_title">Гаманець</string>
     <string name="unlock_label">Увійти</string>
     <string name="use_password">Ввести пароль</string>
     <string name="receive_title">Отримання</string>
