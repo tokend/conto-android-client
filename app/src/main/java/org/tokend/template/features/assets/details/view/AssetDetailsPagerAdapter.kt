@@ -10,6 +10,7 @@ import org.tokend.template.view.BaseFragmentPagerAdapter
 
 class AssetDetailsPagerAdapter(asset: AssetRecord,
                                withRefund: Boolean,
+                               withSecondaryMarket: Boolean,
                                context: Context,
                                fragmentManager: FragmentManager
 ) : BaseFragmentPagerAdapter(fragmentManager) {
@@ -36,15 +37,17 @@ class AssetDetailsPagerAdapter(asset: AssetRecord,
             )
         }
 
-        add(
-                Page(
-                        AssetSecondaryMarketFragment.newInstance(AssetSecondaryMarketFragment.getBundle(
-                                asset = asset
-                        )),
-                        context.getString(R.string.asset_secondary_market),
-                        SECONDARY_MARKET_PAGE
-                )
-        )
+        if (withSecondaryMarket) {
+            add(
+                    Page(
+                            AssetSecondaryMarketFragment.newInstance(AssetSecondaryMarketFragment.getBundle(
+                                    asset = asset
+                            )),
+                            context.getString(R.string.asset_secondary_market),
+                            SECONDARY_MARKET_PAGE
+                    )
+            )
+        }
     }
 
     companion object {
