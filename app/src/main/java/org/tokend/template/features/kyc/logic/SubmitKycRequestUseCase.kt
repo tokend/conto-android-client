@@ -4,6 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
+import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.blobs.model.Blob
@@ -38,7 +39,6 @@ class SubmitKycRequestUseCase(
         private val repositoryProvider: RepositoryProvider,
         private val txManager: TxManager
 ) {
-    private val requestIdToSubmit = 0L
     private val isReviewRequired = form !is KycForm.General
 
     private var roleToAdd: Long = 0L
@@ -46,6 +46,8 @@ class SubmitKycRequestUseCase(
     private lateinit var currentRoles: Set<Long>
     private lateinit var formBlobId: String
     private lateinit var networkParams: NetworkParams
+    private lateinit var transactionResultXdr: String
+    private var submittedRequestId = 0L
     private lateinit var newKycRequestState: KycRequestState
 
     fun perform(): Completable {
@@ -88,6 +90,15 @@ class SubmitKycRequestUseCase(
                 }
                 .flatMap { transaction ->
                     txManager.submit(transaction)
+                }
+                .doOnSuccess { response ->
+                    this.transactionResultXdr = response.resultMetaXdr
+                }
+                .flatMap {
+                    getSubmittedRequestId()
+                }
+                .doOnSuccess { submittedRequestId ->
+                    this.submittedRequestId = submittedRequestId
                 }
                 .flatMap {
                     getNewKycRequestState()
@@ -225,17 +236,28 @@ class SubmitKycRequestUseCase(
         }.subscribeOn(Schedulers.computation())
     }
 
-    private fun getNewKycRequestState(): Single<KycRequestState.Submitted<KycForm>> {
-        // As soon as we can't edit KYC request once it was submitted
-        // it is not necessary to set a true request id,
-        // so if it was 0 it can stay 0.
-        val requestId = requestIdToSubmit
+    private fun getSubmittedRequestId(): Single<Long> {
+        return {
+            (TransactionMeta.fromBase64(transactionResultXdr) as? TransactionMeta.EmptyVersion)
+                    ?.operations
+                    ?.firstOrNull()
+                    ?.changes
+                    ?.filterIsInstance(LedgerEntryChange.Created::class.java)
+                    ?.map { it.created.data }
+                    ?.filterIsInstance(LedgerEntry.LedgerEntryData.ReviewableRequest::class.java)
+                    ?.first()
+                    ?.reviewableRequest
+                    ?.requestID
+                    ?: 0L
+        }.toSingle()
+    }
 
+    private fun getNewKycRequestState(): Single<KycRequestState.Submitted<KycForm>> {
         return Single.just(
                 if (isReviewRequired)
-                    KycRequestState.Submitted.Pending(form, requestId)
+                    KycRequestState.Submitted.Pending(form, submittedRequestId)
                 else
-                    KycRequestState.Submitted.Approved(form, requestIdToSubmit)
+                    KycRequestState.Submitted.Approved(form, submittedRequestId)
         )
     }
 

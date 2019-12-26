@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -18,13 +17,11 @@ import kotlinx.android.synthetic.main.fragment_balances_collapsing_content.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.tokend.sdk.factory.GsonFactory
 import org.tokend.template.R
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceItemsAdapter
 import org.tokend.template.features.dashboard.balances.view.adapter.BalanceListItem
-import org.tokend.template.features.kyc.model.KycRequestState
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
@@ -84,23 +81,6 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         subscribeToBalances()
 
         update()
-
-        repositoryProvider.kycRequestState().run {
-            itemSubject.subscribe { kycState ->
-                Log.i("Oleg", kycState::class.java.simpleName)
-                if (kycState is KycRequestState.Submitted<*>) {
-                    Log.i("Oleg", kycState.formData::class.java.simpleName)
-                    Log.i("Oleg", GsonFactory().getBaseGson().toJson(kycState.formData))
-
-                    if (kycState is KycRequestState.Submitted.Rejected<*>) {
-                        Log.i("Oleg", "Rejected because: ${kycState.rejectReason}")
-                    }
-                }
-            }
-            errorsSubject.subscribe(Throwable::printStackTrace)
-
-            update()
-        }
     }
 
     // region Init
