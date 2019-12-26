@@ -139,7 +139,7 @@ ext {
     // Allows direct buy through atomic swaps
     allow_direct_buy = true
     // Allows secondary market for assets (but it is not trading)
-    allow_asset_secondary_market = true
+    allow_asset_secondary_market = false
 
     // Controls balance amounts conversion
     // into `balances_conversion_asset`
