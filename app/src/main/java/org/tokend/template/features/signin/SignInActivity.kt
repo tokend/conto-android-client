@@ -344,6 +344,7 @@ class SignInActivity : BaseActivity() {
                 SIGN_IN_WITH_LOCAL_ACCOUNT_REQUEST -> {
                     onSignInComplete()
                 }
+                RECOVERY_REQUEST -> finish()
             }
         }
     }
@@ -357,5 +358,7 @@ class SignInActivity : BaseActivity() {
                 "sign_in_with_authenticator".hashCode() and 0xffff
         private val SIGN_IN_WITH_LOCAL_ACCOUNT_REQUEST =
                 "sign_in_with_local_account".hashCode() and 0xffff
+        private val RECOVERY_REQUEST =
+                "recovery".hashCode() and 0xffff
     }
 }

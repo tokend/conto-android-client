@@ -15,13 +15,16 @@ import kotlinx.android.synthetic.main.layout_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.enabled
 import org.jetbrains.anko.onClick
+import org.tokend.crypto.ecdsa.erase
 import org.tokend.sdk.api.wallets.model.EmailNotVerifiedException
 import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
+import org.tokend.sdk.keyserver.KeyServer
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.extensions.*
 import org.tokend.template.features.recovery.logic.RecoverPasswordUseCase
+import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.logic.UrlConfigManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -212,10 +215,11 @@ class RecoveryActivity : BaseActivity() {
                 }
                 .doOnTerminate {
                     isLoading = false
-                    password.fill('0')
                 }
                 .subscribeBy(
-                        onComplete = this::finishWithSuccess,
+                        onComplete = {
+                            onRecoveryCompleted(email, password)
+                        },
                         onError = {
                             handleRecoveryError(it)
                             updateRecoveryAvailability()
@@ -224,10 +228,41 @@ class RecoveryActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
-    private fun finishWithSuccess() {
+    private fun onRecoveryCompleted(email: String,
+                                    newPassword: CharArray) {
         toastManager.long(R.string.password_changed_successfully)
+        tryToSignIn(email, newPassword)
+    }
+
+    private fun tryToSignIn(email: String, password: CharArray) {
+
+        SignInUseCase(
+                email,
+                password,
+                KeyServer(apiProvider.getApi().wallets),
+                session,
+                credentialsPersistor,
+                postSignInManagerFactory.get()
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .doOnSubscribe {
+                    isLoading = true
+                }
+                .doOnTerminate {
+                    isLoading = false
+                    password.erase()
+                }
+                .subscribeBy(
+                        onComplete = this::onSuccessfulSignIn,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun onSuccessfulSignIn() {
         setResult(Activity.RESULT_OK)
-        finish()
+        Navigator.from(this).performPostSignInRouting(repositoryProvider.kycState().item)
     }
 
     private fun handleRecoveryError(error: Throwable) {
