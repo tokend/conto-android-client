@@ -7,8 +7,13 @@ import dagger.Provides
 import org.tokend.sdk.factory.JsonApiToolsProvider
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.di.providers.AccountProvider
+import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.di.providers.RepositoryProvider
+import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.localaccount.mnemonic.logic.EnglishMnemonicWords
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
+import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.util.cipher.Aes256GcmDataCipher
 import org.tokend.template.util.cipher.DataCipher
@@ -120,5 +125,15 @@ class UtilModule {
     @Singleton
     fun dataCipher(): DataCipher {
         return Aes256GcmDataCipher()
+    }
+
+    @Provides
+    @Singleton
+    fun postSignInManagerFactory(apiProvider: ApiProvider,
+                                 walletInfoProvider: WalletInfoProvider,
+                                 accountProvider: AccountProvider,
+                                 repositoryProvider: RepositoryProvider): PostSignInManagerFactory {
+        return PostSignInManagerFactory(apiProvider, accountProvider,
+                walletInfoProvider, repositoryProvider)
     }
 }

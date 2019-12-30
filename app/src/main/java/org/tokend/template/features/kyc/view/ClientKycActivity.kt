@@ -109,7 +109,6 @@ class ClientKycActivity : BaseActivity() {
 
         SubmitKycRequestUseCase(
                 form,
-                apiProvider,
                 walletInfoProvider,
                 accountProvider,
                 repositoryProvider,

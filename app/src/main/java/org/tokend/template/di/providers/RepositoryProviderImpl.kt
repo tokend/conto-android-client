@@ -153,7 +153,7 @@ class RepositoryProviderImpl(
     }
 
     private val blobs: BlobsRepository by lazy {
-        BlobsRepository(apiProvider)
+        BlobsRepository(apiProvider, walletInfoProvider)
     }
 
     private val companiesRepository: CompaniesRepository by lazy {

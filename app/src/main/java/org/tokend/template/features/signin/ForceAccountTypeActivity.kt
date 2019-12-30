@@ -5,7 +5,6 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.model.ForcedAccountType
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -28,7 +27,7 @@ class ForceAccountTypeActivity : BaseActivity() {
     }
 
     private fun performLoading() {
-        PostSignInManager(repositoryProvider, forcedAccountType)
+        postSignInManagerFactory.get(forcedAccountType)
                 .doPostSignIn()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
                 .subscribeBy(

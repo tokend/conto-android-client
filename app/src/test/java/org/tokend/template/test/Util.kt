@@ -52,7 +52,9 @@ object Util {
                 apiProvider.getKeyServer(),
                 session,
                 null,
-                repositoryProvider?.let { PostSignInManager(it) }
+                repositoryProvider?.let { repositoryProvider ->
+                    PostSignInManager(apiProvider, session, session, repositoryProvider)
+                }
         ).perform().blockingAwait()
 
         return createResult

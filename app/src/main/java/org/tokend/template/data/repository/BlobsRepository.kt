@@ -6,9 +6,11 @@ import io.reactivex.rxkotlin.toSingle
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.blobs.model.Blob
 import org.tokend.template.di.providers.ApiProvider
+import org.tokend.template.di.providers.WalletInfoProvider
 
 class BlobsRepository(
-        private val apiProvider: ApiProvider
+        private val apiProvider: ApiProvider,
+        private val walletInfoProvider: WalletInfoProvider
 ) {
     private val cache = LruCache<String, Blob>(CACHE_SIZE)
 
@@ -39,6 +41,19 @@ class BlobsRepository(
                             cache.put(blobId, blob)
                         }
 
+    }
+
+    fun create(blob: Blob): Single<Blob> {
+        val signedApi = apiProvider.getSignedApi()
+                ?: return Single.error(IllegalStateException("No signed API instance found"))
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+                ?: return Single.error(IllegalStateException("No wallet info found"))
+
+        return signedApi
+                .blobs
+                .create(blob, accountId)
+                .toSingle()
+                .doOnSuccess { cache.put(it.id, it) }
     }
 
     companion object {

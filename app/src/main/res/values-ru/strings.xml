@@ -14,7 +14,8 @@
     <string name="terms_of_service">Условия использования</string>
     <string name="new_password">Новый пароль</string>
     <string name="confirm_new_password">Подтвердите новый пароль</string>
-    <string name="recover_account">Восстановить аккаунт</string>
+    <string name="recover_password">Восстановить пароль</string>
+    <string name="recover_password_action">Восстановить</string>
     <string name="sign_out">Выйти</string>
     <string name="loading_data">Загрузка…</string>
     <string name="retry">Повторить</string>

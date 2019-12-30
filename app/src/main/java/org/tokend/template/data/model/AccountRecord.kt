@@ -7,7 +7,7 @@ import java.util.*
 
 class AccountRecord(
         val id: String,
-        val kycRecoveryStatus: KycRecoveryStatus,
+        var kycRecoveryStatus: KycRecoveryStatus,
         val depositAccounts: List<DepositAccount>
 ) : Serializable {
     constructor(source: AccountResource) : this(

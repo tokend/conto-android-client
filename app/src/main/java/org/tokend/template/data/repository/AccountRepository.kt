@@ -35,4 +35,11 @@ class AccountRepository(private val apiProvider: ApiProvider,
                 .toSingle()
                 .map(::AccountRecord)
     }
+
+    fun updateKycRecoveryStatus(newStatus: AccountRecord.KycRecoveryStatus) {
+        item?.also { account ->
+            account.kycRecoveryStatus = newStatus
+            broadcast()
+        }
+    }
 }

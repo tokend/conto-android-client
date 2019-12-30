@@ -177,10 +177,11 @@ class Navigator private constructor() {
                 ?.also { performIntent(it) }
     }
 
-    fun openRecovery(email: String? = null) {
+    fun openRecovery(email: String? = null,
+                     requestCode: Int = 0) {
         context?.intentFor<RecoveryActivity>()
                 ?.putExtras(RecoveryActivity.getBundle(email))
-                ?.also { performIntent(it) }
+                ?.also { performIntent(it, requestCode = 0) }
     }
 
     fun toSignIn(finishAffinity: Boolean = false) {

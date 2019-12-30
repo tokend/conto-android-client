@@ -3,13 +3,11 @@ package org.tokend.template.features.kyc.logic
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.blobs.model.Blob
 import org.tokend.sdk.api.blobs.model.BlobType
 import org.tokend.sdk.factory.GsonFactory
 import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.AccountProvider
-import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
@@ -29,7 +27,6 @@ import org.tokend.wallet.xdr.Operation
  */
 class SubmitKycRequestUseCase(
         private val form: KycForm,
-        private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val accountProvider: AccountProvider,
         private val repositoryProvider: RepositoryProvider,
@@ -95,24 +92,12 @@ class SubmitKycRequestUseCase(
     }
 
     private fun uploadFormAsBlob(): Single<String> {
-        val signedApi = apiProvider.getSignedApi()
-                ?: return Single.error(IllegalStateException("No signed API instance found"))
-        val accountId = walletInfoProvider.getWalletInfo()?.accountId
-                ?: return Single.error(IllegalStateException("No wallet info found"))
-
         val formJson = GsonFactory().getBaseGson().toJson(form)
 
-        return signedApi
-                .blobs
-                .create(
-                        ownerAccountId = accountId,
-                        blob = Blob(
-                                type = BlobType.KYC_FORM,
-                                value = formJson
-                        )
-                )
+        return repositoryProvider
+                .blobs()
+                .create(Blob(BlobType.KYC_FORM, formJson))
                 .map(Blob::id)
-                .toSingle()
     }
 
     private fun getNetworkParams(): Single<NetworkParams> {

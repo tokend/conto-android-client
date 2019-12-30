@@ -29,7 +29,6 @@ import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
-import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
 import org.tokend.template.features.signin.logic.SignInMethod
 import org.tokend.template.features.signin.logic.SignInUseCase
@@ -237,7 +236,7 @@ class SignInActivity : BaseActivity() {
                 apiProvider.getKeyServer(),
                 session,
                 credentialsPersistor,
-                PostSignInManager(repositoryProvider)
+                postSignInManagerFactory.get()
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())

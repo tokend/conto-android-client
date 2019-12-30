@@ -20,10 +20,8 @@ import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.extensions.*
 import org.tokend.template.features.recovery.logic.RecoverPasswordUseCase
-import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
 import org.tokend.template.logic.UrlConfigManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -74,7 +72,7 @@ class RecoveryActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_recovery)
         setSupportActionBar(toolbar)
-        setTitle(R.string.recover_account)
+        setTitle(R.string.recover_password)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         urlConfigManager = UrlConfigManager(urlConfigProvider, urlConfigPersistor)
@@ -217,7 +215,7 @@ class RecoveryActivity : BaseActivity() {
                     password.fill('0')
                 }
                 .subscribeBy(
-                        onComplete = this::showInitiatedRecoveryDialogAndFinish,
+                        onComplete = this::finishWithSuccess,
                         onError = {
                             handleRecoveryError(it)
                             updateRecoveryAvailability()
@@ -226,20 +224,8 @@ class RecoveryActivity : BaseActivity() {
                 .addTo(compositeDisposable)
     }
 
-    private fun showInitiatedRecoveryDialogAndFinish() {
-        KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
-                .getStatusDialog(
-                        AccountRecord.KycRecoveryStatus.INITIATED,
-                        urlConfigProvider.getConfig().client
-                ) {
-                    setOnDismissListener {
-                        finishWithSuccess()
-                    }
-                }
-                .show()
-    }
-
     private fun finishWithSuccess() {
+        toastManager.long(R.string.password_changed_successfully)
         setResult(Activity.RESULT_OK)
         finish()
     }

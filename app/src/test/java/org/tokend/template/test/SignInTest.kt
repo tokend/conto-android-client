@@ -54,7 +54,7 @@ class SignInTest {
                 apiProvider.getKeyServer(),
                 session,
                 credentialsPersistor,
-                PostSignInManager(repositoryProvider)
+                PostSignInManager(apiProvider, session, session, repositoryProvider)
         )
 
         useCase.perform().blockingAwait()
@@ -111,7 +111,7 @@ class SignInTest {
                 credentialsPersistor = credentialsPersistor,
                 repositoryProvider = repositoryProvider,
                 apiProvider = apiProvider,
-                postSignInManager = PostSignInManager(repositoryProvider)
+                postSignInManager = PostSignInManager(apiProvider, session, session, repositoryProvider)
         )
 
         useCase.perform().blockingAwait()
@@ -172,7 +172,7 @@ class SignInTest {
                 credentialsPersistor = null,
                 repositoryProvider = repositoryProvider,
                 apiProvider = apiProvider,
-                postSignInManager = PostSignInManager(repositoryProvider)
+                postSignInManager = PostSignInManager(apiProvider, session, session, repositoryProvider)
         )
 
         useCase.perform().blockingAwait()

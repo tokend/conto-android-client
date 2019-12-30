@@ -264,7 +264,7 @@ class UnlockAppActivity : BaseActivity() {
                 apiProvider.getKeyServer(),
                 session,
                 credentialsPersistor,
-                PostSignInManager(repositoryProvider)
+                postSignInManagerFactory.get()
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())

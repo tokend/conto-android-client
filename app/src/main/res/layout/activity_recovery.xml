@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:text="@string/recover_account" />
+                    android:text="@string/recover_password_action" />
 
                 <TextView
                     android:id="@+id/sign_in_text_view"

@@ -27,7 +27,6 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.setErrorAndFocus
-import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.features.signup.logic.SignUpUseCase
 import org.tokend.template.logic.UrlConfigManager
@@ -261,7 +260,7 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun onSuccessfulSignUp(walletCreateResult: WalletCreateResult) {
-        if (walletCreateResult.walletData.attributes?.isVerified == true) {
+        if (walletCreateResult.walletData.attributes.isVerified) {
             tryToSignIn()
         } else {
             showNotVerifiedEmailDialogAndFinish()
@@ -317,7 +316,7 @@ class SignUpActivity : BaseActivity() {
                 KeyServer(apiProvider.getApi().wallets),
                 session,
                 credentialsPersistor,
-                PostSignInManager(repositoryProvider)
+                postSignInManagerFactory.get()
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
