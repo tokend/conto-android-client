@@ -104,7 +104,7 @@ open class ShareRedemptionQrFragment : ShareQrFragment(), VisibilityChangesConsu
         toastManager.long(R.string.successfully_accepted_redemption)
 
         repositoryProvider.balanceChanges(balanceId).addBalanceChange(balanceChange)
-        repositoryProvider.balances().updateBalance(balanceChange.balanceId, -balanceChange.amount)
+        repositoryProvider.balances().updateBalanceByDelta(balanceChange.balanceId, -balanceChange.amount)
 
         (activity as? WalletEventsListener)?.onRedemptionRequestAccepted()
     }
