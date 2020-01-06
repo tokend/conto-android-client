@@ -580,6 +580,8 @@
     <string name="company_all_assets">All assets</string>
     <string name="nfc_redemption_aid_description" translatable="false">Conto redemption applet</string>
     <string name="nfc_redemption_adpu_description" translatable="false">@string/app_name</string>
+    <string name="nfc_payment_aid_description" translatable="false">Conto payment applet</string>
+    <string name="nfc_payment_adpu_description" translatable="false">@string/app_name</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
