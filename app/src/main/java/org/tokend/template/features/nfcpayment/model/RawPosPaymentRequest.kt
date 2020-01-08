@@ -32,6 +32,9 @@ class RawPosPaymentRequest(
         return byteStream.toByteArray()
     }
 
+    val referenceString: String
+        get() = reference.encodeHexString()
+
     companion object {
         private const val REFERENCE_SIZE = 32
         private val STRING_CHARSET = Charsets.UTF_8

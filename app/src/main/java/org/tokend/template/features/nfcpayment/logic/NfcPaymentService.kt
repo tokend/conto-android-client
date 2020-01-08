@@ -8,6 +8,7 @@ import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.CompletableSubject
 import io.reactivex.subjects.PublishSubject
 import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.features.nfcpayment.model.ClientToPosResponse
@@ -23,6 +24,7 @@ import java.io.ByteArrayOutputStream
 @RequiresApi(Build.VERSION_CODES.KITKAT)
 class NfcPaymentService : HostApduService() {
     private lateinit var compositeDisposable: CompositeDisposable
+    private var lastSentTransactionReference: String = ""
 
     override fun processCommandApdu(commandApdu: ByteArray, extras: Bundle?): ByteArray? {
         Log.i(LOG_TAG, "Received ${commandApdu.encodeHexString()}")
@@ -46,6 +48,7 @@ class NfcPaymentService : HostApduService() {
                     onPaymentRequestReceived(command.request)
                     null
                 } else {
+                    lastSentTransactionReference = command.request.referenceString
                     ClientToPosResponse.PaymentTransaction(readyEnvelope)
                 }
             }
@@ -64,8 +67,7 @@ class NfcPaymentService : HostApduService() {
 
     private fun getReadyTransactionEnvelopeForRequest(request: RawPosPaymentRequest)
             : ByteArray? {
-        val reference = request.reference.encodeHexString()
-        return readyTransactionsByReference[reference]?.toXdrBytes()
+        return readyTransactionsByReference[request.referenceString]?.toXdrBytes()
                 ?: return null
     }
 
@@ -74,17 +76,25 @@ class NfcPaymentService : HostApduService() {
     }
 
     private fun onOk() {
-
+        resultSubjectsByReference[lastSentTransactionReference]?.onComplete()
+        forgetReference(lastSentTransactionReference)
     }
 
     private fun onError() {
-
+        resultSubjectsByReference[lastSentTransactionReference]?.onError(Exception())
+        forgetReference(lastSentTransactionReference)
     }
 
     private fun onNewReadyTransaction(envelope: TransactionEnvelope) {
         if (isActive) {
+            lastSentTransactionReference = getReferenceFromEnvelope(envelope)
             sendResponseApdu(ClientToPosResponse.PaymentTransaction(envelope.toXdrBytes()).data)
         }
+    }
+
+    private fun forgetReference(reference: String) {
+        resultSubjectsByReference.remove(reference)
+        readyTransactionsByReference.remove(reference)
     }
 
     override fun onDeactivated(reason: Int) {
@@ -111,30 +121,37 @@ class NfcPaymentService : HostApduService() {
         return outputStream.toByteArray()
     }
 
-    companion object: TransactionBroadcaster {
+    companion object : TransactionBroadcaster {
         private const val LOG_TAG = "NfcPayments"
 
         private val readyTransactionsByReference = mutableMapOf<String, TransactionEnvelope>()
         private val newTransactionsSubject = PublishSubject.create<TransactionEnvelope>()
+        private val resultSubjectsByReference = mutableMapOf<String, CompletableSubject>()
 
         var isActive: Boolean = false
             private set
 
         override fun broadcastTransaction(transaction: Transaction): Completable {
             val envelope = transaction.getEnvelope()
-            val reference = envelope.tx.operations
+            val reference = getReferenceFromEnvelope(envelope)
+
+            readyTransactionsByReference[reference] = envelope
+            newTransactionsSubject.onNext(envelope)
+
+            val resultSubject = CompletableSubject.create()
+            resultSubjectsByReference[reference] = resultSubject
+
+            return resultSubject
+        }
+
+        private fun getReferenceFromEnvelope(envelope: TransactionEnvelope): String {
+            return envelope.tx.operations
                     .map(Operation::body)
                     .filterIsInstance(Operation.OperationBody.Payment::class.java)
                     .firstOrNull()
                     ?.paymentOp
                     ?.reference
-                    ?: return Completable.error(IllegalArgumentException("Transaction must contain payment"))
-
-            readyTransactionsByReference[reference] = envelope
-            newTransactionsSubject.onNext(envelope)
-
-            // TODO: Implement
-            return Completable.complete()
+                    ?: throw IllegalArgumentException("Transaction must contain a payment")
         }
     }
 }
