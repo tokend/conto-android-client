@@ -78,20 +78,16 @@
             android:value="${fabricApiKey}" />
 
         <activity
-            android:name=".features.signin.SplashActivity"
-            android:screenOrientation="portrait"
+            android:name=".features.signin.SignInActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:theme="@style/SplashTheme"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".features.signin.SignInActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
             android:name=".features.signin.AuthenticatorSignInActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
@@ -317,8 +313,9 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
         <activity
             android:name=".features.nfcpayment.view.NfcPaymentActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:launchMode="singleInstance"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
+            android:theme="@style/SplashTheme" />
     </application>
 
 </manifest>
