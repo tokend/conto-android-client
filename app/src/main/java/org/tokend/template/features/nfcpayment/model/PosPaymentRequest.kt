@@ -1,6 +1,8 @@
 package org.tokend.template.features.nfcpayment.model
 
+import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.data.model.Asset
+import java.io.Serializable
 import java.math.BigDecimal
 
 class PosPaymentRequest(
@@ -8,7 +10,7 @@ class PosPaymentRequest(
         val asset: Asset,
         val reference: ByteArray,
         val destinationBalanceId: String
-) {
+): Serializable {
     constructor(amount: BigDecimal,
                 asset: Asset,
                 rawRequest: RawPosPaymentRequest) : this(
@@ -17,4 +19,7 @@ class PosPaymentRequest(
             reference = rawRequest.reference,
             destinationBalanceId = rawRequest.destinationBalanceId
     )
+
+    val referenceString: String
+        get() = reference.encodeHexString()
 }

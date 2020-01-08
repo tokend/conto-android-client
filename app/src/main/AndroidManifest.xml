@@ -315,6 +315,7 @@
             android:name=".features.nfcpayment.view.NfcPaymentActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme" />
     </application>
 

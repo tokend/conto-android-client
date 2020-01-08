@@ -15,6 +15,7 @@ import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
+import java.util.concurrent.CancellationException
 
 class NfcPaymentActivity : BaseActivity() {
     override val allowUnauthorized = true
@@ -84,8 +85,7 @@ class NfcPaymentActivity : BaseActivity() {
 
     private fun onPaymentRequestLoaded(paymentRequest: PosPaymentRequest) {
         this.paymentRequest = paymentRequest
-        toastManager.short(amountFormatter.formatAssetAmount(paymentRequest.amount, paymentRequest.asset,
-                withAssetName = true))
+        toPaymentRequestConfirmation()
     }
 
     private fun onPaymentRequestLoadingError(error: Throwable) {
@@ -93,10 +93,35 @@ class NfcPaymentActivity : BaseActivity() {
         finish()
     }
 
-    override fun onBackPressed() {
-        if (!fragmentDisplayer.tryPopBackStack()) {
-            finish()
+    private fun toPaymentRequestConfirmation() {
+        val fragment = PosPaymentRequestConfirmationFragment.newInstance(
+                PosPaymentRequestConfirmationFragment.getBundle(paymentRequest)
+        )
+
+        fragment
+                .resultCompletable
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .subscribeBy(
+                        onComplete = this::onPaymentRequestConfirmed,
+                        onError = this::onPaymentRequestConfirmationError
+                )
+
+        fragmentDisplayer.display(fragment, "confirmation", true)
+    }
+
+    private fun onPaymentRequestConfirmed() {
+        toastManager.short("Nice!")
+    }
+
+    private fun onPaymentRequestConfirmationError(error: Throwable) {
+        if (error !is CancellationException) {
+            errorHandlerFactory.getDefault().handle(error)
         }
+        finish()
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 
     companion object {
