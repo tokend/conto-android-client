@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.dip
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.features.nfcpayment.logic.NfcPaymentService
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.util.ObservableTransformers
@@ -130,6 +131,11 @@ class NfcPaymentActivity : BaseActivity() {
 
     override fun onBackPressed() {
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        NfcPaymentService.clearPendingTransactions()
     }
 
     companion object {

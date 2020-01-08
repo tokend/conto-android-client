@@ -144,6 +144,11 @@ class NfcPaymentService : HostApduService() {
             return resultSubject
         }
 
+        fun clearPendingTransactions() {
+            readyTransactionsByReference.clear()
+            resultSubjectsByReference.clear()
+        }
+
         private fun getReferenceFromEnvelope(envelope: TransactionEnvelope): String {
             return envelope.tx.operations
                     .map(Operation::body)
