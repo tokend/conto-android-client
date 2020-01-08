@@ -52,6 +52,8 @@ import org.tokend.template.features.localaccount.view.LocalAccountDetailsActivit
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.massissuance.view.MassIssuanceActivity
 import org.tokend.template.features.massissuance.view.MassIssuanceConfirmationActivity
+import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
+import org.tokend.template.features.nfcpayment.view.NfcPaymentActivity
 import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.OfferConfirmationActivity
 import org.tokend.template.features.offers.OffersActivity
@@ -622,5 +624,12 @@ class Navigator private constructor() {
         context?.intentFor<AssetRefundConfirmationActivity>()
                 ?.putExtras(OfferConfirmationActivity.getBundle(offerRequest))
                 ?.also { performIntent(it, requestCode) }
+    }
+
+    fun openNfcPayment(request: RawPosPaymentRequest) {
+        context?.intentFor<NfcPaymentActivity>()
+                ?.putExtras(NfcPaymentActivity.getBundle(request))
+                ?.clearTop()
+                ?.also { performIntent(it) }
     }
 }

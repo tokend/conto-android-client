@@ -23,7 +23,7 @@
         android:required="false" />
     <uses-feature
         android:name="android.hardware.nfc.hce"
-        android:required="false"/>
+        android:required="false" />
 
     <application
         android:name=".App"
@@ -50,7 +50,7 @@
         <service
             android:name=".features.redeem.logic.NfcRedemptionService"
             android:exported="true"
-            android:permission="android.permission.BIND_NFC_SERVICE" >
+            android:permission="android.permission.BIND_NFC_SERVICE">
             <intent-filter>
                 <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
             </intent-filter>
@@ -63,7 +63,7 @@
         <service
             android:name=".features.nfcpayment.logic.NfcPaymentService"
             android:exported="true"
-            android:permission="android.permission.BIND_NFC_SERVICE" >
+            android:permission="android.permission.BIND_NFC_SERVICE">
             <intent-filter>
                 <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
             </intent-filter>
@@ -314,6 +314,10 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
             android:name=".features.assets.details.refund.view.AssetRefundConfirmationActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
+        <activity
+            android:name=".features.nfcpayment.view.NfcPaymentActivity"
+            android:launchMode="singleInstance"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
     </application>
 
