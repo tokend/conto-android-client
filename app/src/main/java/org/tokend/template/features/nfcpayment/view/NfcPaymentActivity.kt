@@ -110,7 +110,7 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun onPaymentRequestConfirmed() {
-        toastManager.short("Nice!")
+        toPaymentBroadcast()
     }
 
     private fun onPaymentRequestConfirmationError(error: Throwable) {
@@ -118,6 +118,14 @@ class NfcPaymentActivity : BaseActivity() {
             errorHandlerFactory.getDefault().handle(error)
         }
         finish()
+    }
+
+    private fun toPaymentBroadcast() {
+        val fragment = BroadcastPosPaymentFragment.newInstance(
+                BroadcastPosPaymentFragment.getBundle(paymentRequest)
+        )
+
+        fragmentDisplayer.display(fragment, "broadcast", true)
     }
 
     override fun onBackPressed() {

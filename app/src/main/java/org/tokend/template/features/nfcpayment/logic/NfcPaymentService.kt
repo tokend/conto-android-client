@@ -5,14 +5,17 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.util.Log
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.PublishSubject
 import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.features.nfcpayment.model.ClientToPosResponse
-import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.PosToClientCommand
+import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.util.Navigator
+import org.tokend.wallet.Transaction
+import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.TransactionEnvelope
 import org.tokend.wallet.xdr.utils.XdrDataOutputStream
 import java.io.ByteArrayOutputStream
@@ -108,7 +111,7 @@ class NfcPaymentService : HostApduService() {
         return outputStream.toByteArray()
     }
 
-    companion object {
+    companion object: TransactionBroadcaster {
         private const val LOG_TAG = "NfcPayments"
 
         private val readyTransactionsByReference = mutableMapOf<String, TransactionEnvelope>()
@@ -117,9 +120,21 @@ class NfcPaymentService : HostApduService() {
         var isActive: Boolean = false
             private set
 
-        fun addReadyTransaction(reference: String, envelope: TransactionEnvelope) {
+        override fun broadcastTransaction(transaction: Transaction): Completable {
+            val envelope = transaction.getEnvelope()
+            val reference = envelope.tx.operations
+                    .map(Operation::body)
+                    .filterIsInstance(Operation.OperationBody.Payment::class.java)
+                    .firstOrNull()
+                    ?.paymentOp
+                    ?.reference
+                    ?: return Completable.error(IllegalArgumentException("Transaction must contain payment"))
+
             readyTransactionsByReference[reference] = envelope
             newTransactionsSubject.onNext(envelope)
+
+            // TODO: Implement
+            return Completable.complete()
         }
     }
 }

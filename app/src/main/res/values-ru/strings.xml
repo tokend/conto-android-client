@@ -587,4 +587,7 @@
     <string name="asset_secondary_market">Вторичный рынок</string>
     <string name="template_price_each">По %1$s</string>
     <string name="company_all_assets">Все активы</string>
+    <string name="bring_your_phone_to_the_terminal">Поднесите телефон к терминалу</string>
+    <string name="nfc_payment_accepted">Оплачено</string>
+    <string name="try_again">Повторите попытку</string>
 </resources>

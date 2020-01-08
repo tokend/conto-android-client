@@ -582,6 +582,9 @@
     <string name="nfc_redemption_adpu_description" translatable="false">@string/app_name</string>
     <string name="nfc_payment_aid_description" translatable="false">Conto payment applet</string>
     <string name="nfc_payment_adpu_description" translatable="false">@string/app_name</string>
+    <string name="bring_your_phone_to_the_terminal">Bring your phone to the terminal</string>
+    <string name="nfc_payment_accepted">Accepted</string>
+    <string name="try_again">Try again</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
