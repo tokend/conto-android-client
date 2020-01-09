@@ -1,12 +1,16 @@
-package org.tokend.template.features.signin.unlock
+package org.tokend.template.features.signin.unlock.view
 
+import android.app.Application
 import android.os.Bundle
 import android.text.Editable
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.Completable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.activity_unlock_app.*
+import io.reactivex.subjects.CompletableSubject
+import kotlinx.android.synthetic.main.fragment_unlock_app.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.layout_error_empty_view.view.*
 import org.jetbrains.anko.onClick
@@ -14,14 +18,13 @@ import org.tokend.crypto.ecdsa.erase
 import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
 import org.tokend.template.App
 import org.tokend.template.R
-import org.tokend.template.activities.BaseActivity
 import org.tokend.template.extensions.getChars
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
-import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
-import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
+import org.tokend.template.features.signin.unlock.model.UnlockMethod
+import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.logic.fingerprint.FingerprintAuthManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -32,8 +35,9 @@ import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 
-class UnlockAppActivity : BaseActivity() {
-    override val allowUnauthorized: Boolean = true
+class UnlockAppFragment : BaseFragment() {
+    private val resultSubject = CompletableSubject.create()
+    val resultCompletable: Completable = resultSubject
 
     private lateinit var fingerprintAuthManager: FingerprintAuthManager
     private lateinit var fingerprintIndicatorManager: FingerprintIndicatorManager
@@ -64,21 +68,26 @@ class UnlockAppActivity : BaseActivity() {
     private lateinit var email: String
     private var lastEnteredPassword: CharArray? = null
 
-    override fun onCreateAllowed(savedInstanceState: Bundle?) {
-        setContentView(R.layout.activity_unlock_app)
+    private val application: Application
+        get() = requireActivity().application
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_unlock_app, container, false)
+    }
+
+    override fun onInitAllowed() {
         val email = credentialsPersistor.getSavedEmail()
         if (email == null) {
             errorHandlerFactory.getDefault().handle(
                     IllegalStateException("No saved email, unlock is not possible")
             )
-            (application as? App)?.signOut(this)
+            (application as? App)?.signOut(requireActivity())
             return
         }
         this.email = email
 
-        fingerprintAuthManager = FingerprintAuthManager(applicationContext, credentialsPersistor)
-        fingerprintIndicatorManager = FingerprintIndicatorManager(this, fingerprint_indicator)
+        fingerprintAuthManager = FingerprintAuthManager(requireContext(), credentialsPersistor)
+        fingerprintIndicatorManager = FingerprintIndicatorManager(requireContext(), fingerprint_indicator)
 
         initViews()
         initUnlockMethod()
@@ -115,8 +124,8 @@ class UnlockAppActivity : BaseActivity() {
 
         sign_out_button.onClick {
             if (!loadingIndicator.isLoading) {
-                SignOutDialogFactory.getDialog(this) {
-                    (application as App).signOut(this)
+                SignOutDialogFactory.getDialog(requireContext()) {
+                    (application as App).signOut(requireActivity())
                 }.show()
             }
         }
@@ -187,7 +196,7 @@ class UnlockAppActivity : BaseActivity() {
     }
 
     private fun showLoading() {
-        SoftInputUtil.hideSoftInput(this)
+        SoftInputUtil.hideSoftInput(requireActivity())
         progress.visibility = View.VISIBLE
         password_layout.visibility = View.INVISIBLE
         fingerprint_layout.visibility = View.INVISIBLE
@@ -256,7 +265,7 @@ class UnlockAppActivity : BaseActivity() {
         }
         lastEnteredPassword = password
 
-        SoftInputUtil.hideSoftInput(this)
+        SoftInputUtil.hideSoftInput(requireActivity())
 
         SignInUseCase(
                 email,
@@ -270,7 +279,7 @@ class UnlockAppActivity : BaseActivity() {
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
                 .doOnSubscribe {
                     isLoading = true
-                    SoftInputUtil.hideSoftInput(this)
+                    SoftInputUtil.hideSoftInput(requireActivity())
                 }
                 .subscribeBy(
                         onComplete = this::onUnlockComplete,
@@ -283,20 +292,7 @@ class UnlockAppActivity : BaseActivity() {
     }
 
     private fun onUnlockComplete() {
-        // KYC recovery check.
-        val account = repositoryProvider.account().item
-        if (account != null && account.isKycRecoveryActive) {
-            KycRecoveryStatusDialogFactory(this, R.style.AlertDialogStyle)
-                    .getStatusDialog(account, urlConfigProvider.getConfig().client) {
-                        setOnDismissListener {
-                            (application as? App)?.signOut(this@UnlockAppActivity)
-                        }
-                    }
-                    .show()
-        } else {
-            Navigator.from(this)
-                    .performPostSignInRouting(repositoryProvider.kycState().item)
-        }
+        resultSubject.onComplete()
     }
 
     private fun onUnlockError(error: Throwable) {
@@ -335,17 +331,22 @@ class UnlockAppActivity : BaseActivity() {
         cancelFingerprintAuth()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         lastEnteredPassword?.erase()
     }
 
-    override fun onBackPressed() {
-        if (!isLoading && unlockMethod == UnlockMethod.PASSWORD
+    override fun onBackPressed(): Boolean {
+        return if (!isLoading && unlockMethod == UnlockMethod.PASSWORD
                 && fingerprintAuthManager.isAuthAvailable) {
             unlockMethod = UnlockMethod.FINGERPRINT
+            false
         } else {
-            super.onBackPressed()
+            true
         }
+    }
+
+    companion object {
+        fun newInstance() = UnlockAppFragment()
     }
 }
