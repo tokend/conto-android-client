@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.Gravity
+import android.view.Window
 import android.widget.ImageView
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.dip
 import org.tokend.template.R
@@ -39,6 +41,7 @@ class NfcPaymentActivity : BaseActivity() {
         this.rawPaymentRequest = rawPaymentRequest
 
         initToolbar()
+        initSwipeRefresh()
 
         toPaymentRequestLoading()
     }
@@ -65,6 +68,10 @@ class NfcPaymentActivity : BaseActivity() {
                     scaleType = ImageView.ScaleType.FIT_CENTER
                 }
         )
+    }
+
+    private fun initSwipeRefresh() {
+        swipe_refresh.isEnabled = false
     }
 
     private fun toPaymentRequestLoading() {
