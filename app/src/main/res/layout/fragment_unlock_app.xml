@@ -9,6 +9,8 @@
     <ScrollView
         style="@style/LimitedMatchParentWidthConstraint"
         android:overScrollMode="never"
+        android:fadingEdge="vertical"
+        android:requiresFadingEdge="vertical"
         android:scrollbars="none">
 
         <LinearLayout
