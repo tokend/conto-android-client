@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.Gravity
-import android.view.Window
 import android.widget.ImageView
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -16,6 +15,7 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentService
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import java.util.concurrent.CancellationException
@@ -39,6 +39,11 @@ class NfcPaymentActivity : BaseActivity() {
             return
         }
         this.rawPaymentRequest = rawPaymentRequest
+
+        if (!canProcessPaymentRequest()) {
+            Navigator.from(this).toSignIn(true)
+            return
+        }
 
         initToolbar()
         initSwipeRefresh()
@@ -72,6 +77,10 @@ class NfcPaymentActivity : BaseActivity() {
 
     private fun initSwipeRefresh() {
         swipe_refresh.isEnabled = false
+    }
+
+    private fun canProcessPaymentRequest(): Boolean {
+        return credentialsPersistor.hasSimpleCredentials()
     }
 
     private fun toPaymentRequestLoading() {
