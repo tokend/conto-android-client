@@ -80,6 +80,14 @@
             android:title="@string/use_fingerprint" />
 
         <android.support.v7.preference.SwitchPreferenceCompat
+            android:icon="@drawable/ic_nfc"
+            android:key="confirm_nfc_payments"
+            android:layout="@layout/preference_layout"
+            android:persistent="true"
+            android:defaultValue="true"
+            android:title="@string/require_confirmation_for_nfc_payments" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:icon="@drawable/ic_security"
             android:key="tfa"
             android:layout="@layout/preference_layout"

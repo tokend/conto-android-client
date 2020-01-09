@@ -585,6 +585,7 @@
     <string name="bring_your_phone_to_the_terminal">Bring your phone to the terminal</string>
     <string name="nfc_payment_accepted">Accepted</string>
     <string name="try_again">Try again</string>
+    <string name="require_confirmation_for_nfc_payments">Require confirmation of NFC payments</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

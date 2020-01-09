@@ -1,6 +1,7 @@
 package org.tokend.template.features.settings
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v7.preference.PreferenceCategory
 import android.support.v7.preference.SwitchPreferenceCompat
@@ -22,6 +23,7 @@ import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.data.repository.TfaFactorsRepository
 import org.tokend.template.features.localaccount.mnemonic.view.MnemonicPhraseDialog
+import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
 import org.tokend.template.features.settings.view.OpenSourceLicensesDialog
 import org.tokend.template.features.tfa.logic.DisableTfaUseCase
@@ -153,6 +155,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         } else {
             initLocalAccountMnemonicItem()
             initBackgroundLockItem()
+            initNfcPaymentConfirmationItem()
             initFingerprintItem()
             initTfaItem()
             initChangePasswordItem()
@@ -201,6 +204,24 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         lockPreference.isChecked = backgroundLockManager.isBackgroundLockEnabled
         lockPreference.setOnPreferenceClickListener {
             backgroundLockManager.isBackgroundLockEnabled = lockPreference.isChecked
+            true
+        }
+    }
+
+    private fun initNfcPaymentConfirmationItem() {
+        val confirmationPreference = findPreference(NfcPaymentConfirmationManager.PREFERENCE_KEY)
+                as? SwitchPreferenceCompat
+                ?: return
+
+        val isNfcAvailable = requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_NFC)
+        if (!isNfcAvailable) {
+            confirmationPreference.isVisible = false
+            return
+        }
+
+        confirmationPreference.isChecked = nfcPaymentConfirmationManager.isConfirmationRequired
+        confirmationPreference.setOnPreferenceClickListener {
+            nfcPaymentConfirmationManager.isConfirmationRequired = confirmationPreference.isChecked
             true
         }
     }

@@ -105,7 +105,15 @@ class NfcPaymentActivity : BaseActivity() {
 
     private fun onPaymentRequestLoaded(paymentRequest: PosPaymentRequest) {
         this.paymentRequest = paymentRequest
-        toPaymentRequestConfirmation()
+        confirmPaymentRequestIfNeeded()
+    }
+
+    private fun confirmPaymentRequestIfNeeded() {
+        if (nfcPaymentConfirmationManager.isConfirmationRequired) {
+            toPaymentRequestConfirmation()
+        } else {
+            onPaymentRequestConfirmed()
+        }
     }
 
     private fun toPaymentRequestConfirmation() {
@@ -125,7 +133,7 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun onPaymentRequestConfirmed() {
-        unlockIfNeededAndConfirmPaymentRequest()
+        unlockIfNeeded()
     }
 
     private fun onPaymentRequestConfirmationError(error: Throwable) {
@@ -135,15 +143,15 @@ class NfcPaymentActivity : BaseActivity() {
         finish()
     }
 
-    private fun unlockIfNeededAndConfirmPaymentRequest() {
+    private fun unlockIfNeeded() {
         if (accountProvider.getAccount() != null) {
-            toPaymentBroadcast()
+            onUnlocked()
         } else {
-            unlockAndConfirmPaymentRequest()
+            toUnlock()
         }
     }
 
-    private fun unlockAndConfirmPaymentRequest() {
+    private fun toUnlock() {
         val fragment = UnlockForPosPaymentFragment.newInstance()
 
         onBackPressedListener = fragment

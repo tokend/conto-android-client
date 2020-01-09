@@ -590,4 +590,5 @@
     <string name="bring_your_phone_to_the_terminal">Піднесіть телефон до терміналу</string>
     <string name="nfc_payment_accepted">Сплачено</string>
     <string name="try_again">Спробуйте ще раз</string>
+    <string name="require_confirmation_for_nfc_payments">Запитувати підтвердження NFC платежів</string>
 </resources>
