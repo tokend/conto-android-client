@@ -18,10 +18,8 @@ import org.tokend.crypto.ecdsa.erase
 import org.tokend.sdk.api.wallets.model.InvalidCredentialsException
 import org.tokend.template.App
 import org.tokend.template.R
-import org.tokend.template.extensions.getChars
-import org.tokend.template.extensions.hasError
-import org.tokend.template.extensions.onEditorAction
-import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.extensions.*
+import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.features.signin.unlock.model.UnlockMethod
 import org.tokend.template.fragments.BaseFragment
@@ -35,7 +33,7 @@ import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 
-class UnlockAppFragment : BaseFragment() {
+open class UnlockAppFragment : BaseFragment() {
     private val resultSubject = CompletableSubject.create()
     val resultCompletable: Completable = resultSubject
 
@@ -71,6 +69,10 @@ class UnlockAppFragment : BaseFragment() {
     private val application: Application
         get() = requireActivity().application
 
+    private val allowSignOut: Boolean by lazy {
+        arguments?.getBoolean(ALLOW_SIGN_OUT_EXTRA, true) ?: true
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_unlock_app, container, false)
     }
@@ -100,7 +102,7 @@ class UnlockAppFragment : BaseFragment() {
         ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, kycStatePersistor.loadState())
     }
 
-    private fun initButtons() {
+    protected open fun initButtons() {
         use_password_text_button.onClick {
             password_edit_text?.text?.clear()
             cancelFingerprintAuth()
@@ -122,12 +124,16 @@ class UnlockAppFragment : BaseFragment() {
             tryToUnlockWithPassword()
         }
 
-        sign_out_button.onClick {
-            if (!loadingIndicator.isLoading) {
-                SignOutDialogFactory.getDialog(requireContext()) {
-                    (application as App).signOut(requireActivity())
-                }.show()
+        if (allowSignOut) {
+            sign_out_button.onClick {
+                if (!loadingIndicator.isLoading) {
+                    SignOutDialogFactory.getDialog(requireContext()) {
+                        (application as App).signOut(requireActivity())
+                    }.show()
+                }
             }
+        } else {
+            sign_out_button.visibility = View.GONE
         }
 
         recovery_button.onClick {
@@ -178,7 +184,9 @@ class UnlockAppFragment : BaseFragment() {
         password_layout.visibility = View.VISIBLE
         fingerprint_layout.visibility = View.INVISIBLE
         error_empty_view.hide()
-        sign_out_button.visibility = View.VISIBLE
+        if (allowSignOut) {
+            sign_out_button.visibility = View.VISIBLE
+        }
     }
 
     private fun showFingerprintUnlock() {
@@ -188,7 +196,9 @@ class UnlockAppFragment : BaseFragment() {
         password_layout.visibility = View.INVISIBLE
         fingerprint_layout.visibility = View.VISIBLE
         error_empty_view.hide()
-        sign_out_button.visibility = View.VISIBLE
+        if (allowSignOut) {
+            sign_out_button.visibility = View.VISIBLE
+        }
     }
 
     private fun showAutoUnlock() {
@@ -201,7 +211,9 @@ class UnlockAppFragment : BaseFragment() {
         password_layout.visibility = View.INVISIBLE
         fingerprint_layout.visibility = View.INVISIBLE
         error_empty_view.hide()
-        sign_out_button.visibility = View.GONE
+        if (allowSignOut) {
+            sign_out_button.visibility = View.GONE
+        }
     }
 
     private fun showError(error: Throwable) {
@@ -213,7 +225,9 @@ class UnlockAppFragment : BaseFragment() {
                 unlock(email, it)
             }
         }
-        sign_out_button.visibility = View.VISIBLE
+        if (allowSignOut) {
+            sign_out_button.visibility = View.VISIBLE
+        }
     }
 
     private fun updatePasswordUnlockAvailability() {
@@ -273,7 +287,7 @@ class UnlockAppFragment : BaseFragment() {
                 apiProvider.getKeyServer(),
                 session,
                 credentialsPersistor,
-                postSignInManagerFactory.get()
+                getPostSignInManager()
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
@@ -289,6 +303,10 @@ class UnlockAppFragment : BaseFragment() {
                         }
                 )
                 .addTo(compositeDisposable)
+    }
+
+    protected open fun getPostSignInManager(): PostSignInManager? {
+        return postSignInManagerFactory.get()
     }
 
     private fun onUnlockComplete() {
@@ -347,6 +365,13 @@ class UnlockAppFragment : BaseFragment() {
     }
 
     companion object {
-        fun newInstance() = UnlockAppFragment()
+        private const val ALLOW_SIGN_OUT_EXTRA = "allow_sign_out"
+
+        fun getBundle(allowSignOut: Boolean = true) = Bundle().apply {
+            putBoolean(ALLOW_SIGN_OUT_EXTRA, allowSignOut)
+        }
+
+        fun newInstance(bundle: Bundle): UnlockAppFragment =
+                UnlockAppFragment().withArguments(bundle)
     }
 }

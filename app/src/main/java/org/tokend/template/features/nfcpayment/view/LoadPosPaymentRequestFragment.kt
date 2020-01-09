@@ -38,8 +38,7 @@ class LoadPosPaymentRequestFragment : BaseFragment() {
     private fun loadRequest() {
         val loader = PosPaymentRequestLoader(repositoryProvider)
 
-        loader
-                .load(rawRequest)
+        Single.defer { loader.load(rawRequest) }
                 .retryWhen { errors ->
                     errors.filter { it is IOException }.delay(2, TimeUnit.SECONDS)
                 }

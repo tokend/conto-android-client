@@ -18,7 +18,7 @@ class UnlockAppActivity : BaseActivity() {
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_single_fragment)
 
-        val fragment = UnlockAppFragment.newInstance()
+        val fragment = UnlockAppFragment.newInstance(UnlockAppFragment.getBundle())
         onBackPressedListener = fragment
 
         fragment

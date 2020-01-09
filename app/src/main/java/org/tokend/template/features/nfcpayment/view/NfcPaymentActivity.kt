@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.dip
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
+import org.tokend.template.activities.OnBackPressedListener
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentService
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
@@ -28,6 +29,8 @@ class NfcPaymentActivity : BaseActivity() {
 
     private lateinit var rawPaymentRequest: RawPosPaymentRequest
     private lateinit var paymentRequest: PosPaymentRequest
+
+    private var onBackPressedListener: OnBackPressedListener? = null
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -93,7 +96,7 @@ class NfcPaymentActivity : BaseActivity() {
                 .compose(ObservableTransformers.defaultSchedulersSingle())
                 .subscribeBy(
                         onSuccess = this::onPaymentRequestLoaded,
-                        onError = this::onPaymentRequestLoadingError
+                        onError = this::onFatalError
                 )
                 .addTo(compositeDisposable)
 
@@ -103,11 +106,6 @@ class NfcPaymentActivity : BaseActivity() {
     private fun onPaymentRequestLoaded(paymentRequest: PosPaymentRequest) {
         this.paymentRequest = paymentRequest
         toPaymentRequestConfirmation()
-    }
-
-    private fun onPaymentRequestLoadingError(error: Throwable) {
-        errorHandlerFactory.getDefault().handle(error)
-        finish()
     }
 
     private fun toPaymentRequestConfirmation() {
@@ -127,7 +125,7 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun onPaymentRequestConfirmed() {
-        toPaymentBroadcast()
+        unlockIfNeededAndConfirmPaymentRequest()
     }
 
     private fun onPaymentRequestConfirmationError(error: Throwable) {
@@ -135,6 +133,35 @@ class NfcPaymentActivity : BaseActivity() {
             errorHandlerFactory.getDefault().handle(error)
         }
         finish()
+    }
+
+    private fun unlockIfNeededAndConfirmPaymentRequest() {
+        if (accountProvider.getAccount() != null) {
+            toPaymentBroadcast()
+        } else {
+            unlockAndConfirmPaymentRequest()
+        }
+    }
+
+    private fun unlockAndConfirmPaymentRequest() {
+        val fragment = UnlockForPosPaymentFragment.newInstance()
+
+        onBackPressedListener = fragment
+
+        fragment
+                .resultCompletable
+                .compose(ObservableTransformers.defaultSchedulersCompletable())
+                .subscribeBy(
+                        onComplete = this::onUnlocked,
+                        onError = this::onFatalError
+                )
+                .addTo(compositeDisposable)
+
+        fragmentDisplayer.display(fragment, "unlock", true)
+    }
+
+    private fun onUnlocked() {
+        toPaymentBroadcast()
     }
 
     private fun toPaymentBroadcast() {
@@ -145,8 +172,15 @@ class NfcPaymentActivity : BaseActivity() {
         fragmentDisplayer.display(fragment, "broadcast", true)
     }
 
-    override fun onBackPressed() {
+    private fun onFatalError(error: Throwable) {
+        errorHandlerFactory.getDefault().handle(error)
         finish()
+    }
+
+    override fun onBackPressed() {
+        if (onBackPressedListener?.onBackPressed() != false) {
+            finish()
+        }
     }
 
     override fun onDestroy() {
