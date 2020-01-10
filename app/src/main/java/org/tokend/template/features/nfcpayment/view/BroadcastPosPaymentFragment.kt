@@ -3,6 +3,7 @@ package org.tokend.template.features.nfcpayment.view
 import android.animation.ValueAnimator
 import android.graphics.drawable.Animatable
 import android.os.Bundle
+import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_broadcast_pos_payment.*
@@ -20,11 +22,12 @@ import org.tokend.template.features.nfcpayment.logic.NfcPaymentService
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.AnimationUtil
 import java.util.concurrent.TimeUnit
 
 class BroadcastPosPaymentFragment : BaseFragment() {
     private lateinit var paymentRequest: PosPaymentRequest
+
+    private val animationsDisposable = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_broadcast_pos_payment, container, false)
@@ -45,7 +48,9 @@ class BroadcastPosPaymentFragment : BaseFragment() {
                 .subscribe {
                     (circles_image_view.drawable as? Animatable)?.start()
                 }
-                .addTo(compositeDisposable)
+                .addTo(animationsDisposable)
+
+        animationsDisposable.addTo(compositeDisposable)
     }
 
     private fun createAndBroadcastPayment() {
@@ -66,14 +71,20 @@ class BroadcastPosPaymentFragment : BaseFragment() {
     }
 
     private fun onSuccessfulBroadcast() {
+        stopAnimations()
         expandStatus()
         displayStatus(isSuccessful = true)
     }
 
     private fun onBroadcastError(error: Throwable) {
         error.printStackTrace()
+        stopAnimations()
         expandStatus()
         displayStatus(isSuccessful = false)
+    }
+
+    private fun stopAnimations() {
+        animationsDisposable.dispose()
     }
 
     private fun displayStatus(isSuccessful: Boolean) {
@@ -84,20 +95,30 @@ class BroadcastPosPaymentFragment : BaseFragment() {
                     R.string.try_again
         )
 
-        status_image_view.setImageDrawable(ContextCompat.getDrawable(
+        phone_image_view.setImageDrawable(ContextCompat.getDrawable(
                 requireContext(),
                 if (isSuccessful)
                     R.drawable.ic_check_circle_ok
                 else
                     R.drawable.ic_close_circle_error
         ))
-        AnimationUtil.fadeInView(status_image_view)
+
+        if (isSuccessful) {
+            amount_text_view.text = amountFormatter.formatAssetAmount(
+                    paymentRequest.amount,
+                    paymentRequest.asset,
+                    withAssetName = true
+            )
+            amount_text_view.visibility = View.VISIBLE
+        } else {
+            amount_text_view.visibility = View.GONE
+        }
     }
 
     private fun expandStatus() {
         val targetLayoutParams = circles_image_view.layoutParams as ConstraintLayout.LayoutParams
 
-        val animator = ValueAnimator.ofFloat(1.1f, 1.6f).apply {
+        val animator = ValueAnimator.ofFloat(1.1f, 1.4f).apply {
             interpolator = AccelerateInterpolator()
             duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
             addUpdateListener {

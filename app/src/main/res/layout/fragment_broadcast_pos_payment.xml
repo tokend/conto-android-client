@@ -68,16 +68,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/standard_padding">
+        android:layout_marginTop="@dimen/half_standard_margin"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/status_image_view"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="center_horizontal"
-            android:visibility="gone"
-            tools:background="@color/md_green_100"
-            tools:visibility="visible" />
+        <TextView
+            android:id="@+id/amount_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:gravity="center"
+            android:textSize="16sp"
+            tools:text="1 My awesome asset" />
     </FrameLayout>
 
 </LinearLayout>
