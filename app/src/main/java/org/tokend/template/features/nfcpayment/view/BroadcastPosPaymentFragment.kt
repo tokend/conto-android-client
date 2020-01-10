@@ -3,7 +3,6 @@ package org.tokend.template.features.nfcpayment.view
 import android.animation.ValueAnimator
 import android.graphics.drawable.Animatable
 import android.os.Bundle
-import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
@@ -56,6 +55,7 @@ class BroadcastPosPaymentFragment : BaseFragment() {
     private fun createAndBroadcastPayment() {
         CreateAndBroadcastPosPaymentUseCase(
                 paymentRequest = paymentRequest,
+                apiProvider = apiProvider,
                 repositoryProvider = repositoryProvider,
                 accountProvider = accountProvider,
                 walletInfoProvider = walletInfoProvider,

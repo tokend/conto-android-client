@@ -3,7 +3,10 @@ package org.tokend.template.features.nfcpayment.logic
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
+import org.tokend.rx.extensions.toSingle
+import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
 import org.tokend.template.di.providers.AccountProvider
+import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
@@ -18,6 +21,7 @@ import org.tokend.wallet.xdr.PaymentOp
 
 class CreateAndBroadcastPosPaymentUseCase(
         private val paymentRequest: PosPaymentRequest,
+        private val apiProvider: ApiProvider,
         private val repositoryProvider: RepositoryProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val accountProvider: AccountProvider,
@@ -53,21 +57,24 @@ class CreateAndBroadcastPosPaymentUseCase(
     }
 
     private fun getSenderBalance(): Single<String> {
-        val balancesRepository = repositoryProvider.balances()
+        val accountId = walletInfoProvider.getWalletInfo()?.accountId
+                ?: return Single.error(IllegalStateException("No wallet info found"))
 
-        return balancesRepository
-                .updateIfNotFreshDeferred()
-                .toSingleDefault(true)
-                .flatMapMaybe {
-                    balancesRepository
-                            .itemsList
-                            .find { it.assetCode == asset.code }
+        return apiProvider.getApi().v3.accounts
+                .getById(
+                        accountId,
+                        AccountParamsV3(listOf(
+                                AccountParamsV3.Includes.BALANCES
+                        ))
+                )
+                .toSingle()
+                .flatMapMaybe { account ->
+                    account.balances
+                            .find { it.asset.id == asset.code }
                             ?.id
                             .toMaybe()
                 }
-                .switchIfEmpty(Single.error(
-                        IllegalStateException("No balance ID found for $asset")
-                ))
+                .switchIfEmpty(Single.error(IllegalStateException("No balance ID found for $asset")))
     }
 
     private fun getTransaction(): Single<Transaction> {
