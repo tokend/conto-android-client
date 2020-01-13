@@ -579,9 +579,9 @@
     <string name="template_price_each">%1$s each</string>
     <string name="company_all_assets">All assets</string>
     <string name="nfc_redemption_aid_description" translatable="false">Conto redemption applet</string>
-    <string name="nfc_redemption_adpu_description" translatable="false">@string/app_name</string>
+    <string name="nfc_redemption_apdu_description" translatable="false">@string/app_name</string>
     <string name="nfc_payment_aid_description" translatable="false">Conto payment applet</string>
-    <string name="nfc_payment_adpu_description" translatable="false">@string/app_name</string>
+    <string name="nfc_payment_apdu_description" translatable="false">@string/app_name</string>
     <string name="bring_your_phone_to_the_terminal">Bring your phone to the terminal</string>
     <string name="nfc_payment_accepted">Accepted</string>
     <string name="try_again">Try again</string>
