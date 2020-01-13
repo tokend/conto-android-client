@@ -16,6 +16,7 @@ import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
+import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.settings.view.PreferenceDividerDecoration
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.credentials.persistence.CredentialsPersistor
@@ -55,6 +56,8 @@ abstract class SettingsFragment : PreferenceFragmentCompat(),
     lateinit var backgroundLockManager: BackgroundLockManager
     @Inject
     lateinit var mnemonicCode: MnemonicCode
+    @Inject
+    lateinit var nfcPaymentConfirmationManager: NfcPaymentConfirmationManager
 
     protected val compositeDisposable = CompositeDisposable()
 

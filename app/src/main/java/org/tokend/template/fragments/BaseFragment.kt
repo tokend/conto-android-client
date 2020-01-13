@@ -9,8 +9,12 @@ import org.tokend.template.activities.OnBackPressedListener
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
+import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
+import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.logic.AppTfaCallback
 import org.tokend.template.logic.Session
+import org.tokend.template.logic.credentials.persistence.CredentialsPersistor
+import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.view.ToastManager
 import org.tokend.template.view.util.formatter.AmountFormatter
@@ -43,6 +47,14 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     lateinit var amountFormatter: AmountFormatter
     @Inject
     lateinit var session: Session
+    @Inject
+    lateinit var credentialsPersistor: CredentialsPersistor
+    @Inject
+    lateinit var kycStatePersistor: SubmittedKycStatePersistor
+    @Inject
+    lateinit var backgroundLockManager: BackgroundLockManager
+    @Inject
+    lateinit var postSignInManagerFactory: PostSignInManagerFactory
 
     override fun onBackPressed() = true
 

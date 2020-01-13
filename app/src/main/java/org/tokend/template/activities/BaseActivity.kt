@@ -19,6 +19,7 @@ import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
 import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
+import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.features.tfa.view.TfaDialogFactory
 import org.tokend.template.logic.AppTfaCallback
@@ -81,6 +82,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     lateinit var defaultDataCipher: DataCipher
     @Inject
     lateinit var postSignInManagerFactory: PostSignInManagerFactory
+    @Inject
+    lateinit var nfcPaymentConfirmationManager: NfcPaymentConfirmationManager
 
     /**
      * If set to true the activity will be operational

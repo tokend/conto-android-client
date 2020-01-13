@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".features.signin.unlock.UnlockAppActivity">
+    tools:context=".features.signin.unlock.view.UnlockAppActivity">
 
     <ScrollView
         style="@style/LimitedMatchParentWidthConstraint"
+        android:fadingEdge="vertical"
         android:overScrollMode="never"
+        android:requiresFadingEdge="vertical"
         android:scrollbars="none">
 
         <LinearLayout
@@ -45,7 +47,7 @@
                     android:layout_margin="@dimen/standard_margin"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="invisible">
 
                     <android.support.v7.widget.AppCompatImageView
                         android:id="@+id/fingerprint_indicator"
@@ -75,7 +77,9 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/standard_margin"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="invisible"
+                    tools:visibility="visible">
 
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/password_edit_text"
@@ -133,7 +137,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_padding"
-                android:text="@string/sign_out" />
+                android:text="@string/sign_out"
+                android:visibility="invisible"
+                tools:visibility="visible" />
 
         </LinearLayout>
     </ScrollView>

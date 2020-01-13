@@ -13,6 +13,7 @@ import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.localaccount.mnemonic.logic.EnglishMnemonicWords
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
+import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.util.cipher.Aes256GcmDataCipher
@@ -135,5 +136,11 @@ class UtilModule {
                                  repositoryProvider: RepositoryProvider): PostSignInManagerFactory {
         return PostSignInManagerFactory(apiProvider, accountProvider,
                 walletInfoProvider, repositoryProvider)
+    }
+
+    @Provides
+    @Singleton
+    fun nfcPaymentConfirmationManager(context: Context): NfcPaymentConfirmationManager {
+        return NfcPaymentConfirmationManager(context)
     }
 }

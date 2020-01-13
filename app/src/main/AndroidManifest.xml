@@ -23,7 +23,7 @@
         android:required="false" />
     <uses-feature
         android:name="android.hardware.nfc.hce"
-        android:required="false"/>
+        android:required="false" />
 
     <application
         android:name=".App"
@@ -50,14 +50,27 @@
         <service
             android:name=".features.redeem.logic.NfcRedemptionService"
             android:exported="true"
-            android:permission="android.permission.BIND_NFC_SERVICE" >
+            android:permission="android.permission.BIND_NFC_SERVICE">
             <intent-filter>
                 <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.nfc.cardemulation.host_apdu_service"
-                android:resource="@xml/apduservice" />
+                android:resource="@xml/nfc_redemption_service" />
+        </service>
+
+        <service
+            android:name=".features.nfcpayment.logic.NfcPaymentService"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.nfc.cardemulation.host_apdu_service"
+                android:resource="@xml/nfc_payment_service" />
         </service>
 
         <meta-data
@@ -65,20 +78,16 @@
             android:value="${fabricApiKey}" />
 
         <activity
-            android:name=".features.signin.SplashActivity"
-            android:screenOrientation="portrait"
+            android:name=".features.signin.SignInActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:theme="@style/SplashTheme"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".features.signin.SignInActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
             android:name=".features.signin.AuthenticatorSignInActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
@@ -197,7 +206,7 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
-            android:name=".features.signin.unlock.UnlockAppActivity"
+            android:name=".features.signin.unlock.view.UnlockAppActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -302,6 +311,13 @@
         <activity
             android:name=".features.assets.details.refund.view.AssetRefundConfirmationActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
+        <activity
+            android:name=".features.nfcpayment.view.NfcPaymentActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme" />
     </application>
 
 </manifest>

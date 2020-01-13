@@ -1,5 +1,5 @@
 <host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:description="@string/nfc_redemption_adpu_description"
+    android:description="@string/nfc_redemption_apdu_description"
     android:requireDeviceUnlock="false">
     <aid-group
         android:category="other"
