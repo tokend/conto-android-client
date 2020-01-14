@@ -7,7 +7,7 @@ ext {
     version_name = '1.7.0'
     // Version Code - code number for version,
     // must be incremented after each release
-    version_code = 25
+    version_code = 26
 
     // --------------------------
 
