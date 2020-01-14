@@ -96,12 +96,20 @@ class NewBalanceDetailsActivity : BaseActivity() {
     }
 
     private fun initButtons() {
+        send_button.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                ContextCompat.getDrawable(this, R.drawable.ic_send_button),
+                null, null, null
+        )
         send_button.setOnClickListener {
             if (canSend) {
                 openSend()
             }
         }
 
+        redeem_button.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                ContextCompat.getDrawable(this, R.drawable.ic_qr_code_button),
+                null, null, null
+        )
         redeem_button.setOnClickListener {
             if (canRedeem) {
                 openRedemption()
@@ -114,24 +122,14 @@ class NewBalanceDetailsActivity : BaseActivity() {
         if (company != null) {
             company_badge.visibility = View.VISIBLE
             company_name_text_view.text = company.name
-            val logoUrl = company.logoUrl
-            if (logoUrl != null) {
-                CircleLogoUtil.setLogo(company_logo_image_view, company.name, company.logoUrl)
-            } else {
-                company_logo_image_view.setImageDrawable(
-                        ContextCompat.getDrawable(this, R.drawable.ic_company)
-                )
-            }
+            CircleLogoUtil.setLogo(company_logo_image_view, company.name, company.logoUrl)
         } else {
             company_badge.visibility = View.GONE
         }
     }
 
     private fun initAssetLogo() {
-        val logoUrl = balance.asset.logoUrl
-        if (logoUrl != null) {
-            CircleLogoUtil.setAssetLogo(asset_logo_image_view, balance.asset)
-        }
+        CircleLogoUtil.setAssetLogo(asset_logo_image_view, balance.asset)
     }
     // endregion
 

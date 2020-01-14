@@ -80,7 +80,7 @@
 
     <style name="DialogButton" parent="SecondaryButton">
         <item name="android:theme">@style/PrimaryButton.Overlay</item>
-        <item name="android:textColor">@color/color_dialog_button_text</item>
+        <item name="android:textColor">@color/color_dialog_button_content</item>
     </style>
 
     <style name="PrimaryActionTextView">

@@ -15,7 +15,6 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.activity_share_qr.*
-import kotlinx.android.synthetic.main.appbar.*
 import org.jetbrains.anko.textColor
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
@@ -111,7 +110,6 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun hideRedundantViews() {
-        appbar.visibility = View.GONE
         data_text_view.visibility = View.GONE
         bottom_text_view.visibility = View.GONE
     }

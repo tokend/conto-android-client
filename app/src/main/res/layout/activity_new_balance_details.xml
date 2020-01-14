@@ -95,7 +95,9 @@
                     style="@style/ImpressiveCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/triple_margin">
+                    android:layout_marginTop="@dimen/triple_margin"
+                    app:contentPadding="0dp"
+                    app:contentPaddingBottom="@dimen/half_standard_margin">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -107,12 +109,11 @@
                             android:id="@+id/amount_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/half_standard_padding" />
+                            android:layout_margin="@dimen/standard_padding" />
 
-                        <RelativeLayout
+                        <android.support.constraint.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/standard_padding"
                             android:orientation="horizontal">
 
                             <View
@@ -120,52 +121,46 @@
                                 android:layout_width="1dp"
                                 android:layout_height="32dp"
                                 android:layout_centerInParent="true"
-                                android:background="@color/material_drawer_divider" />
+                                android:background="@color/material_drawer_divider"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                            <LinearLayout
+                            <android.support.v7.widget.AppCompatButton
+                                android:id="@+id/send_button"
+                                style="@style/DialogButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentStart="true"
-                                android:layout_toStartOf="@id/divider"
-                                android:gravity="center"
-                                android:orientation="horizontal">
+                                android:drawablePadding="@dimen/half_standard_margin"
+                                android:maxLines="1"
+                                android:text="@string/send_title"
+                                android:textAllCaps="false"
+                                app:layout_constraintEnd_toStartOf="@id/divider"
+                                app:layout_constraintStart_toStartOf="parent" />
 
-                                <android.support.v7.widget.AppCompatButton
-                                    android:id="@+id/send_button"
-                                    style="@style/DialogButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:drawablePadding="@dimen/half_standard_margin"
-                                    android:text="@string/send_title"
-                                    android:textAllCaps="false" />
-                            </LinearLayout>
-
-                            <LinearLayout
+                            <android.support.v7.widget.AppCompatButton
+                                android:id="@+id/redeem_button"
+                                style="@style/DialogButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
                                 android:layout_toEndOf="@id/divider"
-                                android:gravity="center"
-                                android:orientation="horizontal">
+                                android:drawablePadding="@dimen/half_standard_margin"
+                                android:maxLines="1"
+                                android:text="@string/redeem"
+                                android:textAllCaps="false"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/divider" />
 
-                                <android.support.v7.widget.AppCompatButton
-                                    android:id="@+id/redeem_button"
-                                    style="@style/DialogButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:drawablePadding="@dimen/half_standard_margin"
-                                    android:text="@string/redeem"
-                                    android:textAllCaps="false" />
-                            </LinearLayout>
-
-                        </RelativeLayout>
+                        </android.support.constraint.ConstraintLayout>
                     </LinearLayout>
                 </android.support.v7.widget.CardView>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_marginTop="@dimen/standard_padding"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standard_padding"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -178,10 +173,8 @@
                         <android.support.v7.widget.AppCompatButton
                             android:id="@+id/history_button"
                             style="@style/SecondaryButton"
-                            android:drawableTint="@color/primary_action"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableStart="@drawable/ic_decimal_decrease"
                             android:drawablePadding="@dimen/half_standard_margin"
                             android:text="Докупити"
                             android:textAllCaps="false" />
@@ -190,9 +183,7 @@
                             style="@style/SecondaryButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableStart="@drawable/ic_history"
                             android:drawablePadding="@dimen/half_standard_margin"
-                            android:drawableTint="@color/primary_action"
                             android:text="@string/operations_history_short"
                             android:textAllCaps="false" />
 
@@ -207,10 +198,8 @@
 
                         <android.support.v7.widget.AppCompatButton
                             style="@style/SecondaryButton"
-                            android:drawableTint="@color/primary_action"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableStart="@drawable/ic_tx_match"
                             android:drawablePadding="@dimen/half_standard_margin"
                             android:text="@string/sell_action"
                             android:textAllCaps="false" />
@@ -219,9 +208,7 @@
                             style="@style/SecondaryButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableStart="@drawable/ic_information"
                             android:drawablePadding="@dimen/half_standard_margin"
-                            android:drawableTint="@color/primary_action"
                             android:text="@string/details"
                             android:textAllCaps="false" />
                     </LinearLayout>
