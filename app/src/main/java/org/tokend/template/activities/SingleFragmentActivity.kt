@@ -94,7 +94,6 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
 
     override fun onRedemptionRequestAccepted() {
         setResult(Activity.RESULT_OK)
-        finish()
     }
 
     override fun onBackPressed() {

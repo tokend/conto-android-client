@@ -48,10 +48,12 @@ class NfcRedemptionService : HostApduService() {
 
         private var serializedRedemptionRequest: ByteArray? = null
 
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
         fun broadcast(serializedRedemptionRequest: ByteArray) {
             this.serializedRedemptionRequest = serializedRedemptionRequest
         }
 
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
         fun cancelBroadcast() {
             this.serializedRedemptionRequest = null
         }

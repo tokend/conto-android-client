@@ -635,11 +635,12 @@ class Navigator private constructor() {
     }
 
     fun openSimpleRedemptionCreation(balanceId: String,
+                                     amount: BigDecimal? = null,
                                      requestCode: Int = 0) {
         context?.intentFor<SingleFragmentActivity>()
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         SimpleRedemptionFragment.ID,
-                        SimpleRedemptionFragment.getBundle(balanceId)
+                        SimpleRedemptionFragment.getBundle(balanceId, amount)
                 ))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }

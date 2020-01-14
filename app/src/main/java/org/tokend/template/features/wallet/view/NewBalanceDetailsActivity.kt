@@ -217,7 +217,8 @@ class NewBalanceDetailsActivity : BaseActivity() {
     private fun openRedemption() {
         Navigator.from(this).openSimpleRedemptionCreation(
                 balanceId = balanceId,
-                requestCode = SEND_REQUEST
+                amount = amount_view.amountWrapper.scaledAmount,
+                requestCode = REDEMPTION_REQUEST
         )
     }
 
