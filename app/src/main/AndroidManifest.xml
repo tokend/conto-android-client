@@ -315,9 +315,17 @@
             android:name=".features.nfcpayment.view.NfcPaymentActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:launchMode="singleInstance"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme" />
+            android:theme="@style/SplashTheme"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".activities.TestActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".features.wallet.view.NewBalanceDetailsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
     </application>
 
 </manifest>

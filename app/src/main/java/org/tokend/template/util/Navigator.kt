@@ -68,6 +68,7 @@ import org.tokend.template.features.redeem.accept.view.ConfirmRedemptionActivity
 import org.tokend.template.features.redeem.accept.view.ScanRedemptionActivity
 import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
 import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
+import org.tokend.template.features.redeem.create.view.SimpleRedemptionFragment
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -85,7 +86,7 @@ import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
 import org.tokend.template.features.wallet.view.BalanceDetailsActivity
-import org.tokend.template.features.wallet.view.SimpleBalanceDetailsActivity
+import org.tokend.template.features.wallet.view.NewBalanceDetailsActivity
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.WithdrawalConfirmationActivity
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
@@ -433,8 +434,8 @@ class Navigator private constructor() {
     }
 
     fun openSimpleBalanceDetails(balanceId: String) {
-        context?.intentFor<SimpleBalanceDetailsActivity>()
-                ?.putExtras(SimpleBalanceDetailsActivity.getBundle(balanceId))
+        context?.intentFor<NewBalanceDetailsActivity>()
+                ?.putExtras(NewBalanceDetailsActivity.getBundle(balanceId))
                 ?.also { performIntent(it) }
     }
 
@@ -631,5 +632,15 @@ class Navigator private constructor() {
                 ?.putExtras(NfcPaymentActivity.getBundle(request))
                 ?.clearTop()
                 ?.also { performIntent(it) }
+    }
+
+    fun openSimpleRedemptionCreation(balanceId: String,
+                                     requestCode: Int = 0) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        SimpleRedemptionFragment.ID,
+                        SimpleRedemptionFragment.getBundle(balanceId)
+                ))
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 }

@@ -316,6 +316,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     companion object {
+        val ID = "simple_redemption".hashCode().toLong()
         private val PRE_FILLED_AMOUNT = BigDecimal.ONE
         private const val BALANCE_ID_EXTRA = "balance_id"
 
