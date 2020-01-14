@@ -2,6 +2,7 @@ package org.tokend.template.features.clients.model
 
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
 import org.tokend.template.data.model.Asset
+import org.tokend.template.extensions.tryOrNull
 import java.io.Serializable
 import java.math.BigDecimal
 
@@ -40,9 +41,11 @@ class CompanyClientRecord(
             firstName = source.firstName?.takeIf(String::isNotEmpty),
             lastName = source.lastName?.takeIf(String::isNotEmpty),
             balances = source.balances
-                    ?.map {
-                        Balance(it.amount, assetsMap[it.assetCode]
-                                ?: throw IllegalStateException("Asset ${it.assetCode} is not in the map"))
+                    ?.mapNotNull {
+                        tryOrNull {
+                            Balance(it.amount, assetsMap[it.assetCode]
+                                    ?: throw IllegalStateException("Asset ${it.assetCode} is not in the map"))
+                        }
                     }
                     ?.sortedByDescending { it.amount.signum() > 0 }
                     ?: emptyList()
