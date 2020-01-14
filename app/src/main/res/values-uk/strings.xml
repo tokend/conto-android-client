@@ -482,7 +482,7 @@
     <string name="error_invalid_redemption_request">Некоректний запит на погашення. Спробуйте ще раз</string>
     <string name="error_no_companies">Компанії не знайдено</string>
     <string name="error_redemption_not_owned_asset">Ви можете приймати погашення лише створених вами активів</string>
-    <string name="redeem">Погашення</string>
+    <string name="redeem">Погасити</string>
     <string name="redemption_title">Погашення</string>
     <string name="share_account">Поділитися акаунтом</string>
     <string name="share_redemption_request">Поділитися погашенням</string>

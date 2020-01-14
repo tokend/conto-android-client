@@ -134,7 +134,7 @@
                                 android:layout_height="wrap_content"
                                 android:drawablePadding="@dimen/half_standard_margin"
                                 android:maxLines="1"
-                                android:text="@string/send_title"
+                                android:text="@string/send_action"
                                 android:textAllCaps="false"
                                 app:layout_constraintEnd_toStartOf="@id/divider"
                                 app:layout_constraintStart_toStartOf="parent" />
