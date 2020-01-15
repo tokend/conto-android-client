@@ -9,6 +9,7 @@ import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.deposit.DepositFragment
+import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
 import org.tokend.template.features.redeem.create.view.SimpleRedemptionFragment
@@ -52,6 +53,7 @@ class SingleFragmentActivity : BaseActivity(), WalletEventsListener {
             ShareRedemptionQrFragment.ID -> bundle?.let(ShareRedemptionQrFragment.Companion::newInstance)
             AccountDetailsFragment.ID -> bundle?.let(AccountDetailsFragment.Companion::newInstance)
             SimpleRedemptionFragment.ID -> bundle?.let(SimpleRedemptionFragment.Companion::newInstance)
+            AssetMovementsFragment.ID -> bundle?.let(AssetMovementsFragment.Companion::newInstance)
             else -> null
         }
     }

@@ -52,6 +52,7 @@ import org.tokend.template.features.localaccount.view.LocalAccountDetailsActivit
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.massissuance.view.MassIssuanceActivity
 import org.tokend.template.features.massissuance.view.MassIssuanceConfirmationActivity
+import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.features.nfcpayment.view.NfcPaymentActivity
 import org.tokend.template.features.offers.CreateOfferActivity
@@ -86,7 +87,7 @@ import org.tokend.template.features.signup.SignUpActivity
 import org.tokend.template.features.trade.TradeActivity
 import org.tokend.template.features.wallet.details.*
 import org.tokend.template.features.wallet.view.BalanceDetailsActivity
-import org.tokend.template.features.wallet.view.NewBalanceDetailsActivity
+import org.tokend.template.features.wallet.view.SimpleBalanceDetailsActivity
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.WithdrawalConfirmationActivity
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
@@ -434,8 +435,8 @@ class Navigator private constructor() {
     }
 
     fun openSimpleBalanceDetails(balanceId: String) {
-        context?.intentFor<NewBalanceDetailsActivity>()
-                ?.putExtras(NewBalanceDetailsActivity.getBundle(balanceId))
+        context?.intentFor<SimpleBalanceDetailsActivity>()
+                ?.putExtras(SimpleBalanceDetailsActivity.getBundle(balanceId))
                 ?.also { performIntent(it) }
     }
 
@@ -643,5 +644,14 @@ class Navigator private constructor() {
                         SimpleRedemptionFragment.getBundle(balanceId, amount)
                 ))
                 ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openAssetMovements(balanceId: String? = null) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        AssetMovementsFragment.ID,
+                        AssetMovementsFragment.getBundle(balanceId)
+                ))
+                ?.also { performIntent(it) }
     }
 }

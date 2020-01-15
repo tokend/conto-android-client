@@ -283,10 +283,6 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <activity
             android:name=".features.shaketopay.view.ShakeToPayActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:screenOrientation="portrait" />
@@ -319,11 +315,7 @@
             android:theme="@style/SplashTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".activities.TestActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <activity
-            android:name=".features.wallet.view.NewBalanceDetailsActivity"
+            android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
     </application>
