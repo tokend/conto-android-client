@@ -79,12 +79,14 @@
                         android:layout_toStartOf="@id/asset_logo_image_view"
                         android:orientation="vertical">
 
-                        <TextView
+                        <me.grantland.widget.AutofitTextView
                             android:id="@+id/available_text_view"
                             style="@style/HeadingText"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="32sp"
+                            android:maxLines="1"
+                            android:gravity="bottom"
                             tools:text="405,5" />
 
                         <TextView
