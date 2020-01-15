@@ -4,10 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.NestedScrollView
 import android.view.View
+import android.widget.TextView
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_new_balance_details.*
+import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.childrenSequence
 import org.jetbrains.anko.textColor
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
@@ -15,7 +19,9 @@ import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.view.util.AnimationUtil
 import org.tokend.template.view.util.CircleLogoUtil
+import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import java.math.BigDecimal
 import kotlin.math.roundToInt
@@ -76,6 +82,53 @@ class NewBalanceDetailsActivity : BaseActivity() {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         toolbar.setNavigationOnClickListener { onBackPressed() }
         toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleAppearance)
+
+        initToolbarAnimations()
+    }
+
+    private fun initToolbarAnimations() {
+        val elevationScrollListener =
+                ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
+
+        // Force toolbar to create title and subtitle views.
+        toolbar.title = "*"
+        toolbar.subtitle = "*"
+
+        val fadingToolbarViews = toolbar
+                .childrenSequence()
+                .filter { it is TextView }
+
+        val fadeDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+
+        fadingToolbarViews.forEach {
+            it.visibility = View.INVISIBLE
+        }
+
+        val location = IntArray(2)
+        var wasVisible = true
+        scroll_view.setOnScrollChangeListener { a: NestedScrollView?,
+                                                b: Int,
+                                                c: Int,
+                                                d: Int,
+                                                e: Int ->
+            elevationScrollListener.onScrollChange(a, b, c, d, e)
+
+            val cutPoint = location.apply(appbar_elevation_view::getLocationInWindow)[1]
+            val availableTop = location.apply(available_text_view::getLocationInWindow)[1]
+
+            val isVisible = availableTop + available_text_view.height / 2 > cutPoint
+
+            if (isVisible != wasVisible) {
+                wasVisible = isVisible
+                fadingToolbarViews.forEach {
+                    if (!isVisible) {
+                        AnimationUtil.fadeInView(it, fadeDuration)
+                    } else {
+                        AnimationUtil.fadeOutView(it, fadeDuration)
+                    }
+                }
+            }
+        }
     }
 
     private fun initSwipeRefresh() {
@@ -222,6 +275,9 @@ class NewBalanceDetailsActivity : BaseActivity() {
                 withAssetCode = false, withAssetName = false
         )
         asset_name_text_view.text = balance.asset.run { name ?: code }
+
+        toolbar.title = available_text_view.text
+        toolbar.subtitle = asset_name_text_view.text
     }
 
     private fun openSend() {

@@ -7,17 +7,18 @@ import android.view.View
 
 object ElevationUtil {
 
-    fun initScrollElevation(scrollView: NestedScrollView, elevationView: View) {
+    fun initScrollElevation(scrollView: NestedScrollView, elevationView: View):
+            NestedScrollView.OnScrollChangeListener {
         elevationView.visibility = View.GONE
 
         var wasInScroll = false
         val animationDuration = scrollView.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-        scrollView.setOnScrollChangeListener { _: NestedScrollView?,
-                                               _: Int,
-                                               scrollY: Int,
-                                               _: Int,
-                                               _: Int ->
+        val listener = NestedScrollView.OnScrollChangeListener { _: NestedScrollView?,
+                                                                 _: Int,
+                                                                 scrollY: Int,
+                                                                 _: Int,
+                                                                 _: Int ->
             val inScroll = scrollY > 0.01f
             if (inScroll != wasInScroll) {
                 if (inScroll) {
@@ -28,6 +29,10 @@ object ElevationUtil {
                 wasInScroll = inScroll
             }
         }
+
+        scrollView.setOnScrollChangeListener(listener)
+
+        return listener
     }
 
     fun initScrollElevation(recyclerView: RecyclerView, elevationView: View) {
