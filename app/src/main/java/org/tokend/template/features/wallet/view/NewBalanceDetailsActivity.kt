@@ -18,6 +18,7 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import java.math.BigDecimal
+import kotlin.math.roundToInt
 
 class NewBalanceDetailsActivity : BaseActivity() {
     private val loadingIndicator = LoadingIndicatorManager(
@@ -92,6 +93,15 @@ class NewBalanceDetailsActivity : BaseActivity() {
         }
         amount_view.amountWrapper.maxPlacesAfterComa = balance.asset.trailingDigits
 
+        amount_card_content_layout.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
+            val width = right - left
+            val oldWidth = oldRight - oldLeft
+            if (width != oldWidth) {
+                // Max amount input field width is 45% of the container width.
+                amount_view.editText.maxWidth = (width * 0.45).roundToInt()
+            }
+        }
+
         preFillAmount()
     }
 
@@ -114,6 +124,14 @@ class NewBalanceDetailsActivity : BaseActivity() {
             if (canRedeem) {
                 openRedemption()
             }
+        }
+
+        asset_logo_image_view.setOnClickListener {
+            openAssetDetails()
+        }
+
+        company_badge.setOnClickListener {
+            openCompanyDetails()
         }
     }
 
@@ -220,6 +238,14 @@ class NewBalanceDetailsActivity : BaseActivity() {
                 amount = amount_view.amountWrapper.scaledAmount,
                 requestCode = REDEMPTION_REQUEST
         )
+    }
+
+    private fun openAssetDetails() {
+        Navigator.from(this).openAssetDetails(balance.asset)
+    }
+
+    private fun openCompanyDetails() {
+        balance.company?.also(Navigator.from(this)::openCompanyDetails)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
