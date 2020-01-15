@@ -482,7 +482,7 @@
     <string name="error_invalid_redemption_request">Некорректный запрос на погашение. Попробуйте еще раз</string>
     <string name="error_no_companies">Компании не найдены</string>
     <string name="error_redemption_not_owned_asset">Вы можете принимать погашения только созданых вами активов</string>
-    <string name="redeem">Погашение</string>
+    <string name="redeem">Погасить</string>
     <string name="redemption_title">Погашение</string>
     <string name="share_account">Поделиться аккаунтом</string>
     <string name="share_redemption_request">Поделиться погашением</string>

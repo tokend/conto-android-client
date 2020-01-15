@@ -52,6 +52,7 @@ import org.tokend.template.features.localaccount.view.LocalAccountDetailsActivit
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.massissuance.view.MassIssuanceActivity
 import org.tokend.template.features.massissuance.view.MassIssuanceConfirmationActivity
+import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.features.nfcpayment.view.NfcPaymentActivity
 import org.tokend.template.features.offers.CreateOfferActivity
@@ -68,6 +69,7 @@ import org.tokend.template.features.redeem.accept.view.ConfirmRedemptionActivity
 import org.tokend.template.features.redeem.accept.view.ScanRedemptionActivity
 import org.tokend.template.features.redeem.create.view.CreateRedemptionActivity
 import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment
+import org.tokend.template.features.redeem.create.view.SimpleRedemptionFragment
 import org.tokend.template.features.send.PaymentConfirmationActivity
 import org.tokend.template.features.send.SendFragment
 import org.tokend.template.features.send.model.PaymentRequest
@@ -630,6 +632,26 @@ class Navigator private constructor() {
         context?.intentFor<NfcPaymentActivity>()
                 ?.putExtras(NfcPaymentActivity.getBundle(request))
                 ?.clearTop()
+                ?.also { performIntent(it) }
+    }
+
+    fun openSimpleRedemptionCreation(balanceId: String,
+                                     amount: BigDecimal? = null,
+                                     requestCode: Int = 0) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        SimpleRedemptionFragment.ID,
+                        SimpleRedemptionFragment.getBundle(balanceId, amount)
+                ))
+                ?.also { performIntent(it, requestCode = requestCode) }
+    }
+
+    fun openAssetMovements(balanceId: String? = null) {
+        context?.intentFor<SingleFragmentActivity>()
+                ?.putExtras(SingleFragmentActivity.getBundle(
+                        AssetMovementsFragment.ID,
+                        AssetMovementsFragment.getBundle(balanceId)
+                ))
                 ?.also { performIntent(it) }
     }
 }

@@ -42,7 +42,7 @@ class CreateRedemptionActivity : BaseActivity() {
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        title = getString(R.string.redeem)
+        title = getString(R.string.redemption_title)
     }
 
     private fun initSwipeRefresh() {

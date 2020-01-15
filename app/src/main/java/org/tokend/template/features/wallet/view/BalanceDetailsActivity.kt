@@ -163,7 +163,7 @@ class BalanceDetailsActivity : BaseActivity() {
         } else {
             actions.add(FloatingActionMenuAction(
                     this,
-                    R.string.redeem,
+                    R.string.redemption_title,
                     R.drawable.ic_redeem,
                     {
                         val assetCode = asset?.code ?: return@FloatingActionMenuAction

@@ -2,6 +2,7 @@ package org.tokend.template.features.redeem.create.view
 
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
@@ -15,8 +16,8 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.activity_share_qr.*
-import kotlinx.android.synthetic.main.appbar.*
 import org.jetbrains.anko.textColor
+import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
 import org.tokend.template.data.model.BalanceRecord
@@ -80,6 +81,13 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
                 )
         )
 
+    override val title: String
+        get() = balance.asset.run { name ?: code }
+
+    private val requiredAmount: BigDecimal by lazy {
+        arguments?.getString(AMOUNT_EXTRA).let { BigDecimalUtil.valueOf(it, DEFAULT_AMOUNT) }
+    }
+
     override fun onInitAllowed() {
         balanceId = arguments?.getString(BALANCE_ID_EXTRA)
                 ?: throw  IllegalArgumentException("No $BALANCE_ID_EXTRA specified")
@@ -111,12 +119,16 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun hideRedundantViews() {
-        appbar.visibility = View.GONE
         data_text_view.visibility = View.GONE
         bottom_text_view.visibility = View.GONE
     }
 
     private fun initAmountViews() {
+        // Prevent soft keyboard pop up.
+        qr_code_layout.isFocusable = true
+        qr_code_layout.isFocusableInTouchMode = true
+        qr_code_layout.requestFocus()
+
         availableTextView = TextView(ContextThemeWrapper(requireContext(), R.style.SecondaryText),
                 null, R.style.SecondaryText)
         availableTextView.layoutParams = LinearLayout.LayoutParams(
@@ -174,7 +186,7 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     }
 
     private fun preFillAmount() {
-        amountView.amountWrapper.setAmount(PRE_FILLED_AMOUNT.min(balance.available))
+        amountView.amountWrapper.setAmount(requiredAmount.min(balance.available))
     }
 
     private fun subscribeToBalances() {
@@ -304,23 +316,33 @@ class SimpleRedemptionFragment : ShareRedemptionQrFragment() {
     override fun startPollingIfNeeded() {
         if (currentRequest?.amount?.signum()?.let { it > 0 } == true) {
             super.startPollingIfNeeded()
-            currentRequestSerialized
-                    .takeIf(ByteArray::isNotEmpty)
-                    ?.also(NfcRedemptionService.Companion::broadcast)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                currentRequestSerialized
+                        .takeIf(ByteArray::isNotEmpty)
+                        ?.also(NfcRedemptionService.Companion::broadcast)
+            }
         }
     }
 
     override fun stopPolling() {
         super.stopPolling()
-        NfcRedemptionService.cancelBroadcast()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            NfcRedemptionService.cancelBroadcast()
+        }
     }
 
     companion object {
-        private val PRE_FILLED_AMOUNT = BigDecimal.ONE
+        val ID = "simple_redemption".hashCode().toLong()
+        private val DEFAULT_AMOUNT = BigDecimal.ONE
         private const val BALANCE_ID_EXTRA = "balance_id"
+        private const val AMOUNT_EXTRA = "amount"
 
-        fun getBundle(balanceId: String) = Bundle().apply {
+        fun getBundle(balanceId: String,
+                      amount: BigDecimal? = null) = Bundle().apply {
             putString(BALANCE_ID_EXTRA, balanceId)
+            if (amount != null) {
+                putString(AMOUNT_EXTRA, BigDecimalUtil.toPlainString(amount))
+            }
         }
 
         fun newInstance(bundle: Bundle): SimpleRedemptionFragment = SimpleRedemptionFragment()

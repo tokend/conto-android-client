@@ -362,7 +362,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                     allowToolbar = true,
                     ownerAccountId = null
             ))
-            AssetMovementsFragment.ID -> AssetMovementsFragment.newInstance()
+            AssetMovementsFragment.ID -> AssetMovementsFragment.newInstance(AssetMovementsFragment.getBundle())
             BalancesFragment.ID -> BalancesFragment.newInstance(BalancesFragment.getBundle(
                     allowToolbar = true
             ))

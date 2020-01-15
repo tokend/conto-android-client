@@ -80,7 +80,7 @@
 
     <style name="DialogButton" parent="SecondaryButton">
         <item name="android:theme">@style/PrimaryButton.Overlay</item>
-        <item name="android:textColor">@color/color_dialog_button_text</item>
+        <item name="android:textColor">@color/color_dialog_button_content</item>
     </style>
 
     <style name="PrimaryActionTextView">
@@ -221,5 +221,16 @@
 
     <style name="ActionModeTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Title">
         <item name="android:textColor">@color/md_black_1000</item>
+    </style>
+
+    <style name="BalanceActionButton" parent="DialogButton">
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="BalanceActionButton.Secondary" parent="BalanceActionButton">
+        <item name="android:textColor">@color/secondary_text</item>
     </style>
 </resources>

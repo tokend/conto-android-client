@@ -20,6 +20,7 @@ import org.tokend.template.R
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
 import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
 import org.tokend.template.fragments.BaseFragment
@@ -55,6 +56,10 @@ open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
     private lateinit var adapter: BalanceChangesAdapter
 
     private lateinit var balancePicker: BalancePickerBottomDialog
+
+    private val requiredBalanceId: String? by lazy {
+        arguments?.getString(BALANCE_ID_EXTRA)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_movements, container, false)
@@ -120,7 +125,14 @@ open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
             return
         }
 
-        currentBalance = items.first().source
+        val balanceToSet = items
+                .find { it.source?.id == requiredBalanceId }
+                ?.source
+                ?: items.firstOrNull()?.source
+
+        if (balanceToSet != null) {
+            currentBalance = balanceToSet
+        }
     }
 
     private fun initSwipeRefresh() {
@@ -237,7 +249,13 @@ open class AssetMovementsFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         val ID = "asset_movements".hashCode().toLong()
+        private const val BALANCE_ID_EXTRA = "balance_id"
 
-        fun newInstance() = AssetMovementsFragment()
+        fun getBundle(balanceId: String? = null) = Bundle().apply {
+            putString(BALANCE_ID_EXTRA, balanceId)
+        }
+
+        fun newInstance(bundle: Bundle): AssetMovementsFragment =
+                AssetMovementsFragment().withArguments(bundle)
     }
 }
