@@ -18,25 +18,28 @@ class TxManager(
         private val apiProvider: ApiProvider,
         private val confirmationProvider: ConfirmationProvider<Transaction>? = null
 ) {
-    fun submit(transaction: Transaction): Single<SubmitTransactionResponse> {
+    fun submit(transaction: Transaction,
+               waitForIngest: Boolean = true): Single<SubmitTransactionResponse> {
         val confirmationCompletable =
                 confirmationProvider?.requestConfirmation(transaction)
                         ?: Completable.complete()
 
         return confirmationCompletable
-                .andThen(submitEnvelope(transaction.getEnvelope()))
+                .andThen(submitEnvelope(transaction.getEnvelope(), waitForIngest))
     }
 
-    fun submitWithoutConfirmation(transactionEnvelope: TransactionEnvelope)
+    fun submitWithoutConfirmation(transactionEnvelope: TransactionEnvelope,
+                                  waitForIngest: Boolean = true)
             : Single<SubmitTransactionResponse> {
-        return submitEnvelope(transactionEnvelope)
+        return submitEnvelope(transactionEnvelope, waitForIngest)
     }
 
-    private fun submitEnvelope(envelope: TransactionEnvelope): Single<SubmitTransactionResponse> {
+    private fun submitEnvelope(envelope: TransactionEnvelope,
+                               waitForIngest: Boolean): Single<SubmitTransactionResponse> {
         return apiProvider.getApi()
                 .v3
                 .transactions
-                .submit(envelope, true)
+                .submit(envelope, waitForIngest)
                 .toSingle()
     }
 
