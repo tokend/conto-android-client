@@ -123,7 +123,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initMenu() {
-        toolbar.inflateMenu(R.menu.explore)
+        toolbar.inflateMenu(R.menu.search)
         val menu = toolbar.menu
 
         val searchItem = menu.findItem(R.id.search) ?: return
@@ -137,7 +137,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                     .queryChanges
                     .compose(ObservableTransformers.defaultSchedulers())
                     .subscribe { newValue ->
-                        filter = newValue.takeIf { it.isNotEmpty() }
+                        filter = newValue.takeIf(String::isNotEmpty)
                     }
                     .addTo(compositeDisposable)
         } catch (e: Exception) {
@@ -200,6 +200,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     protected open fun displayBalances() {
         val items = balancesRepository
                 .itemsList
+                .asSequence()
                 .sortedWith(balanceComparator)
                 .filter {
                     it.hasAvailableAmount && (companyId == null || it.asset.isOwnedBy(companyId))
@@ -217,6 +218,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
                         SearchUtil.isMatchGeneralCondition(it, item.assetName, item.ownerName)
                     } ?: true
                 }
+                .toList()
 
         adapter.setData(items)
     }

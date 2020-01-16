@@ -132,7 +132,7 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun initMenu() {
-        toolbar.inflateMenu(R.menu.explore)
+        toolbar.inflateMenu(R.menu.search)
         val menu = toolbar.menu
 
         searchItem = menu?.findItem(R.id.search) ?: return

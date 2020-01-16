@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.rxkotlin.addTo
@@ -25,9 +26,11 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.SearchUtil
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.MenuSearchViewManager
 
 class MarketplaceFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject = BehaviorSubject.create<Toolbar>()
@@ -49,6 +52,16 @@ class MarketplaceFragment : BaseFragment(), ToolbarProvider {
     private lateinit var adapter: SinglePriceAtomicSwapAsksAdapter
     private lateinit var layoutManager: GridLayoutManager
 
+    private var searchMenuItem: MenuItem? = null
+
+    private var filter: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                onFilterChanged()
+            }
+        }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_all_atomic_swap_asks, container, false)
     }
@@ -65,9 +78,11 @@ class MarketplaceFragment : BaseFragment(), ToolbarProvider {
         update()
     }
 
+    // region Init
     private fun initToolbar() {
         if (allowToolbar) {
             toolbar.title = getString(R.string.marketplace)
+            initMenu()
             ElevationUtil.initScrollElevation(asks_recycler_view, appbar_elevation_view)
         } else {
             appbar.visibility = View.GONE
@@ -98,6 +113,30 @@ class MarketplaceFragment : BaseFragment(), ToolbarProvider {
             asksRepository.loadMore() || asksRepository.noMoreItems
         }
     }
+
+    private fun initMenu() {
+        toolbar.inflateMenu(R.menu.search)
+        val menu = toolbar.menu
+
+        val searchItem = menu.findItem(R.id.search) ?: return
+        this.searchMenuItem = searchItem
+
+        try {
+            val searchManager = MenuSearchViewManager(searchItem, toolbar, compositeDisposable)
+
+            searchManager.queryHint = getString(R.string.search)
+            searchManager
+                    .queryChanges
+                    .compose(ObservableTransformers.defaultSchedulers())
+                    .subscribe { newValue ->
+                        filter = newValue.takeIf(String::isNotEmpty)
+                    }
+                    .addTo(compositeDisposable)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    // endregion
 
     private fun initSwipeRefresh() {
         swipe_refresh.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.accent))
@@ -146,6 +185,7 @@ class MarketplaceFragment : BaseFragment(), ToolbarProvider {
     private fun displayAsks() {
         val items = asksRepository
                 .itemsList
+                .asSequence()
                 .filterNot(MarketplaceOfferRecord::isCanceled)
                 .map {
                     MarketplaceOfferListItem(
@@ -153,7 +193,18 @@ class MarketplaceFragment : BaseFragment(), ToolbarProvider {
                             withCompany = companyId == null
                     )
                 }
+                .filter { item ->
+                    filter?.let {
+                        SearchUtil.isMatchGeneralCondition(it, item.asset.name, item.companyName)
+                    } ?: true
+                }
+                .toList()
+
         adapter.setData(items)
+    }
+
+    private fun onFilterChanged() {
+        displayAsks()
     }
 
     private fun update(force: Boolean = false) {
@@ -175,6 +226,12 @@ class MarketplaceFragment : BaseFragment(), ToolbarProvider {
 
     private fun updateListColumnsCount() {
         layoutManager.spanCount = ColumnCalculator.getColumnCount(requireActivity())
+    }
+
+    override fun onBackPressed(): Boolean {
+        return searchMenuItem?.isActionViewExpanded == false.also {
+            searchMenuItem?.collapseActionView()
+        }
     }
 
     companion object {
