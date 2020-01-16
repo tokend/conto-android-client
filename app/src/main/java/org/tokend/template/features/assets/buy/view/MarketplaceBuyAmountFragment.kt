@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.layout_atomic_swap_quote_asset_selection.v
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.layoutInflater
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
+import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
@@ -36,13 +37,17 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
             onQuoteAssetChanged()
         }
 
+    private val requiredAmount: BigDecimal by lazy {
+        BigDecimalUtil.valueOf(arguments?.getString(AMOUNT_EXTRA), DEFAULT_AMOUNT)
+    }
+
     override fun onInitAllowed() {
         this.offer = arguments?.getSerializable(OFFER_EXTRA) as? MarketplaceOfferRecord
                 ?: throw IllegalArgumentException("No $OFFER_EXTRA specified")
 
         super.onInitAllowed()
 
-        amountWrapper.setAmount(PRE_FILLED_AMOUNT)
+        amountWrapper.setAmount(requiredAmount)
     }
 
     override fun initFields() {
@@ -165,13 +170,6 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         resultSubject.onNext(AmountInputResult(amount, asset))
     }
 
-//    override fun getMinLayoutHeight(): Int {
-//        return if (needQuoteAssetSelection)
-//            requireContext().dip(248)
-//        else
-//            super.getMinLayoutHeight()
-//    }
-
     override fun getSmallSizingHeightThreshold(): Int {
         return if (needQuoteAssetSelection)
             requireContext().dip(270)
@@ -199,11 +197,14 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
     }
 
     companion object {
-        private val PRE_FILLED_AMOUNT = BigDecimal.ONE
+        private val DEFAULT_AMOUNT = BigDecimal.ONE
         private const val OFFER_EXTRA = "offer"
+        private const val AMOUNT_EXTRA = "amount"
 
-        fun getBundle(offer: MarketplaceOfferRecord) = Bundle().apply {
+        fun getBundle(offer: MarketplaceOfferRecord,
+                      amount: BigDecimal? = null) = Bundle().apply {
             putSerializable(OFFER_EXTRA, offer)
+            putString(AMOUNT_EXTRA, BigDecimalUtil.toPlainString(amount))
         }
 
         fun newInstance(bundle: Bundle): MarketplaceBuyAmountFragment =

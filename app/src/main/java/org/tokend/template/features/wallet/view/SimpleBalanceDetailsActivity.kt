@@ -12,7 +12,9 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_simple_balance_details.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -22,13 +24,13 @@ import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.assets.buy.marketplace.logic.MarketplaceOfferLoader
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.AnimationUtil
-import org.tokend.template.view.util.CircleLogoUtil
-import org.tokend.template.view.util.ElevationUtil
-import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.*
 import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.roundToInt
 
 class SimpleBalanceDetailsActivity : BaseActivity() {
@@ -78,7 +80,6 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         initButtons()
         initCompanyBadge()
         initAssetLogo()
-        initActions()
 
         subscribeToBalances()
     }
@@ -214,36 +215,6 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     private fun initAssetLogo() {
         CircleLogoUtil.setAssetLogo(asset_logo_image_view, balance.asset)
     }
-
-    private fun initActions() {
-        val themedContext = ContextThemeWrapper(this, R.style.BalanceActionButton_Secondary)
-        val tintColorStateList =
-                ContextCompat.getColorStateList(this, R.color.color_dialog_button_content)
-
-        val addAction = { icon: Int, text: Int, clickListener: () -> Unit ->
-            actions_layout.addView(
-                    Button(themedContext, null, R.style.BalanceActionButton_Secondary).apply {
-                        layoutParams = GridLayout.LayoutParams().apply {
-                            width = 0
-                            columnSpec = GridLayout.spec(GridLayout.UNDEFINED,1f)
-                        }
-                        gravity = Gravity.START or Gravity.CENTER_VERTICAL
-                        setCompoundDrawablesRelativeWithIntrinsicBounds(
-                                ContextCompat.getDrawable(themedContext, icon)?.also {
-                                    DrawableCompat.setTintList(it, tintColorStateList)
-                                },
-                                null, null, null
-                        )
-                        setText(text)
-                        setOnClickListener { clickListener() }
-                    }
-            )
-        }
-
-        actions_layout.removeAllViews()
-        addAction(R.drawable.ic_history, R.string.operations_history_short, this::openHistory)
-        addAction(R.drawable.ic_information, R.string.details, this::openAssetDetails)
-    }
     // endregion
 
     // region Amount
@@ -273,6 +244,42 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         val amount = amount_view.amountWrapper.scaledAmount
         canSend = amount.signum() > 0 && amount <= balance.available
         canRedeem = canSend
+    }
+
+    private fun updateBalanceActions() {
+        val themedContext = ContextThemeWrapper(this, R.style.BalanceActionButton_Secondary)
+        val tintColorStateList =
+                ContextCompat.getColorStateList(this, R.color.color_dialog_button_content)
+
+        val addAction = { icon: Int, text: Int, clickListener: () -> Unit ->
+            actions_layout.addView(
+                    Button(themedContext, null, R.style.BalanceActionButton_Secondary).apply {
+                        layoutParams = GridLayout.LayoutParams().apply {
+                            width = 0
+                            columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                        }
+                        gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                        setCompoundDrawablesRelativeWithIntrinsicBounds(
+                                ContextCompat.getDrawable(themedContext, icon)
+                                        ?.mutate()
+                                        ?.also {
+                                            DrawableCompat.setTintList(it, tintColorStateList)
+                                        },
+                                null, null, null
+                        )
+                        setText(text)
+                        setOnClickListener { clickListener() }
+                    }
+            )
+        }
+
+        actions_layout.removeAllViews()
+
+        if (getAvailableDeltaToInteger().signum() != 0 && balance.company != null) {
+            addAction(R.drawable.ic_decimal_decrease, R.string.buy_more, this::buyToInteger)
+        }
+        addAction(R.drawable.ic_history, R.string.operations_history_short, this::openHistory)
+        addAction(R.drawable.ic_information, R.string.details, this::openAssetDetails)
     }
 
     private fun subscribeToBalances() {
@@ -308,6 +315,7 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         updateAmountInputLimitations()
         updateAmountError()
         updateAmountActionsAvailability()
+        updateBalanceActions()
     }
 
     private fun displayBalance() {
@@ -320,6 +328,11 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
 
         toolbar.title = available_text_view.text
         toolbar.subtitle = asset_name_text_view.text
+    }
+
+    private fun getAvailableDeltaToInteger(): BigDecimal {
+        val available = balance.available
+        return available.setScale(0, RoundingMode.UP) - available
     }
 
     private fun openSend() {
@@ -348,6 +361,31 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
 
     private fun openHistory() {
         Navigator.from(this).openAssetMovements(balanceId)
+    }
+
+    private fun buyToInteger() {
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
+            disposable?.dispose()
+        }
+
+        disposable = MarketplaceOfferLoader(repositoryProvider.marketplaceOffers(balance.company?.id))
+                .load(balance.assetCode)
+                .compose(ObservableTransformers.defaultSchedulersMaybe())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::openMarketplaceBuyMore,
+                        onError = { errorHandlerFactory.getDefault().handle(it) },
+                        onComplete = { toastManager.long(R.string.error_asset_cant_be_bought_now) }
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun openMarketplaceBuyMore(offer: MarketplaceOfferRecord) {
+        val delta = getAvailableDeltaToInteger()
+        Navigator.from(this).openMarketplaceBuy(offer, delta)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

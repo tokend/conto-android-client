@@ -586,6 +586,8 @@
     <string name="nfc_payment_accepted">Accepted</string>
     <string name="try_again">Try again</string>
     <string name="require_confirmation_for_nfc_payments">Require confirmation of NFC payments</string>
+    <string name="buy_more">Buy more</string>
+    <string name="error_asset_cant_be_bought_now">This asset can\'t be bought now. Try again later</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

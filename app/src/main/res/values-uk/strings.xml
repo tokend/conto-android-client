@@ -591,4 +591,6 @@
     <string name="nfc_payment_accepted">Сплачено</string>
     <string name="try_again">Спробуйте ще раз</string>
     <string name="require_confirmation_for_nfc_payments">Запитувати підтвердження NFC платежів</string>
+    <string name="buy_more">Докупити</string>
+    <string name="error_asset_cant_be_bought_now">Покупка зараз неможлива. Спробуйте пізніше</string>
 </resources>

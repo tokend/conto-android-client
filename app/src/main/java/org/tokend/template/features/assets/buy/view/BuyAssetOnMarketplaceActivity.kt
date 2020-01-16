@@ -12,10 +12,12 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
+import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.extensions.getBigDecimalExtra
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
 import org.tokend.template.features.assets.buy.marketplace.logic.PerformMarketplaceInnerPaymentUseCase
@@ -48,6 +50,10 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     private val fragmentDisplayer =
             UserFlowFragmentDisplayer(this, R.id.fragment_container_layout)
 
+    private val requiredAmount: BigDecimal? by lazy {
+        intent.getBigDecimalExtra(AMOUNT_EXTRA).takeIf { it.signum() > 0 }
+    }
+
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
 
@@ -79,7 +85,7 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
     private fun toAmountScreen() {
         val fragment = MarketplaceBuyAmountFragment.newInstance(
-                MarketplaceBuyAmountFragment.getBundle(offer)
+                MarketplaceBuyAmountFragment.getBundle(offer, requiredAmount)
         )
 
         fragment
@@ -273,10 +279,13 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
 
     companion object {
         private const val OFFER_EXTRA = "offer"
+        private const val AMOUNT_EXTRA = "amount"
         private val WEB_INVOICE_REQUEST = "web_invoice".hashCode() and 0xffff
 
-        fun getBundle(offer: MarketplaceOfferRecord) = Bundle().apply {
+        fun getBundle(offer: MarketplaceOfferRecord,
+                      amount: BigDecimal? = null) = Bundle().apply {
             putSerializable(OFFER_EXTRA, offer)
+            putString(AMOUNT_EXTRA, BigDecimalUtil.toPlainString(amount))
         }
     }
 }

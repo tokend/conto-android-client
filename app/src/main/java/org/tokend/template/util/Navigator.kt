@@ -450,9 +450,13 @@ class Navigator private constructor() {
     }
 
     fun openMarketplaceBuy(offer: MarketplaceOfferRecord,
+                           amount: BigDecimal? = null,
                            requestCode: Int = 0) {
         context?.intentFor<BuyAssetOnMarketplaceActivity>()
-                ?.putExtras(BuyAssetOnMarketplaceActivity.getBundle(offer))
+                ?.putExtras(BuyAssetOnMarketplaceActivity.getBundle(
+                        offer,
+                        amount
+                ))
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
