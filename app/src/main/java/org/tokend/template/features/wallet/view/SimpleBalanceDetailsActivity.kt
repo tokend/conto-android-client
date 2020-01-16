@@ -169,9 +169,11 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         val tintColorStateList =
                 ContextCompat.getColorStateList(this, R.color.color_dialog_button_content)
         send_button.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                ContextCompat.getDrawable(this, R.drawable.ic_send_fab)?.also {
-                    DrawableCompat.setTintList(it, tintColorStateList)
-                },
+                ContextCompat.getDrawable(this, R.drawable.ic_send_fab)
+                        ?.mutate()
+                        ?.also {
+                            DrawableCompat.setTintList(it, tintColorStateList)
+                        },
                 null, null, null
         )
         send_button.setOnClickListener {
@@ -181,9 +183,11 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         }
 
         redeem_button.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                ContextCompat.getDrawable(this, R.drawable.ic_qr_code)?.also {
-                    DrawableCompat.setTintList(it, tintColorStateList)
-                },
+                ContextCompat.getDrawable(this, R.drawable.ic_qr_code)
+                        ?.mutate()
+                        ?.also {
+                            DrawableCompat.setTintList(it, tintColorStateList)
+                        },
                 null, null, null
         )
         redeem_button.setOnClickListener {
