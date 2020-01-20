@@ -2,20 +2,23 @@ package org.tokend.template.features.nfcpayment.model
 
 import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.data.model.Asset
+import org.tokend.wallet.NetworkParams
 import java.io.Serializable
 import java.math.BigDecimal
 
-class PosPaymentRequest(
+open class PosPaymentRequest(
         val amount: BigDecimal,
         val asset: Asset,
+        val networkParams: NetworkParams,
         val reference: ByteArray,
         val destinationBalanceId: String
 ): Serializable {
-    constructor(amount: BigDecimal,
-                asset: Asset,
+    constructor(asset: Asset,
+                networkParams: NetworkParams,
                 rawRequest: RawPosPaymentRequest) : this(
-            amount = amount,
+            amount = networkParams.amountFromPrecised(rawRequest.precisedAmount),
             asset = asset,
+            networkParams = networkParams,
             reference = rawRequest.reference,
             destinationBalanceId = rawRequest.destinationBalanceId
     )

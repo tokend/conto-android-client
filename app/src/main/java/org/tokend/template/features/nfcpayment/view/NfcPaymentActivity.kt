@@ -13,12 +13,17 @@ import org.jetbrains.anko.dip
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.activities.OnBackPressedListener
+import org.tokend.template.features.assets.buy.marketplace.logic.MarketplaceOfferLoader
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentService
+import org.tokend.template.features.nfcpayment.logic.PosPaymentRequestFulfiller
+import org.tokend.template.features.nfcpayment.model.FulfilledPosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
+import java.math.BigDecimal
 import java.util.concurrent.CancellationException
 
 class NfcPaymentActivity : BaseActivity() {
@@ -29,6 +34,7 @@ class NfcPaymentActivity : BaseActivity() {
 
     private lateinit var rawPaymentRequest: RawPosPaymentRequest
     private lateinit var paymentRequest: PosPaymentRequest
+    private lateinit var fulfilledRequest: FulfilledPosPaymentRequest
 
     private var onBackPressedListener: OnBackPressedListener? = null
 
@@ -169,12 +175,76 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun onUnlocked() {
+        toPaymentRequestFulfillment()
+    }
+
+    private fun toPaymentRequestFulfillment() {
+        // Let it be displayed as a part of unlock.
+
+        PosPaymentRequestFulfiller(
+                walletInfoProvider,
+                apiProvider
+        )
+                .fulfill(paymentRequest)
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .subscribeBy(
+                        onSuccess = this::onPaymentRequestFulfilled,
+                        onError = this::onPaymentRequestFulfillmentError
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun onPaymentRequestFulfilled(request: FulfilledPosPaymentRequest) {
+        this.fulfilledRequest = request
         toPaymentBroadcast()
+    }
+
+    private fun onPaymentRequestFulfillmentError(error: Throwable) {
+        when (error) {
+            is PosPaymentRequestFulfiller.InsufficientOrMissingBalanceException ->
+                // If there is no balance or it's insufficient suggest user
+                // to buy the asset.
+                toMarketplaceOfferLoading(error.missingAmount)
+            else ->
+                onFatalError(error)
+        }
+    }
+
+    private fun toMarketplaceOfferLoading(requiredAmount: BigDecimal) {
+        // Let it be displayed as a part of unlock.
+
+        MarketplaceOfferLoader(repositoryProvider.marketplaceOffers(null))
+                .load(paymentRequest.asset.code)
+                .flatMap { offer ->
+                    repositoryProvider
+                            .balances()
+                            .updateIfNotFreshDeferred()
+                            .toSingleDefault(offer)
+                            .toMaybe()
+                }
+                .compose(ObservableTransformers.defaultSchedulersMaybe())
+                .subscribeBy(
+                        onSuccess = { onMarketplaceOfferLoaded(it, requiredAmount) },
+                        onComplete = this::onNoMarketplaceOfferAvailable,
+                        onError = this::onFatalError
+                )
+                .addTo(compositeDisposable)
+    }
+
+    private fun onMarketplaceOfferLoaded(offer: MarketplaceOfferRecord,
+                                         requiredAmount: BigDecimal) {
+        Navigator.from(this).openMarketplaceBuy(offer, requiredAmount)
+        finish()
+    }
+
+    private fun onNoMarketplaceOfferAvailable() {
+        toastManager.long(R.string.error_asset_cant_be_bought_now)
+        finish()
     }
 
     private fun toPaymentBroadcast() {
         val fragment = BroadcastPosPaymentFragment.newInstance(
-                BroadcastPosPaymentFragment.getBundle(paymentRequest)
+                BroadcastPosPaymentFragment.getBundle(fulfilledRequest)
         )
 
         fragmentDisplayer.display(fragment, "broadcast", true)

@@ -16,15 +16,15 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_broadcast_pos_payment.*
 import org.tokend.template.R
 import org.tokend.template.extensions.withArguments
-import org.tokend.template.features.nfcpayment.logic.CreateAndBroadcastPosPaymentUseCase
+import org.tokend.template.features.nfcpayment.logic.CreateAndBroadcastPosPaymentTxUseCase
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentService
-import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
+import org.tokend.template.features.nfcpayment.model.FulfilledPosPaymentRequest
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
 import java.util.concurrent.TimeUnit
 
 class BroadcastPosPaymentFragment : BaseFragment() {
-    private lateinit var paymentRequest: PosPaymentRequest
+    private lateinit var fulfilledRequest: FulfilledPosPaymentRequest
 
     private val animationsDisposable = CompositeDisposable()
 
@@ -33,8 +33,9 @@ class BroadcastPosPaymentFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
-        paymentRequest = arguments?.getSerializable(PAYMENT_REQUEST_EXTRA) as? PosPaymentRequest
-                ?: throw IllegalArgumentException("No $PAYMENT_REQUEST_EXTRA specified")
+        fulfilledRequest = arguments?.getSerializable(FULFILLED_REQUEST_EXTRA)
+                as? FulfilledPosPaymentRequest
+                ?: throw IllegalArgumentException("No $FULFILLED_REQUEST_EXTRA specified")
 
         initAnimations()
 
@@ -53,10 +54,8 @@ class BroadcastPosPaymentFragment : BaseFragment() {
     }
 
     private fun createAndBroadcastPayment() {
-        CreateAndBroadcastPosPaymentUseCase(
-                paymentRequest = paymentRequest,
-                apiProvider = apiProvider,
-                repositoryProvider = repositoryProvider,
+        CreateAndBroadcastPosPaymentTxUseCase(
+                paymentRequest = fulfilledRequest,
                 accountProvider = accountProvider,
                 walletInfoProvider = walletInfoProvider,
                 transactionBroadcaster = NfcPaymentService.Companion
@@ -105,8 +104,8 @@ class BroadcastPosPaymentFragment : BaseFragment() {
 
         if (isSuccessful) {
             amount_text_view.text = amountFormatter.formatAssetAmount(
-                    paymentRequest.amount,
-                    paymentRequest.asset,
+                    fulfilledRequest.amount,
+                    fulfilledRequest.asset,
                     withAssetName = true
             )
             amount_text_view.visibility = View.VISIBLE
@@ -132,10 +131,10 @@ class BroadcastPosPaymentFragment : BaseFragment() {
     }
 
     companion object {
-        private const val PAYMENT_REQUEST_EXTRA = "payment_request"
+        private const val FULFILLED_REQUEST_EXTRA = "fulfilled_request"
 
-        fun getBundle(paymentRequest: PosPaymentRequest) = Bundle().apply {
-            putSerializable(PAYMENT_REQUEST_EXTRA, paymentRequest)
+        fun getBundle(paymentRequest: FulfilledPosPaymentRequest) = Bundle().apply {
+            putSerializable(FULFILLED_REQUEST_EXTRA, paymentRequest)
         }
 
         fun newInstance(bundle: Bundle): BroadcastPosPaymentFragment =

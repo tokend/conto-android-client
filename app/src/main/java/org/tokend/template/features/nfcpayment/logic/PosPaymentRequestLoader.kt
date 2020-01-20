@@ -24,8 +24,8 @@ class PosPaymentRequestLoader(
         )
                 .map { (networkParams, asset) ->
                     PosPaymentRequest(
-                            amount = networkParams.amountFromPrecised(rawRequest.precisedAmount),
                             asset = asset,
+                            networkParams = networkParams,
                             rawRequest = rawRequest
                     )
                 }
