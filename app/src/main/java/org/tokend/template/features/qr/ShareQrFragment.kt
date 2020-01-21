@@ -13,6 +13,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_share_qr.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -83,8 +84,40 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
     override fun onInitAllowed() {
         toolbarSubject.onNext(toolbar)
         toolbar.title = title
-        displayData()
+        initBrightness()
+        initAutoRedraw()
         ElevationUtil.initScrollElevation(scroll_view, appbar_elevation_view)
+    }
+
+    private fun initBrightness() {
+        requireActivity().window.apply {
+            attributes.screenBrightness = 1f
+            setType(attributes.type)
+        }
+    }
+
+    private fun initAutoRedraw() {
+        val sizeSubject = PublishSubject.create<Boolean>()
+
+        scroll_view.addOnLayoutChangeListener { _, left, top, right, bottom,
+                                                oldLeft, oldTop, oldRight, oldBottom ->
+            val width = right - left
+            val height = bottom - top
+            val oldWidth = oldRight - oldLeft
+            val oldHeight = oldBottom - oldTop
+
+            if (oldWidth != width || oldHeight != height) {
+                sizeSubject.onNext(true)
+            }
+        }
+
+        sizeSubject
+                .debounce(100, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    displayData()
+                }
+                .addTo(compositeDisposable)
     }
 
     protected open fun shareData() {
@@ -106,8 +139,8 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun getMaxQrSize(): Int {
-        val minScreenSize = min(scroll_view.measuredHeight, scroll_view.measuredWidth)
-        return minScreenSize - 2 * resources.getDimensionPixelSize(R.dimen.double_margin)
+        val space = 2 * resources.getDimensionPixelSize(R.dimen.double_margin)
+        return min(scroll_view.height - space, scroll_view.width - space)
     }
 
     protected open fun displayData() {
@@ -139,13 +172,13 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
         displayDisposable?.dispose()
         displayDisposable = QrGenerator().bitmap(text, getMaxQrSize())
                 .delay(300, TimeUnit.MILLISECONDS)
-                .compose(ObservableTransformers.defaultSchedulers())
+                .compose(ObservableTransformers.defaultSchedulersSingle())
                 .doOnSubscribe {
                     qr_code_image_view.clearAnimation()
                     qr_code_image_view.visibility = View.INVISIBLE
                 }
                 .subscribeBy(
-                        onNext = {
+                        onSuccess = {
                             qr_code_image_view.setImageBitmap(it)
                             animateQrCode()
                             saveQrCode(it)
