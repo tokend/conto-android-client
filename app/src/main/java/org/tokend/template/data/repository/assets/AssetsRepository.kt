@@ -9,8 +9,8 @@ import org.tokend.sdk.api.v3.assets.params.AssetsPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.data.repository.base.MultipleItemsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
-import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
@@ -21,7 +21,7 @@ class AssetsRepository(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         itemsCache: RepositoryCache<AssetRecord>
-) : SimpleMultipleItemsRepository<AssetRecord>(itemsCache) {
+) : MultipleItemsRepository<AssetRecord>(itemsCache) {
     private val mItemsMap = mutableMapOf<String, AssetRecord>()
     val itemsMap: Map<String, AssetRecord> = mItemsMap
 

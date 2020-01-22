@@ -76,7 +76,7 @@ class SignInActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         setTitle(R.string.sign_in)
 
-        fingerprintAuthManager = FingerprintAuthManager(applicationContext, credentialsPersistor)
+        fingerprintAuthManager = FingerprintAuthManager(applicationContext, credentialsPersistence)
         urlConfigManager = UrlConfigManager(urlConfigProvider, urlConfigPersistor)
         urlConfigManager.onConfigUpdated {
             initNetworkField()
@@ -103,7 +103,7 @@ class SignInActivity : BaseActivity() {
             SignInMethod.LOCAL_ACCOUNT -> {
                 openLocalAccountSignIn()
             }
-            else -> credentialsPersistor.getSavedEmail()?.let {
+            else -> credentialsPersistence.getSavedEmail()?.let {
                 Navigator.from(this).toUnlock()
             }
         }
@@ -235,8 +235,8 @@ class SignInActivity : BaseActivity() {
                 password,
                 apiProvider.getKeyServer(),
                 session,
-                credentialsPersistor,
-                postSignInManagerFactory.get()
+                credentialsPersistence,
+                postSignInManagerFactory.get()::doPostSignIn
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())

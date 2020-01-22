@@ -52,9 +52,13 @@ object Util {
                 apiProvider.getKeyServer(),
                 session,
                 null,
+<<<<<<< HEAD
                 repositoryProvider?.let { repositoryProvider ->
                     PostSignInManager(apiProvider, session, session, repositoryProvider)
                 }
+=======
+                repositoryProvider?.let { PostSignInManager(it)::doPostSignIn }
+>>>>>>> template_master
         ).perform().blockingAwait()
 
         return createResult

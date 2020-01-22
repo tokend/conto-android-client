@@ -315,8 +315,8 @@ class SignUpActivity : BaseActivity() {
                 password,
                 KeyServer(apiProvider.getApi().wallets),
                 session,
-                credentialsPersistor,
-                postSignInManagerFactory.get()
+                credentialsPersistence,
+                postSignInManagerFactory.get()::doPostSignIn
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())

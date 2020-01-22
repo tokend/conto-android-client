@@ -53,4 +53,12 @@ class BalanceRecord(
 
     val hasAvailableAmount: Boolean
         get() = available.signum() > 0
+
+    override fun equals(other: Any?): Boolean {
+        return other is BalanceRecord && other.id == this.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }

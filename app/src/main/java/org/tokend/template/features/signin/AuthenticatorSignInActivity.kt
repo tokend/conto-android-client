@@ -212,7 +212,7 @@ class AuthenticatorSignInActivity : BaseActivity() {
                 apiProvider.getKeyServer(),
                 apiProvider.getApi().authResults,
                 session,
-                credentialsPersistor,
+                credentialsPersistence,
                 postSignInManagerFactory.get()
         )
                 .perform()

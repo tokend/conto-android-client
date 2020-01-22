@@ -16,6 +16,7 @@ import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.logic.persistence.BackgroundLockManager
+import org.tokend.template.util.ConnectionStateUtil
 import org.tokend.template.util.cipher.Aes256GcmDataCipher
 import org.tokend.template.util.cipher.DataCipher
 import org.tokend.template.util.comparator.*
@@ -133,9 +134,16 @@ class UtilModule {
     fun postSignInManagerFactory(apiProvider: ApiProvider,
                                  walletInfoProvider: WalletInfoProvider,
                                  accountProvider: AccountProvider,
-                                 repositoryProvider: RepositoryProvider): PostSignInManagerFactory {
+                                 repositoryProvider: RepositoryProvider,
+                                 connectionStateUtil: ConnectionStateUtil): PostSignInManagerFactory {
         return PostSignInManagerFactory(apiProvider, accountProvider,
-                walletInfoProvider, repositoryProvider)
+                walletInfoProvider, repositoryProvider, connectionStateUtil)
+    }
+
+    @Provides
+    @Singleton
+    fun connectionStateUtil(context: Context): ConnectionStateUtil {
+        return ConnectionStateUtil(context)
     }
 
     @Provides

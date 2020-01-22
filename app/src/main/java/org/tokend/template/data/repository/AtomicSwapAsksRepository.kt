@@ -14,7 +14,7 @@ import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.template.data.model.AtomicSwapAskRecord
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
-import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
+import org.tokend.template.data.repository.base.MultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
@@ -26,7 +26,7 @@ class AtomicSwapAsksRepository(
         private val urlConfigProvider: UrlConfigProvider,
         private val objectMapper: ObjectMapper,
         itemsCache: RepositoryCache<AtomicSwapAskRecord>
-) : SimpleMultipleItemsRepository<AtomicSwapAskRecord>(itemsCache) {
+) : MultipleItemsRepository<AtomicSwapAskRecord>(itemsCache) {
 
     override fun getItems(): Single<List<AtomicSwapAskRecord>> {
         val signedApi = apiProvider.getSignedApi()

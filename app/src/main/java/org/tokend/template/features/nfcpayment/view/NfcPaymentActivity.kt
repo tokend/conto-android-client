@@ -89,7 +89,7 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun canProcessPaymentRequest(): Boolean {
-        return credentialsPersistor.hasSimpleCredentials()
+        return credentialsPersistence.hasSimpleCredentials()
     }
 
     private fun toPaymentRequestLoading() {

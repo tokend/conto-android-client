@@ -78,7 +78,7 @@ open class UnlockAppFragment : BaseFragment() {
     }
 
     override fun onInitAllowed() {
-        val email = credentialsPersistor.getSavedEmail()
+        val email = credentialsPersistence.getSavedEmail()
         if (email == null) {
             errorHandlerFactory.getDefault().handle(
                     IllegalStateException("No saved email, unlock is not possible")
@@ -88,7 +88,7 @@ open class UnlockAppFragment : BaseFragment() {
         }
         this.email = email
 
-        fingerprintAuthManager = FingerprintAuthManager(requireContext(), credentialsPersistor)
+        fingerprintAuthManager = FingerprintAuthManager(requireContext(), credentialsPersistence)
         fingerprintIndicatorManager = FingerprintIndicatorManager(requireContext(), fingerprint_indicator)
 
         initViews()
@@ -99,7 +99,7 @@ open class UnlockAppFragment : BaseFragment() {
         initButtons()
         initErrorEmptyView()
         user_email_text.text = email
-        ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, kycStatePersistor.loadState())
+        ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, kycStatePersistence.loadItem())
     }
 
     protected open fun initButtons() {
@@ -265,7 +265,7 @@ open class UnlockAppFragment : BaseFragment() {
     }
 
     private fun performAutoUnlock() {
-        val savedPassword = credentialsPersistor.getSavedPassword()
+        val savedPassword = credentialsPersistence.getSavedPassword()
         if (savedPassword == null) {
             unlockMethod = UnlockMethod.PASSWORD
             return
@@ -286,8 +286,8 @@ open class UnlockAppFragment : BaseFragment() {
                 password,
                 apiProvider.getKeyServer(),
                 session,
-                credentialsPersistor,
-                getPostSignInManager()
+                credentialsPersistence,
+                getPostSignInManager()?.let { it::doPostSignIn }
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersCompletable())
