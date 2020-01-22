@@ -1,11 +1,11 @@
 package org.tokend.template.features.signin.logic
 
-import org.tokend.template.util.ConnectionStateUtil
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.signin.model.ForcedAccountType
+import org.tokend.template.util.ConnectionStateUtil
 
 class PostSignInManagerFactory(
         private val apiProvider: ApiProvider,
@@ -16,6 +16,7 @@ class PostSignInManagerFactory(
 ) {
     fun get(forcedAccountType: ForcedAccountType? = null): PostSignInManager {
         return PostSignInManager(apiProvider, accountProvider,
-                walletInfoProvider, repositoryProvider, forcedAccountType)
+                walletInfoProvider, repositoryProvider, forcedAccountType,
+                connectionStateUtil::isOnline)
     }
 }
