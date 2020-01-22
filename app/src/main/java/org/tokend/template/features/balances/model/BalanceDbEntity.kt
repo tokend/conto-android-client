@@ -2,15 +2,13 @@ package org.tokend.template.features.balances.model
 
 import android.arch.persistence.room.*
 import org.tokend.sdk.factory.GsonFactory
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.model.SimpleAsset
+import org.tokend.template.data.model.*
+import org.tokend.template.features.companies.model.CompanyRecord
 import java.math.BigDecimal
 
 @Entity(
         tableName = "balance",
-        indices = [Index("asset_code")]
+        indices = [Index("asset_code"), Index("company_id")]
 )
 @TypeConverters(BalanceDbEntity.Converters::class)
 data class BalanceDbEntity(
@@ -19,6 +17,8 @@ data class BalanceDbEntity(
         val id: String,
         @ColumnInfo(name = "asset_code")
         val assetCode: String,
+        @ColumnInfo(name = "company_id")
+        val companyId: String?,
         @ColumnInfo(name = "available")
         val available: BigDecimal,
         @ColumnInfo(name = "converted_amount")
@@ -42,14 +42,16 @@ data class BalanceDbEntity(
         }
     }
 
-    fun toRecord(assetsMap: Map<String, AssetRecord>): BalanceRecord = TODO("Fix me")/*BalanceRecord(
+    fun toRecord(assetsMap: Map<String, AssetRecord>,
+                 companiesMap: Map<String, CompanyRecord>) = BalanceRecord(
             id = id,
             asset = assetsMap.getValue(assetCode),
+            company = companyId?.let(companiesMap::getValue),
             available = available,
             conversionPrice = conversionPrice,
             convertedAmount = convertedAmount,
             conversionAsset = conversionAsset
-    )*/
+    )
 
     companion object {
         fun fromRecord(record: BalanceRecord) = record.run {
@@ -59,7 +61,8 @@ data class BalanceDbEntity(
                     convertedAmount = convertedAmount,
                     conversionPrice = conversionPrice,
                     available = available,
-                    assetCode = assetCode
+                    assetCode = assetCode,
+                    companyId = company?.id
             )
         }
     }

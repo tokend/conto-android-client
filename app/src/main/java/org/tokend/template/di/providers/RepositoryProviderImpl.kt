@@ -26,6 +26,10 @@ import org.tokend.template.features.assets.buy.marketplace.repository.Marketplac
 import org.tokend.template.features.assets.storage.AssetsDbCache
 import org.tokend.template.features.balances.storage.BalancesDbCache
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
+import org.tokend.template.features.companies.storage.CompaniesDbCache
+import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
@@ -61,13 +65,18 @@ class RepositoryProviderImpl(
             else
                 null
 
+    private val companiesCache by lazy {
+        database?.let { CompaniesDbCache(it.companies) }
+                ?: MemoryOnlyRepositoryCache<CompanyRecord>()
+    }
+
     private val assetsCache by lazy {
         database?.let { AssetsDbCache(it.assets) }
                 ?: MemoryOnlyRepositoryCache<AssetRecord>()
     }
 
     private val balancesCache by lazy {
-        database?.let { BalancesDbCache(it.balances, assetsCache) }
+        database?.let { BalancesDbCache(it.balances, assetsCache, companiesCache) }
                 ?: MemoryOnlyRepositoryCache<BalanceRecord>()
     }
     private val balancesRepository: BalancesRepository by lazy {
@@ -155,7 +164,7 @@ class RepositoryProviderImpl(
 
     private val clientCompaniesRepository: ClientCompaniesRepository by lazy {
         ClientCompaniesRepository(apiProvider, walletInfoProvider, urlConfigProvider,
-                MemoryOnlyRepositoryCache())
+                companiesCache)
     }
 
     private val clientBalanceChangesRepositories =

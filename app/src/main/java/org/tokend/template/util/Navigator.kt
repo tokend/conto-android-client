@@ -19,7 +19,7 @@ import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment

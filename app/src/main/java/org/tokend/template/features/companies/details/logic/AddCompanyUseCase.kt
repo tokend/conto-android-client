@@ -1,8 +1,8 @@
 package org.tokend.template.features.companies.details.logic
 
 import io.reactivex.Completable
-import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.ClientCompaniesRepository
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
 
 class AddCompanyUseCase(
         private val company: CompanyRecord,

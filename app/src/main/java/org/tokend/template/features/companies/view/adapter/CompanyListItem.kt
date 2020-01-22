@@ -1,6 +1,6 @@
 package org.tokend.template.features.companies.view.adapter
 
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.features.companies.model.CompanyRecord
 
 class CompanyListItem(
         val id: String,

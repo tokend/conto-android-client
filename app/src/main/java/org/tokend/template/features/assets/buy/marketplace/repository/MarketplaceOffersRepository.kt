@@ -11,8 +11,8 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMetho
 import org.tokend.sdk.api.integrations.marketplace.params.MarketplaceOfferParams
 import org.tokend.sdk.api.integrations.marketplace.params.MarketplaceOffersPageParams
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.CompaniesRepository
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository

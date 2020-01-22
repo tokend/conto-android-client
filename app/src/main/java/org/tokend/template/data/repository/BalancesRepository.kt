@@ -21,6 +21,7 @@ import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.extensions.mapSuccessful
 import org.tokend.template.extensions.tryOrNull
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.*
 import org.tokend.wallet.Transaction
@@ -29,7 +30,6 @@ import org.tokend.wallet.xdr.op_extensions.CreateBalanceOp
 import retrofit2.HttpException
 import java.math.BigDecimal
 import java.math.MathContext
-import java.util.concurrent.TimeUnit
 
 class BalancesRepository(
         private val apiProvider: ApiProvider,

@@ -9,13 +9,16 @@ import org.tokend.template.features.assets.model.AssetDbEntity
 import org.tokend.template.features.assets.storage.AssetsDao
 import org.tokend.template.features.balances.model.BalanceDbEntity
 import org.tokend.template.features.balances.storage.BalancesDao
+import org.tokend.template.features.companies.model.CompanyDbEntity
+import org.tokend.template.features.companies.storage.CompaniesDao
 import java.math.BigDecimal
 import java.util.*
 
 @Database(
         entities = [
             AssetDbEntity::class,
-            BalanceDbEntity::class
+            BalanceDbEntity::class,
+            CompanyDbEntity::class
         ],
         version = 1,
         exportSchema = false
@@ -46,4 +49,5 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract val balances: BalancesDao
     abstract val assets: AssetsDao
+    abstract val companies: CompaniesDao
 }
