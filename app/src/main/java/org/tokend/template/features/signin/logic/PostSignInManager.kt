@@ -1,6 +1,7 @@
 package org.tokend.template.features.signin.logic
 
 import io.reactivex.Completable
+import io.reactivex.rxkotlin.subscribeBy
 import org.tokend.sdk.utils.extentions.isUnauthorized
 import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.di.providers.AccountProvider
@@ -68,6 +69,8 @@ class PostSignInManager(
         val performSyncActions = Completable.concat(syncActions)
 
         repositoryProvider.tfaFactors().invalidate()
+        repositoryProvider.systemInfo().ensureData()
+                .subscribeBy(onError = { it.printStackTrace()})
 
         return performSyncActions
                 .andThen(performParallelActions)
