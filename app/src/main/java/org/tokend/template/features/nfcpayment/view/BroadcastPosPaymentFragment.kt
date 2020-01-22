@@ -58,6 +58,7 @@ class BroadcastPosPaymentFragment : BaseFragment() {
                 paymentRequest = fulfilledRequest,
                 accountProvider = accountProvider,
                 walletInfoProvider = walletInfoProvider,
+                repositoryProvider = repositoryProvider,
                 transactionBroadcaster = NfcPaymentService.Companion
         )
                 .perform()

@@ -182,8 +182,10 @@ class NfcPaymentActivity : BaseActivity() {
         // Let it be displayed as a part of unlock.
 
         PosPaymentRequestFulfiller(
+                repositoryProvider,
                 walletInfoProvider,
-                apiProvider
+                apiProvider,
+                connectionStateUtil::isOnline
         )
                 .fulfill(paymentRequest)
                 .compose(ObservableTransformers.defaultSchedulersSingle())

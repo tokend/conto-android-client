@@ -55,9 +55,12 @@ class AssetsRepository(
      * @return single asset info
      */
     fun getSingle(code: String): Single<AssetRecord> {
-        return itemsCache.items
-                .find { it.code == code }
-                .toMaybe()
+        return itemsCache
+                .loadFromDb()
+                .toSingle { itemsCache.items }
+                .flatMapMaybe { cachedItems ->
+                    cachedItems.find { it.code == code }.toMaybe()
+                }
                 .switchIfEmpty(
                         apiProvider.getApi()
                                 .v3

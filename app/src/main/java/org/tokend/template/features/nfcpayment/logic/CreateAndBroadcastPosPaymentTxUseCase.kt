@@ -3,6 +3,7 @@ package org.tokend.template.features.nfcpayment.logic
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.tokend.template.di.providers.AccountProvider
+import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.nfcpayment.model.FulfilledPosPaymentRequest
 import org.tokend.template.logic.TxManager
@@ -18,7 +19,8 @@ class CreateAndBroadcastPosPaymentTxUseCase(
         private val paymentRequest: FulfilledPosPaymentRequest,
         private val walletInfoProvider: WalletInfoProvider,
         private val accountProvider: AccountProvider,
-        private val transactionBroadcaster: TransactionBroadcaster
+        private val transactionBroadcaster: TransactionBroadcaster,
+        private val repositoryProvider: RepositoryProvider?
 ) {
     private val networkParams = paymentRequest.networkParams
 
@@ -26,6 +28,9 @@ class CreateAndBroadcastPosPaymentTxUseCase(
         return getTransaction()
                 .flatMapCompletable { transaction ->
                     transactionBroadcaster.broadcastTransaction(transaction)
+                }
+                .doOnComplete {
+                    updateRepositories()
                 }
                 .delay(VISUAL_DELAY, TimeUnit.MILLISECONDS)
     }
@@ -52,6 +57,15 @@ class CreateAndBroadcastPosPaymentTxUseCase(
                         subject = "",
                         ext = PaymentOp.PaymentOpExt.EmptyVersion()
                 )))
+    }
+
+    private fun updateRepositories() {
+        repositoryProvider?.balances()?.apply {
+            updateBalanceByDelta(
+                    balanceId = paymentRequest.sourceBalanceId,
+                    delta = paymentRequest.amount.negate()
+            )
+        }
     }
 
     private companion object {
