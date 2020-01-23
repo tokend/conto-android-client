@@ -1,8 +1,6 @@
 package org.tokend.template.features.kyc.storage
 
-import android.util.Log
 import io.reactivex.Maybe
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import org.json.JSONObject
@@ -17,7 +15,7 @@ import org.tokend.sdk.api.v3.requests.params.ChangeRoleRequestPageParams
 import org.tokend.sdk.api.v3.requests.params.RequestParamsV3
 import org.tokend.sdk.utils.extentions.getTypedRequestDetails
 import org.tokend.template.data.repository.BlobsRepository
-import org.tokend.template.data.repository.base.SimpleSingleItemRepository
+import org.tokend.template.data.repository.base.SingleItemRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.WalletInfoProvider
 import org.tokend.template.features.kyc.model.KycForm
@@ -30,9 +28,9 @@ import org.tokend.template.features.signin.model.ForcedAccountType
 class KycStateRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
-        private val submittedStatePersistor: SubmittedKycStatePersistor?,
+        private val submittedStatePersistence: SubmittedKycStatePersistence?,
         private val blobsRepository: BlobsRepository
-) : SimpleSingleItemRepository<KycState>() {
+) : SingleItemRepository<KycState>() {
     private class NoRequestFoundException : Exception()
 
     private data class KycRequestAttributes(
@@ -42,14 +40,14 @@ class KycStateRepository(
     )
 
     // region Persistence
-    override fun getStoredItem(): Observable<KycState> {
-        return Observable.defer {
-            val state = submittedStatePersistor?.loadState()
+    override fun getStoredItem(): Maybe<KycState> {
+        return Maybe.defer {
+            val state = submittedStatePersistence?.loadItem()
 
             if (state != null)
-                Observable.just(state)
+                Maybe.just(state)
             else
-                Observable.empty()
+                Maybe.empty()
         }
     }
 
@@ -59,7 +57,7 @@ class KycStateRepository(
             return
         }
 
-        submittedStatePersistor?.saveState(item)
+        submittedStatePersistence?.saveItem(item)
     }
     // endregion
 
@@ -80,11 +78,11 @@ class KycStateRepository(
         onNewItem(newState)
     }
 
-    override fun getItem(): Observable<KycState> {
+    override fun getItem(): Maybe<KycState> {
         val signedApi = apiProvider.getSignedApi()
-                ?: return Observable.error(IllegalStateException("No signed API instance found"))
+                ?: return Maybe.error(IllegalStateException("No signed API instance found"))
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
-                ?: return Observable.error(IllegalStateException("No wallet info found"))
+                ?: return Maybe.error(IllegalStateException("No wallet info found"))
 
         var requestId: Long = 0
 
@@ -119,7 +117,7 @@ class KycStateRepository(
                     else
                         Single.error(error)
                 }
-                .toObservable()
+                .toMaybe()
     }
 
     private fun getLastKycRequest(signedApi: TokenDApi,

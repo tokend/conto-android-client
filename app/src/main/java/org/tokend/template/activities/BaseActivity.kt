@@ -17,16 +17,17 @@ import org.tokend.template.R
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
-import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistor
+import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistence
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.features.tfa.view.TfaDialogFactory
 import org.tokend.template.logic.AppTfaCallback
 import org.tokend.template.logic.Session
-import org.tokend.template.logic.credentials.persistence.CredentialsPersistor
+import org.tokend.template.logic.credentials.persistence.CredentialsPersistence
 import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.logic.persistence.UrlConfigPersistor
+import org.tokend.template.util.ConnectionStateUtil
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.cipher.DataCipher
 import org.tokend.template.util.environments.AppEnvironment
@@ -49,7 +50,7 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     @Inject
     lateinit var repositoryProvider: RepositoryProvider
     @Inject
-    lateinit var credentialsPersistor: CredentialsPersistor
+    lateinit var credentialsPersistence: CredentialsPersistence
     @Inject
     lateinit var urlConfigProvider: UrlConfigProvider
     @Inject
@@ -69,7 +70,7 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     @Inject
     lateinit var amountFormatter: AmountFormatter
     @Inject
-    lateinit var kycStatePersistor: SubmittedKycStatePersistor
+    lateinit var kycStatePersistence: SubmittedKycStatePersistence
     @Inject
     lateinit var localeManager: AppLocaleManager
     @Inject
@@ -84,6 +85,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     lateinit var postSignInManagerFactory: PostSignInManagerFactory
     @Inject
     lateinit var nfcPaymentConfirmationManager: NfcPaymentConfirmationManager
+    @Inject
+    lateinit var connectionStateUtil: ConnectionStateUtil
 
     /**
      * If set to true the activity will be operational
@@ -162,7 +165,7 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
         runOnUiThread {
             val email = walletInfoProvider.getWalletInfo()?.email
             TfaDialogFactory(this, errorHandlerFactory.getDefault(),
-                    credentialsPersistor, toastManager)
+                    credentialsPersistence, toastManager)
                     .getForException(exception, verifierInterface, email)
                     ?.show()
                     ?: verifierInterface.cancelVerification()

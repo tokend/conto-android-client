@@ -6,9 +6,9 @@ import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import org.tokend.rx.extensions.toSingle
-import org.tokend.sdk.api.general.model.SystemInfo
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.sdk.api.v3.accounts.params.AccountParamsV3
+import org.tokend.template.data.model.SystemInfoRecord
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
@@ -27,7 +27,7 @@ class ConfirmRedemptionRequestUseCase(
     class RedemptionAlreadyProcessedException : Exception()
 
     private lateinit var accountId: String
-    private lateinit var systemInfo: SystemInfo
+    private lateinit var systemInfo: SystemInfoRecord
     private lateinit var networkParams: NetworkParams
     private lateinit var senderBalanceId: String
     private lateinit var transaction: Transaction
@@ -72,7 +72,7 @@ class ConfirmRedemptionRequestUseCase(
                 .ignoreElement()
     }
 
-    private fun getSystemInfo(): Single<SystemInfo> {
+    private fun getSystemInfo(): Single<SystemInfoRecord> {
         val systemInfoRepository = repositoryProvider.systemInfo()
 
         return systemInfoRepository
@@ -121,9 +121,7 @@ class ConfirmRedemptionRequestUseCase(
     }
 
     private fun ensureActualSubmit(): Single<Boolean> {
-        val latestBlockBeforeSubmit = systemInfo.ledgersState[SystemInfo.LEDGER_CORE]?.latest
-                ?: return Single.error(IllegalStateException("Cannot obtain latest core block"))
-
+        val latestBlockBeforeSubmit = systemInfo.latestBlock
         val transactionBlock = submitTransactionResponse.ledger ?: 0
 
         // The exactly same transaction is always accepted without any errors

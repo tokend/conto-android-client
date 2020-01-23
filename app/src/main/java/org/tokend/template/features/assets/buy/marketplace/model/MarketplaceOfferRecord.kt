@@ -4,7 +4,7 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferResourc
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodResource
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
 import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.features.companies.model.CompanyRecord
 import java.io.Serializable
 import java.math.BigDecimal
 

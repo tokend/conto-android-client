@@ -16,9 +16,9 @@ import kotlinx.android.synthetic.main.activity_company_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.ClientCompaniesRepository
 import org.tokend.template.features.companies.details.logic.AddCompanyUseCase
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.ImageViewUtil
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -49,6 +49,8 @@ class CompanyDetailsActivity : BaseActivity() {
         initBanner()
 
         subscribeToClientCompanies()
+
+        clientCompaniesRepository.updateIfNotFresh()
     }
 
     private fun initToolbar() {

@@ -1,4 +1,4 @@
-package org.tokend.template.data.repository
+package org.tokend.template.features.companies.storage
 
 import io.reactivex.Single
 import org.tokend.rx.extensions.toSingle
@@ -7,9 +7,9 @@ import org.tokend.sdk.api.v3.base.PageQueryParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.sdk.utils.extentions.isBadRequest
 import org.tokend.sdk.utils.extentions.isNotFound
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.data.repository.base.MultipleItemsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
-import org.tokend.template.data.repository.base.SimpleMultipleItemsRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
@@ -19,7 +19,7 @@ open class CompaniesRepository(
         private val apiProvider: ApiProvider,
         private val urlConfigProvider: UrlConfigProvider,
         itemsCache: RepositoryCache<CompanyRecord>
-) : SimpleMultipleItemsRepository<CompanyRecord>(itemsCache) {
+) : MultipleItemsRepository<CompanyRecord>(itemsCache) {
     private val mItemsMap = mutableMapOf<String, CompanyRecord>()
     val itemsMap: Map<String, CompanyRecord> = mItemsMap
 

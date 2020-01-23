@@ -3,6 +3,7 @@ package org.tokend.template.data.model
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.sdk.api.generated.resources.BalanceResource
 import org.tokend.sdk.api.generated.resources.ConvertedBalanceStateResource
+import org.tokend.template.features.companies.model.CompanyRecord
 import java.io.Serializable
 import java.math.BigDecimal
 
@@ -53,4 +54,12 @@ class BalanceRecord(
 
     val hasAvailableAmount: Boolean
         get() = available.signum() > 0
+
+    override fun equals(other: Any?): Boolean {
+        return other is BalanceRecord && other.id == this.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }

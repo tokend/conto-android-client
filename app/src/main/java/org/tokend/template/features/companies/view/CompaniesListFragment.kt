@@ -14,7 +14,7 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_companies_list.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import org.tokend.template.R
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.data.repository.base.MultipleItemsRepository
 import org.tokend.template.features.companies.view.adapter.CompanyItemsAdapter
 import org.tokend.template.features.companies.view.adapter.CompanyListItem

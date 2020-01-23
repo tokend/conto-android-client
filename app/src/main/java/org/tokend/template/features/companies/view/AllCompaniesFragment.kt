@@ -5,8 +5,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.include_error_empty_view.*
-import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.ClientCompaniesRepository
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
 import org.tokend.template.data.repository.base.MultipleItemsRepository
 import org.tokend.template.features.companies.view.adapter.CompanyListItem
 import org.tokend.template.util.ObservableTransformers

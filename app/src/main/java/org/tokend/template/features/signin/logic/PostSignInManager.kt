@@ -1,6 +1,7 @@
 package org.tokend.template.features.signin.logic
 
 import io.reactivex.Completable
+import io.reactivex.rxkotlin.subscribeBy
 import org.tokend.sdk.utils.extentions.isUnauthorized
 import org.tokend.template.data.model.AccountRecord
 import org.tokend.template.di.providers.AccountProvider
@@ -18,9 +19,13 @@ class PostSignInManager(
         private val accountProvider: AccountProvider,
         private val walletInfoProvider: WalletInfoProvider,
         private val repositoryProvider: RepositoryProvider,
-        private val forcedAccountType: ForcedAccountType? = null
+        private val forcedAccountType: ForcedAccountType? = null,
+        private val connectionStateProvider: (() -> Boolean)? = null
 ) {
     class AuthMismatchException : Exception()
+
+    private val isOnline: Boolean
+        get() = connectionStateProvider?.invoke() ?: true
 
     /**
      * Updates all important repositories.
@@ -28,16 +33,35 @@ class PostSignInManager(
     fun doPostSignIn(): Completable {
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
-                repositoryProvider.kycState().updateDeferred()
+                repositoryProvider.kycState()
+                        .run {
+                            if (isOnline)
+                                updateDeferred()
+                            else
+                                ensureData().doOnComplete {
+                                    if (!isFresh) {
+                                        update()
+                                    }
+                                }
+                        }
                         .doOnComplete {
                             repositoryProvider.kycState().forcedType = forcedAccountType
                         },
-                repositoryProvider.balances().updateDeferred()
+                repositoryProvider.balances().ensureData()
         )
         val syncActions = listOf<Completable>(
                 // Added actions will be performed on after another in
                 // provided order.
-                repositoryProvider.account().updateDeferred()
+                repositoryProvider.account()
+                        .run {
+                            repositoryProvider.account()
+                                    .run {
+                                        if (isOnline)
+                                            updateDeferred()
+                                        else
+                                            ensureData()
+                                    }
+                        }
                         .andThen(Completable.defer { sendEmptyKycRecoveryRequestIfNeeded() })
         )
 
@@ -45,6 +69,8 @@ class PostSignInManager(
         val performSyncActions = Completable.concat(syncActions)
 
         repositoryProvider.tfaFactors().invalidate()
+        repositoryProvider.systemInfo().ensureData()
+                .subscribeBy(onError = { it.printStackTrace()})
 
         return performSyncActions
                 .andThen(performParallelActions)
@@ -57,7 +83,7 @@ class PostSignInManager(
     }
 
     private fun sendEmptyKycRecoveryRequestIfNeeded(): Completable {
-        if (repositoryProvider.account().item!!.kycRecoveryStatus
+        if (!isOnline || repositoryProvider.account().item!!.kycRecoveryStatus
                 != AccountRecord.KycRecoveryStatus.INITIATED) {
             return Completable.complete()
         }

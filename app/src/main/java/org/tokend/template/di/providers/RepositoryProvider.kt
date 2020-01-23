@@ -7,11 +7,13 @@ import org.tokend.template.data.repository.balancechanges.BalanceChangesReposito
 import org.tokend.template.data.repository.pairs.AssetPairsRepository
 import org.tokend.template.features.assets.buy.marketplace.repository.MarketplaceOffersRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
+import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
 import org.tokend.template.features.kyc.storage.KycStateRepository
-import org.tokend.template.features.localaccount.repository.LocalAccountRepository
+import org.tokend.template.features.localaccount.storage.LocalAccountRepository
 import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.features.polls.repository.PollsRepository
 import org.tokend.template.features.send.recipient.contacts.repository.ContactsRepository

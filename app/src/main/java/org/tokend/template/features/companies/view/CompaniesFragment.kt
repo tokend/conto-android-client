@@ -18,9 +18,9 @@ import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.CompanyRecord
-import org.tokend.template.data.repository.ClientCompaniesRepository
-import org.tokend.template.data.repository.CompaniesRepository
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.ClientCompaniesRepository
+import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.features.companies.logic.CompanyLoader
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider

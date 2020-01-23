@@ -89,7 +89,7 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun canProcessPaymentRequest(): Boolean {
-        return credentialsPersistor.hasSimpleCredentials()
+        return credentialsPersistence.hasSimpleCredentials()
     }
 
     private fun toPaymentRequestLoading() {
@@ -182,8 +182,10 @@ class NfcPaymentActivity : BaseActivity() {
         // Let it be displayed as a part of unlock.
 
         PosPaymentRequestFulfiller(
+                repositoryProvider,
                 walletInfoProvider,
-                apiProvider
+                apiProvider,
+                connectionStateUtil::isOnline
         )
                 .fulfill(paymentRequest)
                 .compose(ObservableTransformers.defaultSchedulersSingle())

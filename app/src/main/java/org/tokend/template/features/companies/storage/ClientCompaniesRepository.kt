@@ -1,4 +1,4 @@
-package org.tokend.template.data.repository
+package org.tokend.template.features.companies.storage
 
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -9,7 +9,7 @@ import org.tokend.sdk.api.v3.base.PageQueryParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.sdk.utils.extentions.isBadRequest
 import org.tokend.sdk.utils.extentions.isNotFound
-import org.tokend.template.data.model.CompanyRecord
+import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider

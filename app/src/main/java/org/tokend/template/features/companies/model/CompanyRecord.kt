@@ -1,8 +1,10 @@
-package org.tokend.template.data.model
+package org.tokend.template.features.companies.model
 
 import org.tokend.sdk.api.base.model.RemoteFile
 import org.tokend.sdk.api.integrations.dns.model.BusinessResource
 import org.tokend.sdk.factory.GsonFactory
+import org.tokend.template.data.model.RecordWithLogo
+import org.tokend.template.data.model.UrlConfig
 import java.io.Serializable
 
 class CompanyRecord(
