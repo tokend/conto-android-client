@@ -72,6 +72,10 @@ class MarketplaceOffersRepository(
                 .map { (page, assetsMap, companiesMap) ->
                     page.mapItemsNotNull {
                         tryOrNull {
+                            if (it.isCanceled) {
+                                return@tryOrNull null
+                            }
+
                             MarketplaceOfferRecord(it, assetsMap, companiesMap)
                         }
                     }
