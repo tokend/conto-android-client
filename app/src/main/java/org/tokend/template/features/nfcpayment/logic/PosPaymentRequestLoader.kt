@@ -1,11 +1,11 @@
 package org.tokend.template.features.nfcpayment.logic
 
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
 import org.tokend.template.data.model.Asset
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
+import org.tokend.template.util.BiFunctionToPair
 import org.tokend.wallet.NetworkParams
 
 /**
@@ -18,9 +18,7 @@ class PosPaymentRequestLoader(
         return Single.zip(
                 getNetworkParams(),
                 getAsset(rawRequest),
-                BiFunction { networkParams: NetworkParams, asset: Asset ->
-                    networkParams to asset
-                }
+                BiFunctionToPair<NetworkParams, Asset>()
         )
                 .map { (networkParams, asset) ->
                     PosPaymentRequest(

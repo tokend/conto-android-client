@@ -1,7 +1,6 @@
 package org.tokend.template.features.assets.buy.marketplace.repository
 
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
 import org.tokend.rx.extensions.toSingle
 import org.tokend.sdk.api.base.model.DataPage
 import org.tokend.sdk.api.base.params.PagingOrder
@@ -11,14 +10,15 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMetho
 import org.tokend.sdk.api.integrations.marketplace.params.MarketplaceOfferParams
 import org.tokend.sdk.api.integrations.marketplace.params.MarketplaceOffersPageParams
 import org.tokend.template.data.model.Asset
-import org.tokend.template.features.companies.model.CompanyRecord
-import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.extensions.tryOrNull
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.companies.storage.CompaniesRepository
+import org.tokend.template.util.BiFunctionToPair
 import java.math.BigDecimal
 
 class MarketplaceOffersRepository(
@@ -61,9 +61,7 @@ class MarketplaceOffersRepository(
                     Single.zip(
                             assetsRepository.ensureAssets(assetCodes),
                             companiesRepository.ensureCompanies(companyAccounts),
-                            BiFunction { a: Map<String, Asset>, b: Map<String, CompanyRecord> ->
-                                a to b
-                            }
+                            BiFunctionToPair<Map<String, Asset>, Map<String, CompanyRecord>>()
                     )
                             .map { (assetsMap, companiesMap) ->
                                 Triple(page, assetsMap, companiesMap)
