@@ -82,6 +82,9 @@ class NfcPaymentActivity : BaseActivity() {
                     scaleType = ImageView.ScaleType.FIT_CENTER
                 }
         )
+
+        toolbar.navigationIcon = ContextCompat.getDrawable(this, R.drawable.ic_close)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
     }
 
     private fun initSwipeRefresh() {
