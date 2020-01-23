@@ -25,7 +25,7 @@ android {
         manifestPlaceholders = [
                 fabricApiKey: keystoreProperties['FabricApiKey'] != null
                         ? keystoreProperties['FabricApiKey']
-                        : ""
+                        : "a000000000000000000000000000000000000000"
         ]
         multiDexKeepFile file('multidex-keep.txt')
     }
@@ -106,6 +106,9 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation "com.android.support:design:$support_lib_version"
     implementation "com.android.support:gridlayout-v7:$support_lib_version"
+
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
 
     implementation "android.arch.persistence.room:runtime:$room_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
