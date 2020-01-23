@@ -204,7 +204,7 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         fun getBundle(offer: MarketplaceOfferRecord,
                       amount: BigDecimal? = null) = Bundle().apply {
             putSerializable(OFFER_EXTRA, offer)
-            putString(AMOUNT_EXTRA, BigDecimalUtil.toPlainString(amount))
+            putString(AMOUNT_EXTRA, amount?.let(BigDecimalUtil::toPlainString))
         }
 
         fun newInstance(bundle: Bundle): MarketplaceBuyAmountFragment =
