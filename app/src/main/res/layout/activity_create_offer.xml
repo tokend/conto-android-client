@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".features.offers.CreateOfferActivity">
 
-    <include layout="@layout/appbar"/>
+    <include layout="@layout/appbar" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll_view"
@@ -93,8 +93,34 @@
                     android:text="@string/max_buy_hint" />
             </RelativeLayout>
 
+            <LinearLayout
+                android:id="@+id/single_actions_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_padding"
+                android:gravity="center_horizontal"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/half_standard_margin"
+                android:visibility="gone">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/single_buy_btn"
+                    style="@style/PrimaryButton.Rounded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/buy_action" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/single_sell_btn"
+                    style="@style/PrimaryButton.Rounded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sell_action" />
+            </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/actions_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_padding"

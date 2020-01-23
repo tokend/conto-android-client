@@ -187,13 +187,13 @@ open class CreateOfferActivity : BaseActivity() {
     }
 
     private fun initButtons() {
-        sell_btn.onClick {
+        listOf(sell_btn, single_sell_btn).forEach { it.onClick {
             goToOfferConfirmation(false)
-        }
+        }}
 
-        buy_btn.onClick {
+        listOf(buy_btn, single_buy_btn).forEach { it.onClick {
             goToOfferConfirmation(true)
-        }
+        }}
 
         max_sell_text_view.onClick {
             amount_edit_text.setAmount(baseBalance, baseScale)
@@ -207,12 +207,16 @@ open class CreateOfferActivity : BaseActivity() {
 
         when (forcedOfferType) {
             ForcedOfferType.BUY -> {
-                sell_btn.visibility = View.GONE
+                actions_layout.visibility = View.GONE
+                single_actions_layout.visibility = View.VISIBLE
+                single_sell_btn.visibility = View.GONE
                 max_sell_text_view.visibility = View.GONE
                 sell_hint.visibility = View.GONE
             }
             ForcedOfferType.SELL -> {
-                buy_btn.visibility = View.GONE
+                actions_layout.visibility = View.GONE
+                single_actions_layout.visibility = View.VISIBLE
+                single_buy_btn.visibility = View.GONE
                 max_buy_text_view.visibility = View.GONE
                 buy_hint.visibility = View.GONE
             }
@@ -315,8 +319,9 @@ open class CreateOfferActivity : BaseActivity() {
                 && !amount_edit_text.hasError()
                 && !total_edit_text.hasError()
 
-        sell_btn.isEnabled = isAvailable
-        buy_btn.isEnabled = isAvailable
+        listOf(sell_btn, single_sell_btn, buy_btn, single_buy_btn).forEach {
+            it.isEnabled = isAvailable
+        }
     }
 
     private var offerCreationDisposable: Disposable? = null
