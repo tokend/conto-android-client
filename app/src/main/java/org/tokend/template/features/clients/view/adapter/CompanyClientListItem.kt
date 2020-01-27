@@ -12,7 +12,7 @@ class CompanyClientListItem(
         val source: CompanyClientRecord?
 ) {
     constructor(source: CompanyClientRecord): this(
-            id = source.id,
+            id = source.id.toString(),
             email = source.email,
             status = source.status,
             balances = source.balances,

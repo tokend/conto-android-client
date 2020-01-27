@@ -34,7 +34,6 @@ import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragm
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
-import org.tokend.template.features.dashboard.view.DashboardFragment
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
@@ -44,7 +43,6 @@ import org.tokend.template.features.polls.view.PollsFragment
 import org.tokend.template.features.send.model.PaymentRequest
 import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
-import org.tokend.template.features.trade.orderbook.view.OrderBookFragment
 import org.tokend.template.features.trade.pairs.view.TradeAssetPairsFragment
 import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
@@ -291,7 +289,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
             }
 
             if (BuildConfig.IS_TRADE_ALLOWED) {
-                addDrawerItems(items[OrderBookFragment.ID])
+                addDrawerItems(items[TradeAssetPairsFragment.ID])
             }
 
             if (BuildConfig.ARE_POLLS_ALLOWED) {
@@ -348,7 +346,6 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     protected open fun getFragment(screenIdentifier: Long): Fragment? {
         return when (screenIdentifier) {
-            DashboardFragment.ID -> DashboardFragment.newInstance()
             WithdrawFragment.ID -> WithdrawFragment.newInstance(WithdrawFragment.getBundle())
             ExploreAssetsFragment.ID -> ExploreAssetsFragment.newInstance(ExploreAssetsFragment.getBundle(
                     allowToolbar = true,

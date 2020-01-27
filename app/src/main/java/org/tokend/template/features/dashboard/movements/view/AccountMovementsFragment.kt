@@ -90,6 +90,7 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
 
         history_list.adapter = adapter
         history_list.layoutManager = LinearLayoutManager(context!!)
+        history_list.setHasFixedSize(true)
 
         history_list.listenBottomReach({ adapter.getDataItemCount() }) {
             balanceChangesRepository.loadMore() || balanceChangesRepository.noMoreItems
@@ -111,10 +112,13 @@ class AccountMovementsFragment : BaseFragment(), ToolbarProvider {
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribe { loading ->
                     if (loading) {
-                        if (balanceChangesRepository.isOnFirstPage) {
-                            loadingIndicator.show("transactions")
-                        } else {
+                        if (!balanceChangesRepository.isOnFirstPage) {
                             adapter.showLoadingFooter()
+                        }
+
+                        if (balanceChangesRepository.isOnFirstPage
+                                || balanceChangesRepository.isLoadingTopPages) {
+                            loadingIndicator.show("transactions")
                         }
                     } else {
                         loadingIndicator.hide("transactions")

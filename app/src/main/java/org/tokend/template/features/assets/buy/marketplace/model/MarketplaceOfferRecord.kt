@@ -4,12 +4,13 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferResourc
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodResource
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
 import org.tokend.template.data.model.Asset
+import org.tokend.template.data.repository.base.pagination.PagingRecord
 import org.tokend.template.features.companies.model.CompanyRecord
 import java.io.Serializable
 import java.math.BigDecimal
 
 class MarketplaceOfferRecord(
-        val id: String,
+        val id: Long,
         val asset: Asset,
         var amount: BigDecimal,
         val price: BigDecimal,
@@ -17,7 +18,7 @@ class MarketplaceOfferRecord(
         val paymentMethods: List<PaymentMethod>,
         val company: CompanyRecord,
         val isCanceled: Boolean
-) : Serializable {
+) : Serializable, PagingRecord {
     class PaymentMethod(
             val id: String,
             val type: MarketplacePaymentMethodType,
@@ -47,7 +48,7 @@ class MarketplaceOfferRecord(
     constructor(source: MarketplaceOfferResource,
                 assetsMap: Map<String, Asset>,
                 companiesMap: Map<String, CompanyRecord>) : this(
-            id = source.id,
+            id = source.id.toLong(),
             asset = assetsMap[source.baseAsset]
                     ?: throw IllegalStateException("Base asset ${source.baseAsset} is not in the map"),
             amount = source.baseAmount,
@@ -59,6 +60,8 @@ class MarketplaceOfferRecord(
             isCanceled = source.isCanceled,
             paymentMethods = source.paymentMethods.map { PaymentMethod(it, assetsMap) }
     )
+
+    override fun getPagingId(): Long = id
 
     override fun hashCode(): Int {
         return id.hashCode()

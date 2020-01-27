@@ -8,7 +8,7 @@ import java.math.BigDecimal
 
 class MarketplaceOfferPriceLoader(
         private val apiProvider: ApiProvider,
-        private val offerId: String,
+        private val offerId: Long,
         private val paymentMethodId: String
 ) {
     fun load(amount: BigDecimal,
@@ -18,7 +18,7 @@ class MarketplaceOfferPriceLoader(
                 .integrations
                 .marketplace
                 .getCalculatedOfferPrice(
-                        offerId = offerId,
+                        offerId = offerId.toString(),
                         paymentMethodId = paymentMethodId,
                         amount = amount,
                         promocode = promoCode

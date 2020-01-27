@@ -2,19 +2,20 @@ package org.tokend.template.features.clients.model
 
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
 import org.tokend.template.data.model.Asset
+import org.tokend.template.data.repository.base.pagination.PagingRecord
 import org.tokend.template.extensions.tryOrNull
 import java.io.Serializable
 import java.math.BigDecimal
 
 class CompanyClientRecord(
-        val id: String,
+        val id: Long,
         val accountId: String?,
         val email: String,
         val status: Status,
         val firstName: String?,
         val lastName: String?,
         val balances: List<Balance>
-) : Serializable {
+) : Serializable, PagingRecord {
     class Balance(
             val amount: BigDecimal,
             val asset: Asset
@@ -32,9 +33,17 @@ class CompanyClientRecord(
             else
                 null
 
+    override fun equals(other: Any?): Boolean =
+            other is CompanyClientRecord && other.id == this.id
+
+    override fun hashCode(): Int =
+            id.hashCode()
+
+    override fun getPagingId(): Long = id
+
     constructor(source: ClientResource,
                 assetsMap: Map<String, Asset>) : this(
-            id = source.id,
+            id = source.id.toLong(),
             accountId = source.accountId,
             email = source.email,
             status = Status.valueOf(source.status.toUpperCase()),

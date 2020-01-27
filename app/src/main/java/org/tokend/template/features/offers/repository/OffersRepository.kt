@@ -14,7 +14,6 @@ import org.tokend.sdk.api.v3.offers.params.OfferParamsV3
 import org.tokend.sdk.api.v3.offers.params.OffersPageParamsV3
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.template.data.repository.SystemInfoRepository
-import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
@@ -34,10 +33,10 @@ class OffersRepository(
         private val walletInfoProvider: WalletInfoProvider,
         private val onlyPrimary: Boolean,
         private val baseAsset: String?,
-        private val quoteAsset: String?,
-        itemsCache: RepositoryCache<OfferRecord>
-) : PagedDataRepository<OfferRecord>(itemsCache) {
-    override fun getPage(nextCursor: String?): Single<DataPage<OfferRecord>> {
+        private val quoteAsset: String?
+) : PagedDataRepository<OfferRecord>(PagingOrder.DESC, null) {
+    override fun getRemotePage(nextCursor: Long?,
+                               requiredOrder: PagingOrder): Single<DataPage<OfferRecord>> {
         val signedApi = apiProvider.getSignedApi()
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
@@ -50,8 +49,9 @@ class OffersRepository(
                 quoteAsset = quoteAsset,
                 isBuy = if (onlyPrimary) true else null,
                 pagingParams = PagingParamsV2(
-                        page = nextCursor,
-                        order = PagingOrder.DESC
+                        page = nextCursor?.toString(),
+                        limit = pageLimit,
+                        order = requiredOrder
                 ),
                 include = listOf(
                         OfferParamsV3.Includes.BASE_ASSET,
@@ -260,8 +260,8 @@ class OffersRepository(
     // endregion
 
     fun removeLocally(offerToRemove: OfferRecord) {
-        if (itemsCache.delete(offerToRemove)) {
-            broadcast()
-        }
+        mItems.remove(offerToRemove)
+        cache?.delete(offerToRemove)
+        broadcast()
     }
 }

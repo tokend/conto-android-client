@@ -14,7 +14,7 @@ import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.data.model.history.converter.ParticipantEffectConverter
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.data.repository.AccountDetailsRepository
-import org.tokend.template.data.repository.base.RepositoryCache
+import org.tokend.template.data.repository.base.pagination.PagedDataCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.features.redeem.model.RedemptionRequest
@@ -35,19 +35,21 @@ class BalanceChangesRepository(
         private val apiProvider: ApiProvider,
         private val participantEffectConverter: ParticipantEffectConverter,
         private val accountDetailsRepository: AccountDetailsRepository?,
-        itemsCache: RepositoryCache<BalanceChange>
-) : PagedDataRepository<BalanceChange>(itemsCache) {
-
+        cache: PagedDataCache<BalanceChange>
+) : PagedDataRepository<BalanceChange>(PagingOrder.DESC, cache) {
     init {
         if (balanceId == null && accountId == null) {
             throw IllegalArgumentException("Balance or account ID must be specified")
         }
     }
 
-    override fun getPage(nextCursor: String?) = getPage(nextCursor, LIMIT)
+    override fun getRemotePage(nextCursor: Long?, requiredOrder: PagingOrder):
+            Single<DataPage<BalanceChange>> =
+            getPage(nextCursor, pageLimit, requiredOrder)
 
-    fun getPage(nextCursor: String?,
+    fun getPage(nextCursor: Long?,
                 limit: Int,
+                requiredOrder: PagingOrder,
                 loadEmails: Boolean = true): Single<DataPage<BalanceChange>> {
         val signedApi = apiProvider.getSignedApi()
                 ?: return Single.error(IllegalStateException("No signed API instance found"))
@@ -64,9 +66,9 @@ class BalanceChangesRepository(
                                 )
                                 .withPagingParams(
                                         PagingParamsV2(
-                                                order = PagingOrder.DESC,
+                                                order = requiredOrder,
                                                 limit = limit,
-                                                page = nextCursor
+                                                page = nextCursor?.toString()
                                         )
                                 )
                                 .apply {
@@ -134,7 +136,7 @@ class BalanceChangesRepository(
 
     fun addPayment(request: PaymentRequest) {
         val balanceChange = BalanceChange(
-                id = request.reference,
+                id = System.currentTimeMillis(),
                 amount = request.amount,
                 date = Date(),
                 asset = request.asset,
@@ -156,7 +158,7 @@ class BalanceChangesRepository(
                                       accountId: String,
                                       senderNickname: String?) {
         val balanceChange = BalanceChange(
-                id = request.salt.toString(),
+                id = request.salt,
                 amount = request.amount,
                 date = Date(),
                 asset = asset,
@@ -180,11 +182,7 @@ class BalanceChangesRepository(
     }
 
     fun addBalanceChange(balanceChange: BalanceChange) {
-        itemsCache.add(balanceChange)
+        mItems.add(0, balanceChange)
         broadcast()
-    }
-
-    companion object {
-        private const val LIMIT = 20
     }
 }

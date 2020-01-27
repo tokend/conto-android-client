@@ -6,6 +6,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
+import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.template.R
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
@@ -66,7 +67,7 @@ open class ShareRedemptionQrFragment : ShareQrFragment(), VisibilityChangesConsu
                 Single.defer {
                     repositoryProvider
                             .balanceChanges(balanceId)
-                            .getPage(null, BALANCE_CHANGES_TO_CHECK, false)
+                            .getPage(null, BALANCE_CHANGES_TO_CHECK, PagingOrder.DESC, false)
                             .map { page ->
                                 page.items.find {
                                     it.cause is BalanceChangeCause.Payment

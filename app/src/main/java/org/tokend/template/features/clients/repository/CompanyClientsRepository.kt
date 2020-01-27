@@ -10,7 +10,6 @@ import org.tokend.sdk.api.integrations.dns.model.ClientBalanceResource
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
 import org.tokend.sdk.api.integrations.dns.params.ClientsPageParams
 import org.tokend.template.data.repository.assets.AssetsRepository
-import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.WalletInfoProvider
@@ -19,11 +18,11 @@ import org.tokend.template.features.clients.model.CompanyClientRecord
 class CompanyClientsRepository(
         private val apiProvider: ApiProvider,
         private val walletInfoProvider: WalletInfoProvider,
-        private val assetsRepository: AssetsRepository,
-        itemsCache: RepositoryCache<CompanyClientRecord>
-) : PagedDataRepository<CompanyClientRecord>(itemsCache) {
+        private val assetsRepository: AssetsRepository
+) : PagedDataRepository<CompanyClientRecord>(PagingOrder.DESC, null) {
 
-    override fun getPage(nextCursor: String?): Single<DataPage<CompanyClientRecord>> {
+    override fun getRemotePage(nextCursor: Long?,
+                               requiredOrder: PagingOrder): Single<DataPage<CompanyClientRecord>> {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
                 ?: return Single.error(IllegalStateException("No wallet info found"))
 
@@ -38,9 +37,9 @@ class CompanyClientsRepository(
                         params = ClientsPageParams(
                                 include = listOf(ClientsPageParams.Includes.BALANCES),
                                 pagingParams = PagingParamsV2(
-                                        order = PagingOrder.DESC,
-                                        page = nextCursor,
-                                        limit = PAGE_LIMIT
+                                        order = requiredOrder,
+                                        page = nextCursor?.toString(),
+                                        limit = pageLimit
                                 )
                         )
                 )
@@ -72,9 +71,5 @@ class CompanyClientsRepository(
                             clientsPage.isLast
                     )
                 }
-    }
-
-    private companion object {
-        private const val PAGE_LIMIT = 20
     }
 }
