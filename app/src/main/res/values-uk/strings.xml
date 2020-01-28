@@ -264,7 +264,7 @@
     <string name="use_fingerprint">Використовувати відбиток пальця</string>
     <string name="secret_seed">Секретний ключ</string>
     <string name="secret_seed_description">Поточний приватний ключ вашого акаунта</string>
-    <string name="template_offer_creation_price">Ціна (%1$s за 1 %2$s)</string>
+    <string name="template_offer_creation_price">Ціна за 1 %2$s у %1$s</string>
     <string name="deposit_address_copied">Адресу скопійовано</string>
     <string name="deposit_address_renewed">Адресу подовжено</string>
     <string name="error_kyc_required_to_own_asset">Тільки верифіковані користувачі можуть

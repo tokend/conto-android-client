@@ -102,14 +102,14 @@ open class CreateOfferActivity : BaseActivity() {
     private fun initTextFields() {
         initAmountWrappers()
 
-        price_edit_text.floatingLabelText =
+        price_hint.text =
                 getString(R.string.template_offer_creation_price,
                         quoteAsset.code, baseAsset.name ?: baseAsset.code)
 
-        amount_edit_text.floatingLabelText =
+        amount_hint.text =
                 getString(R.string.template_amount_hint, baseAsset.name ?: baseAsset.code)
 
-        total_edit_text.floatingLabelText =
+        total_hint.text =
                 getString(R.string.template_total_hint, quoteAsset.code)
 
         preFillFields()

@@ -20,6 +20,15 @@
             android:orientation="vertical"
             android:padding="@dimen/standard_margin">
 
+            <TextView
+                android:id="@+id/price_hint"
+                style="@style/HintText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                tools:text="Price hint" />
+
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/price_edit_text"
                 style="@style/EditText.OneLine"
@@ -28,23 +37,33 @@
                 android:hint="@string/zero"
                 android:inputType="numberDecimal"
                 android:lines="1"
-                app:met_floatingLabelAlwaysShown="true" />
+                app:met_floatingLabel="none" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_padding">
 
+                <TextView
+                    android:id="@+id/amount_hint"
+                    style="@style/HintText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    tools:text="Amount hint" />
+
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/amount_edit_text"
                     style="@style/EditText.OneLine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/amount_hint"
                     android:hint="@string/zero"
                     android:inputType="numberDecimal"
                     android:lines="1"
                     android:paddingRight="@dimen/quadra_margin"
-                    app:met_floatingLabelAlwaysShown="true"
+                    app:met_floatingLabel="none"
                     app:met_helperText="@string/template_available"
                     app:met_helperTextAlwaysShown="true" />
 
@@ -67,16 +86,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_padding">
 
+                <TextView
+                    android:id="@+id/total_hint"
+                    style="@style/HintText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    tools:text="Total hint" />
+
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/total_edit_text"
                     style="@style/EditText.OneLine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/total_hint"
                     android:hint="@string/zero"
                     android:inputType="numberDecimal"
                     android:lines="1"
                     android:paddingRight="@dimen/quadra_margin"
-                    app:met_floatingLabelAlwaysShown="true"
+                    app:met_floatingLabel="none"
                     app:met_helperText="@string/template_available"
                     app:met_helperTextAlwaysShown="true" />
 
@@ -98,8 +127,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/standard_padding"
-                android:gravity="center_horizontal"
                 android:clipToPadding="false"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingBottom="@dimen/half_standard_margin"
                 android:visibility="gone">
