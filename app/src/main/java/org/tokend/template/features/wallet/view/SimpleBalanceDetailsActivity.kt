@@ -282,6 +282,11 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         if (getAvailableDeltaToInteger().signum() != 0 && balance.company != null) {
             addAction(R.drawable.ic_decimal_decrease, R.string.buy_more, this::buyToInteger)
         }
+
+        if (balance.available.signum() > 0) {
+            addAction(R.drawable.ic_tx_sent, R.string.sell_action, this::openMarketplaceSell)
+        }
+
         addAction(R.drawable.ic_history, R.string.operations_history_short, this::openHistory)
         addAction(R.drawable.ic_information, R.string.details, this::openAssetDetails)
     }
@@ -390,6 +395,10 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     private fun openMarketplaceBuyMore(offer: MarketplaceOfferRecord) {
         val delta = getAvailableDeltaToInteger()
         Navigator.from(this).openMarketplaceBuy(offer, delta)
+    }
+
+    private fun openMarketplaceSell() {
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
