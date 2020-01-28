@@ -26,7 +26,7 @@ class AssetPairItemViewHolder(
         }
 
     override fun bind(item: AssetPairListItem) {
-        baseCodeTextView.text = item.baseAsset.code
+        baseCodeTextView.text = item.baseAsset.run { name ?: code }
         restCodeTextView.text = view.context.getString(
                 R.string.template_asset_pair,
                 "",

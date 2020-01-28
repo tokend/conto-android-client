@@ -61,7 +61,7 @@ class TradeHistoryFragment : BaseFragment() {
 
     private fun initFields() {
         price_hint.text = getString(R.string.template_price_hint, assetPair.quote)
-        amount_hint.text = getString(R.string.template_amount_hint, assetPair.base)
+        amount_hint.text = getString(R.string.volume_label)
     }
 
     private fun initList() {

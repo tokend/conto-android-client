@@ -34,10 +34,14 @@ class TradeActivity : BaseActivity() {
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        title = getString(R.string.template_asset_pair, assetPair.base, assetPair.quote)
+        title = getString(R.string.template_asset_pair, assetPair.base.run { name ?: code },
+                assetPair.quote)
         toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleAppearance)
-        toolbar.subtitle = getString(R.string.template_price_one_equals, assetPair.base,
-                amountFormatter.formatAssetAmount(assetPair.price, assetPair.quote))
+        toolbar.subtitle = amountFormatter.formatAssetAmount(
+                assetPair.price,
+                assetPair.quote,
+                withAssetCode = true
+        )
         appbar_elevation_view.layoutParams = appbar_elevation_view.layoutParams.apply {
             height = dip(3)
         }
