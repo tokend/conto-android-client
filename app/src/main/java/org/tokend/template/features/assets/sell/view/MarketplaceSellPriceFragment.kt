@@ -17,6 +17,7 @@ import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.sell.model.MarketplaceSellInfoHolder
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.view.util.input.SoftInputUtil
+import java.math.MathContext
 import kotlin.math.roundToInt
 
 class MarketplaceSellPriceFragment : BaseFragment() {
@@ -50,6 +51,8 @@ class MarketplaceSellPriceFragment : BaseFragment() {
         initLabels()
         initFields()
         initButtons()
+
+        onAmountChanged()
     }
 
     private fun initLabels() {
@@ -69,9 +72,11 @@ class MarketplaceSellPriceFragment : BaseFragment() {
         amount_view.amountWrapper.apply {
             maxPlacesAfterComa = asset.trailingDigits
             onAmountChanged { _, _ ->
-                updateContinueAvailability()
+                onAmountChanged()
             }
-            setAmount(sellInfoHolder.price)
+            if (sellInfoHolder.price.signum() > 0) {
+                setAmount(sellInfoHolder.price)
+            }
         }
 
         amount_view.editText.onEditorAction {
@@ -97,9 +102,27 @@ class MarketplaceSellPriceFragment : BaseFragment() {
         }
     }
 
+    private fun onAmountChanged() {
+        updateContinueAvailability()
+        displayTotal()
+    }
+
     private fun updateContinueAvailability() {
         val amount = amount_view.amountWrapper.scaledAmount
         canContinue = amount.signum() > 0
+    }
+
+    private fun displayTotal() {
+        total_text_view.text = getString(
+                R.string.template_amount_total,
+                amountFormatter.formatAssetAmount(
+                        amount_view.amountWrapper.scaledAmount
+                                .multiply(sellInfoHolder.amount, MathContext.DECIMAL64),
+                        asset,
+                        withAssetCode = false,
+                        withAssetName = false
+                )
+        )
     }
 
     private fun tryToPostResult() {
