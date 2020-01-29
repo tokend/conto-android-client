@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        style="@style/LimitedMatchParentWidthConstraint"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/standard_margin"
+        app:layout_constraintBottom_toTopOf="@id/continue_button"
+        app:layout_constraintTop_toBottomOf="@null">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/amount_label"
+            android:textSize="@dimen/text_size_heading" />
+
+        <org.tokend.template.features.wallet.view.PlusMinusAmountInputView
+            android:id="@+id/amount_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_padding" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/continue_button"
+        style="@style/PrimaryButton.NoBorders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/continue_action"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</android.support.constraint.ConstraintLayout>

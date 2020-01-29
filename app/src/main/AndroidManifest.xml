@@ -319,6 +319,10 @@
             android:name=".features.wallet.view.SimpleBalanceDetailsActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".features.assets.sell.view.SellAssetOnMarketplaceActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
     </application>
 
 </manifest>

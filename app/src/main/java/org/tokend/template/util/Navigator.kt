@@ -19,7 +19,7 @@ import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
@@ -29,12 +29,14 @@ import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivit
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.assets.details.refund.view.AssetRefundConfirmationActivity
 import org.tokend.template.features.assets.details.view.AssetDetailsActivity
+import org.tokend.template.features.assets.sell.view.SellAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
 import org.tokend.template.features.clients.details.movements.view.CompanyClientMovementsActivity
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.companies.details.view.CompanyDetailsActivity
+import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
@@ -655,6 +657,16 @@ class Navigator private constructor() {
                 ?.putExtras(SingleFragmentActivity.getBundle(
                         AssetMovementsFragment.ID,
                         AssetMovementsFragment.getBundle(balanceId)
+                ))
+                ?.also { performIntent(it) }
+    }
+
+    fun openMarketplaceSell(balanceId: String,
+                            amount: BigDecimal) {
+        context?.intentFor<SellAssetOnMarketplaceActivity>()
+                ?.putExtras(SellAssetOnMarketplaceActivity.getBundle(
+                        balanceId,
+                        amount
                 ))
                 ?.also { performIntent(it) }
     }

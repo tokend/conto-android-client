@@ -398,7 +398,10 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     }
 
     private fun openMarketplaceSell() {
-
+        Navigator.from(this).openMarketplaceSell(
+                balanceId = balance.id,
+                amount = amount_view.amountWrapper.scaledAmount
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
