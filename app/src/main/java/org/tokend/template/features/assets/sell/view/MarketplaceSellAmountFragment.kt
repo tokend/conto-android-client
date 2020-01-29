@@ -1,6 +1,7 @@
 package org.tokend.template.features.assets.sell.view
 
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +16,21 @@ import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.input.SoftInputUtil
 import java.math.BigDecimal
+import kotlin.math.roundToInt
 
 class MarketplaceSellAmountFragment: BaseFragment() {
     private lateinit var sellInfoHolder: MarketplaceSellInfoHolder
 
     private val resultSubject = PublishSubject.create<BigDecimal>()
     val resultObservable: Observable<BigDecimal> = resultSubject
+
+    private val hintColor: Int by lazy {
+        ContextCompat.getColor(requireContext(), R.color.secondary_text)
+    }
+
+    private val errorColor: Int by lazy {
+        ContextCompat.getColor(requireContext(), R.color.error)
+    }
 
     private var canContinue: Boolean = false
         set(value) {
@@ -36,10 +46,15 @@ class MarketplaceSellAmountFragment: BaseFragment() {
         sellInfoHolder = requireActivity() as? MarketplaceSellInfoHolder
                 ?: throw IllegalArgumentException("Activity must hold sell info")
 
+        initLabels()
         initFields()
         initButtons()
 
         subscribeToBalances()
+    }
+
+    private fun initLabels() {
+        top_info_text_view.text = sellInfoHolder.balance.asset.run { name ?: code }
     }
 
     private fun initFields() {
@@ -49,11 +64,21 @@ class MarketplaceSellAmountFragment: BaseFragment() {
 
         amount_view.amountWrapper.apply {
             onAmountChanged { _, _ ->
+                updateAmountError()
                 updateContinueAvailability()
             }
 
             maxPlacesAfterComa = sellInfoHolder.balance.asset.trailingDigits
             setAmount(sellInfoHolder.amount)
+        }
+
+        root_layout.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
+            val width = right - left
+            val oldWidth = oldRight - oldLeft
+            if (width != oldWidth) {
+                // Max amount input field width is 45% of the container width.
+                amount_view.editText.maxWidth = (width * 0.45).roundToInt()
+            }
         }
 
         amount_view.editText.requestFocus()
@@ -77,15 +102,36 @@ class MarketplaceSellAmountFragment: BaseFragment() {
     private fun onBalancesUpdated() {
         updateMaxAmount()
         updateContinueAvailability()
+        displayBalance()
     }
 
     private fun updateMaxAmount() {
         amount_view.maxAmount = sellInfoHolder.balance.available
     }
 
+    private fun updateAmountError() {
+        if (amount_view.amountWrapper.scaledAmount > sellInfoHolder.balance.available) {
+            balance_text_view.setTextColor(errorColor)
+        } else {
+            balance_text_view.setTextColor(hintColor)
+        }
+    }
+
     private fun updateContinueAvailability() {
         val amount = amount_view.amountWrapper.scaledAmount
         canContinue = amount.signum() > 0 && amount <= sellInfoHolder.balance.available
+    }
+
+    private fun displayBalance() {
+        balance_text_view.text = getString(
+                R.string.template_available,
+                amountFormatter.formatAssetAmount(
+                        sellInfoHolder.balance.available,
+                        sellInfoHolder.balance.asset,
+                        withAssetCode = false,
+                        withAssetName = false
+                )
+        )
     }
 
     private fun tryToPostResult() {

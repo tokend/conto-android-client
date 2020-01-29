@@ -13,6 +13,7 @@ import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.getBigDecimalExtra
+import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.sell.model.MarketplaceSellInfoHolder
 import org.tokend.template.features.assets.sell.model.MarketplaceSellPaymentMethod
 import org.tokend.template.util.ObservableTransformers
@@ -38,7 +39,7 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
 
     override lateinit var balance: BalanceRecord
     override lateinit var amount: BigDecimal
-    override lateinit var price: BigDecimal
+    override var price: BigDecimal = BigDecimal.ZERO
     override lateinit var priceAsset: Asset
     override val paymentMethods = mutableListOf<MarketplaceSellPaymentMethod>()
 
@@ -69,8 +70,6 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
         setSupportActionBar(toolbar)
         setTitle(R.string.sell)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleAppearance)
-        toolbar.subtitle = balance.asset.run { name ?: code }
     }
 
     private fun initSwipeRefresh() {
@@ -125,6 +124,26 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
 
     private fun onAmountEntered(amount: BigDecimal) {
         this.amount = amount
+        toPriceInput()
+    }
+
+    private fun toPriceInput() {
+        val fragment = MarketplaceSellPriceFragment.newInstance()
+
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribeBy(
+                        onNext = this::onPriceEntered,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+
+        fragmentDisplayer.display(fragment, "price", true)
+    }
+
+    private fun onPriceEntered(price: AmountInputResult) {
+        this.price = price.amount
+        this.priceAsset = price.asset
     }
 
     override fun onBackPressed() {

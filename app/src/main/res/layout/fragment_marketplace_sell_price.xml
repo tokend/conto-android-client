@@ -22,11 +22,12 @@
             tools:text="My awesome asset" />
 
         <TextView
+            android:id="@+id/prices_hint_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@id/space"
             android:gravity="center"
-            android:text="@string/amount_label"
+            android:text="@string/template_price_hint"
             android:textSize="@dimen/text_size_heading" />
 
         <Space
@@ -42,16 +43,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/space"
             android:layout_centerHorizontal="true" />
-
-        <TextView
-            android:id="@+id/balance_text_view"
-            style="@style/HintText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/amount_view"
-            android:layout_marginTop="@dimen/half_standard_margin"
-            android:gravity="center"
-            tools:text="10 available" />
 
     </RelativeLayout>
 
