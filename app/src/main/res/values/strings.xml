@@ -596,6 +596,7 @@
     <string name="payment_method_internal">Internal asset</string>
     <string name="card_number">Card number</string>
     <string name="save_this_card">Save this card</string>
+    <string name="template_payment_method_transfer_to">Transfer to %1$s</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

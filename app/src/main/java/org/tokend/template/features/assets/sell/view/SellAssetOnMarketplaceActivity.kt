@@ -20,6 +20,7 @@ import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.sell.logic.CreateMarketplaceSellRequestUseCase
 import org.tokend.template.features.assets.sell.model.MarketplaceSellInfoHolder
 import org.tokend.template.features.assets.sell.model.MarketplaceSellRequest
+import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -198,7 +199,8 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
     }
 
     private fun onSellRequestCreated(request: MarketplaceSellRequest) {
-        toastManager.short("Created!")
+        Navigator.from(this)
+                .openMarketplaceSellConfirmation(request, SELL_CONFIRMATION_REQUEST)
     }
 
     override fun onBackPressed() {

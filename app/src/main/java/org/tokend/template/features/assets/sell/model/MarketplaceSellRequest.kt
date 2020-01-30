@@ -13,7 +13,7 @@ class MarketplaceSellRequest(
         val asset: Asset,
         val price: BigDecimal,
         val priceAsset: Asset,
-        val paymentMethods: Collection<MarketplaceSellPaymentMethod>,
+        val paymentMethods: List<MarketplaceSellPaymentMethod>,
         val sourceAccountId: String,
         val sourceBalanceId: String,
         val marketplaceAccountId: String

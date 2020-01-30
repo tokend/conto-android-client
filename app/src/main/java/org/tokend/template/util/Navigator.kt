@@ -19,7 +19,6 @@ import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
@@ -29,6 +28,8 @@ import org.tokend.template.features.assets.buy.view.BuyAssetOnMarketplaceActivit
 import org.tokend.template.features.assets.buy.view.WebInvoiceActivity
 import org.tokend.template.features.assets.details.refund.view.AssetRefundConfirmationActivity
 import org.tokend.template.features.assets.details.view.AssetDetailsActivity
+import org.tokend.template.features.assets.sell.model.MarketplaceSellRequest
+import org.tokend.template.features.assets.sell.view.MarketplaceSellConfirmationActivity
 import org.tokend.template.features.assets.sell.view.SellAssetOnMarketplaceActivity
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.changepassword.ChangePasswordActivity
@@ -669,5 +670,12 @@ class Navigator private constructor() {
                         amount
                 ))
                 ?.also { performIntent(it) }
+    }
+
+    fun openMarketplaceSellConfirmation(request: MarketplaceSellRequest,
+                                        requestCode: Int) {
+        context?.intentFor<MarketplaceSellConfirmationActivity>()
+                ?.putExtras(MarketplaceSellConfirmationActivity.getBundle(request))
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 }

@@ -73,15 +73,7 @@ class CreateMarketplaceSellRequestUseCase(
                 price = price,
                 priceAsset = priceAsset,
                 marketplaceAccountId = marketplaceAccountId,
-                paymentMethods = setOf(
-                        MarketplaceSellPaymentMethod(
-                                method = MarketplaceOfferRecord.PaymentMethod(
-                                        id = "",
-                                        type = MarketplacePaymentMethodType.INTERNAL,
-                                        asset = quoteAsset
-                                ),
-                                destination = sourceAccountId
-                        ),
+                paymentMethods = listOf(
                         MarketplaceSellPaymentMethod(
                                 method = MarketplaceOfferRecord.PaymentMethod(
                                         id = "",
@@ -89,6 +81,14 @@ class CreateMarketplaceSellRequestUseCase(
                                         asset = quoteAsset
                                 ),
                                 destination = cardNumber
+                        ),
+                        MarketplaceSellPaymentMethod(
+                                method = MarketplaceOfferRecord.PaymentMethod(
+                                        id = "",
+                                        type = MarketplacePaymentMethodType.INTERNAL,
+                                        asset = quoteAsset
+                                ),
+                                destination = sourceAccountId
                         )
                 )
         ).toSingle()

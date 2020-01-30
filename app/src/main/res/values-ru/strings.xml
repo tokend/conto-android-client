@@ -601,4 +601,5 @@
     <string name="payment_method_crypto">Криптовалюта</string>
     <string name="card_number">Номер карты</string>
     <string name="save_this_card">Сохранить эту карту</string>
+    <string name="template_payment_method_transfer_to">Перевод на %1$s</string>
 </resources>

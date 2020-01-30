@@ -323,6 +323,9 @@
             android:name=".features.assets.sell.view.SellAssetOnMarketplaceActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
+        <activity
+            android:name=".features.assets.sell.view.MarketplaceSellConfirmationActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" />
     </application>
 
 </manifest>
