@@ -12,7 +12,6 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_simple_balance_details.*
@@ -28,7 +27,10 @@ import org.tokend.template.features.assets.buy.marketplace.logic.MarketplaceOffe
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
-import org.tokend.template.view.util.*
+import org.tokend.template.view.util.AnimationUtil
+import org.tokend.template.view.util.CircleLogoUtil
+import org.tokend.template.view.util.ElevationUtil
+import org.tokend.template.view.util.LoadingIndicatorManager
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.roundToInt
@@ -64,6 +66,8 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
             redeem_button.isEnabled = value
         }
 
+    private var marketplaceOffer: MarketplaceOfferRecord? = null
+
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_simple_balance_details)
 
@@ -82,6 +86,10 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         initAssetLogo()
 
         subscribeToBalances()
+
+        if (balance.company != null) {
+            loadMarketplaceOffer()
+        }
     }
 
     // region Init
@@ -279,11 +287,11 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
 
         actions_layout.removeAllViews()
 
-        if (getAvailableDeltaToInteger().signum() != 0 && balance.company != null) {
-            addAction(R.drawable.ic_decimal_decrease, R.string.buy_more, this::buyToInteger)
-        }
         addAction(R.drawable.ic_history, R.string.operations_history_short, this::openHistory)
         addAction(R.drawable.ic_information, R.string.details, this::openAssetDetails)
+        if (canBuyToInteger()) {
+            addAction(R.drawable.ic_decimal_decrease, R.string.buy_more, this::openMarketplaceBuyMore)
+        }
     }
 
     private fun subscribeToBalances() {
@@ -367,27 +375,32 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         Navigator.from(this).openAssetMovements(balanceId)
     }
 
-    private fun buyToInteger() {
-        var disposable: Disposable? = null
-
-        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
-            disposable?.dispose()
-        }
-
-        disposable = MarketplaceOfferLoader(repositoryProvider.marketplaceOffers(balance.company?.id))
+    private fun loadMarketplaceOffer() {
+        MarketplaceOfferLoader(repositoryProvider.marketplaceOffers(balance.company?.id))
                 .load(balance.assetCode)
                 .compose(ObservableTransformers.defaultSchedulersMaybe())
-                .doOnSubscribe { progress.show() }
-                .doOnEvent { _, _ -> progress.dismiss() }
                 .subscribeBy(
-                        onSuccess = this::openMarketplaceBuyMore,
-                        onError = { errorHandlerFactory.getDefault().handle(it) },
-                        onComplete = { toastManager.long(R.string.error_asset_cant_be_bought_now) }
+                        onSuccess = this::onMarketplaceOfferLoaded,
+                        onError = { },
+                        onComplete = { }
                 )
                 .addTo(compositeDisposable)
     }
 
-    private fun openMarketplaceBuyMore(offer: MarketplaceOfferRecord) {
+    private fun onMarketplaceOfferLoaded(offer: MarketplaceOfferRecord) {
+        this.marketplaceOffer = offer
+        updateBalanceActions()
+    }
+
+    private fun canBuyToInteger(): Boolean {
+        val offer = this.marketplaceOffer
+        val delta = getAvailableDeltaToInteger()
+        return delta.signum() > 0 && offer != null && offer.amount >= delta
+    }
+
+    private fun openMarketplaceBuyMore() {
+        val offer = this.marketplaceOffer
+                ?: return
         val delta = getAvailableDeltaToInteger()
         Navigator.from(this).openMarketplaceBuy(offer, delta)
     }
