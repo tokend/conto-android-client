@@ -594,4 +594,11 @@
     <string name="buy_more">Докупить</string>
     <string name="error_asset_cant_be_bought_now">Покупка сейчас невозможна. Попробуйте позже</string>
     <string name="template_amount_total">%1$s всего</string>
+    <string name="add_payment_method">Добавить способ оплаты</string>
+    <string name="payment_methods">Способы оплаты</string>
+    <string name="payment_method_credit_card">Карта</string>
+    <string name="payment_method_internal">Внутренний актив</string>
+    <string name="payment_method_crypto">Криптовалюта</string>
+    <string name="card_number">Номер карты</string>
+    <string name="save_this_card">Сохранить эту карту</string>
 </resources>

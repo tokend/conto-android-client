@@ -1,9 +1,11 @@
 package org.tokend.template.view.util
 
 import android.content.Context
+import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
 import org.tokend.template.R
 import org.tokend.template.data.model.history.BalanceChangeAction
 import org.tokend.template.data.model.history.details.BalanceChangeCause
+import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.fees.adapter.FeeListItem
 import org.tokend.template.features.kyc.model.KycForm
@@ -160,6 +162,17 @@ class LocalizedName(private val context: Context) {
                 context.getString(R.string.company_client_active)
             CompanyClientRecord.Status.BLOCKED ->
                 context.getString(R.string.company_client_blocked)
+        }
+    }
+
+    fun forMarketplacePaymentMethodType(type: MarketplacePaymentMethodType): String {
+        return when (type) {
+            MarketplacePaymentMethodType.FORBILL ->
+                context.getString(R.string.payment_method_credit_card)
+            MarketplacePaymentMethodType.COINPAYMENTS ->
+                context.getString(R.string.payment_method_crypto)
+            MarketplacePaymentMethodType.INTERNAL ->
+                context.getString(R.string.payment_method_internal)
         }
     }
 }

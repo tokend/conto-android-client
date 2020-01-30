@@ -1,7 +1,10 @@
 package org.tokend.template.features.assets.sell.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
@@ -14,10 +17,12 @@ import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.getBigDecimalExtra
 import org.tokend.template.features.amountscreen.model.AmountInputResult
+import org.tokend.template.features.assets.sell.logic.CreateMarketplaceSellRequestUseCase
 import org.tokend.template.features.assets.sell.model.MarketplaceSellInfoHolder
-import org.tokend.template.features.assets.sell.model.MarketplaceSellPaymentMethod
+import org.tokend.template.features.assets.sell.model.MarketplaceSellRequest
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import java.math.BigDecimal
 
@@ -41,7 +46,7 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
     override lateinit var amount: BigDecimal
     override var price: BigDecimal = BigDecimal.ZERO
     override lateinit var priceAsset: Asset
-    override val paymentMethods = mutableListOf<MarketplaceSellPaymentMethod>()
+    override lateinit var cardNumber: String
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.fragment_user_flow)
@@ -144,6 +149,56 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
     private fun onPriceEntered(price: AmountInputResult) {
         this.price = price.amount
         this.priceAsset = price.asset
+        toCardNumberInput()
+    }
+
+    private fun toCardNumberInput() {
+        val fragment = MarketplaceSellCardNumberFragment.newInstance()
+
+        fragment.resultObservable
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribeBy(
+                        onNext = this::onCardNumberEntered,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+                .addTo(compositeDisposable)
+
+        fragmentDisplayer.display(fragment, "card", true)
+    }
+
+    private fun onCardNumberEntered(cardNumber: String) {
+        this.cardNumber = cardNumber
+        createAndConfirmSellRequest()
+    }
+
+    private fun createAndConfirmSellRequest() {
+        var disposable: Disposable? = null
+
+        val progress = ProgressDialogFactory.getDialog(this, R.string.loading_data) {
+            disposable?.dispose()
+        }
+
+        disposable = CreateMarketplaceSellRequestUseCase(
+                amount = amount,
+                balance = balance,
+                priceAsset = priceAsset,
+                price = price,
+                cardNumber = cardNumber,
+                apiProvider = apiProvider,
+                walletInfoProvider = walletInfoProvider
+        )
+                .perform()
+                .compose(ObservableTransformers.defaultSchedulersSingle())
+                .doOnSubscribe { progress.show() }
+                .doOnEvent { _, _ -> progress.dismiss() }
+                .subscribeBy(
+                        onSuccess = this::onSellRequestCreated,
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
+                )
+    }
+
+    private fun onSellRequestCreated(request: MarketplaceSellRequest) {
+        toastManager.short("Created!")
     }
 
     override fun onBackPressed() {
@@ -152,9 +207,19 @@ class SellAssetOnMarketplaceActivity : BaseActivity(), MarketplaceSellInfoHolder
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK && requestCode == SELL_CONFIRMATION_REQUEST) {
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+    }
+
     companion object {
         private const val BALANCE_ID_EXTRA = "balance_id"
         private const val AMOUNT_EXTRA = "amount"
+        private val SELL_CONFIRMATION_REQUEST = "sell".hashCode() and 0xffff
 
         fun getBundle(balanceId: String,
                       amount: BigDecimal) = Bundle().apply {

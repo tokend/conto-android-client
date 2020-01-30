@@ -9,5 +9,5 @@ interface MarketplaceSellInfoHolder {
     val balance: BalanceRecord
     val price: BigDecimal
     val priceAsset: Asset
-    val paymentMethods: Collection<MarketplaceSellPaymentMethod>
+    val cardNumber: String
 }

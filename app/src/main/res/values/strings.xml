@@ -589,6 +589,13 @@
     <string name="buy_more">Buy more</string>
     <string name="error_asset_cant_be_bought_now">This asset can\'t be bought now. Try again later</string>
     <string name="template_amount_total">%1$s in total</string>
+    <string name="add_payment_method">Add payment method</string>
+    <string name="payment_methods">Payment methods</string>
+    <string name="payment_method_credit_card">Credit card</string>
+    <string name="payment_method_crypto">Cryptocurrency</string>
+    <string name="payment_method_internal">Internal asset</string>
+    <string name="card_number">Card number</string>
+    <string name="save_this_card">Save this card</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
