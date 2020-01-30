@@ -33,7 +33,7 @@ open class AmountInputFragment : BaseFragment() {
     /**
      * Emits entered amount as [AmountInputResult]
      */
-    open val resultObservable: Observable<out AmountInputResult>
+    open val resultObservable: Observable<AmountInputResult>
         get() = resultSubject
 
     protected val balancesRepository: BalancesRepository
