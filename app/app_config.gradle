@@ -38,10 +38,10 @@ ext {
 
     // Primary color of the brand,
     // can be used as a color of app toolbar
-    color_primary = '#c2185b'
+    color_primary = '#ffffff'
     // Primary dark color - darker version of primary color,
     // can be used as a color of app status bar
-    color_primary_dark = '#8c0032'
+    color_primary_dark = '#ffffff'
 
     // Background color - used as a background color for screens
     color_background = '#ffffff'

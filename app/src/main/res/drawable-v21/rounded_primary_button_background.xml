@@ -8,7 +8,7 @@
                 <item android:state_enabled="false">
                     <shape android:shape="rectangle">
                         <corners android:radius="@dimen/rounded_primary_button_corner_radius" />
-                        <solid android:color="@color/mainActionButtonDisabled" />
+                        <solid android:color="@color/primary_action_disabled" />
                         <padding
                             android:bottom="@dimen/abc_button_padding_vertical_material"
                             android:left="@dimen/abc_button_padding_horizontal_material"

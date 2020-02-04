@@ -3,7 +3,9 @@ package org.tokend.template.features.signin
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.view.View
@@ -72,6 +74,10 @@ class SignInActivity : BaseActivity() {
         }
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
+        window.setBackgroundDrawable(ColorDrawable(
+                ContextCompat.getColor(this, R.color.background)
+        ))
+
         setContentView(R.layout.activity_sign_in)
         setSupportActionBar(toolbar)
         setTitle(R.string.sign_in)

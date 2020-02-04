@@ -63,7 +63,6 @@ class BalanceDetailsActivity : BaseActivity() {
         this.balanceId = balanceId
 
         initToolbar()
-        initBackground()
         initButtons()
         initHistory()
         initSwipeRefresh()
@@ -75,13 +74,6 @@ class BalanceDetailsActivity : BaseActivity() {
     }
 
     // region Init
-    private fun initBackground() {
-        window.setBackgroundDrawable(ColorDrawable(Color.WHITE))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.statusBarColor = Color.WHITE
-        }
-    }
-
     private fun initButtons() {
         initFab()
     }
