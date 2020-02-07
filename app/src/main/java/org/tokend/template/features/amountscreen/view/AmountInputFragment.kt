@@ -265,7 +265,7 @@ open class AmountInputFragment : BaseFragment() {
         balance = balancesRepository.itemsList.find { it.assetCode == asset.code }
         displayBalance()
         amountWrapper.maxPlacesAfterComa = asset.trailingDigits
-        asset_code_text_view.text = asset.code
+        asset_code_text_view.text = asset.run { name ?: code }
     }
 
     protected open fun onBalancesUpdated() {
