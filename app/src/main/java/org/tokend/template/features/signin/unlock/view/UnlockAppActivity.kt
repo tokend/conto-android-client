@@ -52,7 +52,7 @@ class UnlockAppActivity : BaseActivity() {
                     .show()
         } else {
             Navigator.from(this)
-                    .performPostSignInRouting(repositoryProvider.kycState().item)
+                    .performPostSignInRouting(repositoryProvider.activeKyc().item)
         }
     }
 

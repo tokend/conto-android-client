@@ -10,19 +10,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import org.tokend.template.R
 import org.tokend.template.di.providers.UrlConfigProvider
-import org.tokend.template.view.util.LogoFactory
+import org.tokend.template.features.kyc.model.ActiveKyc
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.view.util.ImageViewUtil
 import java.security.MessageDigest
+import org.tokend.template.view.util.LogoFactory
 
 object ProfileUtil {
 
-    fun getAvatarUrl(kycState: KycState?,
+    fun getAvatarUrl(activeKyc: ActiveKyc?,
                      urlConfigProvider: UrlConfigProvider,
                      email: String?): String? {
-        val submittedForm = (kycState as? KycState.Submitted<*>)?.formData
-        val avatar = (submittedForm as? KycForm.Corporate)?.avatar
+        val form = (activeKyc as? ActiveKyc.Form)?.formData
+        val avatar = (form as? KycForm.Corporate)?.avatar
         return avatar?.getUrl(urlConfigProvider.getConfig().storage)
                 ?: email?.let(this::getGravatarUrl)
     }
@@ -50,10 +50,10 @@ object ProfileUtil {
     fun setAvatar(view: ImageView,
                   email: String,
                   urlConfigProvider: UrlConfigProvider,
-                  savedKycState: KycState.Submitted<*>?,
+                  activeKyc: ActiveKyc?,
                   sizePx: Int = (view.layoutParams as ViewGroup.LayoutParams).width) {
         val placeholderDrawable = getAvatarPlaceholder(email, view.context, sizePx)
-        val avatarUrl = getAvatarUrl(savedKycState, urlConfigProvider, email)
+        val avatarUrl = getAvatarUrl(activeKyc, urlConfigProvider, email)
 
         ImageViewUtil.loadImageCircle(view, avatarUrl, placeholderDrawable)
     }
@@ -79,8 +79,8 @@ object ProfileUtil {
     /**
      * @return person full name or company from KYC if it's available
      */
-    fun getDisplayedName(kycState: KycState?, email: String): String? {
-        val form = (kycState as? KycState.Submitted<*>)?.formData
+    fun getDisplayedName(activeKyc: ActiveKyc?, email: String): String? {
+        val form = (activeKyc as? ActiveKyc.Form)?.formData
 
         return when (form) {
             is KycForm.General -> form.firstName + " " + form.lastName

@@ -97,7 +97,7 @@ class PaymentAmountFragment : AmountInputFragment() {
     override fun getBalancePicker(): BalancePickerBottomDialog {
         val accountId = walletInfoProvider.getWalletInfo()?.accountId
         val ownerFilter: ((BalanceRecord) -> Boolean) =
-                if (!repositoryProvider.kycState().isActualOrForcedGeneral)
+                if (!repositoryProvider.activeKyc().isActualOrForcedGeneral)
                     { it: BalanceRecord -> it.asset.isOwnedBy(accountId) }
                 else
                     { _: BalanceRecord -> true }

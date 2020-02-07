@@ -262,7 +262,7 @@ class RecoveryActivity : BaseActivity() {
 
     private fun onSuccessfulSignIn() {
         setResult(Activity.RESULT_OK)
-        Navigator.from(this).performPostSignInRouting(repositoryProvider.kycState().item)
+        Navigator.from(this).performPostSignInRouting(repositoryProvider.activeKyc().item)
     }
 
     private fun handleRecoveryError(error: Throwable) {

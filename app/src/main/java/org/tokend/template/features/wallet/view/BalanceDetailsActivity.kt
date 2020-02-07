@@ -1,9 +1,6 @@
 package org.tokend.template.features.wallet.view
 
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -134,7 +131,7 @@ class BalanceDetailsActivity : BaseActivity() {
         val actions = mutableListOf<FloatingActionMenuAction>()
 
         if (asset?.isOwnedBy(accountId) == true
-                && !repositoryProvider.kycState().isActualOrForcedGeneral) {
+                && !repositoryProvider.activeKyc().isActualOrForcedGeneral) {
             actions.add(FloatingActionMenuAction(
                     this,
                     R.string.issuance_title,

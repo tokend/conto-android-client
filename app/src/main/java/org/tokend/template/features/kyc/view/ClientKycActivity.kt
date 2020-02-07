@@ -14,6 +14,7 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.features.kyc.logic.SubmitKycRequestUseCase
 import org.tokend.template.features.kyc.model.KycForm
+import org.tokend.template.features.kyc.model.KycRequestState
 import org.tokend.template.logic.TxManager
 import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
@@ -124,12 +125,16 @@ class ClientKycActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onComplete = this::onFormSubmitted,
-                        onError = { errorHandlerFactory.getDefault().handle(it)}
+                        onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
                 .addTo(compositeDisposable)
     }
 
     private fun onFormSubmitted() {
-        Navigator.from(this).toWaitingForKycApproval()
+        if (repositoryProvider.kycRequestState().item is KycRequestState.Submitted.Approved<*>) {
+            Navigator.from(this).toClientMainActivity(true)
+        } else {
+            Navigator.from(this).toWaitingForKycApproval()
+        }
     }
 }

@@ -99,7 +99,7 @@ open class UnlockAppFragment : BaseFragment() {
         initButtons()
         initErrorEmptyView()
         user_email_text.text = email
-        ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, kycStatePersistence.loadItem())
+        ProfileUtil.setAvatar(user_logo, email, urlConfigProvider, activeKycPersistence.loadItem())
     }
 
     protected open fun initButtons() {

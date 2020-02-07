@@ -19,7 +19,6 @@ import org.tokend.template.activities.SingleFragmentActivity
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.AssetPairRecord
 import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.data.model.history.BalanceChange
 import org.tokend.template.data.model.history.details.BalanceChangeCause
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
@@ -35,6 +34,7 @@ import org.tokend.template.features.clients.details.movements.view.CompanyClient
 import org.tokend.template.features.clients.details.view.CompanyClientDetailsActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.companies.details.view.CompanyDetailsActivity
+import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.features.deposit.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
@@ -42,8 +42,8 @@ import org.tokend.template.features.invest.view.InvestmentConfirmationActivity
 import org.tokend.template.features.invest.view.SaleActivity
 import org.tokend.template.features.invest.view.SaleInvestActivity
 import org.tokend.template.features.invites.view.InviteNewUsersActivity
+import org.tokend.template.features.kyc.model.ActiveKyc
 import org.tokend.template.features.kyc.model.KycForm
-import org.tokend.template.features.kyc.model.KycState
 import org.tokend.template.features.kyc.view.ClientKycActivity
 import org.tokend.template.features.kyc.view.WaitForKycApprovalActivity
 import org.tokend.template.features.limits.LimitsActivity
@@ -547,23 +547,19 @@ class Navigator private constructor() {
                 ?.also { performIntent(it, requestCode = requestCode) }
     }
 
-    fun performPostSignInRouting(kycState: KycState?) {
-        val kycForm = (kycState as? KycState.Submitted<*>)?.formData
+    fun performPostSignInRouting(activeKyc: ActiveKyc?) {
+        val kycForm = (activeKyc as? ActiveKyc.Form)?.formData
 
-        if (kycForm is KycForm.Corporate) {
-            if (kycState is KycState.Submitted.Approved<*>) {
+        when (kycForm) {
+            is KycForm.Corporate -> {
                 toCorporateMainActivity()
-            } else {
+            }
+            is KycForm.General -> {
                 toClientMainActivity()
             }
-        } else if (kycForm is KycForm.General) {
-            if (kycState is KycState.Submitted.Pending<*>) {
-                toWaitingForKycApproval()
-            } else {
-                toClientMainActivity()
+            else -> {
+                toClientKyc()
             }
-        } else {
-            toClientKyc()
         }
     }
 

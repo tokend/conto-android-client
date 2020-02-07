@@ -9,7 +9,7 @@ import org.tokend.template.activities.OnBackPressedListener
 import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
-import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistence
+import org.tokend.template.features.kyc.storage.ActiveKycPersistence
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.logic.AppTfaCallback
 import org.tokend.template.logic.Session
@@ -50,7 +50,7 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     @Inject
     lateinit var credentialsPersistence: CredentialsPersistence
     @Inject
-    lateinit var kycStatePersistence: SubmittedKycStatePersistence
+    lateinit var activeKycPersistence: ActiveKycPersistence
     @Inject
     lateinit var backgroundLockManager: BackgroundLockManager
     @Inject

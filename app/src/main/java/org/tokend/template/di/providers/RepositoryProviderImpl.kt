@@ -35,8 +35,9 @@ import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.invest.repository.SalesRepository
-import org.tokend.template.features.kyc.storage.KycStateRepository
-import org.tokend.template.features.kyc.storage.SubmittedKycStatePersistence
+import org.tokend.template.features.kyc.storage.ActiveKycPersistence
+import org.tokend.template.features.kyc.storage.ActiveKycRepository
+import org.tokend.template.features.kyc.storage.KycRequestStateRepository
 import org.tokend.template.features.localaccount.model.LocalAccount
 import org.tokend.template.features.localaccount.storage.LocalAccountRepository
 import org.tokend.template.features.offers.repository.OffersRepository
@@ -55,7 +56,7 @@ class RepositoryProviderImpl(
         private val urlConfigProvider: UrlConfigProvider,
         private val mapper: ObjectMapper,
         private val context: Context? = null,
-        private val kycStatePersistence: SubmittedKycStatePersistence? = null,
+        private val activeKycPersistence: ActiveKycPersistence? = null,
         private val localAccountPersistence: ObjectPersistence<LocalAccount>? = null,
         private val persistencePreferences: SharedPreferences? = null,
         private val database: AppDatabase? = null
@@ -260,8 +261,12 @@ class RepositoryProviderImpl(
         }
     }
 
-    private val kycStateRepository: KycStateRepository by lazy {
-        KycStateRepository(apiProvider, walletInfoProvider, kycStatePersistence, blobs())
+    private val kycRequestStateRepository: KycRequestStateRepository by lazy {
+        KycRequestStateRepository(apiProvider, walletInfoProvider, blobs())
+    }
+
+    private val activeKycRepository: ActiveKycRepository by lazy {
+        ActiveKycRepository(account(), blobs(), activeKycPersistence)
     }
 
     override fun account(): AccountRepository {
@@ -337,8 +342,12 @@ class RepositoryProviderImpl(
         }
     }
 
-    override fun kycState(): KycStateRepository {
-        return kycStateRepository
+    override fun kycRequestState(): KycRequestStateRepository {
+        return kycRequestStateRepository
+    }
+
+    override fun activeKyc(): ActiveKycRepository {
+        return activeKycRepository
     }
 
     override fun investmentInfo(sale: SaleRecord): InvestmentInfoRepository {

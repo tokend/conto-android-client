@@ -33,7 +33,7 @@ class PostSignInManager(
     fun doPostSignIn(): Completable {
         val parallelActions = listOf<Completable>(
                 // Added actions will be performed simultaneously.
-                repositoryProvider.kycState()
+                repositoryProvider.activeKyc()
                         .run {
                             if (isOnline)
                                 updateDeferred()
@@ -45,7 +45,7 @@ class PostSignInManager(
                                 }
                         }
                         .doOnComplete {
-                            repositoryProvider.kycState().forcedType = forcedAccountType
+                            repositoryProvider.activeKyc().forcedType = forcedAccountType
                         },
                 repositoryProvider.balances().ensureData()
         )
