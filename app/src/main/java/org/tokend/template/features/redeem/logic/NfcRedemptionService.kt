@@ -27,9 +27,8 @@ class NfcRedemptionService : HostApduService() {
     }
 
     private fun isAidSelected(commandApdu: ByteArray): Boolean {
-        val selectionCommand = SELECT_AID_HEADER + AID.size.toByte() + AID
-        return commandApdu.size >= selectionCommand.size &&
-                selectionCommand.contentEquals(commandApdu.sliceArray(selectionCommand.indices))
+        return commandApdu.size > SELECT_AID_HEADER.size &&
+                SELECT_AID_HEADER.contentEquals(commandApdu.sliceArray(SELECT_AID_HEADER.indices))
     }
 
     private fun getResponse(): ByteArray {
@@ -44,7 +43,6 @@ class NfcRedemptionService : HostApduService() {
 
     companion object {
         private val SELECT_AID_HEADER = "00A40400".decodeHex()
-        private val AID = "F0436F6E746F21".decodeHex()
 
         private var serializedRedemptionRequest: ByteArray? = null
 
