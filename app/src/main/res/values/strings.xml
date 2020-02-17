@@ -588,6 +588,8 @@
     <string name="require_confirmation_for_nfc_payments">Require confirmation of NFC payments</string>
     <string name="buy_more">Buy more</string>
     <string name="error_asset_cant_be_bought_now">This asset can\'t be bought now. Try again later</string>
+    <string name="enter_deposit_amount">Enter amount to deposit</string>
+    <string name="balance_is_required_to_see_polls">Only asset holders can see it\'s polls</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>

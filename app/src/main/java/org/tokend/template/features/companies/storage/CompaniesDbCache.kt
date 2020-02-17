@@ -8,16 +8,8 @@ import org.tokend.template.features.companies.model.CompanyRecord
 class CompaniesDbCache(
         private val dao: CompaniesDao
 ) : RepositoryCache<CompanyRecord>() {
-    override fun isContentSame(first: CompanyRecord, second: CompanyRecord): Boolean {
-        return first.run {
-            name == second.name
-                    && industry == second.industry
-                    && logoUrl == second.logoUrl
-                    && bannerUrl == second.bannerUrl
-                    && conversionAssetCode == second.conversionAssetCode
-                    && descriptionMd == second.descriptionMd
-        }
-    }
+    override fun isContentSame(first: CompanyRecord, second: CompanyRecord): Boolean =
+            first.contentEquals(second)
 
     override fun getAllFromDb(): List<CompanyRecord> =
             dao.selectAll().mapSuccessful(CompanyDbEntity::toRecord)

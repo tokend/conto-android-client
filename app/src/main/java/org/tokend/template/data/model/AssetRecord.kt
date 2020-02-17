@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.NullNode
 import org.tokend.sdk.api.base.model.RemoteFile
 import org.tokend.sdk.api.generated.resources.AssetResource
 import org.tokend.sdk.api.v3.assets.model.AssetState
+import org.tokend.template.extensions.equalsArithmetically
 import org.tokend.template.util.RecordWithPolicy
 import java.io.Serializable
 import java.math.BigDecimal
@@ -22,7 +23,9 @@ class AssetRecord(
         val maximum: BigDecimal,
         val ownerAccountId: String,
         override val trailingDigits: Int,
-        val state: AssetState
+        val state: AssetState,
+        val isConnectedToCoinpayments: Boolean
+        /* Do not forget about contentEquals */
 ) : Serializable, RecordWithPolicy, Asset, RecordWithLogo, RecordWithDescription {
     val isBackedByExternalSystem: Boolean
         get() = externalSystemType != null
@@ -32,6 +35,9 @@ class AssetRecord(
 
     val isWithdrawable: Boolean
         get() = hasPolicy(org.tokend.wallet.xdr.AssetPolicy.WITHDRAWABLE.value)
+
+    val isDepositable: Boolean
+        get() = isBackedByExternalSystem || isConnectedToCoinpayments
 
     val canBeBaseForAtomicSwap: Boolean
         get() = hasPolicy(org.tokend.wallet.xdr.AssetPolicy.CAN_BE_BASE_IN_ATOMIC_SWAP.value)
@@ -58,6 +64,21 @@ class AssetRecord(
         return code
     }
 
+    fun contentEquals(other: AssetRecord): Boolean {
+        return policy == other.policy
+                && name == other.name
+                && logoUrl == other.logoUrl
+                && description == other.description
+                && externalSystemType == other.externalSystemType
+                && issued.equalsArithmetically(other.issued)
+                && available.equalsArithmetically(other.available)
+                && maximum.equalsArithmetically(other.maximum)
+                && ownerAccountId == other.ownerAccountId
+                && trailingDigits == other.trailingDigits
+                && state == other.state
+                && isConnectedToCoinpayments == other.isConnectedToCoinpayments
+    }
+
     companion object {
         @JvmStatic
         fun fromResource(source: AssetResource, urlConfig: UrlConfig?, mapper: ObjectMapper): AssetRecord {
@@ -82,6 +103,10 @@ class AssetRecord(
                     ?.asText("")
                     ?.takeIf(String::isNotEmpty)
 
+            val isConnectedToCoinpayments = source.details.get("is_coinpayments")
+                    ?.asBoolean(false)
+                    ?: false
+
             return AssetRecord(
                     code = source.id,
                     policy = source.policies.value
@@ -96,7 +121,8 @@ class AssetRecord(
                     ownerAccountId = source.owner.id,
                     trailingDigits = source.trailingDigits.toInt(),
                     description = description,
-                    state = AssetState.fromValue(source.state?.value ?: AssetState.ACTIVE.value)
+                    state = AssetState.fromValue(source.state?.value ?: AssetState.ACTIVE.value),
+                    isConnectedToCoinpayments = isConnectedToCoinpayments
             )
         }
     }

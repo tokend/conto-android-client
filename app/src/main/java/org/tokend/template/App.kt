@@ -237,7 +237,8 @@ class App : MultiDexApplication() {
                 DATABASE_NAME
         )
                 .addMigrations(
-                        AppDatabase.MIGRATION_1_2
+                        AppDatabase.MIGRATION_1_2,
+                        AppDatabase.MIGRATION_2_3
                 )
                 .build()
     }

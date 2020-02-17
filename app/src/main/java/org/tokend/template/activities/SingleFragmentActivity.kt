@@ -8,7 +8,7 @@ import org.tokend.template.R
 import org.tokend.template.features.accountdetails.view.AccountDetailsFragment
 import org.tokend.template.features.assets.buy.view.AtomicSwapAsksFragment
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
-import org.tokend.template.features.deposit.DepositFragment
+import org.tokend.template.features.deposit.view.DepositFragment
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.features.redeem.create.view.ShareRedemptionQrFragment

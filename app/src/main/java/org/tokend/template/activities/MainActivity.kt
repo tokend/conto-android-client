@@ -34,7 +34,7 @@ import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceFragm
 import org.tokend.template.features.assets.view.ExploreAssetsFragment
 import org.tokend.template.features.companies.view.CompaniesFragment
 import org.tokend.template.features.dashboard.balances.view.BalancesFragment
-import org.tokend.template.features.deposit.DepositFragment
+import org.tokend.template.features.deposit.view.DepositFragment
 import org.tokend.template.features.invest.view.SalesFragment
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.storage.ActiveKycRepository

@@ -35,7 +35,8 @@ import org.tokend.template.features.clients.details.view.CompanyClientDetailsAct
 import org.tokend.template.features.clients.model.CompanyClientRecord
 import org.tokend.template.features.companies.details.view.CompanyDetailsActivity
 import org.tokend.template.features.companies.model.CompanyRecord
-import org.tokend.template.features.deposit.DepositFragment
+import org.tokend.template.features.deposit.view.DepositAmountActivity
+import org.tokend.template.features.deposit.view.DepositFragment
 import org.tokend.template.features.fees.view.FeesActivity
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.view.InvestmentConfirmationActivity
@@ -653,5 +654,12 @@ class Navigator private constructor() {
                         AssetMovementsFragment.getBundle(balanceId)
                 ))
                 ?.also { performIntent(it) }
+    }
+
+    fun openDepositAmountInput(assetCode: String,
+                               requestCode: Int) {
+        context?.intentFor<DepositAmountActivity>()
+                ?.putExtras(DepositAmountActivity.getBundle(assetCode))
+                ?.also { performIntent(it, requestCode = requestCode) }
     }
 }

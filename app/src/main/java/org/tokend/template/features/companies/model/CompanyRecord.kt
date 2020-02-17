@@ -39,4 +39,13 @@ class CompanyRecord(
     override fun hashCode(): Int {
         return id.hashCode()
     }
+
+    fun contentEquals(other: CompanyRecord): Boolean {
+        return name == other.name
+                && industry == other.industry
+                && logoUrl == other.logoUrl
+                && bannerUrl == other.bannerUrl
+                && conversionAssetCode == other.conversionAssetCode
+                && descriptionMd == other.descriptionMd
+    }
 }

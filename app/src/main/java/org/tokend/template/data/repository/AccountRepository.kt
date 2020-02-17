@@ -43,4 +43,18 @@ class AccountRepository(private val apiProvider: ApiProvider,
             broadcast()
         }
     }
+
+    /**
+     * Adds new [depositAccount] locally
+     */
+    fun addNewDepositAccount(depositAccount: AccountRecord.DepositAccount) {
+        val account = item
+                ?: return
+
+        account.depositAccounts.remove(depositAccount)
+        account.depositAccounts.add(depositAccount)
+
+        storeItem(account)
+        onNewItem(account)
+    }
 }
