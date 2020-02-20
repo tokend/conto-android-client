@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.list_item_asset.*
 import org.jetbrains.anko.find
 import org.jetbrains.anko.onClick
 import org.tokend.template.R
-import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.features.assets.model.AssetRecord
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.adapter.AssetListItem
 import org.tokend.template.features.assets.adapter.AssetListItemViewHolder

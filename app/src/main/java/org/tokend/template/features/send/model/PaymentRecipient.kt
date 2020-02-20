@@ -1,7 +1,7 @@
 package org.tokend.template.features.send.model
 
 import org.tokend.sdk.factory.GsonFactory
-import org.tokend.template.data.model.history.details.BalanceChangeCause
+import org.tokend.template.features.history.model.details.BalanceChangeCause
 import java.io.Serializable
 
 /**

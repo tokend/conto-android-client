@@ -20,12 +20,12 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferPrice
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.sdk.utils.extentions.isBadRequest
 import org.tokend.template.R
-import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.buy.marketplace.logic.MarketplaceOfferPriceLoader
 import org.tokend.template.features.assets.buy.marketplace.model.BuySummaryExtras
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.assets.model.SimpleAsset
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.InfoCard

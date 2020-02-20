@@ -31,7 +31,11 @@ import org.tokend.template.features.shaketopay.logic.LocationUpdatesProvider
 import org.tokend.template.features.shaketopay.model.NearbyUserRecord
 import org.tokend.template.features.shaketopay.view.adapter.NearbyUserListItem
 import org.tokend.template.features.shaketopay.view.adapter.NearbyUsersAdapter
-import org.tokend.template.util.*
+import org.tokend.template.util.IntervalPoller
+import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.PermissionManager
+import org.tokend.template.util.ProfileUtil
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ScrollOnTopItemUpdateAdapterObserver
 import java.util.*

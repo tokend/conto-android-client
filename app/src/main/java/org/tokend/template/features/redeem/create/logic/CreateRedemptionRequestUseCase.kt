@@ -4,10 +4,10 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
-import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.wallet.Account
 import org.tokend.wallet.NetworkParams

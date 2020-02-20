@@ -1,7 +1,5 @@
 package org.tokend.template.features.withdraw
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
@@ -17,22 +15,21 @@ import kotlinx.android.synthetic.main.fragment_user_flow.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.assets.model.AssetRecord
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.withdraw.amount.view.WithdrawAmountFragment
 import org.tokend.template.features.withdraw.destination.view.WithdrawDestinationFragment
 import org.tokend.template.features.withdraw.logic.CreateWithdrawalRequestUseCase
 import org.tokend.template.features.withdraw.logic.WithdrawalAddressUtil
-import org.tokend.template.features.withdraw.model.WithdrawalRequest
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.logic.FeeManager
+import org.tokend.template.features.fees.logic.FeeManager
 import org.tokend.template.logic.WalletEventsListener
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -230,10 +227,13 @@ class WithdrawFragment : BaseFragment(), ToolbarProvider {
                 }
                 .subscribeBy(
                         onSuccess = { request ->
-                            Navigator.from(this).openWithdrawalConfirmation(
-                                    WITHDRAWAL_CONFIRMATION_REQUEST, request
-                            )
-
+                            Navigator.from(this)
+                                    .openWithdrawalConfirmation(request)
+                                    .addTo(activityRequestsBag)
+                                    .doOnSuccess {
+                                        (activity as? WalletEventsListener)
+                                                ?.onWithdrawalRequestConfirmed(request)
+                                    }
                         },
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
@@ -264,29 +264,9 @@ class WithdrawFragment : BaseFragment(), ToolbarProvider {
         return !fragmentDisplayer.tryPopBackStack()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                WITHDRAWAL_CONFIRMATION_REQUEST -> {
-                    val confirmedRequest =
-                            data?.getSerializableExtra(
-                                    WithdrawalConfirmationActivity.WITHDRAWAL_REQUEST_EXTRA
-                            ) as? WithdrawalRequest
-                    if (confirmedRequest != null) {
-                        (activity as? WalletEventsListener)
-                                ?.onWithdrawalRequestConfirmed(confirmedRequest)
-                    }
-                }
-            }
-        }
-    }
-
     companion object {
         private const val ASSET_EXTRA = "asset"
         val ID = "withdraw".hashCode().toLong()
-        val WITHDRAWAL_CONFIRMATION_REQUEST = "confirm_withdrawal".hashCode() and 0xffff
 
         fun newInstance(bundle: Bundle): WithdrawFragment =
                 WithdrawFragment().withArguments(bundle)

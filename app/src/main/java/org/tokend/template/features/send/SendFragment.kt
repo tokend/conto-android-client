@@ -1,7 +1,5 @@
 package org.tokend.template.features.send
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
@@ -19,12 +17,12 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.model.history.SimpleFeeRecord
-import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.assets.model.AssetRecord
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.extensions.withArguments
+import org.tokend.template.features.history.model.SimpleFeeRecord
 import org.tokend.template.features.send.amount.model.PaymentAmountData
 import org.tokend.template.features.send.amount.view.PaymentAmountFragment
 import org.tokend.template.features.send.logic.CreatePaymentRequestUseCase
@@ -36,7 +34,7 @@ import org.tokend.template.features.send.recipient.view.PaymentRecipientFragment
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.WalletEventsListener
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
@@ -294,12 +292,13 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun onPaymentRequestCreated(request: PaymentRequest) {
-        Navigator
-                .from(this)
-                .openPaymentConfirmation(
-                        PAYMENT_CONFIRMATION_REQUEST,
-                        request
-                )
+        Navigator.from(this)
+                .openPaymentConfirmation(request)
+                .addTo(activityRequestsBag)
+                .doOnSuccess {
+                    (activity as? WalletEventsListener)
+                            ?.onPaymentRequestConfirmed(request)
+                }
     }
 
     // region Error/empty
@@ -326,25 +325,6 @@ class SendFragment : BaseFragment(), ToolbarProvider {
         return !fragmentDisplayer.tryPopBackStack()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                PAYMENT_CONFIRMATION_REQUEST -> {
-                    val confirmedRequest =
-                            data?.getSerializableExtra(
-                                    PaymentConfirmationActivity.PAYMENT_REQUEST_EXTRA
-                            ) as? PaymentRequest
-                    if (confirmedRequest != null) {
-                        (activity as? WalletEventsListener)
-                                ?.onPaymentRequestConfirmed(confirmedRequest)
-                    }
-                }
-            }
-        }
-    }
-
     companion object {
         private const val ASSET_EXTRA = "asset"
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
@@ -352,7 +332,6 @@ class SendFragment : BaseFragment(), ToolbarProvider {
         private const val RECIPIENT_ACCOUNT_EXTRA = "recipient_account"
         private const val RECIPIENT_NICKNAME_EXTRA = "recipient_nickname"
         const val ID = 1118L
-        val PAYMENT_CONFIRMATION_REQUEST = "confirm_payment".hashCode() and 0xffff
 
         fun newInstance(bundle: Bundle): SendFragment = SendFragment().withArguments(bundle)
 

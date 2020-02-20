@@ -4,19 +4,20 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import com.google.zxing.integration.android.IntentIntegrator
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import org.spongycastle.util.encoders.DecoderException
 import org.tokend.sdk.utils.extentions.decodeBase64
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.features.redeem.model.RedemptionRequestFormatException
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
+import org.tokend.template.util.navigation.Navigator
 
 class ScanRedemptionActivity : BaseActivity() {
 
@@ -36,6 +37,8 @@ class ScanRedemptionActivity : BaseActivity() {
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
             QrScannerUtil.openScanner(this)
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess(this::onScannerResult)
         }
     }
 
@@ -63,8 +66,14 @@ class ScanRedemptionActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onSuccess = { balance ->
-                            Navigator.from(this).openRedemptionRequestConfirmation(
-                                    balance.id, result, ACCEPT_REQUEST_CODE)
+                            Navigator.from(this)
+                                    .openRedemptionRequestConfirmation(
+                                            balance.id,
+                                            result,
+                                            ACCEPT_REQUEST_CODE
+                                    )
+                                    .addTo(activityRequestsBag)
+                                    .doOnSuccess { finish() }
                         },
                         onError = this::onRequestParsingError
                 )
@@ -89,16 +98,10 @@ class ScanRedemptionActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == ACCEPT_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                finish()
-            } else {
-                tryOpenQrScanner()
-            }
-        } else {
-            if (QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
-                            ?.also(this::onScannerResult) == null) {
-                finish()
+        if (resultCode != Activity.RESULT_OK) {
+            when (requestCode) {
+                ACCEPT_REQUEST_CODE -> tryOpenQrScanner()
+                IntentIntegrator.REQUEST_CODE -> finish()
             }
         }
     }

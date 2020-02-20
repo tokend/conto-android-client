@@ -1,7 +1,5 @@
 package org.tokend.template.features.clients.view
 
-import android.app.Activity
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -17,14 +15,14 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.features.clients.repository.CompanyClientsRepository
 import org.tokend.template.features.clients.view.adapter.CompanyClientItemsAdapter
 import org.tokend.template.features.clients.view.adapter.CompanyClientListItem
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ColumnCalculator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.HideFabScrollListener
@@ -75,10 +73,10 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         actionToolbar.inflateMenu(R.menu.clients_action_mode)
         actionToolbar.setOnMenuItemClickListener {
             val emails = adapter.getSelected().joinToString(",\n") { it.email }
-            Navigator.from(this@CompanyClientsFragment).openMassIssuance(
-                    emails = emails,
-                    requestCode = MASS_ISSUANCE_REQUEST
-            )
+            Navigator.from(this@CompanyClientsFragment)
+                    .openMassIssuance(emails)
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess { onMassIssuancePerformed() }
             true
         }
         actionToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_close)
@@ -164,7 +162,9 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
                 R.string.issuance_title,
                 R.drawable.ic_issuance_white,
                 {
-                    navigator.openMassIssuance(requestCode = MASS_ISSUANCE_REQUEST)
+                    navigator.openMassIssuance()
+                            .addTo(activityRequestsBag)
+                            .doOnSuccess { onMassIssuancePerformed() }
                 },
                 isEnabled = balances.any { it.asset.isOwnedBy(accountId) }
         ))
@@ -240,6 +240,10 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         }
     }
 
+    private fun onMassIssuancePerformed() {
+        adapter.clearSelection()
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateListColumnsCount()
@@ -261,17 +265,7 @@ class CompanyClientsFragment : BaseFragment(), ToolbarProvider {
         return super.onBackPressed()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                MASS_ISSUANCE_REQUEST -> adapter.clearSelection()
-            }
-        }
-    }
-
     companion object {
-        private val MASS_ISSUANCE_REQUEST = "mass_issuance".hashCode() and 0xffff
         val ID = "company_clients".hashCode().toLong()
 
         fun newInstance() = CompanyClientsFragment()

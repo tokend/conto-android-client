@@ -9,10 +9,10 @@ import org.tokend.sdk.api.base.params.PagingParamsV2
 import org.tokend.sdk.api.integrations.dns.model.ClientBalanceResource
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
 import org.tokend.sdk.api.integrations.dns.params.ClientsPageParams
-import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.features.assets.storage.AssetsRepository
 import org.tokend.template.features.clients.model.CompanyClientRecord
 
 class CompanyClientsRepository(

@@ -1,8 +1,8 @@
 package org.tokend.template.features.nfcpayment.logic
 
 import io.reactivex.Single
-import org.tokend.template.data.model.Asset
 import org.tokend.template.di.providers.RepositoryProvider
+import org.tokend.template.features.assets.model.Asset
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
 import org.tokend.template.util.BiFunctionToPair

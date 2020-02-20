@@ -29,8 +29,8 @@ import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.features.signup.logic.SignUpUseCase
-import org.tokend.template.logic.UrlConfigManager
-import org.tokend.template.util.Navigator
+import org.tokend.template.features.urlconfig.logic.UrlConfigManager
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
@@ -77,7 +77,7 @@ class SignUpActivity : BaseActivity() {
         setTitle(R.string.sign_up)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        urlConfigManager = UrlConfigManager(urlConfigProvider, urlConfigPersistor)
+        urlConfigManager = UrlConfigManager(urlConfigProvider, urlConfigPersistence)
         urlConfigManager.onConfigUpdated {
             initNetworkField()
 
@@ -166,6 +166,8 @@ class SignUpActivity : BaseActivity() {
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
             QrScannerUtil.openScanner(this)
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess { urlConfigManager.setFromJson(it) }
         }
     }
 
@@ -249,14 +251,6 @@ class SignUpActivity : BaseActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         cameraPermission.handlePermissionResult(requestCode, permissions, grantResults)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
-            urlConfigManager.setFromJson(it)
-        }
     }
 
     private fun onSuccessfulSignUp(walletCreateResult: WalletCreateResult) {

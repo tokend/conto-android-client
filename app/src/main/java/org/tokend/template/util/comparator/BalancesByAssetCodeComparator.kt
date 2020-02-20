@@ -1,6 +1,6 @@
 package org.tokend.template.util.comparator
 
-import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.features.balances.model.BalanceRecord
 
 /**
  * Compares [BalanceRecord]s by asset code

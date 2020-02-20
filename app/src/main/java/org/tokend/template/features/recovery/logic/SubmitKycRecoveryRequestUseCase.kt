@@ -10,11 +10,11 @@ import org.tokend.sdk.factory.GsonFactory
 import org.tokend.sdk.keyserver.KeyServer
 import org.tokend.sdk.keyserver.models.SignerData
 import org.tokend.template.data.model.AccountRecord
-import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.features.keyvalue.model.KeyValueEntryRecord
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams

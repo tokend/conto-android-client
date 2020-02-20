@@ -11,8 +11,8 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.kyc.model.KycRequestState
 import org.tokend.template.features.kyc.storage.KycRequestStateRepository
 import org.tokend.template.util.IntervalPoller
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import java.util.concurrent.TimeUnit
 
 class WaitForKycApprovalActivity : BaseActivity() {

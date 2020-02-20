@@ -13,12 +13,12 @@ import org.jetbrains.anko.layoutInflater
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.amountscreen.view.AmountInputFragment
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import java.math.BigDecimal
 

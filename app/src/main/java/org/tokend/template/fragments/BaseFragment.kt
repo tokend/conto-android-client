@@ -1,21 +1,23 @@
 package org.tokend.template.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
 import io.reactivex.disposables.CompositeDisposable
 import org.tokend.template.App
 import org.tokend.template.activities.OnBackPressedListener
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.*
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.kyc.storage.ActiveKycPersistence
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
-import org.tokend.template.logic.AppTfaCallback
+import org.tokend.template.features.tfa.logic.AppTfaCallback
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.credentials.persistence.CredentialsPersistence
 import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
+import org.tokend.template.util.navigation.ActivityRequest
 import org.tokend.template.view.ToastManager
 import org.tokend.template.view.util.formatter.AmountFormatter
 import javax.inject.Inject
@@ -63,6 +65,8 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
      */
     protected lateinit var compositeDisposable: CompositeDisposable
 
+    protected val activityRequestsBag: MutableCollection<ActivityRequest<*>> = mutableSetOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity?.application as? App)?.stateComponent?.inject(this)
@@ -86,4 +90,17 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
      * You must implement your fragment initialization here
      */
     abstract fun onInitAllowed()
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        activityRequestsBag.iterator().also { iterator ->
+            while (iterator.hasNext()) {
+                val request = iterator.next()
+                request.handleActivityResult(requestCode, resultCode, data)
+                if (request.isCompleted) {
+                    iterator.remove()
+                }
+            }
+        }
+    }
 }

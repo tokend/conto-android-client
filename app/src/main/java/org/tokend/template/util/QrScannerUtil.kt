@@ -5,6 +5,7 @@ import android.content.Intent
 import android.support.v4.app.Fragment
 import com.google.zxing.integration.android.IntentIntegrator
 import org.tokend.template.features.qr.CaptureActivityPortrait
+import org.tokend.template.util.navigation.ActivityRequest
 
 /**
  * Contains utilities to work with QR scanner
@@ -15,7 +16,8 @@ object QrScannerUtil {
      * no beep, no orientation lock, no labels
      */
     fun openScanner(activity: Activity,
-                    prompt: String = "") {
+                    prompt: String = ""
+    ) = ActivityRequest(IntentIntegrator.REQUEST_CODE, this::getStringFromResult).also {
         IntentIntegrator(activity)
                 .defaultSetup(prompt)
                 .initiateScan()
@@ -26,8 +28,10 @@ object QrScannerUtil {
      * no beep, no orientation lock, no labels
      */
     fun openScanner(fragment: Fragment,
-                    prompt: String = "") {
-        IntentIntegrator.forSupportFragment(fragment)
+                    prompt: String = ""
+    ) = ActivityRequest(IntentIntegrator.REQUEST_CODE, this::getStringFromResult).also {
+        IntentIntegrator
+                .forSupportFragment(fragment)
                 .defaultSetup(prompt)
                 .initiateScan()
     }
@@ -40,10 +44,11 @@ object QrScannerUtil {
                 .setCaptureActivity(CaptureActivityPortrait::class.java)
     }
 
-    /**
-     * @return QR code content if [result] is QR scanner result, null otherwise
-     */
-    fun getStringFromResult(requestCode: Int, resultCode: Int, result: Intent?): String? {
-        return IntentIntegrator.parseActivityResult(requestCode, resultCode, result)?.contents
-    }
+    private fun getStringFromResult(intent: Intent?): String? =
+            IntentIntegrator.parseActivityResult(
+                    IntentIntegrator.REQUEST_CODE,
+                    Activity.RESULT_OK,
+                    intent
+            )
+                    ?.contents
 }

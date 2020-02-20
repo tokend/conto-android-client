@@ -16,8 +16,8 @@ import org.tokend.template.features.kyc.logic.SubmitKycRequestUseCase
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycRequestState
 import org.tokend.template.logic.TxManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher

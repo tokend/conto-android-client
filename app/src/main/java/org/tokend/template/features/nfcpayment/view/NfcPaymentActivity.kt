@@ -20,8 +20,8 @@ import org.tokend.template.features.nfcpayment.logic.PosPaymentRequestFulfiller
 import org.tokend.template.features.nfcpayment.model.FulfilledPosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.PosPaymentRequest
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import java.math.BigDecimal
 import java.util.concurrent.CancellationException

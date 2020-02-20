@@ -18,8 +18,8 @@ import org.jetbrains.anko.onClick
 import org.tokend.sdk.utils.extentions.decodeBase64
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.assets.model.AssetRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.features.redeem.accept.logic.ConfirmRedemptionRequestUseCase
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.logic.TxManager
@@ -58,8 +58,6 @@ class ConfirmRedemptionActivity : BaseActivity() {
 
     override fun onCreateAllowed(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_balance_change_confirmation)
-
-        val errorHandler = errorHandlerFactory.getDefault()
 
         val balanceId = intent.getStringExtra(EXTRA_BALANCE_ID)
         if (balanceId == null) {

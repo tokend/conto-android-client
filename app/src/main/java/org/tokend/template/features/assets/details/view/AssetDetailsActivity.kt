@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.AssetRecord
+import org.tokend.template.features.assets.model.AssetRecord
 import org.tokend.template.view.util.input.SoftInputUtil
 
 class AssetDetailsActivity : BaseActivity() {

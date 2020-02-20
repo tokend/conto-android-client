@@ -1,7 +1,6 @@
 package org.tokend.template.features.massissuance.view
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Editable
@@ -13,16 +12,16 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.setErrorAndFocus
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.features.massissuance.logic.CreateMassIssuanceRequestUseCase
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.validator.EmailValidator
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
 import org.tokend.template.view.util.ElevationUtil
@@ -282,7 +281,13 @@ class MassIssuanceActivity : BaseActivity() {
     }
 
     private fun onMassIssuanceRequestCreated(request: MassIssuanceRequest) {
-        Navigator.from(this).openMassIssuanceConfirmation(ISSUANCE_CONFIRMATION_REQUEST, request)
+        Navigator.from(this)
+                .openMassIssuanceConfirmation(request)
+                .addTo(activityRequestsBag)
+                .doOnSuccess {
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                }
     }
 
     private fun onRequestCreationError(error: Throwable) {
@@ -307,18 +312,9 @@ class MassIssuanceActivity : BaseActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == ISSUANCE_CONFIRMATION_REQUEST && resultCode == Activity.RESULT_OK) {
-            setResult(Activity.RESULT_OK)
-            finish()
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     companion object {
         const val EXTRA_EMAILS = "extra_emails"
         const val EXTRA_ASSET = "extra_asset"
-        private val ISSUANCE_CONFIRMATION_REQUEST = "issuance_confirmation_request".hashCode() and 0xffff
 
         fun getBundle(emails: String?, assetCode: String?) = Bundle().apply {
             putString(EXTRA_EMAILS, emails)

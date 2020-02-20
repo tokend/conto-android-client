@@ -20,10 +20,10 @@ import org.jetbrains.anko.textColor
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.model.history.BalanceChange
-import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.withArguments
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
+import org.tokend.template.features.history.model.BalanceChange
 import org.tokend.template.features.redeem.create.logic.CreateRedemptionRequestUseCase
 import org.tokend.template.features.redeem.logic.NfcRedemptionService
 import org.tokend.template.features.redeem.model.RedemptionRequest

@@ -1,6 +1,5 @@
 package org.tokend.template.features.kyc.logic
 
-import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toSingle
@@ -8,10 +7,10 @@ import io.reactivex.schedulers.Schedulers
 import org.tokend.sdk.api.blobs.model.Blob
 import org.tokend.sdk.api.blobs.model.BlobType
 import org.tokend.sdk.factory.GsonFactory
-import org.tokend.template.data.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.features.keyvalue.model.KeyValueEntryRecord
 import org.tokend.template.features.kyc.model.ActiveKyc
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycRequestState

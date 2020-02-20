@@ -3,8 +3,8 @@ package org.tokend.template.features.assets.buy.marketplace.model
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferResource
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodResource
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodType
-import org.tokend.template.data.model.Asset
 import org.tokend.template.data.repository.base.pagination.PagingRecord
+import org.tokend.template.features.assets.model.Asset
 import org.tokend.template.features.companies.model.CompanyRecord
 import java.io.Serializable
 import java.math.BigDecimal

@@ -1,7 +1,5 @@
 package org.tokend.template.features.assets.view
 
-import android.app.Activity
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -25,19 +23,19 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.BalancesRepository
-import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.adapter.AssetListItem
 import org.tokend.template.features.assets.adapter.AssetsAdapter
 import org.tokend.template.features.assets.logic.CreateBalanceUseCase
+import org.tokend.template.features.assets.storage.AssetsRepository
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.TxManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.SearchUtil
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.*
 import java.util.concurrent.TimeUnit
 
@@ -254,11 +252,10 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
     }
 
     private fun openAssetDetails(view: View?, item: AssetListItem) {
-        Navigator.from(this).openAssetDetails(
-                item.source,
-                cardView = view,
-                requestCode = CREATE_REQUEST
-        )
+        Navigator.from(this)
+                .openAssetDetails(item.source, cardView = view)
+                .addTo(activityRequestsBag)
+                .doOnSuccess { update(force = true) }
     }
 
     private fun createBalance(asset: String) {
@@ -312,13 +309,6 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CREATE_REQUEST && resultCode == Activity.RESULT_OK) {
-            update(true)
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onStart() {
         super.onStart()
         recycler_view.isLayoutFrozen = false
@@ -342,7 +332,6 @@ class ExploreAssetsFragment : BaseFragment(), ToolbarProvider {
 
     companion object {
         val ID = "explore-assets".hashCode().toLong()
-        const val CREATE_REQUEST = 314
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
         private const val OWNER_ACCOUNT_ID_EXTRA = "owner_account_id"
 

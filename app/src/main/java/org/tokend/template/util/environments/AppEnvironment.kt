@@ -1,6 +1,6 @@
 package org.tokend.template.util.environments
 
-import org.tokend.template.data.model.UrlConfig
+import org.tokend.template.features.urlconfig.model.UrlConfig
 
 class AppEnvironment(
         val id: String,

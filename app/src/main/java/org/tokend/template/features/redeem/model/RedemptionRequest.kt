@@ -1,6 +1,6 @@
 package org.tokend.template.features.redeem.model
 
-import org.tokend.template.data.model.history.SimpleFeeRecord
+import org.tokend.template.features.history.model.SimpleFeeRecord
 import org.tokend.template.features.send.model.PaymentFee
 import org.tokend.wallet.Base32Check
 import org.tokend.wallet.NetworkParams

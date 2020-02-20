@@ -9,12 +9,12 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferResourc
 import org.tokend.sdk.api.integrations.marketplace.model.MarketplacePaymentMethodResource
 import org.tokend.sdk.api.integrations.marketplace.params.MarketplaceOfferParams
 import org.tokend.sdk.api.integrations.marketplace.params.MarketplaceOffersPageParams
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.repository.assets.AssetsRepository
 import org.tokend.template.data.repository.base.pagination.PagedDataRepository
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.extensions.tryOrNull
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.assets.storage.AssetsRepository
 import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.features.companies.storage.CompaniesRepository
 import org.tokend.template.util.BiFunctionToPair

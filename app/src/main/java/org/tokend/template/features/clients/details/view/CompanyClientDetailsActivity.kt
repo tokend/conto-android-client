@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.clients.model.CompanyClientRecord
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
 import org.tokend.template.view.dialog.CopyDataDialogFactory

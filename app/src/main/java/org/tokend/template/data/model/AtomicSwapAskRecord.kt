@@ -2,7 +2,10 @@ package org.tokend.template.data.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.tokend.sdk.api.generated.resources.AtomicSwapAskResource
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.assets.model.AssetRecord
 import org.tokend.template.features.companies.model.CompanyRecord
+import org.tokend.template.features.urlconfig.model.UrlConfig
 import java.io.Serializable
 import java.math.BigDecimal
 

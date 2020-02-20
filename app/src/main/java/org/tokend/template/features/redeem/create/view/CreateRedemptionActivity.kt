@@ -10,12 +10,12 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.utils.extentions.encodeBase64String
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.amountscreen.model.AmountInputResult
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.features.redeem.create.logic.CreateRedemptionRequestUseCase
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ProgressDialogFactory
 import java.math.BigDecimal
 

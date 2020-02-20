@@ -1,10 +1,9 @@
 package org.tokend.template.features.assets.buy.marketplace.view.adapter
 
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.data.model.RecordWithDescription
 import org.tokend.template.data.model.RecordWithLogo
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
+import org.tokend.template.features.assets.model.Asset
 import java.math.BigDecimal
 
 class MarketplaceOfferListItem(

@@ -1,7 +1,6 @@
 package org.tokend.template.features.assets.buy.view
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.Menu
@@ -15,8 +14,6 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceInvoiceData
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.getBigDecimalExtra
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.buy.logic.BuyAssetOnMarketplaceUseCase
@@ -24,9 +21,11 @@ import org.tokend.template.features.assets.buy.marketplace.logic.PerformMarketpl
 import org.tokend.template.features.assets.buy.marketplace.model.BuySummaryExtras
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
 import org.tokend.template.features.assets.buy.marketplace.view.MarketplaceBuySummaryFragment
+import org.tokend.template.features.assets.model.AssetRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.logic.TxManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
@@ -91,7 +90,6 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         fragment
                 .resultObservable
                 .compose(ObservableTransformers.defaultSchedulers())
-                .map { it as AmountInputResult }
                 .subscribeBy(
                         onNext = this::onAmountEntered,
                         onError = { errorHandlerFactory.getDefault().handle(it) }
@@ -164,7 +162,10 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     private fun onBidSubmitted(invoice: MarketplaceInvoiceData) {
         when (invoice) {
             is MarketplaceInvoiceData.Redirect ->
-                Navigator.from(this).openWebInvoice(invoice.url, WEB_INVOICE_REQUEST)
+                Navigator.from(this)
+                        .openWebInvoice(invoice.url)
+                        .addTo(activityRequestsBag)
+                        .doOnSuccess { finishWithSuccessMessage() }
             is MarketplaceInvoiceData.Crypto ->
                 openCryptoInvoiceAndFinish(invoice)
             is MarketplaceInvoiceData.Internal ->
@@ -264,13 +265,6 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WEB_INVOICE_REQUEST && resultCode == Activity.RESULT_OK) {
-            finishWithSuccessMessage()
-        }
-    }
-
     private fun finishWithSuccessMessage() {
         toastManager.long(R.string.asset_will_be_received_in_a_moment)
         setResult(Activity.RESULT_OK)
@@ -280,7 +274,6 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
     companion object {
         private const val OFFER_EXTRA = "offer"
         private const val AMOUNT_EXTRA = "amount"
-        private val WEB_INVOICE_REQUEST = "web_invoice".hashCode() and 0xffff
 
         fun getBundle(offer: MarketplaceOfferRecord,
                       amount: BigDecimal? = null) = Bundle().apply {

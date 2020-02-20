@@ -1,7 +1,5 @@
 package org.tokend.template.features.assets.details.refund.view
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +13,13 @@ import org.tokend.template.R
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.amountscreen.model.AmountInputResult
 import org.tokend.template.features.assets.details.refund.logic.AssetRefundOfferLoader
+import org.tokend.template.features.fees.logic.FeeManager
 import org.tokend.template.features.offers.logic.CreateOfferRequestUseCase
 import org.tokend.template.features.offers.model.OfferRequest
 import org.tokend.template.features.trade.orderbook.model.OrderBookEntryRecord
 import org.tokend.template.fragments.BaseFragment
-import org.tokend.template.logic.FeeManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import java.math.BigDecimal
@@ -145,16 +143,10 @@ class AssetRefundFragment : BaseFragment() {
     }
 
     private fun openConfirmation(offerRequest: OfferRequest) {
-        Navigator.from(this).openAssetRefundConfirmation(offerRequest, REFUND_REQUEST)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REFUND_REQUEST) {
-                onOfferConfirmed()
-            }
-        }
+        Navigator.from(this)
+                .openAssetRefundConfirmation(offerRequest)
+                .addTo(activityRequestsBag)
+                .doOnSuccess { onOfferConfirmed() }
     }
 
     private fun onOfferConfirmed() {
@@ -166,7 +158,6 @@ class AssetRefundFragment : BaseFragment() {
         // 😈.
         private const val REFUND_ASSET_CODE = "UAH"
 
-        private val REFUND_REQUEST = "refund".hashCode() and 0xffff
         private const val ASSET_CODE_EXTRA = "asset"
 
         fun getBundle(assetCode: String) = Bundle().apply {

@@ -7,8 +7,8 @@ import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.activities.OnBackPressedListener
 import org.tokend.template.features.recovery.view.KycRecoveryStatusDialogFactory
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 
 class UnlockAppActivity : BaseActivity() {
     override val allowUnauthorized: Boolean = true

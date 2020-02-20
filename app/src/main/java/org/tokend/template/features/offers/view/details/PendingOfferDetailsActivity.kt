@@ -1,7 +1,6 @@
 package org.tokend.template.features.offers.view.details
 
 import android.app.Activity
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -14,9 +13,9 @@ import kotlinx.android.synthetic.main.activity_balance_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.assets.model.AssetRecord
+import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.offers.logic.CancelOfferUseCase
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.logic.TxManager

@@ -12,12 +12,12 @@ import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAskParams
 import org.tokend.sdk.api.v3.atomicswap.params.AtomicSwapAsksPageParams
 import org.tokend.sdk.utils.SimplePagedResourceLoader
 import org.tokend.template.data.model.AtomicSwapAskRecord
-import org.tokend.template.data.repository.assets.AssetsRepository
-import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.data.repository.base.MultipleItemsRepository
+import org.tokend.template.data.repository.base.RepositoryCache
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.UrlConfigProvider
 import org.tokend.template.extensions.mapSuccessful
+import org.tokend.template.features.assets.storage.AssetsRepository
 
 class AtomicSwapAsksRepository(
         private val apiProvider: ApiProvider,

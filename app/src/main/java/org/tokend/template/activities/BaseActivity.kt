@@ -1,6 +1,7 @@
 package org.tokend.template.activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -14,19 +15,20 @@ import org.tokend.sdk.tfa.TfaVerifier
 import org.tokend.template.App
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.BalanceRecord
+import org.tokend.template.data.repository.base.ObjectPersistence
 import org.tokend.template.di.providers.*
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.kyc.storage.ActiveKycPersistence
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.signin.logic.PostSignInManagerFactory
+import org.tokend.template.features.tfa.logic.AppTfaCallback
 import org.tokend.template.features.tfa.view.TfaDialogFactory
-import org.tokend.template.logic.AppTfaCallback
+import org.tokend.template.features.urlconfig.model.UrlConfig
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.credentials.persistence.CredentialsPersistence
 import org.tokend.template.logic.persistence.BackgroundLockManager
-import org.tokend.template.logic.persistence.UrlConfigPersistor
 import org.tokend.template.util.ConnectionStateUtil
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.cipher.DataCipher
@@ -34,6 +36,7 @@ import org.tokend.template.util.environments.AppEnvironment
 import org.tokend.template.util.environments.AppEnvironmentsManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.util.locale.AppLocaleManager
+import org.tokend.template.util.navigation.ActivityRequest
 import org.tokend.template.view.ToastManager
 import org.tokend.template.view.util.formatter.AmountFormatter
 import javax.inject.Inject
@@ -54,7 +57,7 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     @Inject
     lateinit var urlConfigProvider: UrlConfigProvider
     @Inject
-    lateinit var urlConfigPersistor: UrlConfigPersistor
+    lateinit var urlConfigPersistence: ObjectPersistence<UrlConfig>
     @Inject
     lateinit var errorHandlerFactory: ErrorHandlerFactory
     @Inject
@@ -98,6 +101,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
      * Disposable holder which will be disposed on activity destroy
      */
     protected val compositeDisposable: CompositeDisposable = CompositeDisposable()
+
+    protected val activityRequestsBag: MutableCollection<ActivityRequest<*>> = mutableSetOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,5 +221,18 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     protected fun finishWithMissingArgError(argName: String) {
         errorHandlerFactory.getDefault().handle(IllegalArgumentException("No $argName specified"))
         finish()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        activityRequestsBag.iterator().also { iterator ->
+            while (iterator.hasNext()) {
+                val request = iterator.next()
+                request.handleActivityResult(requestCode, resultCode, data)
+                if (request.isCompleted) {
+                    iterator.remove()
+                }
+            }
+        }
     }
 }

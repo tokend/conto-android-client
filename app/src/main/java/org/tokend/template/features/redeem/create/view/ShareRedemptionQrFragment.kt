@@ -8,8 +8,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import org.tokend.sdk.api.base.params.PagingOrder
 import org.tokend.template.R
-import org.tokend.template.data.model.history.BalanceChange
-import org.tokend.template.data.model.history.details.BalanceChangeCause
+import org.tokend.template.features.history.model.BalanceChange
+import org.tokend.template.features.history.model.details.BalanceChangeCause
 import org.tokend.template.features.qr.ShareQrFragment
 import org.tokend.template.fragments.VisibilityChangesConsumer
 import org.tokend.template.logic.WalletEventsListener

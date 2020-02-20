@@ -24,9 +24,9 @@ import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.features.signin.unlock.model.UnlockMethod
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.logic.fingerprint.FingerprintAuthManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.FingerprintIndicatorManager
 import org.tokend.template.view.dialog.SignOutDialogFactory
 import org.tokend.template.view.util.LoadingIndicatorManager
@@ -137,7 +137,10 @@ open class UnlockAppFragment : BaseFragment() {
         }
 
         recovery_button.onClick {
-            Navigator.from(this).openRecovery(email)
+            Navigator.from(this)
+                    .openRecovery(email)
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess { requireActivity().finish() }
         }
     }
 

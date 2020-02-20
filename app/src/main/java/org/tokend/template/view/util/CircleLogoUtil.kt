@@ -5,8 +5,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
-import org.tokend.template.data.model.Asset
 import org.tokend.template.data.model.RecordWithLogo
+import org.tokend.template.features.assets.model.Asset
 import org.tokend.template.util.imagetransform.CircleTransform
 
 object CircleLogoUtil {

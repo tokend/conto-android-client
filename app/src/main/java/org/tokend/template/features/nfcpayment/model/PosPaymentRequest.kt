@@ -1,7 +1,7 @@
 package org.tokend.template.features.nfcpayment.model
 
 import org.tokend.sdk.utils.extentions.encodeHexString
-import org.tokend.template.data.model.Asset
+import org.tokend.template.features.assets.model.Asset
 import org.tokend.wallet.NetworkParams
 import java.io.Serializable
 import java.math.BigDecimal

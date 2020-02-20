@@ -1,8 +1,6 @@
 package org.tokend.template.features.signin
 
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -34,13 +32,13 @@ import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
 import org.tokend.template.features.signin.logic.ResendVerificationEmailUseCase
 import org.tokend.template.features.signin.logic.SignInMethod
 import org.tokend.template.features.signin.logic.SignInUseCase
-import org.tokend.template.logic.UrlConfigManager
+import org.tokend.template.features.urlconfig.logic.UrlConfigManager
 import org.tokend.template.logic.fingerprint.FingerprintAuthManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
 import org.tokend.template.util.environments.AppEnvironment
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.SimpleTextWatcher
@@ -83,7 +81,7 @@ class SignInActivity : BaseActivity() {
         setTitle(R.string.sign_in)
 
         fingerprintAuthManager = FingerprintAuthManager(applicationContext, credentialsPersistence)
-        urlConfigManager = UrlConfigManager(urlConfigProvider, urlConfigPersistor)
+        urlConfigManager = UrlConfigManager(urlConfigProvider, urlConfigPersistence)
         urlConfigManager.onConfigUpdated {
             initNetworkField()
             password_edit_text.error = null
@@ -175,7 +173,10 @@ class SignInActivity : BaseActivity() {
         }
 
         recovery_button.onClick {
-            Navigator.from(this).openRecovery(email_edit_text.text.toString())
+            Navigator.from(this)
+                    .openRecovery(email_edit_text.text.toString())
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess { finish() }
         }
 
         if (BuildConfig.ENABLE_AUTHENTICATOR_AUTH) {
@@ -199,15 +200,23 @@ class SignInActivity : BaseActivity() {
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
             QrScannerUtil.openScanner(this)
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess { urlConfigManager.setFromJson(it) }
         }
     }
 
     private fun openAuthenticatorSignIn() {
-        Navigator.from(this).openAuthenticatorSignIn(SIGN_IN_WITH_AUTHENTICATOR_REQUEST)
+        Navigator.from(this)
+                .openAuthenticatorSignIn()
+                .addTo(activityRequestsBag)
+                .doOnSuccess { onSignInComplete() }
     }
 
     private fun openLocalAccountSignIn() {
-        Navigator.from(this).openLocalAccountSignIn(SIGN_IN_WITH_LOCAL_ACCOUNT_REQUEST)
+        Navigator.from(this)
+                .openLocalAccountSignIn()
+                .addTo(activityRequestsBag)
+                .doOnSuccess { onSignInComplete() }
     }
 
     private fun updateSignInAvailability() {
@@ -336,35 +345,7 @@ class SignInActivity : BaseActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         cameraPermission.handlePermissionResult(requestCode, permissions, grantResults)
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
-            urlConfigManager.setFromJson(it)
-        }
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                SIGN_IN_WITH_AUTHENTICATOR_REQUEST,
-                SIGN_IN_WITH_LOCAL_ACCOUNT_REQUEST -> {
-                    onSignInComplete()
-                }
-                RECOVERY_REQUEST -> finish()
-            }
-        }
-    }
-
     override fun onEnvironmentChange(newEnv: AppEnvironment) {
         initEnvironmentSwitch()
-    }
-
-    companion object {
-        private val SIGN_IN_WITH_AUTHENTICATOR_REQUEST =
-                "sign_in_with_authenticator".hashCode() and 0xffff
-        private val SIGN_IN_WITH_LOCAL_ACCOUNT_REQUEST =
-                "sign_in_with_local_account".hashCode() and 0xffff
-        private val RECOVERY_REQUEST =
-                "recovery".hashCode() and 0xffff
     }
 }

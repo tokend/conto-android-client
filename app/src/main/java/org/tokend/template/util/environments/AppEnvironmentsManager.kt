@@ -3,8 +3,8 @@ package org.tokend.template.util.environments
 import android.content.SharedPreferences
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import org.tokend.template.data.model.UrlConfig
 import org.tokend.template.di.providers.UrlConfigProvider
+import org.tokend.template.features.urlconfig.model.UrlConfig
 
 class AppEnvironmentsManager(
         availableEnvIds: Array<String>,

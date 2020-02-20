@@ -2,7 +2,6 @@ package org.tokend.template.features.companies.view
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
@@ -18,19 +17,18 @@ import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
+import org.tokend.template.features.companies.logic.CompanyLoader
 import org.tokend.template.features.companies.model.CompanyRecord
 import org.tokend.template.features.companies.storage.ClientCompaniesRepository
 import org.tokend.template.features.companies.storage.CompaniesRepository
-import org.tokend.template.features.companies.logic.CompanyLoader
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.MenuSearchViewManager
 import org.tokend.template.view.util.ProgressDialogFactory
-import org.tokend.wallet.Base32Check
 
 class CompaniesFragment : BaseFragment(), ToolbarProvider {
     override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
@@ -136,20 +134,14 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
             QrScannerUtil.openScanner(this, getString(R.string.scan_company_qr_code))
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess(this::onCompanyIdScanned)
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         cameraPermission.handlePermissionResult(requestCode, permissions, grantResults)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)
-                ?.takeIf { Base32Check.isValid(Base32Check.VersionByte.ACCOUNT_ID, it.toCharArray()) }
-                ?.also(this::onCompanyIdScanned)
     }
 
     private fun onCompanyIdScanned(companyId: String) {

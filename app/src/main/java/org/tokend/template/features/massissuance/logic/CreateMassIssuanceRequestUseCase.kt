@@ -3,9 +3,9 @@ package org.tokend.template.features.massissuance.logic
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toMaybe
 import io.reactivex.rxkotlin.toSingle
-import org.tokend.template.data.model.Asset
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.features.assets.model.Asset
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader

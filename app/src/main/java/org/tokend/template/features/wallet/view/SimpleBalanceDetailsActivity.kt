@@ -1,7 +1,5 @@
 package org.tokend.template.features.wallet.view
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.drawable.DrawableCompat
@@ -21,12 +19,12 @@ import org.jetbrains.anko.childrenSequence
 import org.jetbrains.anko.textColor
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.features.assets.buy.marketplace.logic.MarketplaceOfferLoader
 import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOfferRecord
-import org.tokend.template.util.Navigator
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.AnimationUtil
 import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.ElevationUtil
@@ -348,19 +346,23 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     }
 
     private fun openSend() {
-        Navigator.from(this).openSend(
-                asset = balance.assetCode,
-                amount = amount_view.amountWrapper.scaledAmount,
-                requestCode = SEND_REQUEST
-        )
+        Navigator.from(this)
+                .openSend(
+                        asset = balance.assetCode,
+                        amount = amount_view.amountWrapper.scaledAmount
+                )
+                .addTo(activityRequestsBag)
+                .doOnSuccess { preFillAmount() }
     }
 
     private fun openRedemption() {
-        Navigator.from(this).openSimpleRedemptionCreation(
-                balanceId = balanceId,
-                amount = amount_view.amountWrapper.scaledAmount,
-                requestCode = REDEMPTION_REQUEST
-        )
+        Navigator.from(this)
+                .openSimpleRedemptionCreation(
+                        balanceId = balanceId,
+                        amount = amount_view.amountWrapper.scaledAmount
+                )
+                .addTo(activityRequestsBag)
+                .doOnSuccess { preFillAmount() }
     }
 
     private fun openAssetDetails() {
@@ -405,21 +407,9 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
         Navigator.from(this).openMarketplaceBuy(offer, delta)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                SEND_REQUEST,
-                REDEMPTION_REQUEST -> preFillAmount()
-            }
-        }
-    }
-
     companion object {
         private val PRE_FILLED_AMOUNT = BigDecimal.ONE
         private const val BALANCE_ID_EXTRA = "balance_id"
-        private val SEND_REQUEST = "send".hashCode() and 0xffff
-        private val REDEMPTION_REQUEST = "redemption".hashCode() and 0xffff
 
         fun getBundle(balanceId: String) = Bundle().apply {
             putString(BALANCE_ID_EXTRA, balanceId)

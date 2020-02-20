@@ -3,9 +3,9 @@ package org.tokend.template.features.assets.details.view
 import android.content.Context
 import android.support.v4.app.FragmentManager
 import org.tokend.template.R
-import org.tokend.template.data.model.AssetRecord
 import org.tokend.template.features.assets.details.refund.view.AssetRefundFragment
 import org.tokend.template.features.assets.details.secondarymarket.view.AssetSecondaryMarketFragment
+import org.tokend.template.features.assets.model.AssetRecord
 import org.tokend.template.view.BaseFragmentPagerAdapter
 
 class AssetDetailsPagerAdapter(asset: AssetRecord,

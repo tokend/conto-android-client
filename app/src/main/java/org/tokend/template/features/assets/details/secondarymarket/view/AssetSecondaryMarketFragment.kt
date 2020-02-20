@@ -10,16 +10,16 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_asset_secondary_market.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import org.tokend.template.R
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.AssetRecord
-import org.tokend.template.data.model.SimpleAsset
 import org.tokend.template.extensions.withArguments
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.assets.model.AssetRecord
+import org.tokend.template.features.assets.model.SimpleAsset
 import org.tokend.template.features.offers.CreateOfferActivity
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.features.offers.repository.OffersRepository
 import org.tokend.template.fragments.BaseFragment
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.LoadingIndicatorManager
 
 class AssetSecondaryMarketFragment : BaseFragment() {

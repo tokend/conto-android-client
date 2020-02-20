@@ -17,13 +17,13 @@ import kotlinx.android.synthetic.main.fragment_trade_asset_pairs.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.model.AssetPairRecord
-import org.tokend.template.data.repository.pairs.AssetPairsRepository
+import org.tokend.template.features.trade.pairs.model.AssetPairRecord
+import org.tokend.template.features.trade.pairs.repository.AssetPairsRepository
 import org.tokend.template.features.trade.pairs.view.adapter.AssetPairItemsAdapter
 import org.tokend.template.features.trade.pairs.view.adapter.AssetPairListItem
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.SearchUtil
 import org.tokend.template.view.picker.PickerItem
@@ -116,7 +116,7 @@ class TradeAssetPairsFragment : BaseFragment(), ToolbarProvider {
         }
 
         menu.findItem(R.id.pending_offers)?.setOnMenuItemClickListener {
-            Navigator.from(this).openPendingOffers(0, false)
+            Navigator.from(this).openPendingOffers(false)
             true
         }
     }

@@ -21,7 +21,7 @@ import org.tokend.sdk.api.tfa.model.TfaFactor
 import org.tokend.template.App
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
-import org.tokend.template.data.repository.TfaFactorsRepository
+import org.tokend.template.features.tfa.repository.TfaFactorsRepository
 import org.tokend.template.features.localaccount.mnemonic.view.MnemonicPhraseDialog
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager
 import org.tokend.template.features.settings.view.EnvironmentSelectionDialog
@@ -32,7 +32,7 @@ import org.tokend.template.features.tfa.model.TfaFactorRecord
 import org.tokend.template.features.tfa.view.confirmation.TfaConfirmationDialogFactory
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.fingerprint.FingerprintUtil
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.dialog.SignOutDialogFactory
 import org.tokend.template.view.dialog.SingleCheckDialog
@@ -258,10 +258,7 @@ class GeneralSettingsFragment : SettingsFragment(), ToolbarProvider {
         }
 
         changePasswordPreference?.setOnPreferenceClickListener {
-            activity?.let { parentActivity ->
-                Navigator.from(parentActivity).openPasswordChange(3597)
-            }
-
+            Navigator.from(this).openPasswordChange()
             true
         }
     }

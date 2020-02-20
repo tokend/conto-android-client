@@ -1,7 +1,5 @@
 package org.tokend.template.features.offers
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -21,17 +19,17 @@ import org.jetbrains.anko.onClick
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.repository.BalancesRepository
 import org.tokend.template.extensions.getBigDecimalExtra
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.isMaxPossibleAmount
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.balances.storage.BalancesRepository
+import org.tokend.template.features.fees.logic.FeeManager
 import org.tokend.template.features.offers.logic.CreateOfferRequestUseCase
 import org.tokend.template.features.offers.model.OfferRecord
-import org.tokend.template.logic.FeeManager
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.AmountEditTextWrapper
@@ -355,9 +353,10 @@ open class CreateOfferActivity : BaseActivity() {
                 .doOnEvent { _, _ -> progress.cancel() }
                 .subscribeBy(
                         onSuccess = { offerRequest ->
-                            Navigator.from(this).openOfferConfirmation(
-                                    CREATE_OFFER_REQUEST, offerRequest
-                            )
+                            Navigator.from(this)
+                                    .openOfferConfirmation(offerRequest)
+                                    .addTo(activityRequestsBag)
+                                    .doOnSuccess { finish() }
                         },
                         onError = { errorHandlerFactory.getDefault().handle(it) }
                 )
@@ -366,16 +365,7 @@ open class CreateOfferActivity : BaseActivity() {
 
     protected open fun getOfferToCancel(): OfferRecord? = null
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CREATE_OFFER_REQUEST && resultCode == Activity.RESULT_OK) {
-            finish()
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     companion object {
-        private val CREATE_OFFER_REQUEST = "create_offer".hashCode() and 0xffff
-
         private const val BASE_ASSET_EXTRA = "base_asset"
         private const val QUOTE_ASSET_EXTRA = "quote_asset"
         private const val PRICE_STRING_EXTRA = "price"

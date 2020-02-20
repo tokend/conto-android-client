@@ -1,7 +1,5 @@
 package org.tokend.template.features.invest.view
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.Menu
@@ -16,17 +14,18 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.data.model.BalanceRecord
-import org.tokend.template.data.model.SimpleAsset
-import org.tokend.template.data.repository.BalancesRepository
+import org.tokend.template.features.balances.model.BalanceRecord
+import org.tokend.template.features.assets.model.SimpleAsset
+import org.tokend.template.features.balances.storage.BalancesRepository
 import org.tokend.template.extensions.hasError
 import org.tokend.template.features.invest.logic.InvestmentInfoHolder
 import org.tokend.template.features.invest.model.SaleRecord
 import org.tokend.template.features.invest.repository.InvestmentInfoRepository
 import org.tokend.template.features.offers.logic.CreateOfferRequestUseCase
 import org.tokend.template.features.offers.model.OfferRecord
-import org.tokend.template.logic.FeeManager
-import org.tokend.template.util.Navigator
+import org.tokend.template.features.offers.model.OfferRequest
+import org.tokend.template.features.fees.logic.FeeManager
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.view.ContentLoadingProgressBar
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
@@ -361,15 +360,7 @@ class SaleInvestActivity : BaseActivity(), InvestmentInfoHolder {
                             updateInvestAvailability()
                         }
                         .subscribeBy(
-                                onSuccess = { offerRequest ->
-                                    Navigator.from(this).openInvestmentConfirmation(
-                                            INVESTMENT_REQUEST,
-                                            request = offerRequest,
-                                            saleName = sale.name,
-                                            displayToReceive =
-                                            sale.type.value == SaleType.BASIC_SALE.value
-                                    )
-                                },
+                                onSuccess = this::onInvestmentRequestCreated,
                                 onError = {
                                     errorHandlerFactory.getDefault().handle(it)
                                 }
@@ -377,20 +368,20 @@ class SaleInvestActivity : BaseActivity(), InvestmentInfoHolder {
                         .addTo(compositeDisposable)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                INVESTMENT_REQUEST -> {
-                    investmentInfoRepository.update()
-                }
-            }
-        }
+    private fun onInvestmentRequestCreated(request: OfferRequest) {
+        Navigator.from(this)
+                .openInvestmentConfirmation(
+                        investmentRequest = request,
+                        saleName = sale.name,
+                        displayToReceive =
+                        sale.type.value == SaleType.BASIC_SALE.value
+                )
+                .addTo(activityRequestsBag)
+                .doOnSuccess { investmentInfoRepository.update() }
     }
     // endregion
 
     companion object {
-        private val INVESTMENT_REQUEST = "invest".hashCode() and 0xffff
         private const val SALE_EXTRA = "sale"
 
         fun getBundle(sale: SaleRecord) = Bundle().apply {

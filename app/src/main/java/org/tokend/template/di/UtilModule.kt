@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.Module
 import dagger.Provides
 import org.tokend.sdk.factory.JsonApiToolsProvider
-import org.tokend.template.data.model.Asset
-import org.tokend.template.data.model.BalanceRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
 import org.tokend.template.di.providers.WalletInfoProvider
+import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.localaccount.mnemonic.logic.EnglishMnemonicWords
 import org.tokend.template.features.localaccount.mnemonic.logic.MnemonicCode
 import org.tokend.template.features.nfcpayment.logic.NfcPaymentConfirmationManager

@@ -12,7 +12,7 @@ import org.tokend.template.App
 import org.tokend.template.R
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.qr.ShareQrFragment
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.dialog.SignOutDialogFactory
 
 class AccountDetailsFragment : ShareQrFragment() {

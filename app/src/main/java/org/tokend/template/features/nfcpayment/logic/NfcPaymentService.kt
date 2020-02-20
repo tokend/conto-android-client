@@ -14,7 +14,7 @@ import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.template.features.nfcpayment.model.ClientToPosResponse
 import org.tokend.template.features.nfcpayment.model.PosToClientCommand
 import org.tokend.template.features.nfcpayment.model.RawPosPaymentRequest
-import org.tokend.template.util.Navigator
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.wallet.Transaction
 import org.tokend.wallet.xdr.Operation
 import org.tokend.wallet.xdr.TransactionEnvelope

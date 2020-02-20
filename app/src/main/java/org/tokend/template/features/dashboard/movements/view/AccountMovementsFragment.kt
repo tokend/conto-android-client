@@ -15,13 +15,13 @@ import kotlinx.android.synthetic.main.include_appbar_elevation.*
 import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
-import org.tokend.template.data.repository.balancechanges.BalanceChangesRepository
-import org.tokend.template.features.wallet.adapter.BalanceChangeListItem
-import org.tokend.template.features.wallet.adapter.BalanceChangesAdapter
+import org.tokend.template.features.history.storage.BalanceChangesRepository
+import org.tokend.template.features.history.view.adapter.BalanceChangeListItem
+import org.tokend.template.features.history.view.adapter.BalanceChangesAdapter
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.LocalizedName

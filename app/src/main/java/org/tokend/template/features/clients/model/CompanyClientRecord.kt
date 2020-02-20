@@ -1,9 +1,9 @@
 package org.tokend.template.features.clients.model
 
 import org.tokend.sdk.api.integrations.dns.model.ClientResource
-import org.tokend.template.data.model.Asset
 import org.tokend.template.data.repository.base.pagination.PagingRecord
 import org.tokend.template.extensions.tryOrNull
+import org.tokend.template.features.assets.model.Asset
 import java.io.Serializable
 import java.math.BigDecimal
 

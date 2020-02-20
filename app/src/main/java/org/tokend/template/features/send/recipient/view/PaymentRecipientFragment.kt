@@ -3,7 +3,6 @@ package org.tokend.template.features.send.recipient.view
 import android.Manifest
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -244,6 +243,12 @@ open class PaymentRecipientFragment : BaseFragment() {
     private fun tryOpenQrScanner() {
         cameraPermission.check(this) {
             QrScannerUtil.openScanner(this)
+                    .addTo(activityRequestsBag)
+                    .doOnSuccess {
+                        recipient_edit_text.setText(it)
+                        recipient_edit_text.setSelection(recipient_edit_text.text?.length ?: 0)
+                        tryToLoadRecipient()
+                    }
         }
     }
 
@@ -383,16 +388,6 @@ open class PaymentRecipientFragment : BaseFragment() {
                 .takeIf { it.isNotEmpty() }
 
         resultSubject.onNext(PaymentRecipientAndDescription(recipient, description))
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        QrScannerUtil.getStringFromResult(requestCode, resultCode, data)?.also {
-            recipient_edit_text.setText(it)
-            recipient_edit_text.setSelection(recipient_edit_text.text?.length ?: 0)
-            tryToLoadRecipient()
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

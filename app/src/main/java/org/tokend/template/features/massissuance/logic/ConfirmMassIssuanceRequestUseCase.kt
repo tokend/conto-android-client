@@ -4,9 +4,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.tokend.sdk.api.transactions.model.SubmitTransactionResponse
 import org.tokend.sdk.utils.extentions.encodeBase64String
-import org.tokend.template.data.model.history.SimpleFeeRecord
 import org.tokend.template.di.providers.AccountProvider
 import org.tokend.template.di.providers.RepositoryProvider
+import org.tokend.template.features.history.model.SimpleFeeRecord
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.send.model.PaymentRecipient
 import org.tokend.template.logic.TxManager

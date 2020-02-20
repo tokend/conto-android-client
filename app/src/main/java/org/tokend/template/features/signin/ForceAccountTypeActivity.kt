@@ -6,8 +6,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.features.signin.model.ForcedAccountType
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 
 class ForceAccountTypeActivity : BaseActivity() {
     private lateinit var forcedAccountType: ForcedAccountType

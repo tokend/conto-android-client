@@ -16,8 +16,8 @@ import org.tokend.template.features.dashboard.balances.view.CompanyBalancesFragm
 import org.tokend.template.features.movements.view.AssetMovementsFragment
 import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.signin.model.ForcedAccountType
-import org.tokend.template.util.Navigator
 import org.tokend.template.util.ProfileUtil
+import org.tokend.template.util.navigation.Navigator
 
 class CorporateMainActivity : MainActivity() {
     override val defaultFragmentId = CompanyClientsFragment.ID
