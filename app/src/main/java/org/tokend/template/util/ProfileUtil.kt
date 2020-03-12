@@ -83,7 +83,7 @@ object ProfileUtil {
         val form = (activeKyc as? ActiveKyc.Form)?.formData
 
         return when (form) {
-            is KycForm.General -> form.firstName + " " + form.lastName
+            is KycForm.General -> form.fullName
             is KycForm.Corporate -> form.company
             else -> null
         }

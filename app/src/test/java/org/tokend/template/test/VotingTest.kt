@@ -64,6 +64,8 @@ class VotingTest {
         Assert.assertEquals("Poll choice must be updated locally in the repository",
                 choice, repo.itemsList.first().currentChoice)
 
+        Thread.sleep(5000)
+
         repo.updateDeferred().blockingAwait()
 
         Assert.assertEquals("Remote poll choice must be the same as submitted one",
@@ -127,6 +129,8 @@ class VotingTest {
 
         Assert.assertNull("Poll choice must be updated locally in repository and should be null",
                 repo.itemsList.first().currentChoice)
+
+        Thread.sleep(5000)
 
         repo.updateDeferred().blockingAwait()
 
