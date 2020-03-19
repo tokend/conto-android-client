@@ -6,6 +6,7 @@
     <color name="transparentFloatingViewBackground">#3e000000</color>
     <color name="imagePlaceholder">#E0E0E0</color>
     <color name="volumeLevel">@color/accent_highlight</color>
+    <color name="broadcastAnimation">#E5CFD8</color>
 
     <color name="white">#ffffff</color>
     <color name="white_almost">#a0ffffff</color>
@@ -18,5 +19,4 @@
     <color name="material_drawer_selected_text">@color/primary_text</color>
     <color name="material_drawer_background">@color/background</color>
     <color name="material_drawer_selected">@color/accent_highlight</color>
-    <color name="ole">#EEC6D2</color>
 </resources>

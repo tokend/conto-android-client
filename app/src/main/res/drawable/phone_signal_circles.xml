@@ -13,28 +13,28 @@
             android:pathData="M453.58 315.72A137.86 137.86 0 0 1 177.86 315.72A137.86 137.86 0 0 1 453.58 315.72Z"
             android:strokeWidth="4"
             android:strokeAlpha="0.2"
-            android:strokeColor="#E5CFD8"
+            android:strokeColor="@color/broadcastAnimation"
             android:strokeMiterLimit="10" />
         <path
             android:name="c2"
             android:pathData="M509.65 315.72A193.93 193.93 0 0 1 121.79 315.72A193.93 193.93 0 0 1 509.65 315.72Z"
             android:strokeWidth="4"
             android:strokeAlpha="0.2"
-            android:strokeColor="#E5CFD8"
+            android:strokeColor="@color/broadcastAnimation"
             android:strokeMiterLimit="10" />
         <path
             android:name="c3"
             android:pathData="M567.86 315.72A252.14 252.14 0 0 1 63.58 315.72A252.14 252.14 0 0 1 567.86 315.72Z"
             android:strokeWidth="4"
             android:strokeAlpha="0.2"
-            android:strokeColor="#E5CFD8"
+            android:strokeColor="@color/broadcastAnimation"
             android:strokeMiterLimit="10" />
         <path
             android:name="c4"
             android:pathData="M629.44 315.72A313.72 313.72 0 0 1 2 315.72A313.72 313.72 0 0 1 629.44 315.72Z"
             android:strokeWidth="4"
             android:strokeAlpha="0.2"
-            android:strokeColor="#E5CFD8"
+            android:strokeColor="@color/broadcastAnimation"
             android:strokeMiterLimit="10" />
     </group>
 </vector>
