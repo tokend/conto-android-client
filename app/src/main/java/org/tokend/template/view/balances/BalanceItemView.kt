@@ -18,4 +18,6 @@ interface BalanceItemView {
         set(value) {
             dividerView.visibility = if (value) View.VISIBLE else View.GONE
         }
+
+    fun displayLogo(logoUrl: String?, displayedAssetName: String)
 }
