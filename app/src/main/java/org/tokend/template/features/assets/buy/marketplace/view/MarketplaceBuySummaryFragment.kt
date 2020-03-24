@@ -20,7 +20,6 @@ import org.tokend.sdk.api.integrations.marketplace.model.MarketplaceOfferPrice
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.sdk.utils.extentions.isBadRequest
 import org.tokend.template.R
-import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.buy.marketplace.logic.MarketplaceOfferPriceLoader
 import org.tokend.template.features.assets.buy.marketplace.model.BuySummaryExtras
@@ -28,11 +27,14 @@ import org.tokend.template.features.assets.buy.marketplace.model.MarketplaceOffe
 import org.tokend.template.features.assets.model.SimpleAsset
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
 import org.tokend.template.view.InfoCard
 import org.tokend.template.view.util.AnimationUtil
 import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.input.EditTextErrorHandler
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import retrofit2.HttpException
 import java.math.BigDecimal
@@ -170,7 +172,7 @@ class MarketplaceBuySummaryFragment : BaseFragment() {
                 }
                 .subscribeBy(
                         onSuccess = { onPayAmountLoaded(it, promoCode) },
-                        onError = this::onPayAmountLoadingError
+                        onError = payAmountLoadingErrorHandler::handleIfPossible
                 )
                 .addTo(compositeDisposable)
     }
@@ -184,15 +186,18 @@ class MarketplaceBuySummaryFragment : BaseFragment() {
         onPayAmountUpdated()
     }
 
-    private fun onPayAmountLoadingError(error: Throwable) {
-        when {
-            error is HttpException && error.isBadRequest() -> {
-                promoCodeEditText.setErrorAndFocus(R.string.error_invalid_promo_code)
-                calculateInitialPayAmount()
-            }
-            else -> errorHandlerFactory.getDefault().handle(error)
-        }
-    }
+    private val payAmountLoadingErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                EditTextErrorHandler(promoCodeEditText) { error ->
+                    when {
+                        error is HttpException && error.isBadRequest() ->
+                            getString(R.string.error_invalid_promo_code)
+                        else -> null
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle { calculateInitialPayAmount() }
 
     private fun onPayAmountUpdated() {
         displayPayAmount()

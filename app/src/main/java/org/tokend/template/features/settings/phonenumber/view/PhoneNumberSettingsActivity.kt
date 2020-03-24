@@ -24,8 +24,11 @@ import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.settings.phonenumber.logic.SetPhoneNumberUseCase
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
 import org.tokend.template.util.validator.GlobalPhoneNumberValidator
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.input.EditTextErrorHandler
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 
@@ -127,7 +130,7 @@ class PhoneNumberSettingsActivity : BaseActivity() {
     }
 
     private fun onCurrentNumberLoaded(number: String) {
-        val toSet =  number.trimStart('+')
+        val toSet = number.trimStart('+')
         phone_number_edit_text.setText(toSet)
         phone_number_edit_text.setSelection(toSet.length)
     }
@@ -203,7 +206,7 @@ class PhoneNumberSettingsActivity : BaseActivity() {
                     updateActionAvailability()
                 }
                 .subscribeBy(
-                        onError = this::onNumberSettingError,
+                        onError = numberSettingErrorHandler::handleIfPossible,
                         onComplete = this::onNumberSet
                 )
                 .addTo(compositeDisposable)
@@ -214,13 +217,19 @@ class PhoneNumberSettingsActivity : BaseActivity() {
         finish()
     }
 
-    private fun onNumberSettingError(error: Throwable) {
-        if (error is SetPhoneNumberUseCase.PhoneNumberAlreadyTakenException) {
-            phone_number_edit_text.setErrorAndFocus(R.string.error_phone_number_already_taken)
-        } else {
-            errorHandlerFactory.getDefault().handle(error)
-        }
-    }
+    private val numberSettingErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                EditTextErrorHandler(phone_number_edit_text) { error ->
+                    when (error) {
+                        is SetPhoneNumberUseCase.PhoneNumberAlreadyTakenException ->
+                            getString(R.string.error_phone_number_already_taken)
+                        else ->
+                            null
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle { updateActionAvailability() }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

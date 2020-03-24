@@ -17,6 +17,9 @@ import org.tokend.template.features.redeem.model.RedemptionRequestFormatExceptio
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
+import org.tokend.template.util.errorhandler.SimpleErrorHandler
 import org.tokend.template.util.navigation.Navigator
 
 class ScanRedemptionActivity : BaseActivity() {
@@ -75,25 +78,31 @@ class ScanRedemptionActivity : BaseActivity() {
                                     .doOnSuccess { finish() }
                                     .doOnCancel { tryOpenQrScanner() }
                         },
-                        onError = this::onRequestParsingError
+                        onError = requestParsingErrorHandler::handleIfPossible
                 )
                 .addTo(compositeDisposable)
     }
 
-    private fun onRequestParsingError(error: Throwable) {
-        when (error) {
-            is WrongAssetException ->
-                toastManager.long(R.string.error_redemption_not_owned_asset)
-            is RedemptionRequestFormatException,
-            is DecoderException -> {
-                toastManager.short(R.string.error_invalid_redemption_request)
-                error.cause?.printStackTrace()
-            }
-            else ->
-                errorHandlerFactory.getDefault().handle(error)
-        }
-        tryOpenQrScanner()
-    }
+    private val requestParsingErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                SimpleErrorHandler { error ->
+                    when (error) {
+                        is WrongAssetException -> {
+                            toastManager.long(R.string.error_redemption_not_owned_asset)
+                            true
+                        }
+                        is RedemptionRequestFormatException,
+                        is DecoderException -> {
+                            toastManager.short(R.string.error_invalid_redemption_request)
+                            error.cause?.printStackTrace()
+                            true
+                        }
+                        else -> false
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle { tryOpenQrScanner() }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

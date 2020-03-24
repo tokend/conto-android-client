@@ -16,10 +16,12 @@ import org.tokend.template.activities.BaseActivity
 import org.tokend.template.data.repository.AccountDetailsRepository
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
-import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.settings.telegram.logic.SetTelegramUsernameUseCase
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.input.EditTextErrorHandler
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 
@@ -171,7 +173,7 @@ class TelegramUsernameSettingsActivity : BaseActivity() {
                     updateActionAvailability()
                 }
                 .subscribeBy(
-                        onError = this::onUsernameSettingError,
+                        onError = usernameSettingErrorHandler::handleIfPossible,
                         onComplete = this::onUsernameSet
                 )
                 .addTo(compositeDisposable)
@@ -182,11 +184,17 @@ class TelegramUsernameSettingsActivity : BaseActivity() {
         finish()
     }
 
-    private fun onUsernameSettingError(error: Throwable) {
-        if (error is SetTelegramUsernameUseCase.UsernameAlreadyTakenException) {
-            username_edit_text.setErrorAndFocus(R.string.error_telegram_username_already_taken)
-        } else {
-            errorHandlerFactory.getDefault().handle(error)
-        }
-    }
+    private val usernameSettingErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                EditTextErrorHandler(username_edit_text) { error ->
+                    when (error) {
+                        is SetTelegramUsernameUseCase.UsernameAlreadyTakenException ->
+                            getString(R.string.error_telegram_username_already_taken)
+                        else ->
+                            null
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle { updateActionAvailability() }
 }

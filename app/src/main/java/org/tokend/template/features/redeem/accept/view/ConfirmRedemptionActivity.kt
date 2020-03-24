@@ -24,6 +24,9 @@ import org.tokend.template.features.redeem.accept.logic.ConfirmRedemptionRequest
 import org.tokend.template.features.redeem.model.RedemptionRequest
 import org.tokend.template.logic.TxManager
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
+import org.tokend.template.util.errorhandler.SimpleErrorHandler
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.adapter.DetailsItemsAdapter
@@ -138,7 +141,7 @@ class ConfirmRedemptionActivity : BaseActivity() {
                 .doOnTerminate { dialog.dismiss() }
                 .subscribeBy(
                         onComplete = this::onRedemptionConfirmed,
-                        onError = this::onRedemptionConfirmationError
+                        onError = redemptionConfirmationErrorHandler::handleIfPossible
                 )
                 .addTo(compositeDisposable)
     }
@@ -149,16 +152,21 @@ class ConfirmRedemptionActivity : BaseActivity() {
         finish()
     }
 
-    private fun onRedemptionConfirmationError(error: Throwable) {
-        when (error) {
-            is ConfirmRedemptionRequestUseCase.RedemptionAlreadyProcessedException -> {
-                toastManager.long(R.string.error_redemption_request_no_more_valid)
-                setResult(Activity.RESULT_CANCELED)
-                finish()
-            }
-            else -> errorHandlerFactory.getDefault().handle(error)
-        }
-    }
+    private val redemptionConfirmationErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                SimpleErrorHandler { error ->
+                    when (error) {
+                        is ConfirmRedemptionRequestUseCase.RedemptionAlreadyProcessedException -> {
+                            toastManager.long(R.string.error_redemption_request_no_more_valid)
+                            setResult(Activity.RESULT_CANCELED)
+                            finish()
+                            true
+                        }
+                        else -> false
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
 
     private fun displayDetails() {
         val asset = this.asset ?: return

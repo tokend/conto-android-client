@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
 import org.tokend.template.extensions.hasError
-import org.tokend.template.extensions.setErrorAndFocus
 import org.tokend.template.features.assets.model.Asset
 import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.balances.storage.BalancesRepository
@@ -21,6 +20,8 @@ import org.tokend.template.features.massissuance.logic.CreateMassIssuanceRequest
 import org.tokend.template.features.massissuance.model.MassIssuanceRequest
 import org.tokend.template.features.send.recipient.logic.PaymentRecipientLoader
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
 import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.validator.EmailValidator
 import org.tokend.template.view.balancepicker.BalancePickerBottomDialog
@@ -28,6 +29,7 @@ import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.ProgressDialogFactory
 import org.tokend.template.view.util.input.AmountEditTextWrapper
+import org.tokend.template.view.util.input.EditTextErrorHandler
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import java.math.BigDecimal
 
@@ -275,7 +277,7 @@ class MassIssuanceActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onSuccess = this::onMassIssuanceRequestCreated,
-                        onError = this::onRequestCreationError
+                        onError = requestCreationErrorHandler::handleIfPossible
                 )
                 .addTo(compositeDisposable)
     }
@@ -290,19 +292,20 @@ class MassIssuanceActivity : BaseActivity() {
                 }
     }
 
-    private fun onRequestCreationError(error: Throwable) {
-        when (error) {
-            is CreateMassIssuanceRequestUseCase.NoValidRecipientsException -> {
-                emails_edit_text.setErrorAndFocus(R.string.error_no_recipients_for_issuance)
-            }
-            is PaymentRecipientLoader.NoRecipientFoundException -> {
-                emails_edit_text.setErrorAndFocus(R.string.error_recipient_list_contains_non_existing_accounts)
-            }
-            else ->
-                errorHandlerFactory.getDefault().handle(error)
-        }
-        updateIssuanceAvailability()
-    }
+    private val requestCreationErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                EditTextErrorHandler(emails_edit_text) { error ->
+                    when (error) {
+                        is CreateMassIssuanceRequestUseCase.NoValidRecipientsException ->
+                            getString(R.string.error_no_recipients_for_issuance)
+                        is PaymentRecipientLoader.NoRecipientFoundException ->
+                            getString(R.string.error_recipient_list_contains_non_existing_accounts)
+                        else -> null
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle { updateIssuanceAvailability() }
 
     private fun update(force: Boolean = false) {
         if (force) {

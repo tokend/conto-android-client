@@ -26,6 +26,9 @@ import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
+import org.tokend.template.util.errorhandler.SimpleErrorHandler
 import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.MenuSearchViewManager
 import org.tokend.template.view.util.ProgressDialogFactory
@@ -172,7 +175,7 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
                 .doOnEvent { _, _ -> progress.dismiss() }
                 .subscribeBy(
                         onSuccess = this::openCompanyDetails,
-                        onError = this::onCompanyLoadingError
+                        onError = companyLoadingErrorHandler::handleIfPossible
                 )
     }
 
@@ -180,13 +183,19 @@ class CompaniesFragment : BaseFragment(), ToolbarProvider {
         Navigator.from(this).openCompanyDetails(company)
     }
 
-    private fun onCompanyLoadingError(error: Throwable) {
-        when (error) {
-            is CompanyLoader.NoCompanyFoundException ->
-                toastManager.short(R.string.error_company_not_found)
-            else -> errorHandlerFactory.getDefault().handle(error)
-        }
-    }
+    private val companyLoadingErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                SimpleErrorHandler { error ->
+                    when (error) {
+                        is CompanyLoader.NoCompanyFoundException -> {
+                            toastManager.short(R.string.error_company_not_found)
+                            true
+                        }
+                        else -> false
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
 
     companion object {
         val ID = "companies".hashCode().toLong()
