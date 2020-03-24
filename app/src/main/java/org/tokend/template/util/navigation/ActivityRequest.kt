@@ -25,6 +25,7 @@ class ActivityRequest<R : Any>(
         private val resultProvider: (Intent?) -> R?
 ) {
     private var resultCallback: ((R) -> Unit)? = null
+    private var cancellationCallback: (() -> Unit)? = null
 
     var isCompleted: Boolean = false
         private set
@@ -34,6 +35,10 @@ class ActivityRequest<R : Any>(
      */
     fun doOnSuccess(resultWithDataCallback: (R) -> Unit) = also {
         it.resultCallback = resultWithDataCallback
+    }
+
+    fun doOnCancel(cancellationCallback: () -> Unit) = also {
+        it.cancellationCallback = cancellationCallback
     }
 
     /**
@@ -49,13 +54,17 @@ class ActivityRequest<R : Any>(
      * in order for result callback to be called if the result is related to this request
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == this.code && resultCode == Activity.RESULT_OK) {
-            val result = resultProvider(data)
+        if (requestCode == this.code) {
+            if (resultCode == Activity.RESULT_OK) {
+                val result = resultProvider(data)
 
-            val resultCallback = resultCallback
+                val resultCallback = resultCallback
 
-            if (result != null && resultCallback != null) {
-                resultCallback(result)
+                if (result != null && resultCallback != null) {
+                    resultCallback(result)
+                }
+            } else {
+                cancellationCallback?.invoke()
             }
 
             isCompleted = true

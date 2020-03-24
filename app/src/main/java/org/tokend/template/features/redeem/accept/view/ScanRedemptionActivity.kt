@@ -69,11 +69,11 @@ class ScanRedemptionActivity : BaseActivity() {
                             Navigator.from(this)
                                     .openRedemptionRequestConfirmation(
                                             balance.id,
-                                            result,
-                                            ACCEPT_REQUEST_CODE
+                                            result
                                     )
                                     .addTo(activityRequestsBag)
                                     .doOnSuccess { finish() }
+                                    .doOnCancel { tryOpenQrScanner() }
                         },
                         onError = this::onRequestParsingError
                 )
@@ -100,7 +100,6 @@ class ScanRedemptionActivity : BaseActivity() {
 
         if (resultCode != Activity.RESULT_OK) {
             when (requestCode) {
-                ACCEPT_REQUEST_CODE -> tryOpenQrScanner()
                 IntentIntegrator.REQUEST_CODE -> finish()
             }
         }
@@ -114,8 +113,4 @@ class ScanRedemptionActivity : BaseActivity() {
     }
 
     class WrongAssetException : Exception()
-
-    companion object {
-        private val ACCEPT_REQUEST_CODE = "accept_redemption".hashCode() and 0xffff
-    }
 }

@@ -38,9 +38,13 @@ import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
 import org.tokend.template.util.environments.AppEnvironment
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
+import org.tokend.template.util.errorhandler.SimpleErrorHandler
 import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.input.EditTextErrorHandler
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
 import org.tokend.wallet.Account
@@ -266,7 +270,7 @@ class SignInActivity : BaseActivity() {
                 }
                 .subscribeBy(
                         onComplete = this::onSignInComplete,
-                        onError = this::handleSignInError
+                        onError = signInErrorHandler::handleIfPossible
                 )
                 .addTo(compositeDisposable)
     }
@@ -287,17 +291,28 @@ class SignInActivity : BaseActivity() {
         }
     }
 
-    private fun handleSignInError(error: Throwable) {
-        when (error) {
-            is InvalidCredentialsException ->
-                password_edit_text.setErrorAndFocus(R.string.error_invalid_password)
-            is EmailNotVerifiedException ->
-                displayEmailNotVerifiedDialog(error.walletId)
-            else ->
-                errorHandlerFactory.getDefault().handle(error)
-        }
-        updateSignInAvailability()
-    }
+    private val signInErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                EditTextErrorHandler(password_edit_text) { error ->
+                    when (error) {
+                        is InvalidCredentialsException ->
+                            getString(R.string.error_invalid_password)
+                        else ->
+                            null
+                    }
+                },
+                SimpleErrorHandler { error ->
+                    when (error) {
+                        is EmailNotVerifiedException -> {
+                            displayEmailNotVerifiedDialog(error.walletId)
+                            true
+                        }
+                        else -> false
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle(this::updateSignInAvailability)
 
     private fun updateAdditionalButtonsState(isEnabled: Boolean) {
         scan_qr_button.isEnabled = isEnabled

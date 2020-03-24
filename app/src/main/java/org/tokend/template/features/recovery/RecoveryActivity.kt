@@ -21,16 +21,22 @@ import org.tokend.sdk.keyserver.KeyServer
 import org.tokend.template.BuildConfig
 import org.tokend.template.R
 import org.tokend.template.activities.BaseActivity
-import org.tokend.template.extensions.*
+import org.tokend.template.extensions.getChars
+import org.tokend.template.extensions.getStringExtra
+import org.tokend.template.extensions.hasError
+import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.features.recovery.logic.RecoverPasswordUseCase
 import org.tokend.template.features.signin.logic.SignInUseCase
 import org.tokend.template.features.urlconfig.logic.UrlConfigManager
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.PermissionManager
 import org.tokend.template.util.QrScannerUtil
+import org.tokend.template.util.errorhandler.CompositeErrorHandler
+import org.tokend.template.util.errorhandler.ErrorHandler
 import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
+import org.tokend.template.view.util.input.EditTextErrorHandler
 import org.tokend.template.view.util.input.EditTextHelper
 import org.tokend.template.view.util.input.SimpleTextWatcher
 import org.tokend.template.view.util.input.SoftInputUtil
@@ -221,10 +227,7 @@ class RecoveryActivity : BaseActivity() {
                         onComplete = {
                             onRecoveryCompleted(email, password)
                         },
-                        onError = {
-                            handleRecoveryError(it)
-                            updateRecoveryAvailability()
-                        }
+                        onError = recoveryErrorHandler::handleIfPossible
                 )
                 .addTo(compositeDisposable)
     }
@@ -266,16 +269,21 @@ class RecoveryActivity : BaseActivity() {
         Navigator.from(this).performPostSignInRouting(repositoryProvider.activeKyc().item)
     }
 
-    private fun handleRecoveryError(error: Throwable) {
-        error.printStackTrace()
-        when (error) {
-            is InvalidCredentialsException ->
-                email_edit_text.setErrorAndFocus(R.string.error_invalid_email)
-            is EmailNotVerifiedException ->
-                email_edit_text.setErrorAndFocus(R.string.error_email_not_verified)
-            else -> errorHandlerFactory.getDefault().handle(error)
-        }
-    }
+    private val recoveryErrorHandler: ErrorHandler
+        get() = CompositeErrorHandler(
+                EditTextErrorHandler(email_edit_text) { error ->
+                    when (error) {
+                        is InvalidCredentialsException ->
+                            getString(R.string.error_invalid_email)
+                        is EmailNotVerifiedException ->
+                            getString(R.string.error_email_not_verified)
+                        else ->
+                            null
+                    }
+                },
+                errorHandlerFactory.getDefault()
+        )
+                .doOnSuccessfulHandle(this::updateRecoveryAvailability)
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
