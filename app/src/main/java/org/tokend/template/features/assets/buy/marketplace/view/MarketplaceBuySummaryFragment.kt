@@ -1,10 +1,10 @@
 package org.tokend.template.features.assets.buy.marketplace.view
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.rengwuxian.materialedittext.MaterialEditText
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -35,7 +35,6 @@ import org.tokend.template.view.util.CircleLogoUtil
 import org.tokend.template.view.util.ElevationUtil
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.input.EditTextErrorHandler
-import org.tokend.template.view.util.input.SimpleTextWatcher
 import retrofit2.HttpException
 import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
@@ -125,12 +124,19 @@ class MarketplaceBuySummaryFragment : BaseFragment() {
         promoCodeOkView = promoCodeInputLayout.promo_code_ok_image_view
 
         promoCodeEditText = promoCodeInputLayout.promo_code_edit_text
-        promoCodeEditText.addTextChangedListener(object : SimpleTextWatcher() {
-            override fun afterTextChanged(s: Editable?) {
-                promoCodeEditText.error = null
-                promoCode = s?.toString()?.trim()?.takeIf(String::isNotBlank)
-            }
-        })
+        promoCodeEditText
+                .textChanges()
+                .skipInitialValue()
+                .doOnNext { promoCodeEditText.error = null }
+                .debounce(400, TimeUnit.MILLISECONDS)
+                .compose(ObservableTransformers.defaultSchedulers())
+                .subscribe {
+                    promoCode = promoCodeEditText.text
+                            ?.toString()
+                            ?.trim()
+                            ?.takeIf(String::isNotBlank)
+                }
+                .addTo(compositeDisposable)
 
         InfoCard(cards_layout)
                 .setHeading(R.string.promo_code, null)
