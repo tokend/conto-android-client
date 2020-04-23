@@ -348,7 +348,7 @@ class SimpleBalanceDetailsActivity : BaseActivity() {
     private fun openSend() {
         Navigator.from(this)
                 .openSend(
-                        asset = balance.assetCode,
+                        balanceId = balance.id,
                         amount = amount_view.amountWrapper.scaledAmount
                 )
                 .addTo(activityRequestsBag)

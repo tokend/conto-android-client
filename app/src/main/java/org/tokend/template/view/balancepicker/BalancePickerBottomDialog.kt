@@ -115,22 +115,26 @@ open class BalancePickerBottomDialog(
 
         val unfilteredItems =
                 requiredAssets?.map { requiredAsset ->
-                    val balance =
-                            filteredBalances.find { it.assetCode == requiredAsset.code }
+                    val balances =
+                            filteredBalances.filter { it.assetCode == requiredAsset.code }
 
-                    if (balance != null)
-                        BalancePickerListItem(
-                                source = balance,
-                                available = getAvailableAmount(requiredAsset.code, balance)
-                        )
+                    if (balances.isNotEmpty())
+                        balances.map { balance ->
+                            BalancePickerListItem(
+                                    source = balance,
+                                    available = getAvailableAmount(requiredAsset.code, balance)
+                            )
+                        }
                     else
-                        BalancePickerListItem(
-                                asset = requiredAsset,
-                                available = getAvailableAmount(requiredAsset.code, null),
-                                isEnough = true,
-                                source = null
+                        setOf(
+                                BalancePickerListItem(
+                                        asset = requiredAsset,
+                                        available = getAvailableAmount(requiredAsset.code, null),
+                                        isEnough = true,
+                                        source = null
+                                )
                         )
-                } ?: filteredBalances.map {
+                }?.flatten() ?: filteredBalances.map {
                     BalancePickerListItem(
                             source = it,
                             available = getAvailableAmount(it.assetCode, it)

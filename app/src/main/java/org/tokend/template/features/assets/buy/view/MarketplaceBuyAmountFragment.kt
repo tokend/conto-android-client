@@ -68,7 +68,7 @@ class MarketplaceBuyAmountFragment : AmountInputFragment() {
         balance_text_view.text = getString(R.string.quantity)
     }
 
-    override fun initAssetSelection() {
+    override fun initSelection() {
         asset_code_text_view.visibility = View.GONE
 
         quoteAssetPicker = object : BalancePickerBottomDialog(

@@ -17,11 +17,10 @@ import kotlinx.android.synthetic.main.include_error_empty_view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.R
-import org.tokend.template.features.assets.model.Asset
+import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.assets.model.AssetRecord
 import org.tokend.template.features.balances.model.BalanceRecord
 import org.tokend.template.features.balances.storage.BalancesRepository
-import org.tokend.template.extensions.withArguments
 import org.tokend.template.features.history.model.SimpleFeeRecord
 import org.tokend.template.features.send.amount.model.PaymentAmountData
 import org.tokend.template.features.send.amount.view.PaymentAmountFragment
@@ -34,8 +33,8 @@ import org.tokend.template.features.send.recipient.view.PaymentRecipientFragment
 import org.tokend.template.fragments.BaseFragment
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.WalletEventsListener
-import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.LoadingIndicatorManager
 import org.tokend.template.view.util.UserFlowFragmentDisplayer
 import org.tokend.template.view.util.input.SoftInputUtil
@@ -57,13 +56,12 @@ class SendFragment : BaseFragment(), ToolbarProvider {
                 .itemsList
                 .filter(BalanceRecord::hasAvailableAmount)
 
-    private val requiredAssetCode: String?
-        get() = arguments?.getString(ASSET_EXTRA)
+    private val requiredBalanceId: String?
+        get() = arguments?.getString(REQUIRED_BALANCE_ID_EXTRA)
 
-    private val requiredAsset: Asset?
+    private val requiredBalance: BalanceRecord?
         get() = balances
-                .find {it.assetCode == requiredAssetCode }
-                ?.asset
+                .find { it.id == requiredBalanceId }
 
     private val requiredAmount: BigDecimal?
         get() = arguments?.getString(AMOUNT_EXTRA)?.let { BigDecimalUtil.valueOf(it) }
@@ -82,7 +80,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
     private var recipient: PaymentRecipient? = null
     private var amount: BigDecimal = BigDecimal.ZERO
-    private var asset: Asset? = null
+    private var balance: BalanceRecord? = null
     private var description: String? = null
     private var fee: PaymentFee? = null
 
@@ -109,7 +107,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
         toolbar.title = getString(R.string.send_title)
 
         val requiredAmount = this.requiredAmount
-        val requiredAsset = this.requiredAsset
+        val requiredAsset = this.requiredBalance?.asset
 
         if (requiredAmount != null && requiredAsset != null) {
             toolbar.subtitle = amountFormatter.formatAssetAmount(
@@ -225,10 +223,10 @@ class SendFragment : BaseFragment(), ToolbarProvider {
         this.description = recipientAndDescription.description
 
         val requiredAmount = this.requiredAmount
-        val requiredAsset = this.requiredAsset
+        val requiredBalance = this.requiredBalance
 
-        if (requiredAmount != null && requiredAsset != null) {
-            onAmountEntered(PaymentAmountData(requiredAmount, requiredAsset,
+        if (requiredAmount != null && requiredBalance != null) {
+            onAmountEntered(PaymentAmountData(requiredAmount, requiredBalance,
                     description, PaymentFee(SimpleFeeRecord.ZERO, SimpleFeeRecord.ZERO)))
         } else {
             toAmountScreen()
@@ -242,7 +240,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
                 ?: return
 
         val fragment = PaymentAmountFragment.newInstance(
-                PaymentAmountFragment.getBundle(recipientNickname, recipientAccount, requiredAssetCode)
+                PaymentAmountFragment.getBundle(recipientNickname, recipientAccount, requiredBalanceId)
         )
 
         fragment
@@ -259,7 +257,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
     private fun onAmountEntered(result: PaymentAmountData) {
         this.amount = result.amount
-        this.asset = result.asset
+        this.balance = result.balance
         this.description = result.description
         this.fee = result.fee
 
@@ -270,17 +268,16 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     private fun createAndConfirmPaymentRequest() {
         val recipient = recipient ?: return
         val fee = fee ?: return
-        val asset = asset ?: return
+        val balance = balance ?: return
 
         paymentRequestDisposable?.dispose()
         paymentRequestDisposable = CreatePaymentRequestUseCase(
                 recipient,
                 amount,
-                asset,
+                balance,
                 description,
                 fee,
-                walletInfoProvider,
-                balancesRepository
+                walletInfoProvider
         )
                 .perform()
                 .compose(ObservableTransformers.defaultSchedulersSingle())
@@ -326,7 +323,7 @@ class SendFragment : BaseFragment(), ToolbarProvider {
     }
 
     companion object {
-        private const val ASSET_EXTRA = "asset"
+        private const val REQUIRED_BALANCE_ID_EXTRA = "required_balance_id"
         private const val ALLOW_TOOLBAR_EXTRA = "allow_toolbar"
         private const val AMOUNT_EXTRA = "amount"
         private const val RECIPIENT_ACCOUNT_EXTRA = "recipient_account"
@@ -335,12 +332,12 @@ class SendFragment : BaseFragment(), ToolbarProvider {
 
         fun newInstance(bundle: Bundle): SendFragment = SendFragment().withArguments(bundle)
 
-        fun getBundle(assetCode: String?,
-                      amount: BigDecimal?,
+        fun getBundle(amount: BigDecimal?,
                       recipientAccount: String?,
                       recipientNickname: String?,
+                      balanceId: String?,
                       allowToolbar: Boolean) = Bundle().apply {
-            putString(ASSET_EXTRA, assetCode)
+            putString(REQUIRED_BALANCE_ID_EXTRA, balanceId)
             putBoolean(ALLOW_TOOLBAR_EXTRA, allowToolbar)
             putString(AMOUNT_EXTRA, amount?.let(BigDecimalUtil::toPlainString))
             putString(RECIPIENT_ACCOUNT_EXTRA, recipientAccount)

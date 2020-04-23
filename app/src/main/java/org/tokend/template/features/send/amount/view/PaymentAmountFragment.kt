@@ -137,13 +137,13 @@ class PaymentAmountFragment : AmountInputFragment() {
                 .takeIf { it.isNotEmpty() }
         val fee = this.fee
                 ?: return
-        val asset = balance?.asset
+        val balance = this.balance
                 ?: return
 
         resultSubject.onNext(
                 PaymentAmountData(
                         amount = amount,
-                        asset = asset,
+                        balance = balance,
                         description = description,
                         fee = fee
                 )
@@ -246,10 +246,10 @@ class PaymentAmountFragment : AmountInputFragment() {
 
         fun getBundle(recipient: String,
                       recipientAccount: String,
-                      requiredAsset: String? = null) = Bundle().apply {
-            putString(ASSET_EXTRA, requiredAsset)
+                      requiredBalanceId: String? = null) = Bundle().apply {
             putString(RECIPIENT_EXTRA, recipient)
             putString(RECIPIENT_ACCOUNT_EXTRA, recipientAccount)
+            putAll(getBundle(requiredBalanceId = requiredBalanceId))
         }
 
         fun newInstance(bundle: Bundle): PaymentAmountFragment =

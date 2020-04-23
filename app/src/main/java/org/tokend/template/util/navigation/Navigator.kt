@@ -80,7 +80,6 @@ import org.tokend.template.features.settings.GeneralSettingsFragment
 import org.tokend.template.features.settings.phonenumber.view.PhoneNumberSettingsActivity
 import org.tokend.template.features.settings.telegram.view.TelegramUsernameSettingsActivity
 import org.tokend.template.features.shaketopay.view.ShakeToPayActivity
-import org.tokend.template.features.signin.AuthenticatorSignInActivity
 import org.tokend.template.features.signin.ForceAccountTypeActivity
 import org.tokend.template.features.signin.LocalAccountSignInActivity
 import org.tokend.template.features.signin.SignInActivity
@@ -289,7 +288,7 @@ class Navigator private constructor() {
             WithdrawalConfirmationActivity.getBundle(withdrawalRequest)
     )
 
-    fun openSend(asset: String? = null,
+    fun openSend(balanceId: String? = null,
                  amount: BigDecimal? = null,
                  recipientAccount: String? = null,
                  recipientNickname: String? = null
@@ -297,8 +296,8 @@ class Navigator private constructor() {
             SingleFragmentActivity::class.java,
             SingleFragmentActivity.getBundle(
                     SendFragment.ID,
-                    SendFragment.getBundle(asset, amount,
-                            recipientAccount, recipientNickname, true)
+                    SendFragment.getBundle(amount,
+                            recipientAccount, recipientNickname, balanceId, true)
             )
     )
 
@@ -351,10 +350,6 @@ class Navigator private constructor() {
     fun openSale(sale: SaleRecord) = createAndPerformSimpleRequest(
             SaleActivity::class.java,
             SaleActivity.getBundle(sale)
-    )
-
-    fun openAuthenticatorSignIn() = createAndPerformSimpleRequest(
-            AuthenticatorSignInActivity::class.java
     )
 
     fun openBalanceChangeDetails(change: BalanceChange) {
@@ -430,11 +425,11 @@ class Navigator private constructor() {
             )
     )
 
-    fun openWithdraw(asset: String) = createAndPerformSimpleRequest(
+    fun openWithdraw(balanceId: String) = createAndPerformSimpleRequest(
             SingleFragmentActivity::class.java,
             SingleFragmentActivity.getBundle(
                     WithdrawFragment.ID,
-                    WithdrawFragment.getBundle(asset)
+                    WithdrawFragment.getBundle(balanceId)
             )
     )
 

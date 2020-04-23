@@ -19,7 +19,7 @@ class AssetRefundAmountFragment : AmountInputFragment() {
         super.onInitAllowed()
     }
 
-    override fun initAssetSelection() {
+    override fun initSelection() {
         asset_code_text_view.visibility = View.GONE
     }
 
@@ -66,7 +66,7 @@ class AssetRefundAmountFragment : AmountInputFragment() {
         private const val OFFER_EXTRA = "offer"
 
         fun getBundle(offer: OrderBookEntryRecord) = Bundle().apply {
-            putString(ASSET_EXTRA, offer.baseAsset.code)
+            putAll(getBundle(requiredAssetCode = offer.baseAsset.code))
             putSerializable(OFFER_EXTRA, offer)
         }
 
