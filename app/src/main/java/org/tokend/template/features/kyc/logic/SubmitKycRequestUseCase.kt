@@ -14,6 +14,7 @@ import org.tokend.template.features.keyvalue.model.KeyValueEntryRecord
 import org.tokend.template.features.kyc.model.ActiveKyc
 import org.tokend.template.features.kyc.model.KycForm
 import org.tokend.template.features.kyc.model.KycRequestState
+import org.tokend.template.features.kyc.storage.KycRequestStateRepository
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.NetworkParams
 import org.tokend.wallet.PublicKeyFactory
@@ -23,23 +24,27 @@ import org.tokend.wallet.xdr.*
 
 /**
  * Creates and submits change-role request with general KYC data.
- * Sets new KYC state in [KycStateRepository] on complete.
+ * Sets new KYC state in [KycRequestStateRepository] on complete.
  */
 class SubmitKycRequestUseCase(
         private val form: KycForm,
         private val walletInfoProvider: WalletInfoProvider,
         private val accountProvider: AccountProvider,
         private val repositoryProvider: RepositoryProvider,
-        private val txManager: TxManager
+        private val txManager: TxManager,
+        private val requestIdToSubmit: Long = 0L,
+        private val explicitRoleToSet: Long? = null
 ) {
-    private val isReviewRequired = form !is KycForm.General
-    private val requestIdToSubmit = 0L
+    private data class SubmittedRequestAttributes(
+            val id: Long,
+            val isReviewRequired: Boolean
+    )
 
     private var roleToSet: Long = 0L
     private lateinit var formBlobId: String
     private lateinit var networkParams: NetworkParams
     private lateinit var transactionResultXdr: String
-    private var submittedRequestId = 0L
+    private lateinit var submittedRequestAttributes: SubmittedRequestAttributes
     private lateinit var newKycRequestState: KycRequestState
 
     fun perform(): Completable {
@@ -69,10 +74,10 @@ class SubmitKycRequestUseCase(
                     this.transactionResultXdr = response.resultMetaXdr!!
                 }
                 .flatMap {
-                    getSubmittedRequestId()
+                    getSubmittedRequestAttributes()
                 }
-                .doOnSuccess { submittedRequestId ->
-                    this.submittedRequestId = submittedRequestId
+                .doOnSuccess { submittedRequestAttributes ->
+                    this.submittedRequestAttributes = submittedRequestAttributes
                 }
                 .flatMap {
                     getNewKycRequestState()
@@ -87,6 +92,10 @@ class SubmitKycRequestUseCase(
     }
 
     private fun getRoleToSet(): Single<Long> {
+        if (explicitRoleToSet != null && explicitRoleToSet > 0) {
+            return Single.just(explicitRoleToSet)
+        }
+
         val key = when (form) {
             is KycForm.General -> KEY_GENERAL_ACCOUNT_ROLE
             is KycForm.Corporate -> KEY_CORPORATE_ACCOUNT_ROLE
@@ -145,38 +154,47 @@ class SubmitKycRequestUseCase(
         }.subscribeOn(Schedulers.newThread())
     }
 
-    private fun getSubmittedRequestId(): Single<Long> {
+    private fun getSubmittedRequestAttributes(): Single<SubmittedRequestAttributes> {
         return {
-            (TransactionMeta.fromBase64(transactionResultXdr) as? TransactionMeta.EmptyVersion)
-                    ?.operations
-                    ?.firstOrNull()
-                    ?.changes
-                    ?.filterIsInstance(LedgerEntryChange.Created::class.java)
-                    ?.map { it.created.data }
-                    ?.filterIsInstance(LedgerEntry.LedgerEntryData.ReviewableRequest::class.java)
-                    ?.first()
-                    ?.reviewableRequest
-                    ?.requestID
-                    ?: 0L
+            val request = (TransactionMeta.fromBase64(transactionResultXdr) as TransactionMeta.EmptyVersion)
+                    .operations
+                    .first()
+                    .changes
+                    .filter {
+                        it is LedgerEntryChange.Created || it is LedgerEntryChange.Updated
+                    }
+                    .map {
+                        if (it is LedgerEntryChange.Created)
+                            it.created.data
+                        else
+                            (it as LedgerEntryChange.Updated).updated.data
+                    }
+                    .filterIsInstance(LedgerEntry.LedgerEntryData.ReviewableRequest::class.java)
+                    .first()
+                    .reviewableRequest
+
+            SubmittedRequestAttributes(
+                    id = request.requestID,
+                    isReviewRequired = request.tasks.pendingTasks > 0
+            )
         }.toSingle()
     }
 
     private fun getNewKycRequestState(): Single<KycRequestState.Submitted<KycForm>> {
         return Single.just(
-                if (isReviewRequired)
-                    KycRequestState.Submitted.Pending(form, submittedRequestId)
+                if (submittedRequestAttributes.isReviewRequired)
+                    KycRequestState.Submitted.Pending(form, submittedRequestAttributes.id, roleToSet)
                 else
-                    KycRequestState.Submitted.Approved(form, submittedRequestId)
+                    KycRequestState.Submitted.Approved(form, submittedRequestAttributes.id, roleToSet)
         )
     }
-
 
     private fun updateRepositories(): Single<Boolean> {
         repositoryProvider
                 .kycRequestState()
                 .set(newKycRequestState)
 
-        if (!isReviewRequired) {
+        if (!submittedRequestAttributes.isReviewRequired) {
             repositoryProvider
                     .activeKyc()
                     .set(ActiveKyc.Form(form))

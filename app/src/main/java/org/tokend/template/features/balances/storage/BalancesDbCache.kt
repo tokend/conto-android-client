@@ -27,17 +27,17 @@ class BalancesDbCache(
     }
 
     override fun addToDb(items: Collection<BalanceRecord>) {
-        val assets = items.map(BalanceRecord::asset)
+        val assets = items.map(BalanceRecord::asset).distinct()
         assetsCache.add(*assets.toTypedArray())
-        val companies = items.mapNotNull(BalanceRecord::company)
+        val companies = items.mapNotNull(BalanceRecord::company).distinct()
         companiesCache.add(*companies.toTypedArray())
         dao.insert(*items.map(BalanceDbEntity.Companion::fromRecord).toTypedArray())
     }
 
     override fun updateInDb(items: Collection<BalanceRecord>) {
-        val assets = items.map(BalanceRecord::asset)
+        val assets = items.map(BalanceRecord::asset).distinct()
         assetsCache.update(*assets.toTypedArray())
-        val companies = items.mapNotNull(BalanceRecord::company)
+        val companies = items.mapNotNull(BalanceRecord::company).distinct()
         companiesCache.update(*companies.toTypedArray())
         dao.update(*items.map(BalanceDbEntity.Companion::fromRecord).toTypedArray())
     }
