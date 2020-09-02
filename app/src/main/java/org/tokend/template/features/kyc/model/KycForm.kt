@@ -10,12 +10,13 @@ import org.tokend.sdk.api.blobs.model.Blob
  */
 sealed class KycForm(
         @SerializedName("documents")
-        var documents: MutableMap<String, RemoteFile>? = mutableMapOf()
+        var documents: MutableMap<String, RemoteFile>? = mutableMapOf(),
+        var role: String? = null
 ) {
     class Corporate(documents: MutableMap<String, RemoteFile>,
                     @SerializedName(COMPANY_KEY)
                     val company: String
-    ) : KycForm(documents) {
+    ) : KycForm(documents, KEY_CORPORATE_ACCOUNT_ROLE) {
         val avatar: RemoteFile?
             get() = documents?.get("kyc_avatar")
 
@@ -28,7 +29,7 @@ sealed class KycForm(
                   val firstName: String,
                   @SerializedName("last_name")
                   val lastName: String
-    ) : KycForm(null) {
+    ) : KycForm(null, KEY_GENERAL_ACCOUNT_ROLE) {
         val avatar: RemoteFile?
             get() = documents?.get(AVATAR_DOCUMENT_KEY)
 
@@ -63,5 +64,8 @@ sealed class KycForm(
                     throw IllegalArgumentException("Unknown KYC form type")
             }
         }
+        private const val KEY_GENERAL_ACCOUNT_ROLE = "account_role:general"
+        private const val KEY_CORPORATE_ACCOUNT_ROLE = "account_role:corporate"
     }
+
 }

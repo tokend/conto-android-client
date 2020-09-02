@@ -96,20 +96,19 @@ class SubmitKycRequestUseCase(
             return Single.just(explicitRoleToSet)
         }
 
-        val key = when (form) {
-            is KycForm.General -> KEY_GENERAL_ACCOUNT_ROLE
-            is KycForm.Corporate -> KEY_CORPORATE_ACCOUNT_ROLE
-            else -> return Single.error(
-                    IllegalArgumentException("Unsupported form type ${form.javaClass.name}")
-            )
-        }
+        val roleKey = form.role
 
-        return repositoryProvider
-                .keyValueEntries()
-                .ensureEntries(listOf(key))
-                .map { it[key] }
-                .map { it as KeyValueEntryRecord.Number }
-                .map { it.value }
+        return if (roleKey != null) {
+            repositoryProvider
+                    .keyValueEntries()
+                    .ensureEntries(listOf(roleKey))
+                    .map { it[roleKey] }
+                    .map { it as KeyValueEntryRecord.Number }
+                    .map { it.value }
+        } else {
+            Single.error(
+                    IllegalArgumentException("Unsupported form type ${form.javaClass.name}"))
+        }
     }
 
     private fun uploadFormAsBlob(): Single<String> {
@@ -203,8 +202,4 @@ class SubmitKycRequestUseCase(
         return Single.just(true)
     }
 
-    private companion object {
-        private const val KEY_GENERAL_ACCOUNT_ROLE = "account_role:general"
-        private const val KEY_CORPORATE_ACCOUNT_ROLE = "account_role:corporate"
-    }
 }
