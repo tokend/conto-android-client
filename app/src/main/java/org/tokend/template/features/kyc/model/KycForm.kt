@@ -10,13 +10,17 @@ import org.tokend.sdk.api.blobs.model.Blob
  */
 sealed class KycForm(
         @SerializedName("documents")
-        var documents: MutableMap<String, RemoteFile>? = mutableMapOf(),
-        var role: String? = null
+        var documents: MutableMap<String, RemoteFile>? = mutableMapOf()
 ) {
+    abstract val roleKey: String
+
     class Corporate(documents: MutableMap<String, RemoteFile>,
                     @SerializedName(COMPANY_KEY)
                     val company: String
-    ) : KycForm(documents, KEY_CORPORATE_ACCOUNT_ROLE) {
+    ) : KycForm(documents) {
+        override val roleKey: String
+            get() = KEY_CORPORATE_ACCOUNT_ROLE
+
         val avatar: RemoteFile?
             get() = documents?.get("kyc_avatar")
 
@@ -29,7 +33,10 @@ sealed class KycForm(
                   val firstName: String,
                   @SerializedName("last_name")
                   val lastName: String
-    ) : KycForm(null, KEY_GENERAL_ACCOUNT_ROLE) {
+    ) : KycForm(null) {
+        override val roleKey: String
+            get() = KEY_GENERAL_ACCOUNT_ROLE
+
         val avatar: RemoteFile?
             get() = documents?.get(AVATAR_DOCUMENT_KEY)
 
@@ -46,7 +53,11 @@ sealed class KycForm(
      * Empty form to use in case when the original form
      * can't be processed
      */
-    object Empty : KycForm()
+    object Empty : KycForm() {
+        override val roleKey: String
+            get() =
+                throw IllegalArgumentException("You can't use empty form to change role")
+    }
 
     companion object {
         fun fromBlob(blob: Blob): KycForm {

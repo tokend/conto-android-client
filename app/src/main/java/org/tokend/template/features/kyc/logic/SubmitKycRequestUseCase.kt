@@ -96,19 +96,14 @@ class SubmitKycRequestUseCase(
             return Single.just(explicitRoleToSet)
         }
 
-        val roleKey = form.role
+        val roleKey = form.roleKey
 
-        return if (roleKey != null) {
-            repositoryProvider
-                    .keyValueEntries()
-                    .ensureEntries(listOf(roleKey))
-                    .map { it[roleKey] }
-                    .map { it as KeyValueEntryRecord.Number }
-                    .map { it.value }
-        } else {
-            Single.error(
-                    IllegalArgumentException("Unsupported form type ${form.javaClass.name}"))
-        }
+        return repositoryProvider
+                .keyValueEntries()
+                .ensureEntries(listOf(roleKey))
+                .map { it[roleKey] }
+                .map { it as KeyValueEntryRecord.Number }
+                .map { it.value }
     }
 
     private fun uploadFormAsBlob(): Single<String> {
