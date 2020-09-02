@@ -12,10 +12,15 @@ sealed class KycForm(
         @SerializedName("documents")
         var documents: MutableMap<String, RemoteFile>? = mutableMapOf()
 ) {
+    abstract val roleKey: String
+
     class Corporate(documents: MutableMap<String, RemoteFile>,
                     @SerializedName(COMPANY_KEY)
                     val company: String
     ) : KycForm(documents) {
+        override val roleKey: String
+            get() = KEY_CORPORATE_ACCOUNT_ROLE
+
         val avatar: RemoteFile?
             get() = documents?.get("kyc_avatar")
 
@@ -29,6 +34,9 @@ sealed class KycForm(
                   @SerializedName("last_name")
                   val lastName: String
     ) : KycForm(null) {
+        override val roleKey: String
+            get() = KEY_GENERAL_ACCOUNT_ROLE
+
         val avatar: RemoteFile?
             get() = documents?.get(AVATAR_DOCUMENT_KEY)
 
@@ -45,7 +53,11 @@ sealed class KycForm(
      * Empty form to use in case when the original form
      * can't be processed
      */
-    object Empty : KycForm()
+    object Empty : KycForm() {
+        override val roleKey: String
+            get() =
+                throw IllegalArgumentException("You can't use empty form to change role")
+    }
 
     companion object {
         fun fromBlob(blob: Blob): KycForm {
@@ -63,5 +75,8 @@ sealed class KycForm(
                     throw IllegalArgumentException("Unknown KYC form type")
             }
         }
+        private const val KEY_GENERAL_ACCOUNT_ROLE = "account_role:general"
+        private const val KEY_CORPORATE_ACCOUNT_ROLE = "account_role:corporate"
     }
+
 }
