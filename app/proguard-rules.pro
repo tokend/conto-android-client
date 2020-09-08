@@ -44,6 +44,7 @@
 # Wallet
 # Uncomment this if you would like to decode XDRs
 -keep class org.tokend.wallet.xdr.* { *; }
+-dontnote org.tokend.wallet.xdr.*
 
 # General
 -keepattributes SourceFile,LineNumberTable,EnclosingMethod,Exceptions
@@ -63,18 +64,13 @@
 }
 
 # MultiDex
--keep class android.support.multidex.**
+-keep class androidx.multidex.**
 
 # Support library
--keep class android.support.v7.widget.SearchView { *; }
+-keep class androidx.appcompat.widget.SearchView { *; }
 
 # KYC state storage
--keepnames class org.tokend.template.features.kyc.** { *; }
-
-# BottomNavigationView shifting hack
--keepclassmembers class android.support.design.internal.BottomNavigationMenuView {
-    boolean mShiftingMode;
-}
+-keepnames class org.tokend.template.features.kyc.model.** { *; }
 
 # Keep JsonCreator
 -keepclassmembers class * {
@@ -86,3 +82,14 @@
 
 # Balance changes caching
 -keepnames class org.tokend.template.features.history.model.** { *; }
+
+# ProGuard issue
+# https://sourceforge.net/p/proguard/bugs/573/
+-optimizations !class/unboxing/enum
+
+# These classes are used via kotlin reflection and the keep might not be required anymore once Proguard supports
+# Kotlin reflection directly.
+-keep class kotlin.Metadata
+
+# class [META-INF/versions/9/module-info.class] unexpectedly contains class [module-info]
+-dontwarn module-info

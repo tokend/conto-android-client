@@ -2,13 +2,13 @@ package org.tokend.template.features.dashboard.balances.view
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.appbar.*
@@ -246,7 +246,7 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
         Navigator.from(this).openSimpleBalanceDetails(balanceId)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateListColumnsCount()
     }
@@ -257,14 +257,18 @@ open class BalancesFragment : BaseFragment(), ToolbarProvider {
     }
 
     override fun onBackPressed(): Boolean {
-        return if (menu_fab.isOpened) {
-            menu_fab.close(true)
-            false
-        } else if (searchMenuItem?.isActionViewExpanded == true) {
-            searchMenuItem?.collapseActionView()
-            false
-        } else {
-            super.onBackPressed()
+        return when {
+            menu_fab.isOpened -> {
+                menu_fab.close(true)
+                false
+            }
+            searchMenuItem?.isActionViewExpanded == true -> {
+                searchMenuItem?.collapseActionView()
+                false
+            }
+            else -> {
+                super.onBackPressed()
+            }
         }
     }
 

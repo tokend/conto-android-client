@@ -1,8 +1,8 @@
 package org.tokend.template.features.assets.details.refund.view
 
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.fragment_amount_input.*
 import org.tokend.template.R
 import org.tokend.template.extensions.withArguments

@@ -1,19 +1,17 @@
 package org.tokend.template.features.send.recipient.view
 
 import android.Manifest
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SimpleItemAnimator
 import android.text.Editable
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_payment_recipient.*
 import kotlinx.android.synthetic.main.layout_progress.view.*
 import org.jetbrains.anko.enabled
 import org.tokend.template.R
+import org.tokend.template.extensions.clipboardText
 import org.tokend.template.extensions.hasError
 import org.tokend.template.extensions.onEditorAction
 import org.tokend.template.extensions.withArguments
@@ -252,7 +251,7 @@ open class PaymentRecipientFragment : BaseFragment() {
         }
     }
 
-    private fun readRecipient(raw: String): String? {
+    private fun readRecipient(raw: CharSequence): String? {
         val filtered = raw
                 .trim()
                 .split(' ', '\r', '\n')
@@ -422,15 +421,9 @@ open class PaymentRecipientFragment : BaseFragment() {
         }
 
     private fun checkClipboardForRecipient() {
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val content = clipboard.primaryClip
-                ?.takeIf { it.itemCount > 0 }
-                ?.getItemAt(0)
-                ?.text
-                ?.toString()
+        val clipboardText = requireContext().clipboardText
                 ?: return
-
-        recipientSuggestion = readRecipient(content)?.takeIf(String::isNotEmpty)
+        recipientSuggestion = readRecipient(clipboardText)?.takeIf(String::isNotEmpty)
     }
 
     private fun showRecipientAutocompleteIfFocused() {

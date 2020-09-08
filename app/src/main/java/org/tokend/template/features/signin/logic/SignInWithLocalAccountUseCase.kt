@@ -12,14 +12,15 @@ import org.tokend.sdk.keyserver.models.LoginParams
 import org.tokend.sdk.keyserver.models.SignerData
 import org.tokend.sdk.keyserver.models.WalletInfo
 import org.tokend.sdk.utils.extentions.isConflict
-import org.tokend.template.features.keyvalue.model.KeyValueEntryRecord
 import org.tokend.template.di.providers.ApiProvider
 import org.tokend.template.di.providers.RepositoryProvider
+import org.tokend.template.features.keyvalue.model.KeyValueEntryRecord
 import org.tokend.template.features.localaccount.logic.LocalAccountRetryDecryptor
 import org.tokend.template.features.localaccount.model.LocalAccount
 import org.tokend.template.features.userkey.logic.UserKeyProvider
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.credentials.persistence.CredentialsPersistence
+import org.tokend.template.logic.credentials.persistence.WalletInfoPersistence
 import org.tokend.template.util.cipher.DataCipher
 import org.tokend.wallet.Account
 import retrofit2.HttpException
@@ -37,6 +38,7 @@ class SignInWithLocalAccountUseCase(
         userKeyProvider: UserKeyProvider,
         private val session: Session,
         private val credentialsPersistence: CredentialsPersistence?,
+        private val walletInfoPersistence: WalletInfoPersistence?,
         private val apiProvider: ApiProvider,
         private val repositoryProvider: RepositoryProvider,
         private val connectionStateProvider: (() -> Boolean)?,
@@ -93,7 +95,7 @@ class SignInWithLocalAccountUseCase(
 
     private fun getLocalAccount(): Single<LocalAccount> {
         return localAccountRepository
-                .item
+                .presentAccount
                 .toMaybe()
                 .switchIfEmpty(Single.error(IllegalStateException("There is no local account in the repository")))
     }
@@ -159,6 +161,7 @@ class SignInWithLocalAccountUseCase(
 
     private fun updateProviders(): Single<Boolean> {
         session.setWalletInfo(walletInfo)
+        walletInfoPersistence?.clear()
         credentialsPersistence?.clear(false)
         session.setAccount(account)
         session.signInMethod = SignInMethod.LOCAL_ACCOUNT

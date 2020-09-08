@@ -1,7 +1,6 @@
 package org.tokend.template.features.companies.storage
 
-import android.arch.persistence.room.*
-import org.tokend.template.features.assets.model.AssetDbEntity
+import androidx.room.*
 import org.tokend.template.features.companies.model.CompanyDbEntity
 
 @Dao

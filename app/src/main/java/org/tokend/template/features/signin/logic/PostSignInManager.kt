@@ -31,7 +31,7 @@ class PostSignInManager(
      * Updates all important repositories.
      */
     fun doPostSignIn(): Completable {
-        val parallelActions = listOf<Completable>(
+        val parallelActions = listOf(
                 // Added actions will be performed simultaneously.
                 repositoryProvider.activeKyc()
                         .run {

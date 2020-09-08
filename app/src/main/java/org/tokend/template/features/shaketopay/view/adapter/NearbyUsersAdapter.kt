@@ -1,8 +1,8 @@
 package org.tokend.template.features.shaketopay.view.adapter
 
-import android.support.v7.util.DiffUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import org.tokend.template.R
 import org.tokend.template.view.adapter.base.BaseRecyclerAdapter
 

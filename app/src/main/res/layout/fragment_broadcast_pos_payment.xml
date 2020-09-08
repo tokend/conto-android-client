@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context="org.tokend.template.features.shaketopay.view.ShakeToPayActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="-24dp"
@@ -51,7 +51,7 @@
             android:background="@drawable/gradient_background_to_transparent_from_bottom"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/title_text_view"

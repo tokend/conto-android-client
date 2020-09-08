@@ -290,6 +290,7 @@ open class UnlockAppFragment : BaseFragment() {
                 apiProvider.getKeyServer(),
                 session,
                 credentialsPersistence,
+                walletInfoPersistence,
                 getPostSignInManager()?.let { it::doPostSignIn }
         )
                 .perform()

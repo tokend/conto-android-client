@@ -7,13 +7,13 @@ import android.content.res.Configuration
 import android.graphics.drawable.Animatable
 import android.location.Location
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.GridLayoutManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.view.animation.RotateAnimation
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -228,7 +228,7 @@ class ShakeToPayActivity : BaseActivity() {
         locationBroadcastDisposable = IntervalPoller(
                 minInterval = LOCATION_SEND_INTERVAL_MS,
                 timeUnit = TimeUnit.MILLISECONDS,
-                deferredDataSource = Single.defer<List<NearbyUserRecord>> {
+                deferredDataSource = Single.defer {
                     val lastLocation = this.lastLocation
                             ?: return@defer Single.error(IllegalStateException("No location yet"))
 
@@ -307,7 +307,7 @@ class ShakeToPayActivity : BaseActivity() {
         layoutManager.spanCount = ColumnCalculator.getColumnCount(this, maxWidth)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateListColumnsCount()
     }

@@ -1,15 +1,15 @@
 package org.tokend.template.features.wallet.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.drawable.DrawableCompat
-import android.support.v4.widget.NestedScrollView
-import android.support.v7.view.ContextThemeWrapper
-import android.support.v7.widget.GridLayout
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.widget.NestedScrollView
+import androidx.gridlayout.widget.GridLayout
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_simple_balance_details.*

@@ -1,10 +1,10 @@
 package org.tokend.template.features.nfcpayment.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.Toolbar
 import android.view.Gravity
 import android.widget.ImageView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_user_flow.*
@@ -92,7 +92,7 @@ class NfcPaymentActivity : BaseActivity() {
     }
 
     private fun canProcessPaymentRequest(): Boolean {
-        return credentialsPersistence.hasSimpleCredentials()
+        return credentialsPersistence.hasCredentials()
     }
 
     private fun toPaymentRequestLoading() {

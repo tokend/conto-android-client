@@ -1,7 +1,7 @@
 package org.tokend.template.features.assets.details.view
 
 import android.content.Context
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 import org.tokend.template.R
 import org.tokend.template.features.assets.details.refund.view.AssetRefundFragment
 import org.tokend.template.features.assets.details.secondarymarket.view.AssetSecondaryMarketFragment

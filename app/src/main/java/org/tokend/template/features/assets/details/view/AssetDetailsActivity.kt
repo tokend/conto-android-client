@@ -1,7 +1,7 @@
 package org.tokend.template.features.assets.details.view
 
 import android.os.Bundle
-import android.support.design.widget.TabLayout
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.appbar_with_tabs.*
 import kotlinx.android.synthetic.main.fragment_pager.*
 import kotlinx.android.synthetic.main.toolbar.*

@@ -12,17 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/details_list"
                 style="@style/LimitedMatchParentWidthConstraint"
                 android:clipToPadding="false"
-                android:paddingBottom="@dimen/standard_margin" />
+                android:paddingBottom="@dimen/standard_margin"
+                tools:ignore="MissingConstraints" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include layout="@layout/include_appbar_elevation" />
 

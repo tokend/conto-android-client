@@ -1,14 +1,13 @@
 package org.tokend.template.view.util
 
-import android.support.transition.Fade
-import android.support.transition.TransitionManager
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,7 +36,7 @@ class MenuSearchViewManager(
     private val queryChangesSubject = PublishSubject.create<String>()
 
     init {
-        (searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text) as? EditText)
+        (searchView.findViewById(androidx.appcompat.R.id.search_src_text) as? EditText)
                 ?.apply {
                     setHintTextColor(ContextCompat.getColor(context!!, R.color.secondary_text))
                     setTextColor(ContextCompat.getColor(context!!, R.color.primary_text))

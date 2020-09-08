@@ -1,11 +1,11 @@
 package org.tokend.template.view.balancechange
 
 import android.annotation.SuppressLint
-import android.support.design.widget.AppBarLayout
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import com.google.android.material.appbar.AppBarLayout
 import org.jetbrains.anko.childrenSequence
 import org.jetbrains.anko.dip
 import org.tokend.template.R

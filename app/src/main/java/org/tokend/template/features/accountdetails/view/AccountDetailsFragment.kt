@@ -1,12 +1,12 @@
 package org.tokend.template.features.accountdetails.view
 
 import android.os.Bundle
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.activity_share_qr.*
 import org.tokend.template.App
 import org.tokend.template.R

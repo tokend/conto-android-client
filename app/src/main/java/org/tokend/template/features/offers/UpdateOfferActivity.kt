@@ -1,9 +1,9 @@
 package org.tokend.template.features.offers
 
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_create_offer.*
 import org.tokend.template.R
@@ -42,8 +42,8 @@ class UpdateOfferActivity : CreateOfferActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.cancel_offer -> confirmOfferCancellation()
         }
         return super.onOptionsItemSelected(item)

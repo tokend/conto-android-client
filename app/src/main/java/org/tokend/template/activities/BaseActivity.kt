@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.WindowManager
 import io.reactivex.disposables.CompositeDisposable
@@ -28,6 +28,7 @@ import org.tokend.template.features.tfa.view.TfaDialogFactory
 import org.tokend.template.features.urlconfig.model.UrlConfig
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.credentials.persistence.CredentialsPersistence
+import org.tokend.template.logic.credentials.persistence.WalletInfoPersistence
 import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.util.ConnectionStateUtil
 import org.tokend.template.util.ObservableTransformers
@@ -54,6 +55,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     lateinit var repositoryProvider: RepositoryProvider
     @Inject
     lateinit var credentialsPersistence: CredentialsPersistence
+    @Inject
+    lateinit var walletInfoPersistence: WalletInfoPersistence
     @Inject
     lateinit var urlConfigProvider: UrlConfigProvider
     @Inject
@@ -206,8 +209,8 @@ abstract class BaseActivity : AppCompatActivity(), TfaCallback {
     }
     // endregion
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
             onBackPressed()
         }
         return super.onOptionsItemSelected(item)

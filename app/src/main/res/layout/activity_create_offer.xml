@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".features.offers.CreateOfferActivity">
+    tools:context=".features.offers.CreateOfferActivity"
+    tools:ignore="MissingConstraints">
 
     <include layout="@layout/appbar" />
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
         style="@style/LimitedMatchParentWidthConstraint"
         app:layout_constraintTop_toBottomOf="@id/appbar"
@@ -133,14 +134,14 @@
                 android:paddingBottom="@dimen/half_standard_margin"
                 android:visibility="gone">
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/single_buy_btn"
                     style="@style/PrimaryButton.Rounded"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/buy_action" />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/single_sell_btn"
                     style="@style/PrimaryButton.Rounded"
                     android:layout_width="wrap_content"
@@ -155,7 +156,7 @@
                 android:layout_marginTop="@dimen/standard_padding"
                 android:orientation="horizontal">
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/sell_btn"
                     style="@style/PrimaryButton"
                     android:layout_width="0dp"
@@ -166,7 +167,7 @@
                     android:text="@string/sell_action"
                     android:textAllCaps="true" />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buy_btn"
                     style="@style/PrimaryButton"
                     android:layout_width="0dp"
@@ -212,7 +213,7 @@
 
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -222,4 +223,4 @@
         <include layout="@layout/include_appbar_elevation" />
     </FrameLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

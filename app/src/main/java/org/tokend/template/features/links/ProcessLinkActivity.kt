@@ -1,7 +1,7 @@
 package org.tokend.template.features.links
 
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
+import androidx.core.app.ActivityCompat
 import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.rxkotlin.addTo

@@ -1,15 +1,15 @@
 package org.tokend.template.view
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 
 /**
  * Adapter for named pages with IDs
  */
 abstract class BaseFragmentPagerAdapter(
         fragmentManager: FragmentManager
-): FragmentPagerAdapter(fragmentManager) {
+): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
     data class Page(
             val content: Fragment,
             val title: String,
@@ -18,8 +18,8 @@ abstract class BaseFragmentPagerAdapter(
 
     abstract val pages: List<Page>
 
-    override fun getItem(position: Int): Fragment? {
-        return pages.getOrNull(position)?.content
+    override fun getItem(position: Int): Fragment {
+        return pages.getOrNull(position)!!.content
     }
 
     override fun getPageTitle(position: Int): CharSequence {

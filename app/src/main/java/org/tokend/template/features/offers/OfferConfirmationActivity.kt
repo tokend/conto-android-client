@@ -3,10 +3,10 @@ package org.tokend.template.features.offers
 import android.app.Activity
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.LinearLayoutManager
 import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_balance_change_confirmation.*
 import kotlinx.android.synthetic.main.appbar_with_balance_change_main_data.*
@@ -21,8 +21,8 @@ import org.tokend.template.features.offers.logic.ConfirmOfferRequestUseCase
 import org.tokend.template.features.offers.model.OfferRecord
 import org.tokend.template.features.offers.model.OfferRequest
 import org.tokend.template.logic.TxManager
-import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.balancechange.BalanceChangeMainDataView
 import org.tokend.template.view.details.DetailsItem
 import org.tokend.template.view.details.ExtraViewProvider

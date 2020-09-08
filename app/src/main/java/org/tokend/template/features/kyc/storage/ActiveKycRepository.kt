@@ -29,7 +29,7 @@ class ActiveKycRepository(
         get() = itemFormData is KycForm.General
                 || forcedType == ForcedAccountType.GENERAL
 
-    override fun getItem(): Maybe<ActiveKyc> {
+    override fun getItem(): Single<ActiveKyc> {
         return getAccount()
                 .flatMap { account ->
                     if (account.kycBlob != null)
@@ -37,7 +37,6 @@ class ActiveKycRepository(
                     else
                         Single.just(ActiveKyc.Missing)
                 }
-                .toMaybe()
     }
 
     private fun getAccount(): Single<AccountRecord> {

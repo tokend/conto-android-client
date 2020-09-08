@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/ImpressiveCard"
@@ -73,7 +73,7 @@
                     android:paddingStart="@dimen/half_standard_margin"
                     android:paddingEnd="@dimen/half_standard_margin">
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="19dp"
                         android:layout_height="19dp"
                         android:tint="@color/white"
@@ -122,4 +122,4 @@
             android:minWidth="0dp"
             android:text="@string/buy_action" />
     </LinearLayout>
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

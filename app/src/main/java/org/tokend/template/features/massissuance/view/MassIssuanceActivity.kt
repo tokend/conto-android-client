@@ -2,7 +2,7 @@ package org.tokend.template.features.massissuance.view
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.text.Editable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo

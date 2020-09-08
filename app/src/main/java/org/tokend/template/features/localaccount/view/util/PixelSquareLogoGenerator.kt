@@ -1,7 +1,7 @@
 package org.tokend.template.features.localaccount.view.util
 
 import android.graphics.*
-import android.support.v4.util.LruCache
+import androidx.collection.LruCache
 import org.tokend.sdk.utils.extentions.encodeHexString
 import org.tokend.wallet.utils.Hashing
 import kotlin.math.abs
@@ -43,7 +43,7 @@ class PixelSquareLogoGenerator {
     private fun drawSide(colorMatrix: List<List<Int>>,
                          cellSizePx: Int): Bitmap {
         val width = colorMatrix.size
-        val height = colorMatrix.minBy(Collection<*>::size)?.size
+        val height = colorMatrix.minByOrNull(Collection<*>::size)?.size
                 ?: throw IllegalArgumentException("Side rows can't be empty")
 
         val bitmap = Bitmap.createBitmap(

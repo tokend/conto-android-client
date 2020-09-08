@@ -2,7 +2,7 @@ package org.tokend.template.features.assets.buy.view
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
 import io.reactivex.disposables.Disposable
@@ -246,8 +246,8 @@ class BuyAssetOnMarketplaceActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.asset_details -> openAssetDetails()
         }
         return super.onOptionsItemSelected(item)

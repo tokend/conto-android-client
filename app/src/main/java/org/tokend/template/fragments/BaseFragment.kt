@@ -2,7 +2,7 @@ package org.tokend.template.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.View
 import io.reactivex.disposables.CompositeDisposable
 import org.tokend.template.App
@@ -15,6 +15,7 @@ import org.tokend.template.features.signin.logic.PostSignInManagerFactory
 import org.tokend.template.features.tfa.logic.AppTfaCallback
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.credentials.persistence.CredentialsPersistence
+import org.tokend.template.logic.credentials.persistence.WalletInfoPersistence
 import org.tokend.template.logic.persistence.BackgroundLockManager
 import org.tokend.template.util.errorhandler.ErrorHandlerFactory
 import org.tokend.template.util.navigation.ActivityRequest
@@ -51,6 +52,8 @@ abstract class BaseFragment : Fragment(), OnBackPressedListener {
     lateinit var session: Session
     @Inject
     lateinit var credentialsPersistence: CredentialsPersistence
+    @Inject
+    lateinit var walletInfoPersistence: WalletInfoPersistence
     @Inject
     lateinit var activeKycPersistence: ActiveKycPersistence
     @Inject

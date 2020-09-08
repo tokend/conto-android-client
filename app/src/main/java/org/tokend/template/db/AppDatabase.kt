@@ -1,23 +1,23 @@
 package org.tokend.template.db
 
-import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
-import android.arch.persistence.room.TypeConverter
-import android.arch.persistence.room.TypeConverters
-import android.arch.persistence.room.migration.Migration
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
 import org.tokend.sdk.utils.BigDecimalUtil
 import org.tokend.template.features.assets.model.Asset
-import org.tokend.template.features.assets.model.SimpleAsset
-import org.tokend.template.features.history.storage.BalanceChangeDbEntity
-import org.tokend.template.features.history.storage.BalanceChangesDao
 import org.tokend.template.features.assets.model.AssetDbEntity
+import org.tokend.template.features.assets.model.SimpleAsset
 import org.tokend.template.features.assets.storage.AssetsDao
 import org.tokend.template.features.balances.model.BalanceDbEntity
 import org.tokend.template.features.balances.storage.BalancesDao
 import org.tokend.template.features.companies.model.CompanyDbEntity
 import org.tokend.template.features.companies.storage.CompaniesDao
+import org.tokend.template.features.history.storage.BalanceChangeDbEntity
+import org.tokend.template.features.history.storage.BalanceChangesDao
 import java.math.BigDecimal
 import java.util.*
 

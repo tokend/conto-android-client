@@ -46,7 +46,7 @@ class QrGenerator {
             try {
                 generateQrBitmap(content, maxSize).toSingle()
             } catch (e: Exception) {
-                Single.error<Bitmap>(e)
+                Single.error(e)
             }
         }
     }

@@ -1,7 +1,7 @@
 package org.tokend.template.features.companies.view
 
 import android.content.Context
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 import org.tokend.template.R
 import org.tokend.template.view.BaseFragmentPagerAdapter
 
@@ -21,8 +21,8 @@ class CompaniesPagerAdapter(context: Context,
             )
     )
 
-    override fun getItem(position: Int): CompaniesListFragment? {
-        return super.getItem(position) as? CompaniesListFragment
+    override fun getItem(position: Int): CompaniesListFragment {
+        return super.getItem(position) as CompaniesListFragment
     }
 
     companion object {

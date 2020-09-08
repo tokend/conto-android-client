@@ -3,8 +3,8 @@ package org.tokend.template.features.settings.phonenumber.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.text.Editable
+import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.credentials.Credential
 import com.google.android.gms.auth.api.credentials.HintRequest

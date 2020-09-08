@@ -3,7 +3,7 @@ package org.tokend.template.features.redeem.logic
 import android.nfc.cardemulation.HostApduService
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import org.tokend.sdk.utils.extentions.decodeHex
 import org.tokend.template.features.redeem.logic.NfcRedemptionService.Companion.broadcast
 import org.tokend.template.features.redeem.logic.NfcRedemptionService.Companion.cancelBroadcast

@@ -3,8 +3,8 @@ package org.tokend.template.features.nfcpayment.logic
 import android.nfc.cardemulation.HostApduService
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.util.Log
+import androidx.annotation.RequiresApi
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo

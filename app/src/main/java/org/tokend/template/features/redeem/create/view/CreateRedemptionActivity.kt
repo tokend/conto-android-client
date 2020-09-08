@@ -1,7 +1,7 @@
 package org.tokend.template.features.redeem.create.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -55,7 +55,6 @@ class CreateRedemptionActivity : BaseActivity() {
         val fragment = RedemptionAmountInputFragment.newInstance(requestedAssetCode)
         fragment
                 .resultObservable
-                .map { it as AmountInputResult }
                 .compose(ObservableTransformers.defaultSchedulers())
                 .subscribeBy(
                         onNext = this::onAmountEntered,

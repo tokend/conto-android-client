@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:paddingTop="0dp"
     app:behavior_peekHeight="68dp"
-    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+    app:layout_behavior="@string/bottom_sheet_behavior">
 
     <include layout="@layout/include_rounded_elevated_bottom_sheet_header" />
 

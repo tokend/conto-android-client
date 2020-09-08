@@ -1,7 +1,7 @@
 package org.tokend.template.features.invest.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -307,8 +307,8 @@ class SaleInvestActivity : BaseActivity(), InvestmentInfoHolder {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.help -> openHelpDialog()
         }
         return super.onOptionsItemSelected(item)

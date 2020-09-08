@@ -6,8 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.content.FileProvider
-import android.support.v7.widget.Toolbar
+import androidx.core.content.FileProvider
+import androidx.appcompat.widget.Toolbar
 import android.view.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -59,7 +59,7 @@ open class ShareQrFragment : BaseFragment(), ToolbarProvider {
         }
     }
 
-    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create<Toolbar>()
+    override val toolbarSubject: BehaviorSubject<Toolbar> = BehaviorSubject.create()
 
     open val title: String
         get() = arguments?.getString(TITLE_EXTRA) ?: ""

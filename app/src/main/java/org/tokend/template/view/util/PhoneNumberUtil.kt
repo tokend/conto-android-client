@@ -7,7 +7,7 @@ object PhoneNumberUtil {
      *
      * Sample: +38 (095) 398-44-11 -> +380953984411
      */
-    fun getCleanGlobalNumber(phoneNumber: String): String {
+    fun getCleanGlobalNumber(phoneNumber: CharSequence): String {
         return "+" + phoneNumber
                 .mapNotNull { it.takeIf(Char::isDigit) }
                 .joinToString("")

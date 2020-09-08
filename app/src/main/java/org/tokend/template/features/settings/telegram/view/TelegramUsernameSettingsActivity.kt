@@ -1,9 +1,9 @@
 package org.tokend.template.features.settings.telegram.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.InputFilter
+import androidx.core.content.ContextCompat
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_telegram_username_setting.*

@@ -10,12 +10,12 @@ import org.tokend.sdk.keyserver.models.WalletCreateResult
 import org.tokend.sdk.utils.extentions.bitmask
 import org.tokend.sdk.utils.extentions.decodeHex
 import org.tokend.sdk.utils.extentions.encodeHexString
-import org.tokend.template.features.urlconfig.model.UrlConfig
-import org.tokend.template.features.systeminfo.storage.SystemInfoRepository
 import org.tokend.template.di.providers.*
 import org.tokend.template.features.assets.logic.CreateBalanceUseCase
 import org.tokend.template.features.signin.logic.PostSignInManager
 import org.tokend.template.features.signin.logic.SignInUseCase
+import org.tokend.template.features.systeminfo.storage.SystemInfoRepository
+import org.tokend.template.features.urlconfig.model.UrlConfig
 import org.tokend.template.logic.Session
 import org.tokend.template.logic.TxManager
 import org.tokend.wallet.PublicKeyFactory
@@ -51,6 +51,7 @@ object Util {
                 password,
                 apiProvider.getKeyServer(),
                 session,
+                null,
                 null,
                 repositoryProvider?.let { repositoryProvider ->
                     PostSignInManager(apiProvider, session, session, repositoryProvider)::doPostSignIn

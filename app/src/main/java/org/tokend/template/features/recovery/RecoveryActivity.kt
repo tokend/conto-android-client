@@ -246,6 +246,7 @@ class RecoveryActivity : BaseActivity() {
                 KeyServer(apiProvider.getApi().wallets),
                 session,
                 credentialsPersistence,
+                walletInfoPersistence,
                 postSignInManagerFactory.get()::doPostSignIn
         )
                 .perform()

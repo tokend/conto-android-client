@@ -1,10 +1,10 @@
 package org.tokend.template.features.assets.buy.view
 
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.fragment_amount_input.*
 import kotlinx.android.synthetic.main.include_text_view_spinner_for_centering.view.*
 import kotlinx.android.synthetic.main.layout_atomic_swap_quote_asset_selection.view.*

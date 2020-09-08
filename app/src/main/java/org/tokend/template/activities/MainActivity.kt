@@ -4,13 +4,13 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.github.tbouron.shakedetector.library.ShakeDetector
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -48,11 +48,12 @@ import org.tokend.template.features.withdraw.WithdrawFragment
 import org.tokend.template.features.withdraw.model.WithdrawalRequest
 import org.tokend.template.fragments.ToolbarProvider
 import org.tokend.template.logic.WalletEventsListener
-import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.util.ObservableTransformers
 import org.tokend.template.util.ProfileUtil
+import org.tokend.template.util.navigation.Navigator
 import org.tokend.template.view.util.PicassoDrawerImageLoader
 import org.tokend.template.view.util.input.SoftInputUtil
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 open class MainActivity : BaseActivity(), WalletEventsListener {
@@ -99,7 +100,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
         val email = walletInfoProvider.getWalletInfo()?.email
                 ?: throw IllegalStateException("No email found")
 
-        val placeholderValue = email.toUpperCase()
+        val placeholderValue = email.toUpperCase(Locale.ENGLISH)
         val placeholderSize =
                 resources.getDimensionPixelSize(R.dimen.material_drawer_item_profile_icon_width)
         val placeholderBackground =
@@ -467,7 +468,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
                 .addTo(compositeDisposable)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateDrawerVisibility()
     }
@@ -488,7 +489,7 @@ open class MainActivity : BaseActivity(), WalletEventsListener {
 
     override fun onResume() {
         super.onResume()
-        ShakeDetector.start();
+        ShakeDetector.start()
     }
 
     override fun onStop() {

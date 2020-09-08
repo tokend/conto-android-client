@@ -1,8 +1,8 @@
 package org.tokend.template.features.clients.details.movements.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_company_client_movements.*
 import kotlinx.android.synthetic.main.include_appbar_elevation.*
